@@ -13,7 +13,7 @@ func main() {
 	// 	where season = ?
 	// 	and team = ?
 	// `
-	resp, err := mariadb.DBJSONResposne(db, "select * from season_totals")
+	resp, err := mariadb.DBJSONResposne(db, "select * from season_avgs")
 	if err != nil {
 		fmt.Printf("Error occured querying db: %v\n", err)
 	}
