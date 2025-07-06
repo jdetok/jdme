@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>jdeko nba!</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="./css/nba.css">
+    <script src="./js/bball.js"></script>
+  </head>
+  <header>
+    <div class="goback">
+      <a href="index.html">go back</a>
+    </div>
+    <div class="disclaimer">
+      <a class="transpar" href="https://www.nba.com/stats" target="_blank">
+        NO AFFILIATION WITH THE NBA</a>
+    </div>
+    <div class="center">
+        <a href="nba-info.html">Learn More about this Site</a>
+    </div>
+  </header>
+
+  <body>    
+    <div class="intro">
+      <h4>all data owned by and sourced from the NBA (<i>
+        <a class="transpar" href="https://www.nba.com/stats" target="_blank">
+        National Basketball Association</a></i>)
+      </h4>
+      <h1>NBA/WNBA Statistics</h1>
+    </div>
+    
+   <!-- SELECTORS -->
+    <div class="ui"><form id="ui">
+      <div class="modes">
+        <div class="mode">
+          <label for="lg-slct">stats by league:</label>
+          <select class="slct" id="lg-slct">
+            <option value="nba">NBA</option>
+            <option value="wnba">WNBA</option>
+            <option value="all">NBA/WNBA</option>
+          </select>
+        </div>
+        <div class="mode">
+          <label for="team-slct">stats by team:</label>
+          <select class="slct" id="team-slct">
+            <option value="all">any team</option>
+          </select>
+        </div>
+        <div class="mode">
+          <label for="szn-slct">stats by season:</label>
+          <select class="slct" id="szn-slct">
+            <option value="all">any season</option>
+          </select>
+        </div>
+      </div>
+      <div class="btns">
+        <div class="btn">
+          <button id="search" type="submit">search</button>
+        </div>
+        <div class="btn">
+          <button id="randP">random player</button>
+        </div>
+        <div class="btn">
+          <button id="randT">random team</button>
+        </div>
+        <div class="btn">
+          <button id="randS">random season</button>
+        </div>
+        <div class="btn">
+          <button id="reset" type="submit">reset</button>
+        </div>
+      </div>
+    </form></div>
+    <div id="main">
+      <div id="recent-games">
+        <h3>games played on --date--</h3>
+      </div>
+      <div id="top-scorer">
+        <h3>top scorer from --date--</h3>
+        <img src="lksdjflskjdf" alt="top scorer's headshot">
+      </div>
+    </div>
+  </body>
+</html>

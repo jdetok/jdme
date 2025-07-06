@@ -22,7 +22,7 @@ import (
 */
 // SERVE MAIN NBA PAGES
 var nbaPath string = (env.GetString("STATIC_PATH") + "/nba.html")
-var nbaDevPath string = (env.GetString("STATIC_PATH") + "/dev/nba.html")
+var nbaDevPath string = (env.GetString("DEV_PATH") + "/nba.html")
 
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)

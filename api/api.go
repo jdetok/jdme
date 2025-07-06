@@ -48,8 +48,8 @@ func (app *application) mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 // ENDPOINTS 06/19
+	mux.HandleFunc("GET /devl/bball", app.bballDevHandler)
 	mux.HandleFunc("GET /bball", app.bballHandler)
-	mux.HandleFunc("GET /dev/bball", app.bballDevHandler)
 	mux.HandleFunc("GET /bball/players", app.getStats)
 	mux.HandleFunc("GET /bball/players/id", app.getPlayerId)
 	mux.HandleFunc("GET /bball/players/random", app.getRandPlayer)
@@ -57,8 +57,13 @@ func (app *application) mount() *http.ServeMux {
 	mux.HandleFunc("GET /bball/teams", app.getTeams)
 
 // SERVES STATIC SITE IN WEB DIRECTORY, DON'T CACHE JS & CSS
+	// mux.Handle("/devl/", http.HandlerFunc(app.devHandler))	
+	
+	// mux.HandleFunc("/dev", app.devHandler)
+	mux.Handle("/devl/", http.HandlerFunc(app.devHandler))	
 	mux.Handle("/js/", http.HandlerFunc(app.jsNoCache))
 	mux.Handle("/css/", http.HandlerFunc(app.cssNoCache))
+	// mux.Handle("/devl/css/", http.HandlerFunc(app.cssDevNoCache))
 	mux.HandleFunc("/", app.rootHandler)
 	
 // call app.mount() to get mux then app.run(mux) to run server
