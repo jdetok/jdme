@@ -1,0 +1,31 @@
+/* HEADER SECTION */
+.disclaimer {
+    text-align: right;   
+    color: rgba(240, 111, 111, 0.822);   
+}
+
+.modes {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    align-items: center;
+    width: 80%;
+    max-width: 100%;
+}
+
+.modes > .mode {
+    text-align: center;
+    color: red;
+}
+
+/* INTRO SECTION */
+
+/* MODE SELECTORS SECTION
+- add in links to different pages like leaderboards, player, etc
+*/
+
+/* DEFAULT DASHBOARD SECTION ON LOAD
+- make reusable classes for tables/pictures
+*/
+
+/* TABLES
