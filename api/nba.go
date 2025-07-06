@@ -14,6 +14,27 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/internal/store"
 )
 
+/* TODO
+- ENDPOINT: MOST RECENT DATE WITH GAME(S)
+-- highest scoring player's id for headshot
+
+- ENDPOINT: CURRENT LEAGUE RECORDS
+*/
+// SERVE MAIN NBA PAGES
+var nbaPath string = (env.GetString("STATIC_PATH") + "/nba.html")
+var nbaDevPath string = (env.GetString("STATIC_PATH") + "/dev/nba.html")
+
+func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
+	logs.LogHTTP(r)
+	http.ServeFile(w, r, nbaPath)
+}
+
+func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) {
+	logs.LogHTTP(r)
+	http.ServeFile(w, r, nbaDevPath)
+}
+
+// FOR SEASONS SELECTOR - CALLED ON PAGE LOAD
 func (app *application) getSeasons(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	season := r.URL.Query().Get("szn")
@@ -31,7 +52,7 @@ func (app *application) getSeasons(w http.ResponseWriter, r *http.Request) {
 	}	
 }
 
-// /teams for all or /teams?team=LAL for specifc team
+// FOR TEAMS SELECTOR - CALLED ON PAGE LOAD
 func (app *application) getTeams(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	team := r.URL.Query().Get("team")
@@ -48,7 +69,8 @@ func (app *application) getTeams(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application) getRandomPlayer(w http.ResponseWriter, r *http.Request) {
+// RANDOM PLAYER BUTTON
+func (app *application) getRandPlayer(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	numPlayers := len(app.players)
 	randNum := rand.IntN(numPlayers)
@@ -62,6 +84,7 @@ func (app *application) getRandomPlayer(w http.ResponseWriter, r *http.Request) 
 	// random number in range of len(players) to return random player
 }
 
+// CALLED BY JS TO GET PLAYER'S HEADSHOT (DEPRECATE, USE ONE CALL)
 func (app *application) getPlayerId(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	player := r.URL.Query().Get("player")
@@ -75,7 +98,7 @@ func (app *application) getPlayerId(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// RETURN CONTENTS OF JSON FILE AS []byte
+// USED TO READ STATS FROM JSON FILES IN getStats FUNC
 func respFromFile(w *http.ResponseWriter, f string) []byte {
 	e := errs.ErrInfo{Prefix: "json file read"}
 	js, err := jsonops.ReadJSON(env.GetString("CACHE_PATH") + f)
@@ -86,9 +109,11 @@ func respFromFile(w *http.ResponseWriter, f string) []byte {
 	return js
 }
 
-// HANDLE /bball/players REQUESTS
-// EX. QUERY STRING - ALL PLAYERS: ?lg=nba&stype=tot&player=all
-// EX. QUERY STRING - SPECIFIC PLAYER: ?lg=nba&stype=avg&player=tyrese%20haliburton
+/* 
+HANDLE /bball/players REQUESTS
+EX. ALL PLAYERS: ?lg=nba&stype=tot&player=all
+EX. SPECIFIC PLAYER: ?lg=nba&stype=avg&player=tyrese%20haliburton
+*/
 func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 
@@ -142,7 +167,8 @@ func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 				app.JSONWriter(w, js)
 			default: // SPECIFIC WNBA PLAYER AVERAGES
 				playerId := store.SearchPlayers(app.players, player)
-				js := mariadb.SelectLgPlayer(app.database, &w, mariadb.LgPlayerAvg.Q, lg, string(playerId))
+				js := mariadb.SelectLgPlayer(app.database, &w, 
+					mariadb.LgPlayerAvg.Q, lg, string(playerId))
 				app.JSONWriter(w, js)
 			}
 		}

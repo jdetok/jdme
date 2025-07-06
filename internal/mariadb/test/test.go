@@ -13,12 +13,27 @@ func main() {
 	// 	where season = ?
 	// 	and team = ?
 	// `
-	resp, err := mariadb.DBJSONResposne(db, "select * from season_avgs")
+
+	rows, cols, err := mariadb.Select(db, "select * from career_avgs")
 	if err != nil {
-		fmt.Printf("Error occured querying db: %v\n", err)
+		fmt.Printf("Error occured querying db: %v\n", err) 
+	}
+	
+	resp, err := mariadb.ProcessRows(rows, cols)
+	fmt.Println(resp)
+
+	js, err := mariadb.RowsToJSON(rows, false)
+	if err != nil {
+		fmt.Printf("Error with rows to json function: %v\n", err) 
 	}
 
-	fmt.Println(string(resp))
+	fmt.Println(string(js))
+	// resp, err := mariadb.DBJSONResposne(db, "select * from career_avgs")
+	// if err != nil {
+	// 	fmt.Printf("Error occured querying db: %v\n", err)
+	// }
+
+	// fmt.Println(string(resp))
 
 	// var data any
 	// json.Unmarshal(resp, &data)

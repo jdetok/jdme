@@ -46,14 +46,13 @@ func (app *application) run(mux *http.ServeMux) error {
 // returns type ServeMux for a router
 func (app *application) mount() *http.ServeMux {
 	mux := http.NewServeMux()
-	
-// DEV ENDPOINTS 07/04
-	mux.HandleFunc("GET /bball/leaders", app.getLeaders)
 
 // ENDPOINTS 06/19
+	mux.HandleFunc("GET /bball", app.bballHandler)
+	mux.HandleFunc("GET /dev/bball", app.bballDevHandler)
 	mux.HandleFunc("GET /bball/players", app.getStats)
 	mux.HandleFunc("GET /bball/players/id", app.getPlayerId)
-	mux.HandleFunc("GET /bball/players/random", app.getRandomPlayer)
+	mux.HandleFunc("GET /bball/players/random", app.getRandPlayer)
 	mux.HandleFunc("GET /bball/seasons", app.getSeasons)
 	mux.HandleFunc("GET /bball/teams", app.getTeams)
 
@@ -62,7 +61,7 @@ func (app *application) mount() *http.ServeMux {
 	mux.Handle("/css/", http.HandlerFunc(app.cssNoCache))
 	mux.HandleFunc("/", app.rootHandler)
 	
-// return mux instance - call app.mount() to get mux then app.run(mux) to run server
+// call app.mount() to get mux then app.run(mux) to run server
 	return mux
 }
 
