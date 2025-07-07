@@ -10,6 +10,28 @@ type Query struct {
 type Queries struct {
 	DbQueries []Query
 }
+
+var RecentGames = Query{
+	Q:
+	`
+	select a.game_id, a.game_date, a.final, a.ot 
+	from game a
+	where a.game_date = 
+	(select max(z.game_date)
+	from game z)
+	`,
+}
+
+var TopScorer = Query{
+	Q:
+	`
+	select * 
+	from top_scorers 
+	order by points desc, (assists + rebounds + steals + blocks) desc 
+	limit 1;
+	`,
+}
+
 var Test = Query {
 	Q: `
 select 

@@ -10,12 +10,27 @@ body {
     margin: 0 auto;
 }
 
+body > div, form {
+    border: 1px solid black;
+}
+
+div > div {
+    border: 1px dashed black;
+}
+
+div > div > div {
+    border: 1px dashed red;
+}
+
+
 /* MODE SELECTORS SECTION
 - add in links to different pages like leaderboards, player, etc
 */
 
 .ui {
+    margin: 0 auto;
     margin-top: 20px;
+    max-width: fit-content;
 }
 
 .modes {
@@ -51,7 +66,9 @@ body {
     flex-direction: row;
     flex-wrap: wrap;
     max-width: 80%;
+    align-content: center;
     justify-content: center;
+    align-items: center;
     margin: 0 auto;
     gap: 20px;
     margin-top: 15px;
@@ -59,41 +76,80 @@ body {
 
 .btn {
     font-size: 22px;
+    align-content: center;
 }
 
 /* DEFAULT DASHBOARD SECTION ON LOAD
 - make reusable classes for tables/pictures
 */
 
-#main {
+.main {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    max-width: 80%;
+    max-width: 90%;
+    /* width: fit-content; */
     justify-content: center;
     margin: 0 auto;
     gap: 20px;
     margin-top: 15px;
 }
 
-#recent-games {
-    font-size: 16;
+.sect {
+    display: table;
+    vertical-align: middle;
 }
 
-#top-scorer {
+.sect-title {
+    display: table-row;
+    font-size: 32px;
+}
+
+.sect-row {
+    display: table-row;
+}
+
+.sect-table {
+    display: table-cell;
+}
+
+table {
+    border: 3px solid black;
+}
+
+table tr th,
+table tr td {
+    border: 1px solid black;
+}
+
+.sect-img {
+    display: table-cell;
+    display: table;
+    max-width: 30%;
+}
+.sect-img img {
+    width: 400px;
+    height: auto;
+}
+
+/* #recent-games {
+    font-size: 16;
+} */
+
+/* #top-scorer {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 20px;
-    max-width: 40%;
-}
+    max-width: 30%;
+} */
 
-#top-scorer.img {
-    width: 100%;
+/* #top-scorer img {
+    max-width: 30%;
     height: auto;
     display: block;
-}
+} */
 
 
 

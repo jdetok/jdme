@@ -49,12 +49,14 @@ func (app *application) mount() *http.ServeMux {
 
 // ENDPOINTS 06/19
 	mux.HandleFunc("GET /devl/bball", app.bballDevHandler)
-	mux.HandleFunc("GET /bball", app.bballHandler)
+	mux.HandleFunc("GET /bball/games/recent", app.getGamesRecent)
+	mux.HandleFunc("GET /bball/games/recent/top-scorer", app.getTopScorer)
 	mux.HandleFunc("GET /bball/players", app.getStats)
 	mux.HandleFunc("GET /bball/players/id", app.getPlayerId)
 	mux.HandleFunc("GET /bball/players/random", app.getRandPlayer)
 	mux.HandleFunc("GET /bball/seasons", app.getSeasons)
 	mux.HandleFunc("GET /bball/teams", app.getTeams)
+	mux.HandleFunc("GET /bball", app.bballHandler)
 
 // SERVES STATIC SITE IN WEB DIRECTORY, DON'T CACHE JS & CSS
 	// mux.Handle("/devl/", http.HandlerFunc(app.devHandler))	

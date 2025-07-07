@@ -69,6 +69,28 @@ func (app *application) getTeams(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) getGamesRecent(w http.ResponseWriter, r *http.Request) {
+	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+	logs.LogHTTP(r)
+	js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGames.Q)
+	if err != nil {
+		e.Msg = ("failed to get games")
+		errs.HTTPErr(w, e.Error(err))
+	}
+	app.JSONWriter(w, js)
+}
+
+func (app *application) getTopScorer(w http.ResponseWriter, r *http.Request) {
+	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+	logs.LogHTTP(r)
+	js, err := mariadb.DBJSONResposne(app.database, mariadb.TopScorer.Q)
+	if err != nil {
+		e.Msg = ("failed to get top scorer")
+		errs.HTTPErr(w, e.Error(err))
+	}
+	app.JSONWriter(w, js)
+}
+
 // RANDOM PLAYER BUTTON
 func (app *application) getRandPlayer(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
