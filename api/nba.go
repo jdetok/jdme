@@ -24,6 +24,34 @@ import (
 var nbaPath string = (env.GetString("STATIC_PATH") + "/nba.html")
 var nbaDevPath string = (env.GetString("DEV_PATH") + "/nba.html")
 
+
+func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
+	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+	logs.LogHTTP(r)
+	// js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGames.Q)
+	rgs := store.RecentGames{}
+	js, err := rgs.GetRecentGames(app.database)
+	if err != nil {
+		e.Msg = ("failed to get games")
+		errs.HTTPErr(w, e.Error(err))
+	}
+	app.JSONWriter(w, js)
+}
+
+func (app *application) getTopScorerNew(w http.ResponseWriter, r *http.Request) {
+	e := errs.ErrInfo{Prefix: "top scorers endpoint"}
+	logs.LogHTTP(r)
+	ts := store.TopScorers{}
+	js, err := ts.GetTopScorers(app.database)
+	if err != nil {
+		e.Msg = ("failed to get top scorers")
+		errs.HTTPErr(w, e.Error(err))
+	}
+	app.JSONWriter(w, js)
+}
+
+
+
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	http.ServeFile(w, r, nbaPath)
@@ -69,16 +97,16 @@ func (app *application) getTeams(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application) getGamesRecent(w http.ResponseWriter, r *http.Request) {
-	e := errs.ErrInfo{Prefix: "recent games endpoint"}
-	logs.LogHTTP(r)
-	js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGames.Q)
-	if err != nil {
-		e.Msg = ("failed to get games")
-		errs.HTTPErr(w, e.Error(err))
-	}
-	app.JSONWriter(w, js)
-}
+// func (app *application) getGamesRecent(w http.ResponseWriter, r *http.Request) {
+// 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+// 	logs.LogHTTP(r)
+// 	js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGames.Q)
+// 	if err != nil {
+// 		e.Msg = ("failed to get games")
+// 		errs.HTTPErr(w, e.Error(err))
+// 	}
+// 	app.JSONWriter(w, js)
+// }
 
 func (app *application) getTopScorer(w http.ResponseWriter, r *http.Request) {
 	e := errs.ErrInfo{Prefix: "recent games endpoint"}

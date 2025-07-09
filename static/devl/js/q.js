@@ -2,6 +2,21 @@
 take in and query a URL
 used for API calls, making links for images, etc
 */
+
+export async function getAPIResp(url) {
+    try { // WAIT FOR API RESPONSE
+        const response = await fetch(url);
+        if (!response.ok) { 
+            throw new Error(`HTTP Error: ${response.status}`)
+        } // CONVERT SUCCESSFUL RESPONSE TO JSON & CLEAR LOADMSG
+        const data = await response.json();
+        return data
+    }
+    catch(error) {
+        console.log(error);
+    };
+};
+
 // renamed from getStats
 export async function FetchURL(url) {
     const loadMsg = document.getElementById('loadmsg');

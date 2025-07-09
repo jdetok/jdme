@@ -1,26 +1,64 @@
 package main
 
-import (
-	"fmt"
+// import (
+// 	"fmt"
 
-	"github.com/jdetok/go-api-jdeko.me/internal/jsonops"
-)
+// 	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
+// 	"github.com/jdetok/go-api-jdeko.me/internal/store"
+// )
 
-func main() {
-	fmt.Println("TESTING INTERNAL JSON PACKAGE")
-	
-// reads indented file and returns single line json file
-	// jsonops.SingleLine("json/teams.json", "json/teamsx.json")
+// func main() {
+// 	// store.RecGamesTest()
 
-	jsonops.IndentMany("json/teamprofiles", "json/teamprofiles/ind")
-	jsonops.ShrinkMany("json/teamprofiles", "json/teamprofiles/mini")
-	
+// 	db := mariadb.InitDB()
+// 	rg := store.RecentGames{}
+// 	ts := store.TopScorer{}
 
-// old testing: 
-	// res := jsonops.MapJSONFile("json/teams.json")
-	// // fmt.Println(res)
+// 	js, err := rg.Get(db)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	}
+// 	fmt.Println(string(js))
 
-	// var body []byte = jsonops.MapToJSON("", res)
+// 	jsTs, err := ts.Get(db)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	}
+// 	fmt.Println(string(jsTs))
 
-	// jsonops.SaveJSON("json/test.json", body)
-}
+// 	// fmt.Println(rg.GameId)
+// 	// fmt.Println(rg.GameDate)
+// 	// fmt.Println(rg.Final)
+// 	// fmt.Println(rg.Overtime)
+
+// 	// rows, err := db.Query(mariadb.RecentGames.Q)
+// 	// if err != nil {
+// 	// 	fmt.Println(err)
+// 	// }
+
+// 	// rg.Make(rows)
+
+// 	// js, err := json.Marshal(rg)
+// 	// if err != nil {
+// 	// 	fmt.Println(err)
+// 	// }
+
+// 	// fmt.Println(string(js))
+
+// 	// results, err := mariadb.ProcessRows(rows, cols)
+// 	// if err != nil {
+// 	// 	fmt.Println(err)
+// 	// }
+
+// 	// for i, r := range results {
+
+// 	// }
+
+// // old testing:
+// 	// res := jsonops.MapJSONFile("json/teams.json")
+// 	// // fmt.Println(res)
+
+// 	// var body []byte = jsonops.MapToJSON("", res)
+
+// 	// jsonops.SaveJSON("json/test.json", body)
+// }
