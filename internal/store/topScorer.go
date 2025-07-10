@@ -10,9 +10,11 @@ import (
 
 // structs defined in commmon.go
 type TopScorePlayer struct {
-	MetaG GameMeta `json:"gameMeta"`
-	Meta PlayerMeta `json:"playerMeta"`
-	Stats Stats `json:"stats"`
+	MetaG GameMeta `json:"game_meta"`
+	Meta PlayerMeta `json:"player_meta"`
+	Box BoxStats `json:"box_stats"`
+	Shooting ShootingStats `json:"shooting_stats"`
+	// Stats Stats `json:"stats"`
 }
 
 // wrap top scrorer in struct to name the json object
@@ -44,11 +46,11 @@ func (ts *TopScorers) MakeTopScorers(rows *sql.Rows) {//(TopScorers, error)
 		rows.Scan(&tsp.Meta.PlayerId, &tsp.Meta.TeamId, &tsp.Meta.League,
 			&tsp.MetaG.SeasonID, &tsp.MetaG.GameId, &tsp.MetaG.GameDate,
 			&tsp.Meta.Player, &tsp.Meta.Team, &tsp.Meta.TeamName,
-			&tsp.Stats.Minutes, &tsp.Stats.Points, &tsp.Stats.Assists,
-			&tsp.Stats.Rebounds, &tsp.Stats.Steals, &tsp.Stats.Blocks,
-			&tsp.Stats.FgMade, &tsp.Stats.FgAtpt, &tsp.Stats.FgPct,
-			&tsp.Stats.Fg3Made, &tsp.Stats.Fg3Atpt, &tsp.Stats.Fg3Pct,
-			&tsp.Stats.FtMade, &tsp.Stats.FtAtpt, &tsp.Stats.FtPct)
+			&tsp.Box.Minutes, &tsp.Box.Points, &tsp.Box.Assists,
+			&tsp.Box.Rebounds, &tsp.Box.Steals, &tsp.Box.Blocks,
+			&tsp.Shooting.FgMade, &tsp.Shooting.FgAtpt, &tsp.Shooting.FgPct,
+			&tsp.Shooting.Fg3Made, &tsp.Shooting.Fg3Atpt, &tsp.Shooting.Fg3Pct,
+			&tsp.Shooting.FtMade, &tsp.Shooting.FtAtpt, &tsp.Shooting.FtPct)
 		
 		tsp.Meta.MakeCaptions()
 		tsp.Meta.MakeHeadshotUrl()

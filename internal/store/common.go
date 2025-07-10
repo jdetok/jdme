@@ -11,21 +11,21 @@ import (
 )
 
 type GameMeta struct {
-	SeasonID string `json:"seasonId"`
-	GameId string `json:"gameId"`
-	GameDate string `json:"gameDate"`
+	SeasonID string `json:"season_id"`
+	GameId string `json:"game_id"`
+	GameDate string `json:"game_date"`
 }
 
 type PlayerMeta struct {
-	PlayerId string `json:"playerId"`
-	TeamId string `json:"teamId"`
+	PlayerId string `json:"player_id"`
+	TeamId string `json:"team_id"`
 	League string `json:"league"`
-	Player string  `json:"players"`
+	Player string  `json:"player"`
 	Team string  `json:"team"`
-	TeamName string  `json:"teamName"`
+	TeamName string  `json:"team_name"`
 	Caption string  `json:"caption"`
-	CaptionShort string  `json:"captionShort"`
-	HeadshotUrl string `json:"headshotUrl"`
+	CaptionShort string  `json:"caption_short"`
+	HeadshotUrl string `json:"headshot_url"`
 }
 
 // idea: break out box and shooting
@@ -36,15 +36,36 @@ type Stats struct {
 	Rebounds string `json:"rebounds"`
 	Steals string `json:"steals"`
 	Blocks string `json:"blocks"`
-	FgMade string `json:"fgMade"`
-	FgAtpt string `json:"fgAtpt"`
-	FgPct string `json:"fgPct"`
-	Fg3Made string `json:"fg3Made"`
-	Fg3Atpt string `json:"fg3Atpt"`
-	Fg3Pct string `json:"fg3Pct"`
-	FtMade string `json:"ftMade"`
-	FtAtpt string `json:"ftAtpt"`
-	FtPct string `json:"ftPct"`
+	FgMade string `json:"fg_made"`
+	FgAtpt string `json:"fg_atpt"`
+	FgPct string `json:"fg_pct"`
+	Fg3Made string `json:"fg3_made"`
+	Fg3Atpt string `json:"fg3_atpt"`
+	Fg3Pct string `json:"fg3_pct"`
+	FtMade string `json:"ft_made"`
+	FtAtpt string `json:"ft_atpt"`
+	FtPct string `json:"ft_pct"`
+}
+
+type BoxStats struct {
+	Minutes string `json:"minutes"`
+	Points string `json:"points"`
+	Assists string `json:"assists"`
+	Rebounds string `json:"rebounds"`
+	Steals string `json:"steals"`
+	Blocks string `json:"blocks"`
+}
+
+type ShootingStats struct {
+	FgMade string `json:"fg_made"`
+	FgAtpt string `json:"fg_atpt"`
+	FgPct string `json:"fg_pct"`
+	Fg3Made string `json:"fg3_made"`
+	Fg3Atpt string `json:"fg3_atpt"`
+	Fg3Pct string `json:"fg3_pct"`
+	FtMade string `json:"ft_made"`
+	FtAtpt string `json:"ft_atpt"`
+	FtPct string `json:"ft_pct"`
 }
 
 type Player struct {

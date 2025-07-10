@@ -9,18 +9,18 @@ body {
     justify-content: center;
     margin: 0 auto;
 }
-
+/*
 body > div, form {
-    border: 1px solid black;
+    border: 2px solid black;
 }
 
 div > div {
     border: 1px dashed black;
-}
-
+}*/
+/* 
 div > div > div {
     border: 1px dashed red;
-}
+} */
 
 
 /* MODE SELECTORS SECTION
@@ -85,34 +85,43 @@ div > div > div {
 
 .main {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    max-width: 90%;
+    /* flex-direction: row; */
+    /* flex-wrap: wrap; */
+    max-width: 100%;
+    width: 98%;
     /* width: fit-content; */
-    justify-content: center;
+    /* justify-content: center; */
     margin: 0 auto;
     gap: 20px;
     margin-top: 15px;
+    /* border: 20px solid burlywood */
 }
 
 .sect {
-    display: table;
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    gap: 20px;
+    /* border: 10px solid cyan; */
+}
+
+.blk {
+    /* border: 10px solid purple; */
+    width: 100%;
     max-width: 100%;
     height: auto;
 }
 
-.sect-title {
-    display: table-row;
-    font-size: 32px;
+.blk div {
+    /* border: 5px solid pink; */
+    margin-bottom: 15px;
+    align-self: start;
 }
 
-.sect-row {
-    display: table-row;
-}
-
-.sect-table {
-    display: table-cell;
-    vertical-align: top;
+.blk table {
+    
+    width: 100%;
 }
 
 table {
@@ -124,15 +133,29 @@ table tr td {
     border: 1px solid black;
 }
 
-.sect-img {
-    display: table-cell;
-    display: table;
-    max-width: 30%;
+.sect img {
+    max-width: 90%;
+    max-height: 25%;
+    /* border: 5px solid black; */
 }
-.sect-img img {
-    width: 400px;
-    height: auto;
+
+@media (max-width: 600px) {
+    .main {
+        flex-direction: column;       
+    }
+    .sect {
+        flex-direction: column;
+    }
+
+    .blk {
+        width: 100%;
+    }
 }
+/* #ts-shtg {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+} */
 
 /* #recent-games {
     font-size: 16;

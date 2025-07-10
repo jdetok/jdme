@@ -14,7 +14,9 @@ export async function tableJSON(data, element) {
             const label = document.createElement('th');
             const val = document.createElement('td');
 
+
             // FIELD NAME IN LEFT COLUMN OF TABLE (RIGHT ALIGNED)
+            
             label.textContent = keys[i];
             label.style.textAlign = 'right';
 

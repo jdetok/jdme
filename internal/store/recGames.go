@@ -9,14 +9,14 @@ import (
 )
 
 type RecentGame struct {
-	GameId string `json:"gameId"`
-	GameDate string `json:"gameDate"`
+	GameId string `json:"game_id"`
+	GameDate string `json:"game_date"`
 	Final string `json:"final"`
 	Overtime bool `json:"overtime"`
 }
 
 type RecentGames struct {
-	Games []RecentGame `json:"recentGames"`
+	Games []RecentGame `json:"recent_games"`
 }
 
 func MakeRgs(rows *sql.Rows) RecentGames {

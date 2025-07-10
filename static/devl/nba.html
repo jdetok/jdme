@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>jdeko nba!</title>
+    <title>jdeko nba! (dev)</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="./css/nba.css">
-    <script type="module" src="./js/listen.js"></script>
+    <script type="module" src="./js/listen.js" defer></script>
   </head>
-  <header>
+  
+
+  <body>    
+    <header>
     <div class="goback">
       <a href="index.html">go back</a>
     </div>
@@ -21,8 +24,6 @@
         <a href="nba-info.html">Learn More about this Site</a>
     </div>
   </header>
-
-  <body>    
     <div class="intro">
       <h4>all data owned by and sourced from the NBA (<i>
         <a class="transpar" href="https://www.nba.com/stats" target="_blank">
@@ -76,24 +77,40 @@
 
     <div class="main">
 
-      <div class ="sect" id="recent-games">
-        <div class="sect-title">games played on --date--</div>
-        <div class="sect-row">
-          <div class="sect-table" id="recent-games-tbl"></div>
-        </div>
+      <div class="sect" id="recent-games">
+        <div class="blk">loading recent games...</div>
       </div>
-      
-      <div class="sect" id="top-scorer">
-        <div class="sect-title">top scorer from --date--</div>
-        <div class="sect-row">
-          <div class="sect-table" id="top-scorer-tbl"></div>
-          <div class="sect-img">
-            <!-- <img src="https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png"
-            alt="top scorer's headshot"> -->
-          </div>
+
+      <div class="sect">
+        <div class="blk">
+          <div id="top-scorer">loading top scorer...</div>
+          <div id="ts-img"></div>
         </div>
       </div>
 
+      <div class="sect">
+        <div class="blk">
+          <div id="ts-box"></div>
+          <div id="ts-shtg"></div>  
+        </div>
+      </div>
     </div>
   </body>
 </html>
+        <!-- <div class="sect-title"></div> -->
+        
+        
+        <!-- <div class="sect-row"> -->
+          <!-- <div class="sect-table" id="top-scorer-tbl"></div> -->
+          <!-- <div class="sect-img">
+            <img src="https://cdn.nba.com/headshots/nba/latest/1040x760/2544.png"
+            alt="top scorer's headshot">
+          </div> -->
+        <!-- </div> -->
+
+        <!-- <div class="sect" id="ts-shtg">
+          <div class="sect-title">loading top scorer's shooting stats...</div>
+        </div> -->
+      <!-- <div class="sect" id="ts-img"></div> -->
+      
+      <!-- <div class="sect" id="ts-img"></div> -->
