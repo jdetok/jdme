@@ -11,6 +11,15 @@ type Queries struct {
 	DbQueries []Query
 }
 
+var PlayersSeason = Query{
+	Q: `
+	select player_id, player, league, max(season_id), min(season_id)
+	from api_player_stats
+	where left(season_id, 1) = 2
+	group by player_id, player, league, left(season_id, 1);
+	`,
+}
+
 var Player = Query{
 	Q: `
 		select * from api_player_stats 

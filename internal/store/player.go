@@ -76,19 +76,19 @@ type RespPlayerStatsShtg struct {
 
 // change these to just made atpt pct cause putting in parent struct
 type RespPlayerStatsFg struct {
-	Makes    float32 `json:"makes"`
-	Attempts float32 `json:"attempts"`
-	Percent  string  `json:"percent"`
+	Makes    float32 `json:"m"`
+	Attempts float32 `json:"a"`
+	Percent  string  `json:"p"`
 }
 type RespPlayerStatsFg3 struct {
-	Makes    float32 `json:"makes"`
-	Attempts float32 `json:"attempts"`
-	Percent  string  `json:"percent"`
+	Makes    float32 `json:"m"`
+	Attempts float32 `json:"a"`
+	Percent  string  `json:"p"`
 }
 type RespPlayerStatsFt struct {
-	Makes    float32 `json:"makes"`
-	Attempts float32 `json:"attempts"`
-	Percent  string  `json:"percent"`
+	Makes    float32 `json:"m"`
+	Attempts float32 `json:"a"`
+	Percent  string  `json:"p"`
 }
 
 // move caps and url to different struct

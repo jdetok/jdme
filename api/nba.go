@@ -29,17 +29,25 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
 	logs.LogHTTP(r)
 
-	player, _ := strconv.ParseUint(r.URL.Query().Get("player"), 10, 64)
-	season, _ := strconv.ParseUint(r.URL.Query().Get("season"), 10, 32)
+	season := r.URL.Query().Get("season")
+	player := r.URL.Query().Get("player")
+
+	pId, sId := store.GetpIdsId(app.players, player, season)
 
 	var rp store.Resp
-
-	js, err := rp.GetPlayerDash(app.database, player, season)
+	js, err := rp.GetPlayerDash(app.database, pId, sId)
 	if err != nil {
 		e.Msg = "failed to get player dash"
 		errs.HTTPErr(w, e.Error(err))
 	}
 	app.JSONWriter(w, js)
+}
+
+// RANDOM PLAYER
+func (app *application) randPlayer() uint64 {
+	numPlayers := len(app.players)
+	randNum := rand.IntN(numPlayers)
+	return app.players[randNum].PlayerId
 }
 
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {

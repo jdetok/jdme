@@ -3,6 +3,7 @@ package store
 import (
 	"database/sql"
 	"fmt"
+	"math/rand/v2"
 	"strconv"
 	"strings"
 
@@ -69,9 +70,11 @@ type ShootingStats struct {
 }
 
 type Player struct {
-	PlayerId uint64
-	Name     string
-	League   string
+	PlayerId    uint64
+	Name        string
+	League      string
+	SeasonIdMax uint64
+	SeasonIdMin uint64
 }
 
 type Season struct {
@@ -111,7 +114,7 @@ func (t Team) MakeLogoUrl() string {
 func GetPlayers(db *sql.DB) ([]Player, error) {
 	fmt.Println("querying players & saving to struct")
 	e := errs.ErrInfo{Prefix: "saving players to structs"}
-	rows, err := db.Query(mariadb.Players.Q)
+	rows, err := db.Query(mariadb.PlayersSeason.Q)
 	if err != nil {
 		e.Msg = "query failed"
 		return nil, e.Error(err)
@@ -119,7 +122,7 @@ func GetPlayers(db *sql.DB) ([]Player, error) {
 	var players []Player
 	for rows.Next() {
 		var p Player
-		rows.Scan(&p.PlayerId, &p.Name, &p.League)
+		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax, &p.SeasonIdMin)
 		// convert to lowercase to match requests
 		p.Name = strings.ToLower(p.Name)
 		p.League = strings.ToLower(p.League)
@@ -127,14 +130,40 @@ func GetPlayers(db *sql.DB) ([]Player, error) {
 	}
 	return players, nil
 }
+func randPlayer(players []Player) uint64 {
+	numPlayers := len(players)
+	randNum := rand.IntN(numPlayers)
+	return players[randNum].PlayerId
+}
+func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64) {
+	sId, _ := strconv.ParseUint(seasonId, 10, 32)
+	var pId uint64
 
-func GetPlayerId(players []Player, pSearch string) uint64 {
-	for _, p := range players {
-		if p.Name == pSearch { // return match playerid (uint32) as string
-			return p.PlayerId
+	if player == "random" {
+		pId = randPlayer(players)
+	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
+		pId, _ = strconv.ParseUint(player, 10, 64)
+	} else {
+		for _, p := range players {
+			if p.Name == player { // return match playerid (uint32) as string
+				pId = p.PlayerId
+			}
 		}
 	}
-	return 0
+
+	for _, p := range players {
+		if p.PlayerId == pId { // return match playerid (uint32) as string
+			if sId > p.SeasonIdMax {
+				return pId, p.SeasonIdMax
+			} else if sId < p.SeasonIdMin {
+				return pId, p.SeasonIdMin
+			} else {
+				return pId, sId
+			}
+		}
+	}
+
+	return pId, sId
 }
 
 func SearchPlayers(players []Player, pSearch string) string {
