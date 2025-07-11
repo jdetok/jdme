@@ -26,7 +26,7 @@ var nbaDevPath string = (env.GetString("DEV_PATH") + "/nba.html")
 
 func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 	// player & season are params
-	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+	e := errs.ErrInfo{Prefix: "player dash endpoint"}
 	logs.LogHTTP(r)
 
 	season := r.URL.Query().Get("season")
@@ -44,11 +44,11 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 }
 
 // RANDOM PLAYER
-func (app *application) randPlayer() uint64 {
-	numPlayers := len(app.players)
-	randNum := rand.IntN(numPlayers)
-	return app.players[randNum].PlayerId
-}
+// func (app *application) randPlayer() uint64 {
+// 	numPlayers := len(app.players)
+// 	randNum := rand.IntN(numPlayers)
+// 	return app.players[randNum].PlayerId
+// }
 
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
 	e := errs.ErrInfo{Prefix: "recent games endpoint"}

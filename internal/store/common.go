@@ -139,11 +139,12 @@ func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64
 	sId, _ := strconv.ParseUint(seasonId, 10, 32)
 	var pId uint64
 
-	if player == "random" {
+	if player == "random" { // call randplayer function
 		pId = randPlayer(players)
 	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
+		// if it's numeric keep it and convert to uint64
 		pId, _ = strconv.ParseUint(player, 10, 64)
-	} else {
+	} else { // search name through players list
 		for _, p := range players {
 			if p.Name == player { // return match playerid (uint32) as string
 				pId = p.PlayerId
@@ -151,9 +152,10 @@ func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64
 		}
 	}
 
+	// loop through players to check that queried season is within min-max seasons
 	for _, p := range players {
-		if p.PlayerId == pId { // return match playerid (uint32) as string
-			if sId > p.SeasonIdMax {
+		if p.PlayerId == pId {
+			if sId > p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids 
 				return pId, p.SeasonIdMax
 			} else if sId < p.SeasonIdMin {
 				return pId, p.SeasonIdMin
@@ -162,7 +164,6 @@ func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64
 			}
 		}
 	}
-
 	return pId, sId
 }
 

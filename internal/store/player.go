@@ -144,8 +144,19 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error)
 			rp.Totals.Box = s.Box
 			rp.Totals.Shtg = s.Shtg
 		}
-
 	}
+
+	switch rp.Meta.SeasonId {
+	case 99999:
+		rp.Meta.StatType = "career regular season + playoffs"
+	case 99998:
+		rp.Meta.StatType = "career regular season"
+	case 99997:
+		rp.Meta.StatType = "career playoffs"
+	default:
+		rp.Meta.StatType = "regular season"
+	}
+
 	r.Results = append(r.Results, rp)
 
 	js, err := json.Marshal(r)
@@ -155,43 +166,3 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error)
 
 	return js, nil
 }
-
-/*
-// wrap top scrorer in struct to name the json object
-
-func (pr *Players) GetPlayers(db *sql.DB) ([]byte, error) {
-	rows, err := db.Query(mariadb.TopScorer.Q)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	pr.BuildPlayers(rows)
-	js, err := json.Marshal(pr)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-	return js, nil
-}
-
-// scans sql rows to appropriate struct field, runs meta funcs
-func (ps *Players) BuildPlayers(rows *sql.Rows) { //(TopScorers, error)
-	for rows.Next() {
-		var pr PlayerResp
-
-		rows.Scan(&tsp.Meta.PlayerId, &tsp.Meta.TeamId, &tsp.Meta.League,
-			&tsp.MetaG.SeasonID, &tsp.MetaG.GameId, &tsp.MetaG.GameDate,
-			&tsp.Meta.Player, &tsp.Meta.Team, &tsp.Meta.TeamName,
-			&tsp.Box.Minutes, &tsp.Box.Points, &tsp.Box.Assists,
-			&tsp.Box.Rebounds, &tsp.Box.Steals, &tsp.Box.Blocks,
-			&tsp.Shooting.FgMade, &tsp.Shooting.FgAtpt, &tsp.Shooting.FgPct,
-			&tsp.Shooting.Fg3Made, &tsp.Shooting.Fg3Atpt, &tsp.Shooting.Fg3Pct,
-			&tsp.Shooting.FtMade, &tsp.Shooting.FtAtpt, &tsp.Shooting.FtPct)
-
-		tsp.Meta.MakeCaptions()
-		tsp.Meta.MakeHeadshotUrl()
-		ps.Players = append(ps.Players, pr)
-	}
-}
-*/
