@@ -70,26 +70,16 @@ type RespPlayerStatsBox struct {
 
 // struct to wrap shooting stats
 type RespPlayerStatsShtg struct {
-	Fg  RespPlayerStatsFg  `json:"fg"`
-	Fg3 RespPlayerStatsFg3 `json:"fg3"`
-	Ft  RespPlayerStatsFt  `json:"ft"`
+	Fg  RespPlayerStatsShtgType `json:"field_goals"`
+	Fg3 RespPlayerStatsShtgType `json:"three_pointers"`
+	Ft  RespPlayerStatsShtgType `json:"free_throws"`
 }
 
 // change these to just made atpt pct cause putting in parent struct
-type RespPlayerStatsFg struct {
-	Makes    float32 `json:"m"`
-	Attempts float32 `json:"a"`
-	Percent  string  `json:"p"`
-}
-type RespPlayerStatsFg3 struct {
-	Makes    float32 `json:"m"`
-	Attempts float32 `json:"a"`
-	Percent  string  `json:"p"`
-}
-type RespPlayerStatsFt struct {
-	Makes    float32 `json:"m"`
-	Attempts float32 `json:"a"`
-	Percent  string  `json:"p"`
+type RespPlayerStatsShtgType struct {
+	Makes    float32 `json:"made"`
+	Attempts float32 `json:"attempted"`
+	Percent  string  `json:"percentage"`
 }
 
 // move caps and url to different struct
