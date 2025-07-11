@@ -115,6 +115,16 @@ var Seasons = Query{
 	order by right(season_id, 4) desc, left(season_id, 1)
 	`,
 }
+var RSeasons = Query{
+	Args: []string{},
+	Q: `
+	select season_id, season_desc, wseason_desc
+	from season
+	where left(season_id, 1) = '2'
+	and right(season_id, 4) >= 2000
+	order by right(season_id, 4) desc, left(season_id, 1)
+	`,
+}
 
 var Teams = Query{
 	Args: []string{},

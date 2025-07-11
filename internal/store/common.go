@@ -155,7 +155,7 @@ func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64
 	// loop through players to check that queried season is within min-max seasons
 	for _, p := range players {
 		if p.PlayerId == pId {
-			if sId > p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids 
+			if sId > p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids
 				return pId, p.SeasonIdMax
 			} else if sId < p.SeasonIdMin {
 				return pId, p.SeasonIdMin
@@ -180,7 +180,7 @@ func SearchPlayers(players []Player, pSearch string) string {
 func GetSeasons(db *sql.DB) ([]Season, error) {
 	fmt.Println("querying seasons & saving to struct")
 	e := errs.ErrInfo{Prefix: "saving seasons to struct"}
-	rows, err := db.Query(mariadb.Seasons.Q)
+	rows, err := db.Query(mariadb.RSeasons.Q)
 	if err != nil {
 		e.Msg = "error querying db"
 		e.Error(err)

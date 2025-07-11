@@ -46,6 +46,7 @@ type RespPlayerMeta struct {
 	Caption      string `json:"caption"`
 	CaptionShort string `json:"caption_short"`
 	HeadshotUrl  string `json:"headshot_url"`
+	TeamLogoUrl  string `json:"team_logo_url"`
 }
 
 type RespPlayerSznOvw struct {
@@ -106,6 +107,14 @@ func (m *RespPlayerMeta) MakeHeadshotUrl() {
 		lg, lg, pId)
 }
 
+func (m *RespPlayerMeta) MakeTeamLogoUrl() {
+	lg := strings.ToLower(m.League)
+	tId := strconv.Itoa(int(m.TeamId))
+	m.TeamLogoUrl = fmt.Sprintf(
+		`https://cdn.%s.com/logos/%s/%s/primary/L/logo.svg`,
+		lg, lg, tId)
+}
+
 // DB QUERY
 func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error) {
 	e := errs.ErrInfo{Prefix: "getting player dash"}
@@ -131,8 +140,6 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error)
 			&s.Shtg.Fg.Makes, &s.Shtg.Fg.Attempts, &s.Shtg.Fg.Percent,
 			&s.Shtg.Fg3.Makes, &s.Shtg.Fg3.Attempts, &s.Shtg.Fg3.Percent,
 			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent)
-		rp.Meta.MakeCaptions()
-		rp.Meta.MakeHeadshotUrl()
 
 		switch rp.Meta.StatType {
 		case "avg":
@@ -144,8 +151,11 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error)
 			rp.Totals.Box = s.Box
 			rp.Totals.Shtg = s.Shtg
 		}
-	}
 
+	}
+	rp.Meta.MakeCaptions()
+	rp.Meta.MakeHeadshotUrl()
+	rp.Meta.MakeTeamLogoUrl()
 	switch rp.Meta.SeasonId {
 	case 99999:
 		rp.Meta.StatType = "career regular season + playoffs"

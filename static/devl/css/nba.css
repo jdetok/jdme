@@ -97,10 +97,18 @@ div > div > div {
     /* border: 20px solid burlywood */
 }
 
+.sect_pl {
+    /* display: flex; */
+    width: 50%;
+    max-width:50%;
+    height: auto;
+    gap: 20px;
+}
+
 .sect {
     display: flex;
-    width: 100%;
-    max-width: 100%;
+    /* width:0%; */
+    max-width: 50%;
     height: auto;
     gap: 20px;
     /* border: 10px solid cyan; */
@@ -133,9 +141,9 @@ table tr td {
     border: 1px solid black;
 }
 
-.sect img {
-    max-width: 90%;
-    max-height: 25%;
+.sect_pl img {
+    width: 400px;
+    /* max-height: 25%; */
     /* border: 5px solid black; */
 }
 
