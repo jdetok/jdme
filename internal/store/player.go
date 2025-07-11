@@ -29,11 +29,9 @@ type Resp struct {
 
 type RespObj struct {
 	Meta      RespPlayerMeta   `json:"player_meta"`
-	SeasonOvw RespPlayerSznOvw `json:"stats_usage"`
+	SeasonOvw RespPlayerSznOvw `json:"playtime"`
 	Totals    RespPlayerStats  `json:"totals"`
 	PerGame   RespPlayerStats  `json:"per_game"`
-	// Box       RespPlayerStatsBox  `json:"stats_box"`
-	// Shtg      RespPlayerStatsShtg `json:"stats_shtg"`
 }
 
 type RespPlayerMeta struct {
@@ -51,13 +49,14 @@ type RespPlayerMeta struct {
 }
 
 type RespPlayerSznOvw struct {
-	GamesPlayed uint16  `json:"games_played"`
-	Minutes     float32 `json:"minutes"`
+	GamesPlayed   uint16  `json:"games_played"`
+	Minutes       float32 `json:"minutes"`
+	MinutsPerGame float32 `json:"minutes_pg"`
 }
 
 type RespPlayerStats struct {
-	Box  RespPlayerStatsBox
-	Shtg RespPlayerStatsShtg
+	Box  RespPlayerStatsBox  `json:"box_stats"`
+	Shtg RespPlayerStatsShtg `json:"shooting"`
 }
 
 type RespPlayerStatsBox struct {
@@ -121,11 +120,12 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error)
 	for rows.Next() {
 		// temp struct to add logic to which stat struct is populated
 		var s RespPlayerStats
+		var p RespPlayerSznOvw
 		rows.Scan(
 			&rp.Meta.PlayerId, &rp.Meta.TeamId, &rp.Meta.League,
 			&rp.Meta.SeasonId, &rp.Meta.StatType, &rp.Meta.Player,
 			&rp.Meta.Team, &rp.Meta.TeamName,
-			&rp.SeasonOvw.GamesPlayed, &rp.SeasonOvw.Minutes,
+			&rp.SeasonOvw.GamesPlayed, &p.Minutes,
 			&s.Box.Points, &s.Box.Assists, &s.Box.Rebounds,
 			&s.Box.Steals, &s.Box.Blocks,
 			&s.Shtg.Fg.Makes, &s.Shtg.Fg.Attempts, &s.Shtg.Fg.Percent,
@@ -136,9 +136,11 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error)
 
 		switch rp.Meta.StatType {
 		case "avg":
+			rp.SeasonOvw.MinutsPerGame = p.Minutes
 			rp.PerGame.Box = s.Box
 			rp.PerGame.Shtg = s.Shtg
 		case "tot":
+			rp.SeasonOvw.Minutes = p.Minutes
 			rp.Totals.Box = s.Box
 			rp.Totals.Shtg = s.Shtg
 		}
