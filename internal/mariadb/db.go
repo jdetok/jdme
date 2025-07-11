@@ -86,6 +86,12 @@ func Select(db *sql.DB, q string, args ...any) (*sql.Rows, []string, error){
 	return rows, cols, nil
 }
 
+func PrintRows(rows *sql.Rows) {
+	for rows.Next() {
+
+	}
+}
+
 // process rows returned by Select function
 func ProcessRows(rows *sql.Rows, cols []string) ([]any, error) {
 	var vals []any // final slice with vals
@@ -110,11 +116,14 @@ func ProcessRows(rows *sql.Rows, cols []string) ([]any, error) {
 			if reflect.TypeOf(v) == reflect.TypeOf([]byte{}) {
 				v = string(v.([]byte))
 			}
+			
 			rowVals[i] = v
 		}
 		// append row vals to vals slice
 		vals = append(vals, rowVals)
+		
 	}
+	fmt.Println(vals)
 	return vals, nil
 }
 

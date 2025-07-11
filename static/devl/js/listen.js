@@ -4,13 +4,17 @@ Event listeners are called here
 */
 // import { loadSeasonOpts, loadTeamOpts, lgChangeListener } from "./test.js"
 import * as home from "./home.js";
+import * as buttons from "./buttons.js"
 document.addEventListener('DOMContentLoaded', async () => {
     await home.loadSeasonOpts();
     await home.loadTeamOpts();
-    await home.lgChangeListener();
     await home.gamesRecent();
     await home.topScorer();
+    await home.lgChangeListener();
+    await buttons.clear();
 });
+
+
 
 // document.addEventListener('DOMContentLoaded', () => {
 //     test.loadSeasonOpts();

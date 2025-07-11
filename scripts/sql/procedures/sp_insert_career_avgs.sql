@@ -58,3 +58,4 @@ CALL sp_insert_career_avgs();
 
 select count(*) from career_avgs;
 select * from career_avgs;
+

@@ -4,16 +4,22 @@ package mariadb
 
 type Query struct {
 	Args []string // arguments to accept
-	Q string // query
+	Q    string   // query
 }
 
 type Queries struct {
 	DbQueries []Query
 }
 
+var Player = Query{
+	Q: `
+		select * from api_player_stats 
+		where player_id = ? and season_id = ?
+	`,
+}
+
 var RecentGames = Query{
-	Q:
-	`
+	Q: `
 	select a.game_id, a.game_date, a.final, a.ot 
 	from game a
 	where a.game_date = 
@@ -23,8 +29,7 @@ var RecentGames = Query{
 }
 
 var TopScorer = Query{
-	Q:
-	`
+	Q: `
 	select * 
 	from top_scorers 
 	order by points desc, (assists + rebounds + steals + blocks) desc 
@@ -32,7 +37,7 @@ var TopScorer = Query{
 	`,
 }
 
-var Test = Query {
+var Test = Query{
 	Q: `
 select 
 	a.player, 
@@ -65,12 +70,12 @@ select
 	order by pts desc
 `,
 }
+
 // var Avgs25 = Query{
 // 	"select * from v_nba_rs25_avgs"
 // }
 
-
-var Players = Query {
+var Players = Query{
 	Args: []string{},
 	Q: `
 	select player_id, player, lg 
@@ -119,11 +124,10 @@ var Teams = Query{
 	`,
 }
 
-
 // -- and a.lg = ?
 var LgPlayerStat = Query{
 	Args: []string{"lg", "player"},
-	Q:`
+	Q: `
 	select a.player, b.team, 
 		sum(c.pts) as pts, 
 		sum(c.ast) as ast,
@@ -150,7 +154,7 @@ var LgPlayerStat = Query{
 	`,
 }
 
-var LgPlayerAvg = Query {
+var LgPlayerAvg = Query{
 	Args: []string{"lg", "player"},
 	Q: `
 	select 

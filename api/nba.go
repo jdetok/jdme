@@ -24,6 +24,23 @@ import (
 var nbaPath string = (env.GetString("STATIC_PATH") + "/nba.html")
 var nbaDevPath string = (env.GetString("DEV_PATH") + "/nba.html")
 
+func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
+	// player & season are params
+	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+	logs.LogHTTP(r)
+
+	player, _ := strconv.ParseUint(r.URL.Query().Get("player"), 10, 64)
+	season, _ := strconv.ParseUint(r.URL.Query().Get("season"), 10, 32)
+
+	var rp store.Resp
+
+	js, err := rp.GetPlayerDash(app.database, player, season)
+	if err != nil {
+		e.Msg = "failed to get player dash"
+		errs.HTTPErr(w, e.Error(err))
+	}
+	app.JSONWriter(w, js)
+}
 
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
@@ -32,7 +49,7 @@ func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request
 	rgs := store.RecentGames{}
 	js, err := rgs.GetRecentGames(app.database)
 	if err != nil {
-		e.Msg = ("failed to get games")
+		e.Msg = "failed to get games"
 		errs.HTTPErr(w, e.Error(err))
 	}
 	app.JSONWriter(w, js)
@@ -50,8 +67,6 @@ func (app *application) getTopScorerNew(w http.ResponseWriter, r *http.Request) 
 	app.JSONWriter(w, js)
 }
 
-
-
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	http.ServeFile(w, r, nbaPath)
@@ -66,27 +81,27 @@ func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) 
 func (app *application) getSeasons(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	season := r.URL.Query().Get("szn")
-	w.Header().Set("Content-Type", "application/json") 
+	w.Header().Set("Content-Type", "application/json")
 	if season == "" {
-		json.NewEncoder(w).Encode(app.seasons)	
+		json.NewEncoder(w).Encode(app.seasons)
 	} else {
 		for _, szn := range app.seasons {
 			if season == szn.SeasonId {
 				json.NewEncoder(w).Encode(map[string]string{
-				"szn": season,
+					"szn": season,
 				})
 			}
 		}
-	}	
+	}
 }
 
 // FOR TEAMS SELECTOR - CALLED ON PAGE LOAD
 func (app *application) getTeams(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	team := r.URL.Query().Get("team")
-	w.Header().Set("Content-Type", "application/json") 
+	w.Header().Set("Content-Type", "application/json")
 	if team == "" {
-		json.NewEncoder(w).Encode(app.teams)	
+		json.NewEncoder(w).Encode(app.teams)
 	} else {
 		for _, tm := range app.teams {
 			if team == tm.TeamAbbr {
@@ -125,11 +140,11 @@ func (app *application) getRandPlayer(w http.ResponseWriter, r *http.Request) {
 	numPlayers := len(app.players)
 	randNum := rand.IntN(numPlayers)
 
-	w.Header().Set("Content-Type", "application/json") 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"playerId": strconv.FormatUint(app.players[randNum].PlayerId, 10),
-		"player": app.players[randNum].Name,
-		"league": app.players[randNum].League,
+		"player":   app.players[randNum].Name,
+		"league":   app.players[randNum].League,
 	})
 	// random number in range of len(players) to return random player
 }
@@ -139,10 +154,10 @@ func (app *application) getPlayerId(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	player := r.URL.Query().Get("player")
 	logs.LogDebug("Player Requested: " + player)
-	
+
 	playerId := store.SearchPlayers(app.players, player)
 	logs.LogDebug("PlayerId Return: " + playerId)
-	w.Header().Set("Content-Type", "application/json") 
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"playerId": playerId,
 	})
@@ -159,7 +174,7 @@ func respFromFile(w *http.ResponseWriter, f string) []byte {
 	return js
 }
 
-/* 
+/*
 HANDLE /bball/players REQUESTS
 EX. ALL PLAYERS: ?lg=nba&stype=tot&player=all
 EX. SPECIFIC PLAYER: ?lg=nba&stype=avg&player=tyrese%20haliburton
@@ -170,8 +185,8 @@ func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 	lg := r.URL.Query().Get("lg")
 	sType := r.URL.Query().Get("stype")
 	player := r.URL.Query().Get("player")
-	
-	switch lg { // OUTER SWTICH: NBA/WNBA	
+
+	switch lg { // OUTER SWTICH: NBA/WNBA
 	case "nba": // NBA SWITCH TOTALS/AVERAGES
 		switch sType {
 		case "tot": // NBA TOTALS
@@ -181,7 +196,7 @@ func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 				app.JSONWriter(w, js)
 			default: // NBA RS TOTALS SPECIFIC PLAYER
 				playerId := store.SearchPlayers(app.players, player)
-				js := mariadb.SelectLgPlayer(app.database, &w, 
+				js := mariadb.SelectLgPlayer(app.database, &w,
 					mariadb.LgPlayerStat.Q, lg, string(playerId))
 				app.JSONWriter(w, js)
 			}
@@ -190,9 +205,9 @@ func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 			case "all": // NBA RS AVG ALL PLAYERS
 				js := respFromFile(&w, "/nba_rs_avgs.json")
 				app.JSONWriter(w, js)
-			default:  // NBA RS AVG SPECIFIC PLAYER
+			default: // NBA RS AVG SPECIFIC PLAYER
 				playerId := store.SearchPlayers(app.players, player)
-				js := mariadb.SelectLgPlayer(app.database, &w, 
+				js := mariadb.SelectLgPlayer(app.database, &w,
 					mariadb.LgPlayerAvg.Q, lg, string(playerId))
 				app.JSONWriter(w, js)
 			}
@@ -200,13 +215,13 @@ func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 	case "wnba":
 		switch sType { // WNBA SWITCH TOTALS/AVERAGES
 		case "tot": // WNBA TOTALS
-			switch player {  // ALL WNBA TOTALS
+			switch player { // ALL WNBA TOTALS
 			case "all":
 				js := respFromFile(&w, "/wnba_rs_totals.json")
 				app.JSONWriter(w, js)
 			default: // SPECIFIC WNBA PLAYER TOTALS
 				playerId := store.SearchPlayers(app.players, player)
-				js := mariadb.SelectLgPlayer(app.database, &w, 
+				js := mariadb.SelectLgPlayer(app.database, &w,
 					mariadb.LgPlayerStat.Q, lg, string(playerId))
 				app.JSONWriter(w, js)
 			}
@@ -217,7 +232,7 @@ func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 				app.JSONWriter(w, js)
 			default: // SPECIFIC WNBA PLAYER AVERAGES
 				playerId := store.SearchPlayers(app.players, player)
-				js := mariadb.SelectLgPlayer(app.database, &w, 
+				js := mariadb.SelectLgPlayer(app.database, &w,
 					mariadb.LgPlayerAvg.Q, lg, string(playerId))
 				app.JSONWriter(w, js)
 			}
