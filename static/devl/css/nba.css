@@ -116,6 +116,8 @@ div > div > div {
 
 .blk {
     /* border: 10px solid purple; */
+    
+    gap:20px;
     width: 100%;
     max-width: 100%;
     height: auto;
