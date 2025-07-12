@@ -78,9 +78,9 @@ type Player struct {
 }
 
 type Season struct {
-	SeasonId string
-	Season   string
-	WSeason  string
+	SeasonId string `json:"season_id"`
+	Season   string `json:"season"`
+	WSeason  string `json:"wseason"`
 }
 
 type Team struct {

@@ -133,8 +133,10 @@ var RSeasons = Query{
 	Q: `
 	select season_id, season_desc, wseason_desc
 	from season
-	where left(season_id, 1) = '2'
-	and right(season_id, 4) >= 2000
+	where (
+		left(season_id, 1) in ('2', '4')
+		and right(season_id, 4) >= 2000
+	) or season_id > 99990 -- agg seasons 
 	order by right(season_id, 4) desc, left(season_id, 1)
 	`,
 }

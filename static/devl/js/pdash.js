@@ -1,30 +1,44 @@
 import * as table from "./table.js"
-
-export async function getP(base, player) { // add season & team
+import { updateCrnt } from "./listen.js"
+export async function getP(base, player, season) { // add season & team
     const err = document.getElementById('sErr');
     if (err.style.display === "block") {
         err.style.display = 'none';
     }
-
+    const s = encodeURIComponent(season)
     const p = encodeURIComponent(player).toLowerCase();
-
-    const r = await fetch(base + `/player?player=${p}&season=88888`);
+    // await updateCrnt(p);
+    
+    console.log(s);
+    // const r = await fetch(base + `/player?player=${p}&season=88888`);
+    const r = await fetch(base + `/player?player=${p}&season=${s}`);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
     }
-
+    
     const js = await r.json();
     const data = js.player[0];
 
     if (data.player_meta.player_id === 0) {
-        err.textContent = `'${player}' not found...`
-        err.style.display = "block"
+        if (player != '') {
+            err.textContent = `'${player}' not found...`
+            err.style.display = "block"    
+        }
         throw new Error(`Player not found error`);
     } 
+    // await updateCrnt(data.player_meta.player)
     await buildPDash(data, 'main');
+    document.getElementById('pHold').value = data.player_meta.player;
 }
 
+// export async function hdn(data) {
+//     const h = document.createElement('div');
+//     h.style.display = 'none';
+//     h.
+// }
+
 export async function buildPDash(data, pElName) {
+
     const pEl = document.getElementById(pElName);
     pEl.textContent = '';
 

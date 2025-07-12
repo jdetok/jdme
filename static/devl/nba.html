@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="./css/nba.css">
     <script type="module" src="./js/listen.js" defer></script>
   </head>
-  
-
   <body>    
     <header class="row">
     <div>
@@ -18,16 +16,16 @@
     </div>
     
     <div>
-        <a href="../nba-info.html">Learn More about this Site</a>
+      <a href="../about.html">about jdeko.me</a>
+    </div>
+
+    <div>
+        <a href="../nba-info.html">about this site</a>
     </div>
     <div>
       all data owned by and sourced from the NBA (<i>
         <a class="transpar" href="https://www.nba.com/stats" target="_blank">
         National Basketball Association</a></i>)
-    </div>
-    <div class="disclaimer">
-      <a class="transpar" href="https://www.nba.com/stats" target="_blank">
-        NO AFFILIATION WITH THE NBA</a>
     </div>
   </header>
     <h1>NBA/WNBA Statistics</h1>
@@ -50,23 +48,41 @@
           </select>
         </div>
         <div class="mode">
-          <label for="szn-slct">stats by season:</label>
-          <select class="slct" id="szn-slct">
-            <option value="all">any season</option>
-          </select>
+          <label for="rs_slct">stats by regular season:</label>
+          <select class="slct" id="rs_slct"></select>
+        </div>
+        <div class="mode">
+          <label for="ps_slct">stats by post-season:</label>
+          <select class="slct" id="ps_slct"></select>
+        </div>
+        <div class="mode">
+          <label for="cr_slct">career stats:</label>
+          <select class="slct" id="cr_slct"></select>
         </div>
       </div>
       <div class="btns">
         <div class="err" id="sErr"></div>
-        <div class="btn">
-          <input type="text" id="pSearch" placeholder="Search for a player">
+         <div class="btn">
+          <input type="text" style="display:none;" id="pHold">
         </div>
         <div class="btn">
           <button id="search" type="submit">search</button>
+          <input type="text" id="pSearch" placeholder="Search for a player">
+          <button id="clearS">clear search</button>
         </div>
+        <!-- <div class="btn">
+          <button id="search" type="submit">search</button>
+        </div> -->
+        <!-- <div class="btn">
+          <button id="clearS">clear search</button>
+        </div> -->
         <div class="btn">
           <button id="randP">random player</button>
+          <button id="holdP">hold player</button>
         </div>
+        <!-- <div class="btn">
+          <button id="holdP">hold player</button>
+        </div> -->
         <div class="btn">
           <button id="randT">random team</button>
         </div>
@@ -81,28 +97,6 @@
         </div>
       </div>
     </form></div>
-
-    <div class="main" id="main">
-
-      <div class="sect" id="recent-games">
-        <div class="blk">loading recent games...</div>
-        <!-- <div id="tm-img"></div> -->
-      </div>
-
-      <div class="sect">
-        <div class="blk">
-          <div id="top-scorer">loading top scorer...</div>
-              <div id="ts-img"></div>    
-        </div>
-      </div>
-
-      <div class="sect">
-        <div class="blk">
-          <div id="ts-box"></div>
-          <div id="ts-shtg"></div>  
-        </div>
-      </div>
-    </div>
 
     <div class="main" id="player">
       <div class="sect_pl" id="imgs">
@@ -124,6 +118,33 @@
 
   </body>
 </html>
+
+
+
+
+    <!-- <div class="main" id="main">
+
+      <div class="sect" id="recent-games">
+        <div class="blk">loading recent games...</div>
+      </div>
+
+      <div class="sect">
+        <div class="blk">
+          <div id="top-scorer">loading top scorer...</div>
+              <div id="ts-img"></div>    
+        </div>
+      </div>
+
+      <div class="sect">
+        <div class="blk">
+          <div id="ts-box"></div>
+          <div id="ts-shtg"></div>  
+        </div>
+      </div>
+    </div> -->
+
+
+
         <!-- <div class="sect-title"></div> -->
         
         

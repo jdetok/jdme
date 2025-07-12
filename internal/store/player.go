@@ -28,7 +28,7 @@ type RespPlayerMeta struct {
 	TeamId       uint64 `json:"team_id"`
 	League       string `json:"league"`
 	SeasonId     uint64 `json:"season_id"`
-	StatType     string `json:"stat_type"`
+	StatType     string `json:"-"`
 	Player       string `json:"player"`
 	Team         string `json:"team"`
 	TeamName     string `json:"team_name"`
