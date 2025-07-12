@@ -26,22 +26,9 @@ async function boxTable(box, caption, pElName) {
     capt.textContent = caption;
     boxTbl.appendChild(capt);
     const thead = document.createElement('thead');
-    // let capt = document.createElement('caption');
-    // const sType = Object.keys(box);
     const keys = Object.keys(box);
-    // const cols = Object.keys(box[keys[0]])
-    // console.log(`COLUMNS: ${cols}`)
-    // for (let r of Object.keys(shtg[keys[0]])) {
     for (let i=0; i<keys.length; i++) {
-        // console.log(`OUTER LOOP LENGTH: ${cols.length + 1}`)
-        // console.log(r);
         let th = document.createElement('th');
-        // if (i === 0) {
-        //     let th2 = document.createElement('th');
-        //     th2.textContent = 'shot type';  
-        //     thead.appendChild(th2);
-        //     boxTbl.appendChild(thead);  
-        // } 
         th.textContent = keys[i];
         thead.appendChild(th);
     }
@@ -53,13 +40,7 @@ async function boxTable(box, caption, pElName) {
         let td = document.createElement('td');
         td.textContent = box[keys[i]]
         tr.appendChild(td);
-        boxTbl.appendChild(tr);
-        // for (let c=0; c<cols.length; c++) {
-        //     let td = document.createElement('td');
-        //     td.textContent = box[keys[i]][cols[c]];
-        //     tr.appendChild(td);
-        //     boxTbl.appendChild(tr);         
-        // }    
+        boxTbl.appendChild(tr);  
     }
     pEl.appendChild(boxTbl);   
 }
@@ -73,17 +54,13 @@ async function shtgTable(shtg, caption, pElName) {
     let capt = document.createElement('caption');
     capt.textContent = caption;
     shtgTbl.appendChild(capt);
-    // shtgTbl.textContent = ''
     const thead = document.createElement('thead');
-    // let capt = document.createElement('caption');
     const sType = Object.keys(shtg);
     const keys = Object.keys(shtg);
     const cols = Object.keys(shtg[keys[0]])
     console.log(`COLUMNS: ${cols}`)
-    // for (let r of Object.keys(shtg[keys[0]])) {
     for (let i=0; i<(cols.length + 1); i++) {
         console.log(`OUTER LOOP LENGTH: ${cols.length + 1}`)
-        // console.log(r);
         let th = document.createElement('th');
         if (i === 0) {
             let th2 = document.createElement('th');
