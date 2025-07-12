@@ -1,150 +1,68 @@
-export async function getRandP(base, p) {
-    const r = await fetch(base + `/player?player=${p}&season=99998`);
+import * as table from "./table.js"
+
+export async function getP(base, player) { // add season & team
+    const err = document.getElementById('sErr');
+    if (err.style.display === "block") {
+        err.style.display = 'none';
+    }
+
+    const p = encodeURIComponent(player).toLowerCase();
+
+    const r = await fetch(base + `/player?player=${p}&season=88888`);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
     }
+
     const js = await r.json();
     const data = js.player[0];
-    // console.log(data);
-    
-    const home = document.getElementById('main');
-    home.textContent = '';
 
-    await appendImg(data.player_meta.headshot_url, 'imgs', 'pl_img')
-    await appendImg(data.player_meta.team_logo_url, 'imgs', 'tm_img')
-    await playerTitle(data.player_meta, 'player_title');
-    
-    await boxTable(data.totals.box_stats, 'Total Box Stats', 'box');
-    await boxTable(data.per_game.box_stats, 'Avg Box Stats', 'avg-box')
-    await shtgTable(data.totals.shooting, 'Total Shooting Stats', 'shooting');
-    await shtgTable(data.per_game.shooting, 'Per Game Shooting Stats', 'avg-shooting');
-    
+    if (data.player_meta.player_id === 0) {
+        err.textContent = `'${player}' not found...`
+        err.style.display = "block"
+        throw new Error(`Player not found error`);
+    } 
+    await buildPDash(data, 'main');
 }
 
-async function boxTable(box, caption, pElName) {
+export async function buildPDash(data, pElName) {
     const pEl = document.getElementById(pElName);
-    
-    pEl.textContent = ''
-    const boxTbl = document.createElement('table');
-    let capt = document.createElement('caption');
-    capt.textContent = caption;
-    boxTbl.appendChild(capt);
-    const thead = document.createElement('thead');
-    const keys = Object.keys(box);
-    for (let i=0; i<keys.length; i++) {
-        let th = document.createElement('th');
-        th.textContent = keys[i];
-        thead.appendChild(th);
-    }
-    boxTbl.appendChild(thead);
-    let tr = document.createElement('tr');
-    for (let i=0; i<keys.length; i++) {
-        console.log(`OUTER LOOP 2 LENGTH: ${i}/${keys.length}: ${box[keys[i]]}`)
-        
-        let td = document.createElement('td');
-        td.textContent = box[keys[i]]
-        tr.appendChild(td);
-        boxTbl.appendChild(tr);  
-    }
-    pEl.appendChild(boxTbl);   
-}
+    pEl.textContent = '';
 
+    await appendImg(data.player_meta.headshot_url, 'imgs', 'pl_img');
+    await appendImg(data.player_meta.team_logo_url, 'imgs', 'tm_img');
+    await playerResTitle(data.player_meta, 'player_title');
 
-async function shtgTable(shtg, caption, pElName) {
-    const pEl = document.getElementById(pElName);
-    pEl.textContent = ''
-    
-    const shtgTbl = document.createElement('table');
-    let capt = document.createElement('caption');
-    capt.textContent = caption;
-    shtgTbl.appendChild(capt);
-    const thead = document.createElement('thead');
-    const sType = Object.keys(shtg);
-    const keys = Object.keys(shtg);
-    const cols = Object.keys(shtg[keys[0]])
-    console.log(`COLUMNS: ${cols}`)
-    for (let i=0; i<(cols.length + 1); i++) {
-        console.log(`OUTER LOOP LENGTH: ${cols.length + 1}`)
-        let th = document.createElement('th');
-        if (i === 0) {
-            let th2 = document.createElement('th');
-            th2.textContent = 'shot type';  
-            thead.appendChild(th2);
-            shtgTbl.appendChild(thead);  
-        } 
-        th.textContent = cols[i];
-        thead.appendChild(th);
-    }
-    shtgTbl.appendChild(thead);
-    
-for (let i=0; i<sType.length; i++) {
-        console.log(`OUTER LOOP 2 LENGTH: ${i}/${sType.length}`)
-        let tr = document.createElement('tr');
-        let tdh = document.createElement('td');
-        tdh.setAttribute('scope', 'row');
-        tdh.textContent = sType[i]
-        tr.appendChild(tdh);
-        for (let c=0; c<cols.length; c++) {
-            let td = document.createElement('td');
-            td.textContent = shtg[sType[i]][cols[c]];
-            tr.appendChild(td);
-            shtgTbl.appendChild(tr);         
-        }    
-    }
-    pEl.appendChild(shtgTbl);   
+    // box stat tables
+    await table.basicTable(data.totals.box_stats, 'Total Box Stats', 'box');
+    await table.basicTable(data.per_game.box_stats, 'Avg Box Stats', 'avg-box');
+
+    // shooting stats tables
+    await table.rowHdrTable(data.totals.shooting, 'Total Shooting Stats', 
+        'shot_type', 'shooting');
+    await table.rowHdrTable(data.per_game.shooting, 'Per Game Shooting Stats', 
+        'shot_type', 'avg-shooting');
 }
 
 async function appendImg(url, pElName, cElName) {
     const pEl = document.getElementById(pElName);
     const cEl = document.getElementById(cElName);
-    // pEl.textContent = '';
-    cEl.textContent = '';
     const img = document.createElement('img');
+    cEl.textContent = ''; // clear child element
     img.src = url;
     img.alt = "image not found";
     cEl.appendChild(img);
     pEl.append(cEl);
 }
 
-async function playerTitle(meta, elName) {
-    let cont = document.getElementById(elName);
+async function playerResTitle(data, elName) {
+    const cont = document.getElementById(elName);
     cont.textContent = '';
-
-    let d = document.createElement('div');
-    // let h = document.createElement('h3');
-    let t = document.createElement('h1');
-    
-    t.textContent = meta.caption;
-    // h.textContent = meta.team_name;
+    const d = document.createElement('div');
+    const t = document.createElement('h1');
+    const s = document.createElement('h2');
+    t.textContent = data.caption;
+    s.textContent = data.season;
     d.append(t);
+    d.append(s);
     cont.append(d);
 }
-
-/*
-for (let i=0; i<sType.length; i++) {
-        console.log(`OUTER LOOP 2 LENGTH: ${i}/${sType.length}`)
-        let tr = document.createElement('tr');
-        for (let c=0; c<cols.length + 1; c++) {
-            if (c === 0) {
-                let tdh = document.createElement('td');
-                tdh.setAttribute('scope', 'row');
-                
-                tdh.textContent = sType[c];
-                tr.appendChild(tdh);
-                
-
-                console.log(`INNER LOOP i=0: ${i}: ${sType[i]} | ${c}:${cols[c]}`)
-                console.log(`ROW HEADER: ${sType[i]}`)
-            } else {
-                console.log(`ELSE ${i}/${cols.length + 1}`)
-                let td = document.createElement('td');
-                td.textContent = shtg[sType[i]][cols[c-1]];
-                tr.appendChild(td);
-                shtgTbl.appendChild(tr);         
-                console.log(`INNERMOST: ${i}: ${sType[i]} | ${c}:${cols[c-1]}`)
-                console.log(shtg[sType[i]][cols[c-1]])
-            }
-        }    
-    }
-
-*/

@@ -188,6 +188,10 @@ table tr td {
     /* border: 5px solid mediumaquamarine; */
 }
 
+.err {
+    display: none;
+}
+
 .sect_plr div {
     /* border: 3px solid purple; */
     width: 70%;

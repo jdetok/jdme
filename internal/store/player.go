@@ -11,18 +11,7 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
 )
 
-/* INTENT:
-create player structs that will init when a player is searched
-should be able to handle searches for the following:
-  - player only
-  - player/season
-  - player/team
-  - player/season/team
-
-the shooting stats are broke out into three separate struct with made,
-atp, pct for each type of shot. these wrap into another struct
-*/
-
+// outermost struct, returned to http handler as json string
 type Resp struct {
 	Results []RespObj `json:"player"`
 }
@@ -43,8 +32,13 @@ type RespPlayerMeta struct {
 	Player       string `json:"player"`
 	Team         string `json:"team"`
 	TeamName     string `json:"team_name"`
+	Season       string `json:"season"`
 	Caption      string `json:"caption"`
 	CaptionShort string `json:"caption_short"`
+	BoxCapTot    string `json:"cap_box_tot"`
+	BoxCapAvg    string `json:"cap_box_avg"`
+	ShtgCapTot   string `json:"cap_shtg_tot"`
+	ShtgCapAvg   string `json:"cap_shtg_avg"`
 	HeadshotUrl  string `json:"headshot_url"`
 	TeamLogoUrl  string `json:"team_logo_url"`
 }
@@ -82,11 +76,107 @@ type RespPlayerStatsShtgType struct {
 	Percent  string  `json:"percentage"`
 }
 
-// move caps and url to different struct
+// temporary struct used in GetPlayerDash
+type RespSeasonTmp struct {
+	Season  string
+	WSeason string
+}
+
+/*
+CREATE JSON RESPONSE FOR /player
+accept player/team/season ids & query api table in database
+scan rows to structs, build table captions & image urls,
+marshal & return structured json string
+*/
+func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error) {
+	e := errs.ErrInfo{Prefix: "getting player dash"}
+	rows, err := db.Query(mariadb.Player.Q, pId, sId)
+	if err != nil {
+		e.Msg = fmt.Sprintf(
+			`player dash query (player_id: %d | season_id: %d)`, pId, sId)
+		return nil, e.Error(err)
+	}
+	var t RespSeasonTmp // temp seasons for NBA/WNBA, handled after loop
+	var rp RespObj
+	for rows.Next() {
+		// temp structs, handled in hndlRespRow
+		var s RespPlayerStats
+		var p RespPlayerSznOvw
+		rows.Scan( // MUST BE IN ORDER OF QUERY
+			&rp.Meta.PlayerId, &rp.Meta.TeamId, &rp.Meta.League,
+			&rp.Meta.SeasonId, &rp.Meta.StatType, &rp.Meta.Player,
+			&rp.Meta.Team, &rp.Meta.TeamName,
+			&rp.SeasonOvw.GamesPlayed, &p.Minutes,
+			&s.Box.Points, &s.Box.Assists, &s.Box.Rebounds,
+			&s.Box.Steals, &s.Box.Blocks,
+			&s.Shtg.Fg.Makes, &s.Shtg.Fg.Attempts, &s.Shtg.Fg.Percent,
+			&s.Shtg.Fg3.Makes, &s.Shtg.Fg3.Attempts, &s.Shtg.Fg3.Percent,
+			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent,
+			&t.Season, &t.WSeason)
+		// switch on stat type to assign stats to appropriate struct
+		rp.hndlRespRow(&p, &s)
+	}
+	// build table captions & image urls
+	rp.Meta.MakeCaptions()
+	rp.Meta.MakeHeadshotUrl()
+	rp.Meta.MakeTeamLogoUrl()
+
+	// handle aggregate season ids (all, regular season, playoffs)
+	hndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
+	t.hndlSeason(&rp.Meta.League, &rp.Meta.Season)
+
+	r.Results = append(r.Results, rp)
+	js, err := json.Marshal(r)
+	if err != nil {
+		e.Msg = "failed to marshal structs to json"
+	}
+	return js, nil
+}
+
+func (rp *RespObj) hndlRespRow(p *RespPlayerSznOvw, s *RespPlayerStats) {
+	switch rp.Meta.StatType {
+	case "avg":
+		rp.SeasonOvw.MinutsPerGame = p.Minutes
+		rp.PerGame.Box = s.Box
+		rp.PerGame.Shtg = s.Shtg
+	case "tot":
+		rp.SeasonOvw.Minutes = p.Minutes
+		rp.Totals.Box = s.Box
+		rp.Totals.Shtg = s.Shtg
+	}
+}
+
+// accept pointers of league and season, switch season/wseason on league
+func (t *RespSeasonTmp) hndlSeason(league *string, season *string) {
+	switch *league {
+	case "NBA":
+		*season = t.Season
+	case "WNBA":
+		*season = t.WSeason
+	}
+}
+
+// accept pointers of season_id and stat type, switch season to handle stat type
+func hndlAggsIds(sId *uint64, sType *string) {
+	switch *sId {
+	case 99999:
+		*sType = "career regular season + playoffs"
+	case 99998:
+		*sType = "career regular season"
+	case 99997:
+		*sType = "career playoffs"
+	default:
+		*sType = "regular season"
+	}
+}
 
 func (m *RespPlayerMeta) MakeCaptions() {
 	m.Caption = fmt.Sprintf("%s - %s", m.Player, m.TeamName)
 	m.CaptionShort = fmt.Sprintf("%s - %s", m.Player, m.Team)
+	m.BoxCapTot = fmt.Sprintf("%s Box Totals", m.Season)
+	m.BoxCapAvg = fmt.Sprintf("%s Box Averages", m.Season)
+	m.ShtgCapTot = fmt.Sprintf("%s Shooting Totals", m.Season)
+	m.ShtgCapAvg = fmt.Sprintf("%s Shooting Averages", m.Season)
 }
 
 func (m *RespPlayerMeta) MakeHeadshotUrl() {
@@ -103,66 +193,4 @@ func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 	m.TeamLogoUrl = fmt.Sprintf(
 		`https://cdn.%s.com/logos/%s/%s/primary/L/logo.svg`,
 		lg, lg, tId)
-}
-
-// DB QUERY
-func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error) {
-	e := errs.ErrInfo{Prefix: "getting player dash"}
-	rows, err := db.Query(mariadb.Player.Q, pId, sId)
-	if err != nil {
-		e.Msg = fmt.Sprintf(
-			`player dash query (player_id: %d | season_id: %d)`, pId, sId)
-		return nil, e.Error(err)
-	}
-
-	var rp RespObj
-	for rows.Next() {
-		// temp struct to add logic to which stat struct is populated
-		var s RespPlayerStats
-		var p RespPlayerSznOvw
-		rows.Scan(
-			&rp.Meta.PlayerId, &rp.Meta.TeamId, &rp.Meta.League,
-			&rp.Meta.SeasonId, &rp.Meta.StatType, &rp.Meta.Player,
-			&rp.Meta.Team, &rp.Meta.TeamName,
-			&rp.SeasonOvw.GamesPlayed, &p.Minutes,
-			&s.Box.Points, &s.Box.Assists, &s.Box.Rebounds,
-			&s.Box.Steals, &s.Box.Blocks,
-			&s.Shtg.Fg.Makes, &s.Shtg.Fg.Attempts, &s.Shtg.Fg.Percent,
-			&s.Shtg.Fg3.Makes, &s.Shtg.Fg3.Attempts, &s.Shtg.Fg3.Percent,
-			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent)
-
-		switch rp.Meta.StatType {
-		case "avg":
-			rp.SeasonOvw.MinutsPerGame = p.Minutes
-			rp.PerGame.Box = s.Box
-			rp.PerGame.Shtg = s.Shtg
-		case "tot":
-			rp.SeasonOvw.Minutes = p.Minutes
-			rp.Totals.Box = s.Box
-			rp.Totals.Shtg = s.Shtg
-		}
-
-	}
-	rp.Meta.MakeCaptions()
-	rp.Meta.MakeHeadshotUrl()
-	rp.Meta.MakeTeamLogoUrl()
-	switch rp.Meta.SeasonId {
-	case 99999:
-		rp.Meta.StatType = "career regular season + playoffs"
-	case 99998:
-		rp.Meta.StatType = "career regular season"
-	case 99997:
-		rp.Meta.StatType = "career playoffs"
-	default:
-		rp.Meta.StatType = "regular season"
-	}
-
-	r.Results = append(r.Results, rp)
-
-	js, err := json.Marshal(r)
-	if err != nil {
-		e.Msg = "failed to marshal structs to json"
-	}
-
-	return js, nil
 }

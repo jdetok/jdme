@@ -1,35 +1,76 @@
-export async function tableJSON(data, element) {
-    // DIV TO CREATE STATS ELEMENTS
-    const contEl = document.getElementById(element);
-    contEl.innerHTML = ''; 
+// reusable functions for dynamically creating tables
 
-    const keys = Object.keys(data[0]);
-    for (const obj of data) { 
-        const objTbl = document.createElement('table');
-       
-        
-        // LOOP THROUGH FIELDS > numCapFlds, EACH LOOP APPENDS A ROW TO TABLE
-        for (let i = 0; i < keys.length; i++) {
-            const row = document.createElement('tr');
-            const label = document.createElement('th');
-            const val = document.createElement('td');
+// create caption and append to table
+export async function tblCaption(tbl, caption) {
+    const capt = document.createElement('caption');
+    capt.textContent = caption;
+    tbl.appendChild(capt);
+} 
 
+// FIRST ROW CONTAINS HEADERS. ALL COLUMNS CONTAIN A HEADER AND DATA
+export async function basicTable(data, caption, pElName) {
+    // parent element
+    const pEl = document.getElementById(pElName);
+    const tbl = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tr = document.createElement('tr');
+    const cols = Object.keys(data);
+    pEl.textContent = '' // clear parent element
+    await tblCaption(tbl, caption); // create & append caption
 
-            // FIELD NAME IN LEFT COLUMN OF TABLE (RIGHT ALIGNED)
-            
-            label.textContent = keys[i];
-            label.style.textAlign = 'right';
+    // append the header and data for each column
+    for (let i=0; i<cols.length; i++) {
+        const th = document.createElement('th');
+        const td = document.createElement('td');
+        th.textContent = cols[i];
+        td.textContent = data[cols[i]]
+        thead.appendChild(th);
+        tr.appendChild(td);
+    }
+    tbl.appendChild(thead);
+    tbl.appendChild(tr);
+    pEl.appendChild(tbl);
+}
 
-            // VALUE IN RIGHT COLUMN OF TABLE (LEFT ALIGNED)
-            val.textContent = obj[keys[i]];
-            val.style.textAlign = 'left';
-            
-            row.appendChild(label); // APPEND LABEL TO ROW
-            row.appendChild(val); // APPEND VALUE TO ROW
-            objTbl.appendChild(row); // APPEND ROW TO TABLE
-        };
-        
-        contEl.append(objTbl);
-        // div.append(objTbl); // APPEND TABLE TO DIV
-    };
-};
+// FIRST CELL OF EACH ROW IS A HEADER
+export async function rowHdrTable(data, caption, rowHdrLabel, pElName) {
+    const pEl = document.getElementById(pElName);
+    const tbl = document.createElement('table');
+    const thead = document.createElement('thead');
+    const keys = Object.keys(data);
+    const cols = Object.keys(data[keys[0]])
+    
+    pEl.textContent = '' // clear parent element
+    await tblCaption(tbl, caption); // create & append caption
+    
+    // append header row to table
+    for (let i=0; i<(cols.length + 1); i++) {
+        const th = document.createElement('th');
+        if (i === 0) { // append first table cell (col header for row headers)
+            const rowHdr = document.createElement('th');
+            rowHdr.textContent = rowHdrLabel;  
+            thead.appendChild(rowHdr);
+            tbl.appendChild(thead);  
+        } // append colunn headers to thead
+        th.textContent = cols[i];
+        thead.appendChild(th);
+    } // append thead to table
+    tbl.appendChild(thead);
+    
+    // outer loop: set row header for each row
+    for (let i=0; i<keys.length; i++) {
+        const tr = document.createElement('tr');
+        const tdh = document.createElement('td');
+        tdh.setAttribute('scope', 'row');
+        tdh.textContent = keys[i]
+        tr.appendChild(tdh);
+    // inner loop: append each data point for each row
+        for (let c=0; c<cols.length; c++) {
+            const td = document.createElement('td');
+            td.textContent = data[keys[i]][cols[c]]; 
+            tr.appendChild(td);
+            tbl.appendChild(tr);         
+        }    
+    } // append table to parent element
+    pEl.appendChild(tbl);   
+}

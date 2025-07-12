@@ -20,7 +20,20 @@ var PlayersSeason = Query{
 	`,
 }
 
+var Szn = Query{
+	Q: `select season_desc, wseason_desc from season where season_id = ?`,
+}
+
 var Player = Query{
+	Q: `
+		select a.*, b.season_desc, b.wseason_desc
+		from api_player_stats a
+		join season b on b.season_id = a.season_id
+		where a.player_id = ? and a.season_id = ?
+	`,
+}
+
+var PlayerRec0712 = Query{
 	Q: `
 		select * from api_player_stats 
 		where player_id = ? and season_id = ?

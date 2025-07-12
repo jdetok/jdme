@@ -1,4 +1,4 @@
-import { getRandP } from "./pdash.js";
+import * as pdash from "./pdash.js";
 import { base, dev } from "./listen.js";
 const mdiv = document.getElementById('main');
 export async function clear() {
@@ -14,32 +14,17 @@ export async function randPlayerBtn() {
     btn.addEventListener('click', async (event) => {
         event.preventDefault();
         console.log('random')
-        // call randomplayer 
-        // mdiv.textContent = '';
-
-        await getRandP(dev, 'random');
+        await pdash.getP(dev, 'random');
     })
 }
 
 export async function search() {
-
-    // const btn = document.getElementById('search');
-    // btn.addEventListener('click', async (event) => {
     const frm = document.getElementById('ui');
     frm.addEventListener('submit', async (event) => {
         event.preventDefault();
-
-        const player = encodeURIComponent(
-            document.getElementById('pSearch').value.trim()
-            ).toLowerCase();
-        await getRandP(dev, player)
+        const input = document.getElementById('pSearch');
+        const player = input.value.trim(); // pass before encoding for error msg
+        await pdash.getP(dev, player);
+        input.value = ''; // clear input box after searching
     }) 
 }
-
-// function searchListener() {
-//     const btn = document.getElementById('searchBtn');
-//     btn.addEventListener('click', async (event) => {
-//         event.preventDefault();
-//         await search();
-//     });
-// };
