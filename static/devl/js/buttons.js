@@ -17,6 +17,29 @@ export async function randPlayerBtn() {
         // call randomplayer 
         // mdiv.textContent = '';
 
-        await getRandP(dev);
+        await getRandP(dev, 'random');
     })
 }
+
+export async function search() {
+
+    // const btn = document.getElementById('search');
+    // btn.addEventListener('click', async (event) => {
+    const frm = document.getElementById('ui');
+    frm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const player = encodeURIComponent(
+            document.getElementById('pSearch').value.trim()
+            ).toLowerCase();
+        await getRandP(dev, player)
+    }) 
+}
+
+// function searchListener() {
+//     const btn = document.getElementById('searchBtn');
+//     btn.addEventListener('click', async (event) => {
+//         event.preventDefault();
+//         await search();
+//     });
+// };

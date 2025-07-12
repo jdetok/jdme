@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await home.lgChangeListener();
     await buttons.clear();
     await buttons.randPlayerBtn();
+    await buttons.search();
 });
 
 

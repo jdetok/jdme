@@ -1,5 +1,5 @@
-export async function getRandP(base) {
-    const r = await fetch(base + '/player?player=random&season=88888');
+export async function getRandP(base, p) {
+    const r = await fetch(base + `/player?player=${p}&season=99998`);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
     }
@@ -13,8 +13,12 @@ export async function getRandP(base) {
     await appendImg(data.player_meta.headshot_url, 'imgs', 'pl_img')
     await appendImg(data.player_meta.team_logo_url, 'imgs', 'tm_img')
     await playerTitle(data.player_meta, 'player_title');
-    await shtgTable(data.totals.shooting, 'Shooting Stats', 'shooting');
-    await boxTable(data.totals.box_stats, 'Box Stats', 'box');
+    
+    await boxTable(data.totals.box_stats, 'Total Box Stats', 'box');
+    await boxTable(data.per_game.box_stats, 'Avg Box Stats', 'avg-box')
+    await shtgTable(data.totals.shooting, 'Total Shooting Stats', 'shooting');
+    await shtgTable(data.per_game.shooting, 'Per Game Shooting Stats', 'avg-shooting');
+    
 }
 
 async function boxTable(box, caption, pElName) {

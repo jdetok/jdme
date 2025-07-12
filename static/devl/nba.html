@@ -12,25 +12,25 @@
   
 
   <body>    
-    <header>
-    <div class="goback">
+    <header class="row">
+    <div>
       <a href="index.html">go back</a>
+    </div>
+    
+    <div>
+        <a href="../nba-info.html">Learn More about this Site</a>
+    </div>
+    <div>
+      all data owned by and sourced from the NBA (<i>
+        <a class="transpar" href="https://www.nba.com/stats" target="_blank">
+        National Basketball Association</a></i>)
     </div>
     <div class="disclaimer">
       <a class="transpar" href="https://www.nba.com/stats" target="_blank">
         NO AFFILIATION WITH THE NBA</a>
     </div>
-    <div class="center">
-        <a href="../nba-info.html">Learn More about this Site</a>
-    </div>
   </header>
-    <div class="intro">
-      <h4>all data owned by and sourced from the NBA (<i>
-        <a class="transpar" href="https://www.nba.com/stats" target="_blank">
-        National Basketball Association</a></i>)
-      </h4>
-      <h1>NBA/WNBA Statistics</h1>
-    </div>
+    <h1>NBA/WNBA Statistics</h1>
     
    <!-- SELECTORS -->
     <div class="ui"><form id="ui">
@@ -57,6 +57,9 @@
         </div>
       </div>
       <div class="btns">
+        <div class="btn">
+          <input type="text" id="pSearch" placeholder="Search for a player">
+        </div>
         <div class="btn">
           <button id="search" type="submit">search</button>
         </div>
@@ -88,9 +91,7 @@
       <div class="sect">
         <div class="blk">
           <div id="top-scorer">loading top scorer...</div>
-            <div class="blk">
               <div id="ts-img"></div>    
-            </div>
         </div>
       </div>
 
@@ -107,13 +108,15 @@
         <div id="tm_img"></div>
         <div id="pl_img"></div>
       </div>
-      <div class="sect_pl" id="stats">
+      <div class="sect_plr" id="stats">
         <div id="player_title"></div>
-        <div id="box"></div>
-        <div class="blk">
-          <div id="shooting"></div>
+        <!-- <div class="tbls"> -->
           <div id="box"></div>
-        </div>
+          <div id="avg-box"></div>
+          <div id="shooting"></div>
+          <div id="avg-shooting"></div>
+          
+        <!-- </div> -->
       </div>
 
     </div>
