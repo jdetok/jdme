@@ -50,6 +50,7 @@ func (app *application) mount() *http.ServeMux {
 	// ENDPOINTS 06/19
 	mux.HandleFunc("GET /devl/bball", app.bballDevHandler)
 	mux.HandleFunc("GET /devl/bball/player", app.getPlayerDash)
+	// mux.HandleFunc("GET /devl/bball/player/team", app.getPlayerDashTmSzn)
 	mux.HandleFunc("GET /bball/games/recent", app.getGamesRecentNew)
 	mux.HandleFunc("GET /bball/games/recent/top-scorer", app.getTopScorerNew)
 	mux.HandleFunc("GET /bball/players", app.getStats)

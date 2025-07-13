@@ -33,6 +33,17 @@ var Player = Query{
 	`,
 }
 
+var TeamSeasonTopP = Query{
+	Q: `
+		select a.*, b.season_desc, b.wseason_desc
+		from api_player_stats a
+		join season b on b.season_id = a.season_id
+		where team_id = ? and a.season_id = ?
+		order by a.points desc
+		limit 2;
+	`,
+}
+
 var PlayerRec0712 = Query{
 	Q: `
 		select * from api_player_stats 

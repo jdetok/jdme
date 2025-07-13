@@ -24,8 +24,9 @@ export async function randPlayerBtn() {
 
         const szn = document.getElementById('rs_slct');
         const season = szn.value;
+        // const team = document.getElementById('rs_slct').value;
 
-        await pdash.getP(dev, 'random', season);
+        await pdash.getP(dev, 'random', season, 0);
     })
 }
 
@@ -55,10 +56,13 @@ export async function search() {
 
         const szn = document.getElementById('rs_slct');
         const season = szn.value;
+
+        const team = document.getElementById('nba_teams').value;
+        
         // const season = szn.value.trim(); // pass before encoding for error msg
         
-        console.log(season)
-        await pdash.getP(dev, player, season);
+        console.log(team)
+        await pdash.getP(dev, player, season, team);
         input.value = ''; // clear input box after searching
         
     }) 

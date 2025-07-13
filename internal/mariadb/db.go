@@ -14,24 +14,24 @@ import (
 )
 
 type JSONOutput struct {
-	Meta []string `json:"meta"`
+	Meta []string         `json:"meta"`
 	Data []map[string]any `json:"data"`
 }
 
 func InitDB() *sql.DB {
-// get conn. vars from .env & build connection string
+	// get conn. vars from .env & build connection string
 	dbUser := env.GetString("DB_USER")
 	dbHost := env.GetString("DB_HOST")
 	database := env.GetString("DB")
 	connStr := dbUser + "@tcp(" + dbHost + ")/" + database
 
-// attempt to open database connection
+	// attempt to open database connection
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {
 		fmt.Println(err)
 	}
-	
-// ping to confirm connection - exits with error if ping is not successful
+
+	// ping to confirm connection - exits with error if ping is not successful
 	if err := db.Ping(); err != nil {
 		fmt.Println(err)
 	}
@@ -69,7 +69,7 @@ func DBJSONResposne(db *sql.DB, q string, args ...any) ([]byte, error) {
 }
 
 // new database query func, use variatic args
-func Select(db *sql.DB, q string, args ...any) (*sql.Rows, []string, error){
+func Select(db *sql.DB, q string, args ...any) (*sql.Rows, []string, error) {
 	// actual query
 	rows, err := db.Query(q, args...)
 	if err != nil {
@@ -116,12 +116,12 @@ func ProcessRows(rows *sql.Rows, cols []string) ([]any, error) {
 			if reflect.TypeOf(v) == reflect.TypeOf([]byte{}) {
 				v = string(v.([]byte))
 			}
-			
+
 			rowVals[i] = v
 		}
 		// append row vals to vals slice
 		vals = append(vals, rowVals)
-		
+
 	}
 	fmt.Println(vals)
 	return vals, nil
@@ -159,31 +159,31 @@ func MapToJSON(data []map[string]any) ([]byte, error) {
 // =======================================================================
 
 func SelectDB(database *sql.DB, q string) ([]byte, error) {
-	e := errs.ErrInfo{Prefix: "database query",}
+	e := errs.ErrInfo{Prefix: "database query"}
 	rows, err := database.Query(q)
 	if err != nil {
 		fmt.Println(err)
-	}	
+	}
 	js, err := RowsToJSON(rows, false)
 	if err != nil {
 		e.Msg = "func RowsToJSON() failed"
 		return nil, e.Error(err)
 	}
-// return the response as json
+	// return the response as json
 	return js, nil
 }
 
 // USED IN ORIGINAL NBA ENDPOINTS
 func SelectLgPlayer(db *sql.DB, w *http.ResponseWriter, q string, lg string, pl string) []byte {
-	e := errs.ErrInfo{Prefix: "database query (arg)",}
-	
+	e := errs.ErrInfo{Prefix: "database query (arg)"}
+
 	rows, err := db.Query(q, lg, pl)
 	if err != nil {
 		e.Msg = "db.Query failed"
 		errs.HTTPErr(*w, e.Error(err))
 	}
-	
-// return the response as json
+
+	// return the response as json
 	js, err := RowsToJSON(rows, false)
 	if err != nil {
 		e.Msg = "func RowsToJSON() failed"

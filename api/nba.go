@@ -31,17 +31,29 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 
 	season := r.URL.Query().Get("season")
 	player := r.URL.Query().Get("player")
+	team := r.URL.Query().Get("team")
+	var tId uint64
+	tId, _ = strconv.ParseUint(team, 10, 64)
 
 	pId, sId := store.GetpIdsId(app.players, player, season)
 
 	var rp store.Resp
-	js, err := rp.GetPlayerDash(app.database, pId, sId)
+	js, err := rp.GetPlayerDash(app.database, pId, sId, tId)
+	// js, err := rp.GetPlayerDash(app.database, pId, sId, tId)
 	if err != nil {
 		e.Msg = "failed to get player dash"
 		errs.HTTPErr(w, e.Error(err))
 	}
 	app.JSONWriter(w, js)
 }
+
+// func (app *application) getPlayerDashTmSzn(w http.ResponseWriter, r *http.Request) {
+// 	e := errs.ErrInfo{Prefix: "player dash endpoint"}
+// 	logs.LogHTTP(r)
+
+// 	season := r.URL.Query().Get("season")
+// 	team := r.URL.Query().Get("team")
+// }
 
 // RANDOM PLAYER
 // func (app *application) randPlayer() uint64 {

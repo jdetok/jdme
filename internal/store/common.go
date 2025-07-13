@@ -84,11 +84,11 @@ type Season struct {
 }
 
 type Team struct {
-	League   string
-	TeamId   string
-	TeamAbbr string
-	CityTeam string
-	LogoUrl  string
+	League   string `json:"league"`
+	TeamId   string `json:"team_id"`
+	TeamAbbr string `json:"team"`
+	CityTeam string `json:"team_long"`
+	LogoUrl  string `json:"-"`
 }
 
 func (pm *PlayerMeta) MakeCaptions() {

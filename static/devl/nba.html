@@ -32,30 +32,33 @@
     
    <!-- SELECTORS -->
     <div class="ui"><form id="ui">
-      <div class="modes">
-        <div class="mode">
-          <label for="lg-slct">stats by league:</label>
-          <select class="slct" id="lg-slct">
+      <div class="btns">
+        <div class="btn">
+          <label for="league">stats by league:</label>
+          <select class="slct" id="league">
+            <option value="all">NBA/WNBA</option>
             <option value="nba">NBA</option>
             <option value="wnba">WNBA</option>
-            <option value="all">NBA/WNBA</option>
           </select>
         </div>
-        <div class="mode">
-          <label for="team-slct">stats by team:</label>
-          <select class="slct" id="team-slct">
-            <option value="all">any team</option>
-          </select>
+        <div class="btn">
+          <label for="nba_teams">nba teams:</label>
+          <select class="slct" id="nba_teams"></select>
         </div>
-        <div class="mode">
-          <label for="rs_slct">stats by regular season:</label>
+        <div class="btn">
+          <label for="wnba_teams">wnba teams:</label>
+          <select class="slct" id="wnba_teams"></select>
+        </div>
+        
+        <div class="btn">
+          <label for="rs_slct">regular seasons:</label>
           <select class="slct" id="rs_slct"></select>
         </div>
-        <div class="mode">
-          <label for="ps_slct">stats by post-season:</label>
+        <div class="btn">
+          <label for="ps_slct">post-seasons:</label>
           <select class="slct" id="ps_slct"></select>
         </div>
-        <div class="mode">
+        <div class="btn">
           <label for="cr_slct">career stats:</label>
           <select class="slct" id="cr_slct"></select>
         </div>
@@ -100,8 +103,8 @@
 
     <div class="main" id="player">
       <div class="sect_pl" id="imgs">
-        <div id="tm_img"></div>
         <div id="pl_img"></div>
+        <div id="tm_img"></div>
       </div>
       <div class="sect_plr" id="stats">
         <div id="player_title"></div>
@@ -110,10 +113,7 @@
           <div id="avg-box"></div>
           <div id="shooting"></div>
           <div id="avg-shooting"></div>
-          
-        <!-- </div> -->
       </div>
-
     </div>
 
   </body>

@@ -88,9 +88,22 @@ accept player/team/season ids & query api table in database
 scan rows to structs, build table captions & image urls,
 marshal & return structured json string
 */
-func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64) ([]byte, error) {
+// func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
+func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
 	e := errs.ErrInfo{Prefix: "getting player dash"}
-	rows, err := db.Query(mariadb.Player.Q, pId, sId)
+	var q string
+	var p uint64
+	switch tId {
+	case 0:
+		q = mariadb.Player.Q
+		p = pId
+	default:
+		q = mariadb.TeamSeasonTopP.Q
+		p = tId
+	}
+
+	rows, err := db.Query(q, p, sId)
+	// rows, err := db.Query(mariadb.Player.Q, pId, sId)
 	if err != nil {
 		e.Msg = fmt.Sprintf(
 			`player dash query (player_id: %d | season_id: %d)`, pId, sId)

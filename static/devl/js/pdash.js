@@ -1,6 +1,7 @@
 import * as table from "./table.js"
 import { updateCrnt } from "./listen.js"
-export async function getP(base, player, season) { // add season & team
+
+export async function getP(base, player, season, team) { // add season & team
     const err = document.getElementById('sErr');
     if (err.style.display === "block") {
         err.style.display = 'none';
@@ -11,11 +12,11 @@ export async function getP(base, player, season) { // add season & team
     
     console.log(s);
     // const r = await fetch(base + `/player?player=${p}&season=88888`);
-    const r = await fetch(base + `/player?player=${p}&season=${s}`);
+    const r = await fetch(base + `/player?player=${p}&season=${s}&team=${team}`);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
     }
-    
+    console.log("got data")
     const js = await r.json();
     const data = js.player[0];
 
@@ -27,23 +28,20 @@ export async function getP(base, player, season) { // add season & team
         throw new Error(`Player not found error`);
     } 
     // await updateCrnt(data.player_meta.player)
-    await buildPDash(data, 'main');
+    await buildPDash(data, 'player');
     document.getElementById('pHold').value = data.player_meta.player;
 }
-
-// export async function hdn(data) {
-//     const h = document.createElement('div');
-//     h.style.display = 'none';
-//     h.
-// }
 
 export async function buildPDash(data, pElName) {
 
     const pEl = document.getElementById(pElName);
-    pEl.textContent = '';
+    
+    // pEl.textContent = ''; // this breaks it
 
-    await appendImg(data.player_meta.headshot_url, 'imgs', 'pl_img');
-    await appendImg(data.player_meta.team_logo_url, 'imgs', 'tm_img');
+    // await appendImgOld(data.player_meta.headshot_url, 'imgs', 'pl_img');
+    // await appendImgOld(data.player_meta.team_logo_url, 'imgs', 'tm_img');
+    await appendImg(data.player_meta.headshot_url, 'pl_img');
+    await appendImg(data.player_meta.team_logo_url, 'tm_img');
     await playerResTitle(data.player_meta, 'player_title');
 
     // box stat tables
@@ -57,7 +55,17 @@ export async function buildPDash(data, pElName) {
         'shot_type', 'avg-shooting');
 }
 
-async function appendImg(url, pElName, cElName) {
+async function appendImg(url, pElName) {
+    console.log("in image thing")
+    console.log(pElName);
+    const pEl = document.getElementById(pElName);
+    const img = document.createElement('img');
+    pEl.textContent = ''; // clear child element
+    img.src = url;
+    img.alt = "image not found";
+    pEl.append(img);
+}
+async function appendImgOld(url, pElName, cElName) {
     const pEl = document.getElementById(pElName);
     const cEl = document.getElementById(cElName);
     const img = document.createElement('img');

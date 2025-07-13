@@ -17,10 +17,11 @@ export async function updateCrnt(new_crnt) {
 document.addEventListener('DOMContentLoaded', async () => {
     // await home.loadSeasonOpts();
     await selectors.loadSznOptions();
-    await home.loadTeamOpts();
+    await selectors.loadAllTeamOpts();
+    // await home.loadTeamOpts();
     // await home.gamesRecent();
     // await home.topScorer();
-    await home.lgChangeListener();
+    // await home.lgChangeListener();
     await buttons.clear();
     await buttons.randPlayerBtn();
     await buttons.search();
