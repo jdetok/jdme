@@ -44,27 +44,25 @@ body {
 
 .plimgs {
     display: flex;
-    flex-direction: row;
-    max-width: 100%;
-    height: auto;
-    vertical-align: bottom;
+    align-items: center;
+}
+
+.plimgs div {
+    width: 50%;
 }
 
 .plimgs img {
-    width: 500px;
-}
-
-#pl_img {
-    margin-top: 70px;
+    width: 100%;
 }
 
 .main {
+    border: 3px solid brown;
     display: flex;
     flex-direction: row;
     max-width: 100%;
-    width: 98%;
-    margin: 0 auto;
-    gap: 10px;
+    /* width: 98%; */
+    /* margin: 0 auto; */
+    /* gap: 10px; */
 }
 
 .sect {
@@ -75,6 +73,7 @@ body {
 }
 
 table {
+    width: 100%;
     border: 3px solid black;
 }
 
@@ -90,6 +89,7 @@ table tr td {
     max-width:50%;
     height: auto;
     gap: 5%;
+    /* border: 4px solid magenta; */
 }
 
 .err {
@@ -98,11 +98,12 @@ table tr td {
 
 .sect_plr div {
     width: 100%;
+    /* border: 2px solid white; */
 }
 
-.sect_plr table {
+/* .sect_plr table {
     width: 100%;
-}
+} */
 
 caption {
     font-size: 24px;

@@ -1,4 +1,18 @@
 @media (max-width: 600px) {
+    header {
+        display: none;
+    }
+
+    .ui {
+        display: none;
+        max-width: 100%;
+    }
+
+    .sect_plr {
+        max-width: 100%;
+    }
+
+    /* pre final */
     .row {
         flex-direction: column;
     }
