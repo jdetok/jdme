@@ -1,12 +1,12 @@
 // script to load in HTML -- all listener functions are called here 
 
-import * as home from "./home.js";
+// import * as home from "./home.js";
 import * as buttons from "./buttons.js"
 import * as pdash from "./pdash.js"
 import * as selectors from "./selectors.js"
 
 export const base = "https://jdeko.me/bball";
-export const dev = "https://jdeko.me/devl/bball";
+// export const dev = "https://jdeko.me/devl/bball";
 
 export let crnt = "first";
 export async function updateCrnt(new_crnt) {
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await buttons.search();
     await buttons.clearSearch();
     await buttons.holdPlayerBtn();
-    await pdash.getP(dev, 'random', 88888, 0);
+    await pdash.getP(base, 'random', 88888, 0);
 });
 // await home.loadSeasonOpts();
 // await home.loadTeamOpts();

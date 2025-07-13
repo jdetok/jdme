@@ -1,14 +1,5 @@
 import { getP } from "./pdash.js";
-import { dev } from "./listen.js";
-
-// const mdiv = document.getElementById('main');
-// export async function clear() {
-//     const btn = document.getElementById('clear');
-//     btn.addEventListener('click', async (event) => {
-//         event.preventDefault();
-//         mdiv.textContent = '';
-//     })
-// }
+import { base } from "./listen.js";
 
 export async function clearSearch() {
     const btn = document.getElementById('clearS');
@@ -24,7 +15,7 @@ export async function randPlayerBtn() {
         event.preventDefault();
         const szn = document.getElementById('rs_slct');
         const season = szn.value;
-        await getP(dev, 'random', season, 0);
+        await getP(base, 'random', season, 0);
     })
 }
 
@@ -50,7 +41,7 @@ export async function search() {
         const team = document.getElementById('nba_teams').value;
         
         console.log(team)
-        await getP(dev, player, season, '0');
+        await getP(base, player, season, '0');
         input.value = ''; // clear input box after searching
         
     }) 
