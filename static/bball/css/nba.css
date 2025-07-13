@@ -1,56 +1,16 @@
-/*
-body > div, form {
-    border: 2px solid magenta;
-}
-
-div > div {
-    border: 1px solid cyan;
-}*/
-/* 
-div > div > div {
-    border: 1px dashed red;
-} */
-
-
-/* MODE SELECTORS SECTION
-- add in links to different pages like leaderboards, player, etc
-*/
-
-/* HEADER SECTION */
-/* .ohdr {
-    display: flex;
-    flex-direction: row;
-}
-
-.disclaimer {
-    
-    align-items: flex-start;   
-    
-} */
-
 .hdr {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    /* margin-left: 1%; */
-    /* margin-right: 1%; */
-    /* border: 5px solid black; */
 }
 
 .hdr div {
-     /* border: 2px solid black; */
     align-items: flex-end;
     font-size: 18px;
 }
 
-.ctr {
-    justify-content: center;
-}
-
 body {
     text-align: center;
-    justify-content: center;
-    margin: 0 auto;
 }
 
 
@@ -60,40 +20,10 @@ body {
     max-width: 80%;
 }
 
-.modes {
-    display: flex;
-    flex-direction: row;
-    /* flex-wrap: wrap; */
-    max-width: 90%;
-    justify-content: space-between;
-    margin: 0 auto;
-    /* gap: 20px; */
-}
-
-.mode {
-    font-size: 20px;
-    text-align: center;
-}
-
-.mode label {
-    font-size: 20px;
-}
-
-.mode select {
-    font-size: 14px;
-    
-}
-
-.mode option {
-    font-size: 12px;
-}
-
 .btns {
     display: flex;
     flex-direction: row;
-    /* flex-wrap: wrap; */
     max-width: 90%;
-    /* align-content: center; */
     justify-content: center;
     align-items: center;
     margin: 0 auto;
@@ -107,10 +37,6 @@ body {
     align-content: center;
 }
 
-/* DEFAULT DASHBOARD SECTION ON LOAD
-- make reusable classes for tables/pictures
-*/
-
 .res {
     display: flex;
     flex-direction: column;
@@ -119,17 +45,13 @@ body {
 .plimgs {
     display: flex;
     flex-direction: row;
-    /* width: 50%; */
     max-width: 100%;
     height: auto;
     vertical-align: bottom;
 }
 
 .plimgs img {
-    /* border: 3px solid black; */
     width: 500px;
-    
-    /* vertical-align: bottom; */
 }
 
 #pl_img {
@@ -143,51 +65,14 @@ body {
     width: 98%;
     margin: 0 auto;
     gap: 10px;
-    /* margin-top: 15px; */
-    /* align-items: center; */
-    /* border: 10px solid maroon */
 }
-
-
 
 .sect {
     display: flex;
     width:50%;
     max-width: 50%;
     height: auto;
-    /* gap: 5px; */
-    /* border: 10px solid cyan; */
 }
-
-.blk {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-}
-
-.tbls {
-    display: flex;
-    flex-direction: column;
-    gap:20px;
-    max-width: 100%;
-    
-    /* border: 5px solid maroon; */
-}
-
-.tbls table {
-    width: 70%;
-}
-
-.blk div {
-    /* border: 5px solid pink; */
-    margin-bottom: 15px;
-    align-self: start;
-}
-
-/* .blk table {
-    
-    width: 70%;
-} */
 
 table {
     border: 3px solid black;
@@ -198,22 +83,6 @@ table tr td {
     border: 1px solid black;
 }
 
-.sect_pl {
-    display: flex;
-    flex-direction: column;
-    width: 50%;
-    max-width:50%;
-    height: auto;
-    align-items: flex-end;
-    /* border: 5px solid mediumaquamarine; */
-}
-
-.sect_pl div {
-    /* border: 3px solid purple; */
-    width: 70%;
-    /* justify-content: flex-end; */
-}
-
 .sect_plr {
     display: flex;
     flex-direction: column;
@@ -221,8 +90,6 @@ table tr td {
     max-width:50%;
     height: auto;
     gap: 5%;
-    /* border: 5px solid mediumaquamarine; */
-    /* align-items: flex-start; */
 }
 
 .err {
@@ -230,21 +97,6 @@ table tr td {
 }
 
 .sect_plr div {
-    /* border: 3px solid purple; */
-    width: 100%;
-}
-.sect_pl img {
-    /* width: 550px; */
-    width: 65%;
-    /* max-height: 25%; */
-    /* border: 5px solid black; */
-}
-
-img {
-    width: 65%;
-}
-
-#player_title {
     width: 100%;
 }
 
@@ -255,58 +107,3 @@ img {
 caption {
     font-size: 24px;
 }
-
-@media (max-width: 600px) {
-    .row {
-        flex-direction: column;
-    }
-    .row div {
-        margin: 0 auto;
-    }
-    
-    .modes, .btns {
-        /* flex-direction: column; */
-        flex-wrap: wrap;
-    }
-    
-    .main {
-        flex-direction: column;       
-    }
-    .sect, .blk {
-        flex-direction: column;
-        width: 100%
-    }
-
-    .blk {
-        width: 100%;
-    }
-}
-/* #ts-shtg {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-} */
-
-/* #recent-games {
-    font-size: 16;
-} */
-
-/* #top-scorer {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    max-width: 30%;
-} */
-
-/* #top-scorer img {
-    max-width: 30%;
-    height: auto;
-    display: block;
-} */
-
-
-
-
-/* TABLES

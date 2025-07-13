@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     topScorer();
 });
 
-
 async function getAPIResp(url) {
     try { // WAIT FOR API RESPONSE
         const response = await fetch(url);
@@ -34,7 +33,6 @@ async function tableJSON(data, element) {
     const keys = Object.keys(data[0]);
     for (const obj of data) { 
         const objTbl = document.createElement('table');
-       
         
         // LOOP THROUGH FIELDS > numCapFlds, EACH LOOP APPENDS A ROW TO TABLE
         for (let i = 0; i < keys.length; i++) {
@@ -70,7 +68,6 @@ async function topScorer() {
     let data = await getAPIResp(base + '/games/recent/top-scorer');
     await tableJSON(data, 'top-scorer-tbl');
 }
-
 
 function resetListener() {
     const btn = document.getElementById('reset');

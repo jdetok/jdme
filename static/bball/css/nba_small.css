@@ -1,0 +1,17 @@
+@media (max-width: 600px) {
+    .row {
+        flex-direction: column;
+    }
+    .row div {
+        margin: 0 auto;
+    }
+    
+    .btns {
+        /* flex-direction: column; */
+        flex-wrap: wrap;
+    }
+    
+    .main {
+        flex-direction: column;       
+    }
+}
