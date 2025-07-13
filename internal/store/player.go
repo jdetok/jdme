@@ -129,14 +129,14 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 		// switch on stat type to assign stats to appropriate struct
 		rp.hndlRespRow(&p, &s)
 	}
+	// handle aggregate season ids (all, regular season, playoffs)
+	hndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
+	t.hndlSeason(&rp.Meta.League, &rp.Meta.Season)
+
 	// build table captions & image urls
 	rp.Meta.MakeCaptions()
 	rp.Meta.MakeHeadshotUrl()
 	rp.Meta.MakeTeamLogoUrl()
-
-	// handle aggregate season ids (all, regular season, playoffs)
-	hndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
-	t.hndlSeason(&rp.Meta.League, &rp.Meta.Season)
 
 	r.Results = append(r.Results, rp)
 	js, err := json.Marshal(r)
@@ -186,10 +186,10 @@ func hndlAggsIds(sId *uint64, sType *string) {
 func (m *RespPlayerMeta) MakeCaptions() {
 	m.Caption = fmt.Sprintf("%s - %s", m.Player, m.TeamName)
 	m.CaptionShort = fmt.Sprintf("%s - %s", m.Player, m.Team)
-	m.BoxCapTot = fmt.Sprintf("%s Box Totals", m.Season)
-	m.BoxCapAvg = fmt.Sprintf("%s Box Averages", m.Season)
-	m.ShtgCapTot = fmt.Sprintf("%s Shooting Totals", m.Season)
-	m.ShtgCapAvg = fmt.Sprintf("%s Shooting Averages", m.Season)
+	m.BoxCapTot = fmt.Sprintf("Box Totals - %s", m.Season)
+	m.BoxCapAvg = fmt.Sprintf("Box Averages - %s", m.Season)
+	m.ShtgCapTot = fmt.Sprintf("Shooting Totals - %s", m.Season)
+	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages - %s", m.Season)
 }
 
 func (m *RespPlayerMeta) MakeHeadshotUrl() {

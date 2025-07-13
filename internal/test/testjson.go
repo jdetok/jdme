@@ -1,42 +1,42 @@
 package main
 
-import (
-	"encoding/json"
-	"fmt"
+// import (
+// 	"encoding/json"
+// 	"fmt"
 
-	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
-	"github.com/jdetok/go-api-jdeko.me/internal/store"
-)
+// 	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
+// 	"github.com/jdetok/go-api-jdeko.me/internal/store"
+// )
 
-func main() {
-	// store.RecGamesTest()
+// func main() {
+// 	// store.RecGamesTest()
 
-	db := mariadb.InitDB()
-	var rp store.Resp
+// 	db := mariadb.InitDB()
+// 	var rp store.Resp
 
-	rp.GetPlayerDash(db, 2544, 42024)
-	js, err := json.Marshal(rp)
-	if err != nil {
-		fmt.Println("marshal error")
-	}
+// 	rp.GetPlayerDash(db, 2544, 42024)
+// 	js, err := json.Marshal(rp)
+// 	if err != nil {
+// 		fmt.Println("marshal error")
+// 	}
 
-	fmt.Println(string(js))
+// 	fmt.Println(string(js))
 
-	// rows, err := db.Query(`
-	// 	select * from api_player_stats
-	// 	where player_id = ? and season_id = ?
-	// 	`, 2544, 22005)
-	// if err != nil {
-	// 	fmt.Println("query error")
-	// }
+// rows, err := db.Query(`
+// 	select * from api_player_stats
+// 	where player_id = ? and season_id = ?
+// 	`, 2544, 22005)
+// if err != nil {
+// 	fmt.Println("query error")
+// }
 
-	// cols, _ := rows.Columns()
-	// _, err = mariadb.ProcessRows(rows, cols)
-	// if err != nil {
-	// 	fmt.Println("row processing error")
-	// }
+// cols, _ := rows.Columns()
+// _, err = mariadb.ProcessRows(rows, cols)
+// if err != nil {
+// 	fmt.Println("row processing error")
+// }
 
-}
+// }
 
 // 	rg := store.RecentGames{}
 // 	ts := store.TopScorer{}

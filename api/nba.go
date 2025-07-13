@@ -14,15 +14,18 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/internal/store"
 )
 
-/* TODO
-- ENDPOINT: MOST RECENT DATE WITH GAME(S)
--- highest scoring player's id for headshot
-
-- ENDPOINT: CURRENT LEAGUE RECORDS
-*/
-// SERVE MAIN NBA PAGES
-var nbaPath string = (env.GetString("STATIC_PATH") + "/nba.html")
 var nbaDevPath string = (env.GetString("DEV_PATH") + "/nba.html")
+var bballPath string = (env.GetString("BBALL_PATH") + "/nba.html")
+
+func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
+	logs.LogHTTP(r)
+	http.ServeFile(w, r, bballPath)
+}
+
+func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) {
+	logs.LogHTTP(r)
+	http.ServeFile(w, r, nbaDevPath)
+}
 
 func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 	// player & season are params
@@ -47,21 +50,6 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 	app.JSONWriter(w, js)
 }
 
-// func (app *application) getPlayerDashTmSzn(w http.ResponseWriter, r *http.Request) {
-// 	e := errs.ErrInfo{Prefix: "player dash endpoint"}
-// 	logs.LogHTTP(r)
-
-// 	season := r.URL.Query().Get("season")
-// 	team := r.URL.Query().Get("team")
-// }
-
-// RANDOM PLAYER
-// func (app *application) randPlayer() uint64 {
-// 	numPlayers := len(app.players)
-// 	randNum := rand.IntN(numPlayers)
-// 	return app.players[randNum].PlayerId
-// }
-
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
 	logs.LogHTTP(r)
@@ -85,16 +73,6 @@ func (app *application) getTopScorerNew(w http.ResponseWriter, r *http.Request) 
 		errs.HTTPErr(w, e.Error(err))
 	}
 	app.JSONWriter(w, js)
-}
-
-func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
-	logs.LogHTTP(r)
-	http.ServeFile(w, r, nbaPath)
-}
-
-func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) {
-	logs.LogHTTP(r)
-	http.ServeFile(w, r, nbaDevPath)
 }
 
 // FOR SEASONS SELECTOR - CALLED ON PAGE LOAD
@@ -131,17 +109,6 @@ func (app *application) getTeams(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-
-// func (app *application) getGamesRecent(w http.ResponseWriter, r *http.Request) {
-// 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
-// 	logs.LogHTTP(r)
-// 	js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGames.Q)
-// 	if err != nil {
-// 		e.Msg = ("failed to get games")
-// 		errs.HTTPErr(w, e.Error(err))
-// 	}
-// 	app.JSONWriter(w, js)
-// }
 
 func (app *application) getTopScorer(w http.ResponseWriter, r *http.Request) {
 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
@@ -259,3 +226,29 @@ func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+// func (app *application) getPlayerDashTmSzn(w http.ResponseWriter, r *http.Request) {
+// 	e := errs.ErrInfo{Prefix: "player dash endpoint"}
+// 	logs.LogHTTP(r)
+
+// 	season := r.URL.Query().Get("season")
+// 	team := r.URL.Query().Get("team")
+// }
+
+// RANDOM PLAYER
+// func (app *application) randPlayer() uint64 {
+// 	numPlayers := len(app.players)
+// 	randNum := rand.IntN(numPlayers)
+// 	return app.players[randNum].PlayerId
+// }
+
+// func (app *application) getGamesRecent(w http.ResponseWriter, r *http.Request) {
+// 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+// 	logs.LogHTTP(r)
+// 	js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGames.Q)
+// 	if err != nil {
+// 		e.Msg = ("failed to get games")
+// 		errs.HTTPErr(w, e.Error(err))
+// 	}
+// 	app.JSONWriter(w, js)
+// }
