@@ -2,14 +2,14 @@ import * as table from "./table.js"
 
 export async function getP(base, player, season, team) { // add season & team
     const err = document.getElementById('sErr');
-    const loading = document.getElementById('loading');
+    // const loading = document.getElementById('loading');
     if (err.style.display === "block") {
         err.style.display = 'none';
     }
 
     const s = encodeURIComponent(season)
     const p = encodeURIComponent(player).toLowerCase();
-    loading.textContent = `loading player dash for ${player}...`;
+    // loading.textContent = `loading player dash for ${player}...`;
     const r = await fetch(base + `/player?player=${p}&season=${s}&team=${team}`);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
@@ -30,8 +30,8 @@ export async function getP(base, player, season, team) { // add season & team
 }
 
 export async function buildPDash(data, pElName) {
-    const loading = document.getElementById('loading');
-    loading.textContent = '';
+    // const loading = document.getElementById('loading');
+    // loading.textContent = '';
     await appendImg(data.player_meta.headshot_url, 'pl_img');
     await appendImg(data.player_meta.team_logo_url, 'tm_img');
     await playerResTitle(data.player_meta, 'player_title');
@@ -79,8 +79,8 @@ async function info(data, elName) {
     const u = document.createElement('h3');
     s.textContent = data.player_meta.season;
     u.textContent = `${data.playtime.games_played} Games Played | 
-        ${data.playtime.minutes} Minutes Played | 
-        ${data.playtime.minutes_pg} Minutes Per Game`;
+        ${data.playtime.minutes} Minutes | 
+        ${data.playtime.minutes_pg} Minutes/Game`;
     d.append(s);
     d.append(u);
     cont.append(d);
