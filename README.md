@@ -1,8 +1,8 @@
 # full stack repo for my personal website 
 ## main site: https://jdeko.me
-![Alt Text](ex2.png "main example")
+![Alt Text](https://jdeko.me/img/ex2.png "main example")
 ## NBA/WNBA stats site: https://jdeko.me/bball
-![Alt Text](ex.png "/bball example")
+![Alt Text](https://jdeko.me/img/ex.png "/bball example")
 ### written & maintained by Justin DeKock (jdeko17@gmail.com)
 
 # API (Go)
