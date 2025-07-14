@@ -21,12 +21,11 @@ export async function getRecGames() {
         throw new Error(`${r.status}: error calling /games/recent`);
     }
     const data = await r.json();
-
     const player = data.top_scorers[0].player_id;
-
-    await pdash.getP(base, player, 88888, 0);
-
-    console.log(player)
+    // const ts = document.getElementById('top_scorer');
+    // ts.textContent = `Top Scorer from ${data.recent_games[0].game_date}`
+    // ts.style.display = 'block';
+    await pdash.getP(base, player, 88888, 0, data.recent_games[0].game_date);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

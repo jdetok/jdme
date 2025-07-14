@@ -1,6 +1,6 @@
 import * as table from "./table.js"
 
-export async function getP(base, player, season, team) { // add season & team
+export async function getP(base, player, season, team, ts) { // add season & team
     const err = document.getElementById('sErr');
     // const loading = document.getElementById('loading');
     if (err.style.display === "block") {
@@ -25,16 +25,16 @@ export async function getP(base, player, season, team) { // add season & team
         }
         throw new Error(`Player not found error`);
     } 
-    await buildPDash(data, 'player');
+    await buildPDash(data, ts);
     document.getElementById('pHold').value = data.player_meta.player;
 }
 
-export async function buildPDash(data, pElName) {
+export async function buildPDash(data, ts) {
     // const loading = document.getElementById('loading');
     // loading.textContent = '';
     await appendImg(data.player_meta.headshot_url, 'pl_img');
     await appendImg(data.player_meta.team_logo_url, 'tm_img');
-    await playerResTitle(data.player_meta, 'player_title');
+    await playerResTitle(data.player_meta, 'player_title', ts);
     await info(data, 'player_szn');
 
     // box stat tables
@@ -84,13 +84,17 @@ async function info(data, elName) {
     cont.append(d);
 }
 
-async function playerResTitle(data, elName) {
+async function playerResTitle(data, elName, ts) {
     const cont = document.getElementById(elName);
     cont.textContent = '';
     const d = document.createElement('div');
     const t = document.createElement('h1');
     const s = document.createElement('h2');
-    t.textContent = data.caption;
+    if (ts) {
+        t.textContent = `${data.caption} - Top Scorer from ${ts}`;    
+    } else {
+        t.textContent = data.caption;
+    }
     d.append(t);
     cont.append(d);
 }
