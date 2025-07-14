@@ -25,7 +25,7 @@ export async function getRecGames() {
     // const ts = document.getElementById('top_scorer');
     // ts.textContent = `Top Scorer from ${data.recent_games[0].game_date}`
     // ts.style.display = 'block';
-    await pdash.getP(base, player, 88888, 0, data.recent_games[0].game_date);
+    await pdash.getP(base, player, 88888, 0, data);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

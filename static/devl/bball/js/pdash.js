@@ -91,7 +91,8 @@ async function playerResTitle(data, elName, ts) {
     const t = document.createElement('h1');
     const s = document.createElement('h2');
     if (ts) {
-        t.textContent = `${data.caption} - Top Scorer from ${ts}`;    
+        t.textContent = `Top Scorer (${ts.top_scorers[0].points} points)
+         from ${ts.recent_games[0].game_date}: ${data.caption}`;    
     } else {
         t.textContent = data.caption;
     }
