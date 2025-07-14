@@ -18,7 +18,11 @@ body {
     margin-top: 20px;
     max-width: 80%;
 }
-
+.ui-cont {
+    margin: 0 auto;
+    margin-top: 20px;
+    max-width: 80%;
+}
 .resp h1 {
     color: rgb(232, 225, 235);
     font-size: 40px;
@@ -114,6 +118,7 @@ body {
 table {
     width: 100%;
     max-width: 100%;
+    color: rgb(236, 237, 255);
     border: 3px solid black;
 }
 
@@ -141,4 +146,10 @@ table tr td {
 
 caption {
     font-size: 24px;
+}
+
+.btm {
+    margin-top: 1%;
+    font-size: 16px;
+    color: rgb(236, 237, 255);
 }
