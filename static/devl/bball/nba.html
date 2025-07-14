@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>jdeko nba! (dev)</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/devl/bball/css/nba.css">
+  <link rel="stylesheet" href="/devl/bball/css/nba_small.css">
+  <script type="module" src="/devl/bball/js/listen.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="hdr">
+      <div>all data owned by the <i>
+        <a class="transpar" href="https://www.nba.com/stats" target="_blank">
+          nba/wnba</a></i>
+      </div>
+      <div>
+        <a href="../nba-info.html">about jdeko.me/bball</a>
+      </div>
+      <div style="display:none;">
+        <a href="../index.html">go to jdeko.me</a>
+      </div>
+      <div>
+        <a href="../about.html">about jdeko.me</a>
+      </div>
+    </div>
+  </header>
+  <h1>NBA/WNBA Statistics</h1>
+
+  <!-- SELECTS ========================================= -->
+  <div class="ui-cont">
+    <form id="ui">
+      <div id="all_selects">
+        <div class="selects">
+          <!-- <div class="slct"> -->
+          <div class="slct">
+            <select class="slct" id="cr_slct"></select>
+            <label for="career">career</label>
+            <input type="checkbox" id="career">
+          </div>
+           
+          <div class="slct" style="display: none;">
+            <select id="ps_slct"></select>
+            <label for="post">post-seasons:</label>
+            <input type="checkbox" id="post">
+          </div>
+          
+          <div class="slct">
+            <select id="rs_slct"></select>
+            <label for="reg">regular seasons:</label>
+            <input type="checkbox" value="rs" id="reg">
+          </div>
+        </div>
+        <div class="selects" style="display: none;">
+          
+          <div class="slct">
+            <select id="nba_teams"></select>
+            <label for="tm">nba teams:</label>
+            <input type="checkbox" id="tm">
+          </div>
+          <div class="slct">
+            <select id="wnba_teams"></select>
+            <label for="wtm">wnba teams:</label>
+            <input type="checkbox" id="wtm">
+          </div>
+          <div class="slct">
+            <select id="league">
+              <option value="all">NBA/WNBA</option>
+              <option value="nba">NBA</option>
+              <option value="wnba">WNBA</option>
+            </select>
+            <label for="league">league:</label>
+            <input type="checkbox" id="lg">
+          </div>
+        </div>
+      </div>
+
+      <div class="btns">
+        <div class="err" id="sErr"></div>
+        <!-- invisible store of on-screen player's name for hold button -->
+        <div class="btn"> 
+          <input type="text" style="display:none;" id="pHold">
+        </div>
+
+        <div class="btns">
+          <div class="btn">
+            <button id="clearS">clear search</button>
+          </div>
+          <div class="btn">
+            <input type="text" id="pSearch" placeholder="Search for a player">
+          </div>
+          <div class="btn">
+            <button id="search" type="submit">search</button>
+          </div>
+        </div>
+        <div class="btns">
+          <div class="btn">
+            <button id="randP">random player</button>
+           </div>
+           <div class="btn">
+            <button id="holdP">hold player</button>
+           </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="resp">
+    <div id="player_title"></div>
+    <div class="main" id="player">
+
+      <div class="res" id="imgs">
+        <div id="player_szn"></div>
+        <div class="plimgs">
+          <div id="tm_img"></div>
+          <div id="pl_img"></div>
+        </div>
+      </div>
+      <div class="sect_plr" id="stats">
+        <div id="box"></div>
+        <div id="avg-box"></div>
+        <div id="shooting"></div>
+        <div id="avg-shooting"></div>
+      </div>
+    </div>
+  </div>
+  <div class="btm">
+    <i>there may be small inconsitencies with statistics at nba.com -- 
+      this is a personal passion project for learning more
+      about web development & database administration and not an official
+      source of nba/wnba data
+    </i>
+  </div>
+</body>
+
+</html>
+
+      <!-- <div class="selects">
+        <div class="slct">
+          <label for="league">stats by league:</label>
+          <select id="league">
+            <option value="all">NBA/WNBA</option>
+            <option value="nba">NBA</option>
+            <option value="wnba">WNBA</option>
+          </select>
+        </div>
+        <div class="slct">
+          <label for="nba_teams">nba teams:</label>
+          <select id="nba_teams"></select>
+        </div>
+        <div class="slct">
+          <label for="wnba_teams">wnba teams:</label>
+          <select id="wnba_teams"></select>
+        </div>
+
+        <div class="slct">
+          <label for="rs_slct">regular seasons:</label>
+          <select id="rs_slct"></select>
+        </div>
+        <div class="slct">
+          <label for="ps_slct">post-seasons:</label>
+          <select id="ps_slct"></select>
+        </div>
+        <div class="slct">
+          <label for="cr_slct">career stats:</label>
+          <select class="slct" id="cr_slct"></select>
+        </div>
+      </div> -->

@@ -14,7 +14,7 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/internal/store"
 )
 
-var nbaDevPath string = (env.GetString("DEV_PATH") + "/nba.html")
+var nbaDevPath string = (env.GetString("DEV_PATH") + "/bball/nba.html")
 var bballPath string = (env.GetString("BBALL_PATH") + "/nba.html")
 
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
