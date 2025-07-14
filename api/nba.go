@@ -53,7 +53,7 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
 	logs.LogHTTP(r)
-	// js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGames.Q)
+	// js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGamePlayers.Q)
 	rgs := store.RecentGames{}
 	js, err := rgs.GetRecentGames(app.database)
 	if err != nil {

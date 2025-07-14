@@ -9,10 +9,18 @@ import (
 )
 
 type RecentGame struct {
-	GameId string `json:"game_id"`
+	GameId   uint64 `json:"game_id"`
+	TeamId   uint64 `json:"team_id"`
+	PlayerId uint64 `json:"player_id"`
+	Player   string `json:"player"`
+	League   string `json:"league"`
+	Team     string `json:"team"`
+	TeamName string `json:"team_name"`
 	GameDate string `json:"game_date"`
-	Final string `json:"final"`
-	Overtime bool `json:"overtime"`
+	Matchup  string `json:"matchup"`
+	Final    string `json:"final"`
+	Overtime bool   `json:"overtime"`
+	Points   uint16 `json:"points"`
 }
 
 type RecentGames struct {
@@ -23,14 +31,16 @@ func MakeRgs(rows *sql.Rows) RecentGames {
 	var rgs RecentGames
 	for rows.Next() {
 		var rg RecentGame
-		rows.Scan(&rg.GameId, &rg.GameDate, &rg.Final, &rg.Overtime)
+		rows.Scan(&rg.GameId, &rg.TeamId, &rg.PlayerId, &rg.Player, &rg.League, &rg.Team,
+			&rg.TeamName, &rg.GameDate, &rg.Matchup, &rg.Final, &rg.Overtime, &rg.Points)
 		rgs.Games = append(rgs.Games, rg)
 	}
 	return rgs
 }
 
-func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error){
-	rows, err := db.Query(mariadb.RecentGames.Q)
+func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
+	// rows, err := db.Query(mariadb.RecentGames.Q)
+	rows, err := db.Query(mariadb.RecentGamePlayers.Q)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
