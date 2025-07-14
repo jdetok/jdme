@@ -15,6 +15,20 @@ export async function updateCrnt(new_crnt) {
     console.log(`current post test: ${crnt}`);
 }
 
+export async function getRecGames() {
+    const r = await fetch(`${base}/games/recent`);
+    if (!r.ok) {
+        throw new Error(`${r.status}: error calling /games/recent`);
+    }
+    const data = await r.json();
+
+    const player = data.top_scorers[0].player_id;
+
+    await pdash.getP(base, player, 88888, 0);
+
+    console.log(player)
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     await selectors.loadSznOptions();
     await selectors.loadAllTeamOpts();
@@ -22,7 +36,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await buttons.search();
     await buttons.clearSearch();
     await buttons.holdPlayerBtn();
-    await pdash.getP(base, 'random', 88888, 0);
+    // await pdash.getP(base, 'random', 88888, 0);
+
+    await getRecGames();
 });
 // await home.loadSeasonOpts();
 // await home.loadTeamOpts();

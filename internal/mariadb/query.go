@@ -30,7 +30,7 @@ var RecentGamePlayers = Query{
 	inner join player f on f.player_id = e.player_id and f.team_id = a.team_id
 	where b.game_date = (select max(game_date) from game)
 	group by a.game_id, a.team_id
-	order by e.pts
+	order by e.pts desc
 	`,
 }
 
