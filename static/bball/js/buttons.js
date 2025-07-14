@@ -9,12 +9,38 @@ export async function clearSearch() {
     })
 }
 
+
+export async function checkBoxes(box, sel) {
+    const b = document.getElementById(box);
+    const s = document.getElementById(sel);
+    if (b.checked) {
+        // console.log(s.value)
+        return s.value
+    }
+}
+export async function handleSeasonBoxes() {
+    const c = await checkBoxes('career', 'cr_slct')
+    const p = await checkBoxes('post', 'ps_slct')
+    const r = await checkBoxes('reg', 'rs_slct')
+    if (c) {
+        return c;
+    }
+    if (p) {
+        return p;
+    }
+    if (r) {
+        return r;
+    }
+    return 88888;
+}
+
+
 export async function randPlayerBtn() {
     const btn = document.getElementById('randP');
-    btn.addEventListener('click', async (event) => {
+    btn.addEventListener('click', async (event) => {        
         event.preventDefault();
-        const szn = document.getElementById('rs_slct');
-        const season = szn.value;
+        const season = await handleSeasonBoxes();
+        console.log(season);
         await getP(base, 'random', season, 0);
     })
 }
@@ -36,15 +62,16 @@ export async function search() {
 
         const input = document.getElementById('pSearch');
         const player = input.value.trim();
-        const szn = document.getElementById('rs_slct');
-        const season = szn.value;
-        const team = document.getElementById('nba_teams').value;
+        // const szn = document.getElementById('rs_slct');
+        // const season = szn.value;
+        // const team = document.getElementById('nba_teams').value;
         
-        console.log(team)
+        // console.log(team)
+        const season = await handleSeasonBoxes();
+        console.log(`searhing for season ${season}`)
         await getP(base, player, season, '0');
         input.value = ''; // clear input box after searching
         
     }) 
 }
-
 

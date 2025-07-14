@@ -35,9 +35,9 @@
   <!-- SELECTS ========================================= -->
   <div class="ui">
     <form id="ui">
-      <div class="selects">
+      <!-- <div class="selects">
         
-      </div>
+      </div> -->
       <div id="all_selects">
         <!-- <div class="selects">
           <div class="slct">
@@ -47,43 +47,45 @@
           </div>
         </div> -->
         <div class="selects">
+          <!-- <div class="slct"> -->
           <div class="slct">
-            <label for="reg">regular seasons:</label>
-            <input type="checkbox" value="reg" id="reg">
-            
-            <select id="rs_slct"></select>
-          </div>
-          <div class="slct">
-            <label for="post">post-seasons:</label>
-            <input type="checkbox" value="post" id="post">
-            
-            <select id="ps_slct"></select>
-          </div>
-          <div class="slct">
-            <label for="career">career</label>
-            <input type="checkbox" value="cr" id="career">
             <select class="slct" id="cr_slct"></select>
+            <label for="career">career</label>
+            <input type="checkbox" id="career">
+          </div>
+           
+          <div class="slct" style="display: none;">
+            <select id="ps_slct"></select>
+            <label for="post">post-seasons:</label>
+            <input type="checkbox" id="post">
+          </div>
+          
+          <div class="slct">
+            <select id="rs_slct"></select>
+            <label for="reg">regular seasons:</label>
+            <input type="checkbox" value="rs" id="reg">
           </div>
         </div>
-        <div class="selects">
+        <div class="selects" style="display: none;">
+          
           <div class="slct">
-            <label for="league">stats by league:</label>
-            <input type="checkbox" value="lg" id="lg">
+            <select id="nba_teams"></select>
+            <label for="tm">nba teams:</label>
+            <input type="checkbox" id="tm">
+          </div>
+          <div class="slct">
+            <select id="wnba_teams"></select>
+            <label for="wtm">wnba teams:</label>
+            <input type="checkbox" id="wtm">
+          </div>
+          <div class="slct">
             <select id="league">
               <option value="all">NBA/WNBA</option>
               <option value="nba">NBA</option>
               <option value="wnba">WNBA</option>
             </select>
-          </div>
-          <div class="slct">
-            <label for="tm">nba teams:</label>
-            <input type="checkbox" value="tm" id="tm">
-            <select id="nba_teams"></select>
-          </div>
-          <div class="slct">
-            <label for="wtm">wnba teams:</label>
-            <input type="checkbox" value="wtm" id="wtm">
-            <select id="wnba_teams"></select>
+            <label for="league">league:</label>
+            <input type="checkbox" id="lg">
           </div>
         </div>
       </div>

@@ -23,7 +23,7 @@ export async function loadSznOptions() {
         throw new Error(`HTTP Error: ${s.status}`);
     } 
     const data = await r.json();
-    console.log(data);
+    // console.log(data);
     await buildSznSelects(data);
 }
 

@@ -20,18 +20,20 @@ body {
 }
 
 .resp h1 {
-    color: rgb(236, 237, 248);
+    color: rgb(232, 225, 235);
     font-size: 40px;
 }
 
 .resp h2 {
-    color: rgb(201, 182, 200);
+    color: rgb(236, 237, 255);
+    /* color: rgb(201, 182, 200); */
     font-size: 30px;
 }
 
 .resp h3 {
-    color: rgb(193, 214, 159);
-    font-size: 32px;
+    color: rgb(236, 237, 248);
+    /* color: rgb(193, 214, 159); */
+    font-size: 26px;
     margin-top: 0;
     margin-bottom: 0;
 }

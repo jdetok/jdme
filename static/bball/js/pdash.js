@@ -50,8 +50,6 @@ export async function buildPDash(data, pElName) {
 }
 
 async function appendImg(url, pElName) {
-    console.log("in image thing")
-    console.log(pElName);
     const pEl = document.getElementById(pElName);
     const img = document.createElement('img');
     pEl.textContent = ''; // clear child element
