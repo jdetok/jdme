@@ -82,12 +82,15 @@ body {
 }
 
 .resp {
+    /* border: 2px solid black; */
     margin: 0 auto;
+    margin-bottom: 10px;
 }
 
 .main {
     display: flex;
     flex-direction: row;
+    max-width: 100%;
 }
 
 .res {
@@ -110,6 +113,7 @@ body {
 
 table {
     width: 100%;
+    max-width: 100%;
     border: 3px solid black;
 }
 
@@ -122,8 +126,8 @@ table tr td {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width:50%;
-    height: auto;
+    /* max-width:50%; */
+    /* height: auto; */
     gap: 4%;
 }
 
