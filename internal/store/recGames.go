@@ -8,6 +8,25 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
 )
 
+// TODO: make a struct that's just the player/player ids for easy linking to recent players
+
+type RecentGames struct {
+	TopScorers []PlayerBasic `json:"top_scorers"`
+	Games      []RecentGame  `json:"recent_games"`
+}
+
+// type TeamPointLeaders struct {
+// 	TopScorers []PlayerBasic `json:"top_scorers"`
+// }
+
+type PlayerBasic struct {
+	PlayerId uint64 `json:"player_id"`
+	TeamId   uint64 `json:"team_id"`
+	Player   string `json:"player"`
+	League   string `json:"league"`
+	Points   uint16 `json:"points"`
+}
+
 type RecentGame struct {
 	GameId   uint64 `json:"game_id"`
 	TeamId   uint64 `json:"team_id"`
@@ -23,16 +42,21 @@ type RecentGame struct {
 	Points   uint16 `json:"points"`
 }
 
-type RecentGames struct {
-	Games []RecentGame `json:"recent_games"`
-}
-
 func MakeRgs(rows *sql.Rows) RecentGames {
 	var rgs RecentGames
 	for rows.Next() {
 		var rg RecentGame
-		rows.Scan(&rg.GameId, &rg.TeamId, &rg.PlayerId, &rg.Player, &rg.League, &rg.Team,
-			&rg.TeamName, &rg.GameDate, &rg.Matchup, &rg.Final, &rg.Overtime, &rg.Points)
+		var ps PlayerBasic
+		rows.Scan(&rg.GameId, &rg.TeamId, &rg.PlayerId,
+			&rg.Player, &rg.League, &rg.Team,
+			&rg.TeamName, &rg.GameDate, &rg.Matchup,
+			&rg.Final, &rg.Overtime, &rg.Points, &ps.Points)
+
+		ps.PlayerId = rg.PlayerId
+		ps.TeamId = rg.TeamId
+		ps.Player = rg.Player
+		ps.League = rg.League
+		rgs.TopScorers = append(rgs.TopScorers, ps)
 		rgs.Games = append(rgs.Games, rg)
 	}
 	return rgs
