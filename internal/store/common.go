@@ -178,6 +178,9 @@ func (p *Player) handlesId(sId uint64) uint64 {
 	} else if sId >= 70000 && sId < 80000 {
 		return p.PSeasonIdMax // return most recent season
 	} else if sId >= 40000 && sId < 50000 {
+		if p.PSeasonIdMax == 40001 {
+			return p.SeasonIdMax // return reg season if player has no playoffs
+		}
 		if sId > p.PSeasonIdMax {
 			return p.PSeasonIdMax
 		}
