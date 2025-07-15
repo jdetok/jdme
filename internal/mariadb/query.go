@@ -36,7 +36,7 @@ var RecentGamePlayers = Query{
 
 var PlayersSeason = Query{
 	Q: `
-	select a.player_id, a.player, a.league, 
+	select a.player_id, lower(a.player), lower(a.league), 
 		max(a.season_id) as rs_max, 
 		min(a.season_id) as rs_min, 
 		ifnull(b.po_max, 40001) as po_max, ifnull(b.po_min, 40001) as po_min

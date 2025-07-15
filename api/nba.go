@@ -33,7 +33,7 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 
 	season := r.URL.Query().Get("season")
-	player := r.URL.Query().Get("player")
+	player := store.Unaccent(r.URL.Query().Get("player"))
 	team := r.URL.Query().Get("team")
 	var tId uint64
 	tId, _ = strconv.ParseUint(team, 10, 64)

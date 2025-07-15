@@ -6,9 +6,13 @@ import (
 	"math/rand/v2"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/jdetok/go-api-jdeko.me/internal/errs"
 	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 type GameMeta struct {
@@ -112,6 +116,17 @@ func (t Team) MakeLogoUrl() string {
 		lg + "/" + t.TeamId + "/primary/L/logo.svg")
 }
 
+// REMOVE NON SPACING CHARACTERS -- e.g. Dončić becomes doncic
+func Unaccent(input string) string {
+	t := transform.Chain(
+		norm.NFD,
+		runes.Remove(runes.In(unicode.Mn)),
+		norm.NFC,
+	)
+	output, _, _ := transform.String(t, input)
+	return output
+}
+
 // QUERY FOR PLAYER ID, PLAYER AND SAVE TO A LIST OF PLAYER STRUCTS
 func GetPlayers(db *sql.DB) ([]Player, error) {
 	fmt.Println("querying players & saving to struct")
@@ -125,9 +140,7 @@ func GetPlayers(db *sql.DB) ([]Player, error) {
 	for rows.Next() {
 		var p Player
 		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax, &p.SeasonIdMin, &p.PSeasonIdMax, &p.PSeasonIdMin)
-		// convert to lowercase to match requests
-		p.Name = strings.ToLower(p.Name)
-		p.League = strings.ToLower(p.League)
+		p.Name = Unaccent(p.Name) // REMOVE ACCENTS FROM NAMES
 		players = append(players, p)
 	}
 	return players, nil
@@ -158,13 +171,6 @@ func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64
 	for _, p := range players {
 		if p.PlayerId == pId {
 			return pId, p.handlesId(sId)
-			// if sId > p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids
-			// 	return pId, p.SeasonIdMax
-			// } else if sId < p.SeasonIdMin {
-			// 	return pId, p.SeasonIdMin
-			// } else {
-			// 	return pId, sId
-			// }
 		}
 	}
 	return pId, sId

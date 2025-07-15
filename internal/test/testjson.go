@@ -1,5 +1,12 @@
 package main
 
+import (
+	"fmt"
+
+	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
+	"github.com/jdetok/go-api-jdeko.me/internal/store"
+)
+
 // import (
 // 	"encoding/json"
 // 	"fmt"
@@ -8,7 +15,18 @@ package main
 // 	"github.com/jdetok/go-api-jdeko.me/internal/store"
 // )
 
-// func main() {
+func main() {
+	db := mariadb.InitDB()
+	pr, _ := store.GetPlayers(db)
+	for _, p := range pr {
+		if p.PlayerId == 1629029 {
+			fmt.Printf("luka: %s\n", store.Unaccent(p.Name))
+		}
+	}
+	// fmt.Println(p)
+
+}
+
 // 	// store.RecGamesTest()
 
 // 	db := mariadb.InitDB()
