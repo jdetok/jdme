@@ -37,7 +37,7 @@ export async function handleSeasonBoxes() {
 
 export async function randPlayerBtn() {
     const btn = document.getElementById('randP');
-    btn.addEventListener('click', async (event) => {        
+    btn.addEventListener('click', async () => {        
         event.preventDefault();
         const season = await handleSeasonBoxes();
         console.log(season);
@@ -48,7 +48,7 @@ export async function randPlayerBtn() {
 // read pHold invisible val to add on-screen player's name to search bar
 export async function holdPlayerBtn() {
     const btn = document.getElementById('holdP');
-    btn.addEventListener('click', async (event) => {
+    btn.addEventListener('click', async () => {
         event.preventDefault();
         let player = document.getElementById('pHold').value;
         document.getElementById('pSearch').value = player;

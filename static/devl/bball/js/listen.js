@@ -39,6 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await getRecGames();
 });
+
+
+
 // await home.loadSeasonOpts();
 // await home.loadTeamOpts();
     // await home.gamesRecent();

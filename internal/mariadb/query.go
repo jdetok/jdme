@@ -36,6 +36,23 @@ var RecentGamePlayers = Query{
 
 var PlayersSeason = Query{
 	Q: `
+	select a.player_id, a.player, a.league, 
+		max(a.season_id) as rs_max, 
+		min(a.season_id) as rs_min, 
+		b.po_max, b.po_min
+	from api_player_stats a
+	inner join (
+		select player_id, player, league, max(season_id) as po_max, min(season_id) as po_min
+		from api_player_stats
+		where left(season_id, 1) = 4
+		group by player_id, player, league, left(season_id, 1)
+	) b on b.player_id = a.player_id
+	where left(a.season_id, 1) = 2
+	group by a.player_id, a.player, a.league, left(a.season_id, 1)
+	`,
+}
+var PlayersSeasonOld = Query{
+	Q: `
 	select player_id, player, league, max(season_id), min(season_id)
 	from api_player_stats
 	where left(season_id, 1) = 2

@@ -70,11 +70,13 @@ type ShootingStats struct {
 }
 
 type Player struct {
-	PlayerId    uint64
-	Name        string
-	League      string
-	SeasonIdMax uint64
-	SeasonIdMin uint64
+	PlayerId     uint64
+	Name         string
+	League       string
+	SeasonIdMax  uint64
+	SeasonIdMin  uint64
+	PSeasonIdMax uint64
+	PSeasonIdMin uint64
 }
 
 type Season struct {
@@ -122,7 +124,7 @@ func GetPlayers(db *sql.DB) ([]Player, error) {
 	var players []Player
 	for rows.Next() {
 		var p Player
-		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax, &p.SeasonIdMin)
+		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax, &p.SeasonIdMin, &p.PSeasonIdMax, &p.PSeasonIdMin)
 		// convert to lowercase to match requests
 		p.Name = strings.ToLower(p.Name)
 		p.League = strings.ToLower(p.League)
@@ -155,16 +157,57 @@ func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64
 	// loop through players to check that queried season is within min-max seasons
 	for _, p := range players {
 		if p.PlayerId == pId {
-			if sId > p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids
-				return pId, p.SeasonIdMax
-			} else if sId < p.SeasonIdMin {
-				return pId, p.SeasonIdMin
-			} else {
-				return pId, sId
-			}
+			return pId, p.handlesId(sId)
+			// if sId > p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids
+			// 	return pId, p.SeasonIdMax
+			// } else if sId < p.SeasonIdMin {
+			// 	return pId, p.SeasonIdMin
+			// } else {
+			// 	return pId, sId
+			// }
 		}
 	}
 	return pId, sId
+}
+
+func (p *Player) handlesId(sId uint64) uint64 {
+	if sId > 99990 {
+		return sId
+	} else if sId >= 80000 && sId < 90000 {
+		return p.SeasonIdMax // return most recent season
+	} else if sId >= 70000 && sId < 80000 {
+		return p.PSeasonIdMax // return most recent season
+	} else if sId >= 40000 && sId < 50000 {
+		if sId > p.PSeasonIdMax {
+			return p.PSeasonIdMax
+		}
+		if sId < p.PSeasonIdMin {
+			return p.PSeasonIdMin
+		}
+	} else if sId >= 20000 && sId < 30000 {
+		if sId > p.SeasonIdMax {
+			return p.SeasonIdMax
+		}
+		if sId < p.SeasonIdMin {
+			return p.SeasonIdMin
+		}
+	}
+	return sId
+
+	// p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids
+	// 	return p.SeasonIdMax
+	// } else if sId < p.SeasonIdMin {
+	// 	return p.SeasonIdMin
+	// } else {
+	// 	return sId
+	// }
+	// if sId > p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids
+	// 	return p.SeasonIdMax
+	// } else if sId < p.SeasonIdMin {
+	// 	return p.SeasonIdMin
+	// } else {
+	// 	return sId
+	// }
 }
 
 func SearchPlayers(players []Player, pSearch string) string {
