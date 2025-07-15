@@ -9,12 +9,10 @@ export async function clearSearch() {
     })
 }
 
-
 export async function checkBoxes(box, sel) {
     const b = document.getElementById(box);
     const s = document.getElementById(sel);
     if (b.checked) {
-        // console.log(s.value)
         return s.value
     }
 }
@@ -37,10 +35,9 @@ export async function handleSeasonBoxes() {
 
 export async function randPlayerBtn() {
     const btn = document.getElementById('randP');
-    btn.addEventListener('click', async () => {        
+    btn.addEventListener('click', async (event) => {        
         event.preventDefault();
         const season = await handleSeasonBoxes();
-        console.log(season);
         await getP(base, 'random', season, 0);
     })
 }
@@ -48,7 +45,7 @@ export async function randPlayerBtn() {
 // read pHold invisible val to add on-screen player's name to search bar
 export async function holdPlayerBtn() {
     const btn = document.getElementById('holdP');
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (event) => {
         event.preventDefault();
         let player = document.getElementById('pHold').value;
         document.getElementById('pSearch').value = player;
@@ -59,19 +56,11 @@ export async function search() {
     const frm = document.getElementById('ui');
     frm.addEventListener('submit', async (event) => {
         event.preventDefault();
-
         const input = document.getElementById('pSearch');
         const player = input.value.trim();
-        // const szn = document.getElementById('rs_slct');
-        // const season = szn.value;
-        // const team = document.getElementById('nba_teams').value;
-        
-        // console.log(team)
         const season = await handleSeasonBoxes();
-        console.log(`searhing for season ${season}`)
         await getP(base, player, season, '0');
         input.value = ''; // clear input box after searching
-        
     }) 
 }
 

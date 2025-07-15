@@ -1,6 +1,0 @@
-[main 966d526] new
- 15 files changed, 91 insertions(+), 50 deletions(-)
- delete mode 100644 scripts/sql/player_career.sql
- create mode 100644 scripts/sql/v_career_avgs.sql
- rename scripts/sql/{szn.sql => v_career_totals.sql} (66%)
- create mode 100644 scripts/sql/v_szn_totals.sql

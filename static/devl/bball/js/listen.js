@@ -6,14 +6,6 @@ import * as pdash from "./pdash.js"
 import * as selectors from "./selectors.js"
 
 export const base = "https://jdeko.me/bball";
-// export const dev = "https://jdeko.me/devl/bball";
-
-export let crnt = "first";
-export async function updateCrnt(new_crnt) {
-    console.log(`current pre test: ${crnt}`)
-    crnt = new_crnt;
-    console.log(`current post test: ${crnt}`);
-}
 
 export async function getRecGames() {
     const r = await fetch(`${base}/games/recent`);
@@ -22,9 +14,6 @@ export async function getRecGames() {
     }
     const data = await r.json();
     const player = data.top_scorers[0].player_id;
-    // const ts = document.getElementById('top_scorer');
-    // ts.textContent = `Top Scorer from ${data.recent_games[0].game_date}`
-    // ts.style.display = 'block';
     await pdash.getP(base, player, 88888, 0, data);
 }
 
@@ -38,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // await pdash.getP(base, 'random', 88888, 0);
 
     await getRecGames();
+    console.log(document.forms)
 });
 
 
