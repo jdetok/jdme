@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/jdetok/go-api-jdeko.me/api/cache"
+	"github.com/jdetok/go-api-jdeko.me/api/resp"
 	"github.com/jdetok/go-api-jdeko.me/applog"
 )
 
@@ -26,7 +27,7 @@ func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) 
 func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 	e := applog.AppErr{Process: "player dash endpoint", IsHTTP: true}
 	applog.LogHTTP(r)
-	var rp cache.Resp
+	var rp resp.Resp
 
 	var tId uint64
 	team := r.URL.Query().Get("team")
@@ -34,7 +35,7 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 
 	season := r.URL.Query().Get("season")
 	player := cache.Unaccent(r.URL.Query().Get("player"))
-	pId, sId := cache.GetpIdsId(app.players, player, season)
+	pId, sId := resp.GetpIdsId(app.players, player, season)
 
 	js, err := rp.GetPlayerDash(app.database, pId, sId, tId)
 	if err != nil {
@@ -48,7 +49,7 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
 	e := applog.AppErr{Process: "recent games endpoint"}
 	applog.LogHTTP(r)
-	rgs := cache.RecentGames{}
+	rgs := resp.RecentGames{}
 	js, err := rgs.GetRecentGames(app.database)
 	if err != nil {
 		e.Msg = "failed to get recent games"

@@ -3,8 +3,6 @@ package cache
 import (
 	"database/sql"
 	"fmt"
-	"math/rand/v2"
-	"strconv"
 	"strings"
 	"unicode"
 
@@ -14,64 +12,6 @@ import (
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
-
-type GameMeta struct {
-	SeasonID string `json:"season_id"`
-	GameId   string `json:"game_id"`
-	GameDate string `json:"game_date"`
-}
-
-type PlayerMeta struct {
-	PlayerId     string `json:"player_id"`
-	TeamId       string `json:"team_id"`
-	League       string `json:"league"`
-	Player       string `json:"player"`
-	Team         string `json:"team"`
-	TeamName     string `json:"team_name"`
-	Caption      string `json:"caption"`
-	CaptionShort string `json:"caption_short"`
-	HeadshotUrl  string `json:"headshot_url"`
-}
-
-// idea: break out box and shooting
-type Stats struct {
-	Minutes  string `json:"minutes"`
-	Points   string `json:"points"`
-	Assists  string `json:"assists"`
-	Rebounds string `json:"rebounds"`
-	Steals   string `json:"steals"`
-	Blocks   string `json:"blocks"`
-	FgMade   string `json:"fg_made"`
-	FgAtpt   string `json:"fg_atpt"`
-	FgPct    string `json:"fg_pct"`
-	Fg3Made  string `json:"fg3_made"`
-	Fg3Atpt  string `json:"fg3_atpt"`
-	Fg3Pct   string `json:"fg3_pct"`
-	FtMade   string `json:"ft_made"`
-	FtAtpt   string `json:"ft_atpt"`
-	FtPct    string `json:"ft_pct"`
-}
-
-type BoxStats struct {
-	Minutes  string `json:"minutes"`
-	Points   string `json:"points"`
-	Assists  string `json:"assists"`
-	Rebounds string `json:"rebounds"`
-	Steals   string `json:"steals"`
-	Blocks   string `json:"blocks"`
-}
-
-type ShootingStats struct {
-	FgMade  string `json:"fg_made"`
-	FgAtpt  string `json:"fg_atpt"`
-	FgPct   string `json:"fg_pct"`
-	Fg3Made string `json:"fg3_made"`
-	Fg3Atpt string `json:"fg3_atpt"`
-	Fg3Pct  string `json:"fg3_pct"`
-	FtMade  string `json:"ft_made"`
-	FtAtpt  string `json:"ft_atpt"`
-	FtPct   string `json:"ft_pct"`
-}
 
 type Player struct {
 	PlayerId     uint64
@@ -97,25 +37,6 @@ type Team struct {
 	LogoUrl  string `json:"-"`
 }
 
-func (pm *PlayerMeta) MakeCaptions() {
-	pm.Caption = fmt.Sprintf("%s - %s", pm.Player, pm.TeamName)
-	pm.CaptionShort = fmt.Sprintf("%s - %s", pm.Player, pm.Team)
-}
-
-func (pm *PlayerMeta) MakeHeadshotUrl() {
-	lg := strings.ToLower(pm.League)
-	pm.HeadshotUrl = fmt.Sprintf(
-		`https://cdn.%s.com/headshots/%s/latest/1040x760/%s.png`,
-		lg, lg, pm.PlayerId)
-}
-
-// makes src url for team img
-func (t Team) MakeLogoUrl() string {
-	lg := strings.ToLower(t.League)
-	return ("https://cdn." + lg + ".com/logos/" +
-		lg + "/" + t.TeamId + "/primary/L/logo.svg")
-}
-
 // REMOVE NON SPACING CHARACTERS -- e.g. Dončić becomes doncic
 func Unaccent(input string) string {
 	t := transform.Chain(
@@ -125,6 +46,13 @@ func Unaccent(input string) string {
 	)
 	output, _, _ := transform.String(t, input)
 	return output
+}
+
+// makes src url for team img
+func (t Team) MakeLogoUrl() string {
+	lg := strings.ToLower(t.League)
+	return ("https://cdn." + lg + ".com/logos/" +
+		lg + "/" + t.TeamId + "/primary/L/logo.svg")
 }
 
 // QUERY FOR PLAYER ID, PLAYER AND SAVE TO A LIST OF PLAYER STRUCTS
@@ -143,73 +71,6 @@ func GetPlayers(db *sql.DB) ([]Player, error) {
 		players = append(players, p)
 	}
 	return players, nil
-}
-func randPlayer(players []Player) uint64 {
-	numPlayers := len(players)
-	randNum := rand.IntN(numPlayers)
-	return players[randNum].PlayerId
-}
-func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64) {
-	sId, _ := strconv.ParseUint(seasonId, 10, 32)
-	var pId uint64
-
-	if player == "random" { // call randplayer function
-		pId = randPlayer(players)
-	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
-		// if it's numeric keep it and convert to uint64
-		pId, _ = strconv.ParseUint(player, 10, 64)
-	} else { // search name through players list
-		for _, p := range players {
-			if p.Name == player { // return match playerid (uint32) as string
-				pId = p.PlayerId
-			}
-		}
-	}
-
-	// loop through players to check that queried season is within min-max seasons
-	for _, p := range players {
-		if p.PlayerId == pId {
-			return pId, p.handlesId(sId)
-		}
-	}
-	return pId, sId
-}
-
-func (p *Player) handlesId(sId uint64) uint64 {
-	if sId > 99990 {
-		return sId
-	} else if sId >= 80000 && sId < 90000 {
-		return p.SeasonIdMax // return most recent season
-	} else if sId >= 70000 && sId < 80000 {
-		return p.PSeasonIdMax // return most recent season
-	} else if sId >= 40000 && sId < 50000 {
-		if p.PSeasonIdMax == 40001 {
-			return p.SeasonIdMax // return reg season if player has no playoffs
-		}
-		if sId > p.PSeasonIdMax {
-			return p.PSeasonIdMax
-		}
-		if sId < p.PSeasonIdMin {
-			return p.PSeasonIdMin
-		}
-	} else if sId >= 20000 && sId < 30000 {
-		if sId > p.SeasonIdMax {
-			return p.SeasonIdMax
-		}
-		if sId < p.SeasonIdMin {
-			return p.SeasonIdMin
-		}
-	}
-	return sId
-}
-
-func SearchPlayers(players []Player, pSearch string) string {
-	for _, p := range players {
-		if p.Name == pSearch { // return match playerid (uint32) as string
-			return strconv.FormatUint(p.PlayerId, 10)
-		}
-	}
-	return ""
 }
 
 // seasons
