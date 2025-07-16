@@ -1,6 +1,6 @@
 # high level architecture overview
 
-## applog package: project-wide error handling
+## applog package: project-wide error handling & logging
 ###
 below is the error struct that should be used project-wide
 ``` go
@@ -10,6 +10,16 @@ type applog struct {
 	Err      error
 	IsHTTP   bool
 	MsgHTTP  string
+}
+
+func (e *AppErr) BuildError(err error) error {
+	return fmt.Errorf("** ERROR IN %s\n-- ***MSG: %s\n ****SOURCE FUNC ERR: %e",
+		e.Process, e.Msg, err)
+}
+
+func (e *AppErr) HTTPErr(w http.ResponseWriter, err error) {
+	e.MsgHTTP = fmt.Sprintf(`*Error occured within jdeko.me API --n%e`, err)
+	http.Error(w, e.MsgHTTP, http.StatusInternalServerError)
 }
 ```
 #### notes on applog struct
