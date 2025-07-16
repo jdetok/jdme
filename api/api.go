@@ -49,11 +49,9 @@ func (app *application) mount() *http.ServeMux {
 
 	// ENDPOINTS 06/19
 	mux.HandleFunc("GET /bball", app.bballHandler)
-	mux.HandleFunc("GET /devl/bball", app.bballDevHandler)
 	mux.HandleFunc("GET /bball/seasons", app.getSeasons)
 	mux.HandleFunc("GET /bball/teams", app.getTeams)
 	mux.HandleFunc("GET /bball/player", app.getPlayerDash)
-	mux.HandleFunc("GET /devl/bball/player", app.getPlayerDash)
 	mux.HandleFunc("GET /bball/games/recent", app.getGamesRecentNew)
 
 	mux.Handle("/js/", http.HandlerFunc(app.jsNoCache))

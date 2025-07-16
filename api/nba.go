@@ -11,17 +11,11 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/applog"
 )
 
-var nbaDevPath string = "/app/static/devl/bball/nba.html"
 var bballPath string = "/app/static/bball/nba.html"
 
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
 	applog.LogHTTP(r)
 	http.ServeFile(w, r, bballPath)
-}
-
-func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) {
-	applog.LogHTTP(r)
-	http.ServeFile(w, r, nbaDevPath)
 }
 
 func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
