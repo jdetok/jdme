@@ -1,32 +1,19 @@
 @media (max-width: 600px) {
-    /* header {
-        font-size: 8px;
-    }
-
-    .hdr div {
-       align-items: flex-end;
-       font-size: 14px;
-    } */
 
     .ui {
-        /* display: none; */
         max-width: 100%;
-        /* border: 2px solid yellow; */
     }
     .selects {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         max-width: 100%;
-        /* justify-content: center; */
         align-items: center;
         margin: 0 auto;
-        /* border: 2px solid magenta; */
     }
 
     
     .slct {
-        /* max-width: 50%; */
         max-width:200px;
         width:100%;
 
