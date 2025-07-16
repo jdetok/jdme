@@ -49,18 +49,12 @@ func (app *application) mount() *http.ServeMux {
 
 	// ENDPOINTS 06/19
 	mux.HandleFunc("GET /bball", app.bballHandler)
-	mux.HandleFunc("GET /bball/player", app.getPlayerDash)
-
 	mux.HandleFunc("GET /devl/bball", app.bballDevHandler)
-	mux.HandleFunc("GET /devl/bball/player", app.getPlayerDash)
-
-	mux.HandleFunc("GET /bball/games/recent", app.getGamesRecentNew)
-	mux.HandleFunc("GET /bball/games/recent/top-scorer", app.getTopScorerNew)
-	mux.HandleFunc("GET /bball/players", app.getStats)
-	mux.HandleFunc("GET /bball/players/id", app.getPlayerId)
-	mux.HandleFunc("GET /bball/players/random", app.getRandPlayer)
 	mux.HandleFunc("GET /bball/seasons", app.getSeasons)
 	mux.HandleFunc("GET /bball/teams", app.getTeams)
+	mux.HandleFunc("GET /bball/player", app.getPlayerDash)
+	mux.HandleFunc("GET /devl/bball/player", app.getPlayerDash)
+	mux.HandleFunc("GET /bball/games/recent", app.getGamesRecentNew)
 
 	mux.Handle("/js/", http.HandlerFunc(app.jsNoCache))
 	mux.Handle("/css/", http.HandlerFunc(app.cssNoCache))
@@ -77,12 +71,3 @@ func (app *application) JSONWriter(w http.ResponseWriter, js []byte) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 }
-
-// mux.HandleFunc("/dev", app.devHandler)
-
-// mux.Handle("/devl/", http.HandlerFunc(app.devHandler))
-// mux.HandleFunc("GET /bball/", app.bballHandler)
-// mux.HandleFunc("GET /devl/bball/player/team", app.getPlayerDashTmSzn)
-// SERVES STATIC SITE IN WEB DIRECTORY, DON'T CACHE JS & CSS
-// mux.Handle("/devl/", http.HandlerFunc(app.devHandler))
-// mux.Handle("/devl/css/", http.HandlerFunc(app.cssDevNoCache))

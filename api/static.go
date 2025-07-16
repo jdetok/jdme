@@ -19,7 +19,6 @@ func (app *application) cssNoCache(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
 	w.Header().Set("Cache-Control", "no-store")
 	http.StripPrefix("/css/", http.FileServer(http.Dir(fsPath+"/css"))).ServeHTTP(w, r)
-	// http.StripPrefix("/css/", http.FileServer(http.Dir(fsPath+"/css"))).ServeHTTP(w, r)
 }
 
 func (app *application) jsNoCache(w http.ResponseWriter, r *http.Request) {
@@ -27,22 +26,3 @@ func (app *application) jsNoCache(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-store")
 	http.StripPrefix("/js/", http.FileServer(http.Dir(fsPath+"**/js"))).ServeHTTP(w, r)
 }
-
-// func (app *application) bballSiteHandler(w http.ResponseWriter, r *http.Request) {
-// 	logs.LogHTTP(r)
-// 	w.Header().Set("Cache-Control", "no-store")
-// 	http.StripPrefix("/bball/", http.FileServer(http.Dir(fsPath+"/bball"))).ServeHTTP(w, r)
-// }
-
-// func (app *application) devHandler(w http.ResponseWriter, r *http.Request) {
-// 	logs.LogHTTP(r)
-// 	w.Header().Set("Cache-Control", "no-store")
-// 	http.StripPrefix("/devl/", http.FileServer(http.Dir(devPath))).ServeHTTP(w, r)
-// 	// http.FileServer(http.Dir(devPath)).ServeHTTP(w, r)
-// }
-
-// func (app *application) cssDevNoCache(w http.ResponseWriter, r *http.Request) {
-// 	logs.LogHTTP(r)
-// 	w.Header().Set("Cache-Control", "no-store")
-// 	http.StripPrefix("/devl/css/", http.FileServer(http.Dir(devPath+"/css"))).ServeHTTP(w, r)
-// }
