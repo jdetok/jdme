@@ -25,21 +25,19 @@ func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
-	// player & season are params
 	e := errs.ErrInfo{Prefix: "player dash endpoint"}
 	logs.LogHTTP(r)
+	var rp store.Resp
+
+	var tId uint64
+	team := r.URL.Query().Get("team")
+	tId, _ = strconv.ParseUint(team, 10, 64)
 
 	season := r.URL.Query().Get("season")
 	player := store.Unaccent(r.URL.Query().Get("player"))
-	team := r.URL.Query().Get("team")
-	var tId uint64
-	tId, _ = strconv.ParseUint(team, 10, 64)
-
 	pId, sId := store.GetpIdsId(app.players, player, season)
 
-	var rp store.Resp
 	js, err := rp.GetPlayerDash(app.database, pId, sId, tId)
-	// js, err := rp.GetPlayerDash(app.database, pId, sId, tId)
 	if err != nil {
 		e.Msg = "failed to get player dash"
 		errs.HTTPErr(w, e.Error(err))
@@ -50,7 +48,6 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
 	e := errs.ErrInfo{Prefix: "recent games endpoint"}
 	logs.LogHTTP(r)
-	// js, err := mariadb.DBJSONResposne(app.database, mariadb.RecentGamePlayers.Q)
 	rgs := store.RecentGames{}
 	js, err := rgs.GetRecentGames(app.database)
 	if err != nil {
@@ -105,18 +102,4 @@ func (app *application) getTeams(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
-}
-
-// CALLED BY JS TO GET PLAYER'S HEADSHOT (DEPRECATE, USE ONE CALL)
-func (app *application) getPlayerId(w http.ResponseWriter, r *http.Request) {
-	logs.LogHTTP(r)
-	player := r.URL.Query().Get("player")
-	logs.LogDebug("Player Requested: " + player)
-
-	playerId := store.SearchPlayers(app.players, player)
-	logs.LogDebug("PlayerId Return: " + playerId)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"playerId": playerId,
-	})
 }

@@ -14,6 +14,17 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/internal/store"
 )
 
+func (app *application) getTopScorer(w http.ResponseWriter, r *http.Request) {
+	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+	logs.LogHTTP(r)
+	js, err := mariadb.DBJSONResposne(app.database, mariadb.TopScorer.Q)
+	if err != nil {
+		e.Msg = ("failed to get top scorer")
+		errs.HTTPErr(w, e.Error(err))
+	}
+	app.JSONWriter(w, js)
+}
+
 // RANDOM PLAYER BUTTON
 func (app *application) getRandPlayer(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
@@ -104,4 +115,18 @@ func (app *application) getStats(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+}
+
+// CALLED BY JS TO GET PLAYER'S HEADSHOT (DEPRECATE, USE ONE CALL)
+func (app *application) getPlayerId(w http.ResponseWriter, r *http.Request) {
+	logs.LogHTTP(r)
+	player := r.URL.Query().Get("player")
+	logs.LogDebug("Player Requested: " + player)
+
+	playerId := store.SearchPlayers(app.players, player)
+	logs.LogDebug("PlayerId Return: " + playerId)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]string{
+		"playerId": playerId,
+	})
 }
