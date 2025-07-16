@@ -1,4 +1,4 @@
-package store
+package cache
 
 import (
 	"database/sql"
@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jdetok/go-api-jdeko.me/internal/errs"
-	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
+	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/mdb"
 )
 
 // outermost struct, returned to http handler as json string
@@ -90,15 +90,15 @@ marshal & return structured json string
 */
 // func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
 func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
-	e := errs.ErrInfo{Prefix: "getting player dash"}
+	e := apperr.AppErr{Process: "GetPlayerDash()"}
 	var q string
 	var p uint64
 	switch tId {
 	case 0:
-		q = mariadb.Player.Q
+		q = mdb.Player.Q
 		p = pId
 	default:
-		q = mariadb.TeamSeasonTopP.Q
+		q = mdb.TeamSeasonTopP.Q
 		p = tId
 	}
 
@@ -107,7 +107,7 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 	if err != nil {
 		e.Msg = fmt.Sprintf(
 			`player dash query (player_id: %d | season_id: %d)`, pId, sId)
-		return nil, e.Error(err)
+		return nil, e.BuildError(err)
 	}
 	var t RespSeasonTmp // temp seasons for NBA/WNBA, handled after loop
 	var rp RespObj
@@ -137,11 +137,12 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 	rp.Meta.MakeCaptions()
 	rp.Meta.MakeHeadshotUrl()
 	rp.Meta.MakeTeamLogoUrl()
-
 	r.Results = append(r.Results, rp)
+
 	js, err := json.Marshal(r)
 	if err != nil {
 		e.Msg = "failed to marshal structs to json"
+		return nil, e.BuildError(err)
 	}
 	return js, nil
 }

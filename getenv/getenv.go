@@ -29,26 +29,19 @@ func GetEnvStr(key string) (string, error) {
 	return val, nil
 }
 
-// func GetEnvStr(key string) string {
-// 	LoadDotEnv()
-// 	val, found := os.LookupEnv(key)
-// 	if !found {
-// 		return ""
-// 	}
-// 	return val
-// }
-
-func GetEnvInt(key string) int {
-	LoadDotEnv()
-	val, found := os.LookupEnv(key)
-	if !found {
-		return 0
+func GetEnvInt(key string) (int, error) {
+	e := apperr.AppErr{Process: "GetEnvInt()"}
+	val, ok := os.LookupEnv(key)
+	if !ok {
+		e.Msg = fmt.Sprintf("*** FATAL: couldn't key value for variable '%s'", key)
+		return 0, e.BuildError(errors.New("GetEnvStr() error"))
 	}
 
 	// convert key from string to int
 	valAsInt, err := strconv.Atoi(val)
 	if err != nil {
-		return 0
+		e.Msg = fmt.Sprintf("*** FATAL: couldn't key value for variable '%s'", key)
+		return 0, e.BuildError(errors.New("error converting to int"))
 	}
-	return valAsInt
+	return valAsInt, nil
 }

@@ -3,11 +3,10 @@ package main
 import (
 	"net/http"
 
-	"github.com/jdetok/go-api-jdeko.me/internal/env"
-	"github.com/jdetok/go-api-jdeko.me/internal/logs"
+	"github.com/jdetok/go-api-jdeko.me/logs"
 )
 
-var fsPath string = env.GetString("STATIC_PATH")
+var fsPath string = "/app/static"
 
 func (app *application) rootHandler(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)

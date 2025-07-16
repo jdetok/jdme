@@ -1,4 +1,4 @@
-package store
+package cache
 
 import (
 	"database/sql"
@@ -8,8 +8,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/jdetok/go-api-jdeko.me/internal/errs"
-	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
+	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/mdb"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -129,12 +129,11 @@ func Unaccent(input string) string {
 
 // QUERY FOR PLAYER ID, PLAYER AND SAVE TO A LIST OF PLAYER STRUCTS
 func GetPlayers(db *sql.DB) ([]Player, error) {
-	fmt.Println("querying players & saving to struct")
-	e := errs.ErrInfo{Prefix: "saving players to structs"}
-	rows, err := db.Query(mariadb.PlayersSeason.Q)
+	e := apperr.AppErr{Process: "saving players to structs"}
+	rows, err := db.Query(mdb.PlayersSeason.Q)
 	if err != nil {
 		e.Msg = "query failed"
-		return nil, e.Error(err)
+		return nil, e.BuildError(err)
 	}
 	var players []Player
 	for rows.Next() {
@@ -202,21 +201,6 @@ func (p *Player) handlesId(sId uint64) uint64 {
 		}
 	}
 	return sId
-
-	// p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids
-	// 	return p.SeasonIdMax
-	// } else if sId < p.SeasonIdMin {
-	// 	return p.SeasonIdMin
-	// } else {
-	// 	return sId
-	// }
-	// if sId > p.SeasonIdMax && sId < 99990 { // 99990 are agg season ids
-	// 	return p.SeasonIdMax
-	// } else if sId < p.SeasonIdMin {
-	// 	return p.SeasonIdMin
-	// } else {
-	// 	return sId
-	// }
 }
 
 func SearchPlayers(players []Player, pSearch string) string {
@@ -231,11 +215,11 @@ func SearchPlayers(players []Player, pSearch string) string {
 // seasons
 func GetSeasons(db *sql.DB) ([]Season, error) {
 	fmt.Println("querying seasons & saving to struct")
-	e := errs.ErrInfo{Prefix: "saving seasons to struct"}
-	rows, err := db.Query(mariadb.RSeasons.Q)
+	e := apperr.AppErr{Process: "saving seasons to struct"}
+	rows, err := db.Query(mdb.RSeasons.Q)
 	if err != nil {
 		e.Msg = "error querying db"
-		e.Error(err)
+		e.BuildError(err)
 	}
 
 	var seasons []Season
@@ -250,12 +234,11 @@ func GetSeasons(db *sql.DB) ([]Season, error) {
 
 // teams
 func GetTeams(db *sql.DB) ([]Team, error) {
-	fmt.Println("querying teams & saving to struct")
-	e := errs.ErrInfo{Prefix: "saving teams to struct"}
-	rows, err := db.Query(mariadb.Teams.Q)
+	e := apperr.AppErr{Process: "saving teams to struct"}
+	rows, err := db.Query(mdb.Teams.Q)
 	if err != nil {
 		e.Msg = "error querying db"
-		e.Error(err)
+		e.BuildError(err)
 	}
 
 	var teams []Team

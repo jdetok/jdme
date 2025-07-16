@@ -1,11 +1,11 @@
-package store
+package cache
 
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 
-	"github.com/jdetok/go-api-jdeko.me/internal/mariadb"
+	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/mdb"
 )
 
 type RecentGames struct {
@@ -57,16 +57,17 @@ func MakeRgs(rows *sql.Rows) RecentGames {
 }
 
 func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
-	rows, err := db.Query(mariadb.RecentGamePlayers.Q)
+	e := apperr.AppErr{Process: "GetRecentGames()"}
+	rows, err := db.Query(mdb.RecentGamePlayers.Q)
 	if err != nil {
-		fmt.Println(err)
-		return nil, err
+		e.Msg = "query failed"
+		return nil, e.BuildError(err)
 	}
 	recentGames := MakeRgs(rows)
 	js, err := json.Marshal(recentGames)
 	if err != nil {
-		fmt.Println(err)
-		return nil, err
+		e.Msg = "json marshal failed"
+		return nil, e.BuildError(err)
 	}
 	return js, nil
 }
