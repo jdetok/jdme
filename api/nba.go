@@ -7,26 +7,25 @@ import (
 	"strconv"
 
 	"github.com/jdetok/go-api-jdeko.me/api/cache"
-	"github.com/jdetok/go-api-jdeko.me/apperr"
-	"github.com/jdetok/go-api-jdeko.me/logs"
+	"github.com/jdetok/go-api-jdeko.me/applog"
 )
 
 var nbaDevPath string = "/app/static/devl/bball/nba.html"
 var bballPath string = "/app/static/bball/nba.html"
 
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
-	logs.LogHTTP(r)
+	applog.LogHTTP(r)
 	http.ServeFile(w, r, bballPath)
 }
 
 func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) {
-	logs.LogHTTP(r)
+	applog.LogHTTP(r)
 	http.ServeFile(w, r, nbaDevPath)
 }
 
 func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
-	e := apperr.AppErr{Process: "player dash endpoint", IsHTTP: true}
-	logs.LogHTTP(r)
+	e := applog.AppErr{Process: "player dash endpoint", IsHTTP: true}
+	applog.LogHTTP(r)
 	var rp cache.Resp
 
 	var tId uint64
@@ -47,8 +46,8 @@ func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
-	e := apperr.AppErr{Process: "recent games endpoint"}
-	logs.LogHTTP(r)
+	e := applog.AppErr{Process: "recent games endpoint"}
+	applog.LogHTTP(r)
 	rgs := cache.RecentGames{}
 	js, err := rgs.GetRecentGames(app.database)
 	if err != nil {
@@ -61,7 +60,7 @@ func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request
 
 // FOR SEASONS SELECTOR - CALLED ON PAGE LOAD
 func (app *application) getSeasons(w http.ResponseWriter, r *http.Request) {
-	logs.LogHTTP(r)
+	applog.LogHTTP(r)
 	season := r.URL.Query().Get("szn")
 	w.Header().Set("Content-Type", "application/json")
 	if season == "" {
@@ -79,7 +78,7 @@ func (app *application) getSeasons(w http.ResponseWriter, r *http.Request) {
 
 // FOR TEAMS SELECTOR - CALLED ON PAGE LOAD
 func (app *application) getTeams(w http.ResponseWriter, r *http.Request) {
-	logs.LogHTTP(r)
+	applog.LogHTTP(r)
 	team := r.URL.Query().Get("team")
 	w.Header().Set("Content-Type", "application/json")
 	if team == "" {

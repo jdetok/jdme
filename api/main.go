@@ -6,14 +6,14 @@ import (
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api/cache"
-	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/applog"
 	"github.com/jdetok/go-api-jdeko.me/getenv"
 	"github.com/jdetok/go-api-jdeko.me/mdb"
 )
 
 func main() {
 	// load environment variabels
-	e := apperr.AppErr{Process: "Main function"}
+	e := applog.AppErr{Process: "Main function"}
 
 	// err := godotenv.Load()
 	err := getenv.LoadDotEnv()

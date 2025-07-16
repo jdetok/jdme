@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 
-	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/applog"
 	"github.com/jdetok/go-api-jdeko.me/mdb"
 )
 
@@ -57,7 +57,7 @@ func MakeRgs(rows *sql.Rows) RecentGames {
 }
 
 func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
-	e := apperr.AppErr{Process: "GetRecentGames()"}
+	e := applog.AppErr{Process: "GetRecentGames()"}
 	rows, err := db.Query(mdb.RecentGamePlayers.Q)
 	if err != nil {
 		e.Msg = "query failed"

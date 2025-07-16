@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/applog"
 	"github.com/jdetok/go-api-jdeko.me/mdb"
 )
 
@@ -90,7 +90,7 @@ marshal & return structured json string
 */
 // func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
 func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
-	e := apperr.AppErr{Process: "GetPlayerDash()"}
+	e := applog.AppErr{Process: "GetPlayerDash()"}
 	var q string
 	var p uint64
 	switch tId {

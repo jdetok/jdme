@@ -18,8 +18,12 @@ tmp_dir = "tmp"
 [watch]
   dirs = [
     "./api",
-    "./internal",
-    "./www/src"
+    "./api/cache",
+    "./logs",
+    "./mdb",
+    "./getenv",
+    "./applog",
+    "./static"
   ]
 
   exclude = ["**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.svg", "**/test*.go"]

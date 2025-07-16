@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/applog"
 )
 
 func CreateDBConn(connStr string) (*sql.DB, error) {
-	e := apperr.AppErr{Process: "InitDB(): initialize database connection"}
+	e := applog.AppErr{Process: "InitDB(): initialize database connection"}
 
 	db, err := sql.Open("mysql", connStr)
 	if err != nil {

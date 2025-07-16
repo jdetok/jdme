@@ -6,13 +6,13 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/applog"
 	"github.com/joho/godotenv"
 )
 
 func LoadDotEnv() error {
-	e := apperr.AppErr{Process: "getenv.LoadDotEnv()"}
-	if err := godotenv.Load("../.env"); err != nil {
+	e := applog.AppErr{Process: "getenv.LoadDotEnv()"}
+	if err := godotenv.Load(); err != nil {
 		e.Msg = "*** FATAL: failed to load .env variabels"
 		return e.BuildError(err)
 	}
@@ -20,7 +20,7 @@ func LoadDotEnv() error {
 }
 
 func GetEnvStr(key string) (string, error) {
-	e := apperr.AppErr{Process: "GetEnvStr()"}
+	e := applog.AppErr{Process: "GetEnvStr()"}
 	val, ok := os.LookupEnv(key)
 	if !ok {
 		e.Msg = fmt.Sprintf("*** FATAL: couldn't key value for variable '%s'", key)
@@ -30,7 +30,7 @@ func GetEnvStr(key string) (string, error) {
 }
 
 func GetEnvInt(key string) (int, error) {
-	e := apperr.AppErr{Process: "GetEnvInt()"}
+	e := applog.AppErr{Process: "GetEnvInt()"}
 	val, ok := os.LookupEnv(key)
 	if !ok {
 		e.Msg = fmt.Sprintf("*** FATAL: couldn't key value for variable '%s'", key)

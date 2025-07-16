@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/applog"
 )
 
 func UpdateStructs(
@@ -18,7 +18,7 @@ func UpdateStructs(
 	threshold time.Duration) {
 
 	// func starts here
-	e := apperr.AppErr{Process: "UpdateStructs()"}
+	e := applog.AppErr{Process: "UpdateStructs()"}
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
