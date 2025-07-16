@@ -7,23 +7,12 @@ async function makeOption(slct, txt, val) {
     slct.appendChild(opt);
 }
 
-export async function sznChangeListener() {
-    const rs = document.getElementById('rs_slct');
-    const ps = document.getElementById('ps_slct');
-    const cr = document.getElementById('cr_slct');
-    rs.addEventListener('change', async (event) => {
-        event.preventDefault();
-        // await ;
-    });
-};
-
 export async function loadSznOptions() {
     const r = await fetch(base + '/seasons');
     if (!r.ok) { 
         throw new Error(`HTTP Error: ${s.status}`);
     } 
     const data = await r.json();
-    // console.log(data);
     await buildSznSelects(data);
 }
 
@@ -51,8 +40,6 @@ export async function loadAllTeamOpts() {
     if (data[0] == '') {
         console.log('empty json');
     }
-
-    // const lg = document.getElementById('league').value.trim()
     const w = document.getElementById('wnba_teams');//.value.trim()
     const n = document.getElementById('nba_teams');//.value.trim()
     const def = document.createElement('option');
@@ -80,13 +67,3 @@ export async function loadAllTeamOpts() {
         }
     }   
 };
-
-/*
-
- if (lg != "all") {
-            defaultOpt.textContent = `All ${lg.toUpperCase()} Teams`;    
-        } else {
-            defaultOpt.textContent = `All Teams`;    
-        }
-        // defaultOpt.textContent = `All ${lg.toUpperCase()} Teams`;
-        slct.appendChild(defaultOpt);*/

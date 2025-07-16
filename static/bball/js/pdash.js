@@ -30,12 +30,10 @@ export async function getP(base, player, season, team, ts) { // add season & tea
 }
 
 export async function buildPDash(data, ts) {
-    // const loading = document.getElementById('loading');
-    // loading.textContent = '';
     await appendImg(data.player_meta.headshot_url, 'pl_img');
     await appendImg(data.player_meta.team_logo_url, 'tm_img');
     await playerResTitle(data.player_meta, 'player_title', ts);
-    await info(data, 'player_szn');
+    await sznInfo(data, 'player_szn');
 
     // box stat tables
     await table.basicTable(data.totals.box_stats, data.player_meta.cap_box_tot, 'box');
@@ -57,22 +55,11 @@ async function appendImg(url, pElName) {
     img.alt = "image not found";
     pEl.append(img);
 }
-async function appendImgOld(url, pElName, cElName) {
-    const pEl = document.getElementById(pElName);
-    const cEl = document.getElementById(cElName);
-    const img = document.createElement('img');
-    cEl.textContent = ''; // clear child element
-    img.src = url;
-    img.alt = "image not found";
-    cEl.appendChild(img);
-    pEl.append(cEl);
-}
 
-async function info(data, elName) {
+async function sznInfo(data, elName) {
     const cont = document.getElementById(elName);
     cont.textContent = '';
     const d = document.createElement('div');
-    // const t = document.createElement('h1');
     const s = document.createElement('h2');
     const u = document.createElement('h3');
     s.textContent = data.player_meta.season;
