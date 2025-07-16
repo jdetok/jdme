@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/internal/store"
+	"github.com/jdetok/go-api-jdeko.me/api/cache"
 )
 
 type application struct {
@@ -14,9 +14,9 @@ type application struct {
 	database   *sql.DB
 	StartTime  time.Time
 	lastUpdate time.Time
-	players    []store.Player
-	seasons    []store.Season
-	teams      []store.Team
+	players    []cache.Player
+	seasons    []cache.Season
+	teams      []cache.Team
 }
 
 type config struct {

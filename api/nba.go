@@ -2,17 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/jdetok/go-api-jdeko.me/internal/env"
-	"github.com/jdetok/go-api-jdeko.me/internal/errs"
-	"github.com/jdetok/go-api-jdeko.me/internal/logs"
-	"github.com/jdetok/go-api-jdeko.me/internal/store"
+	"github.com/jdetok/go-api-jdeko.me/api/cache"
+	"github.com/jdetok/go-api-jdeko.me/apperr"
+	"github.com/jdetok/go-api-jdeko.me/logs"
 )
 
-var nbaDevPath string = (env.GetString("DEV_PATH") + "/bball/nba.html")
-var bballPath string = (env.GetString("BBALL_PATH") + "/nba.html")
+var nbaDevPath string = "/app/static/devl/bball/nba.html"
+var bballPath string = "/app/static/bball/nba.html"
 
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
 	logs.LogHTTP(r)
@@ -25,46 +25,36 @@ func (app *application) bballDevHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
-	e := errs.ErrInfo{Prefix: "player dash endpoint"}
+	e := apperr.AppErr{Process: "player dash endpoint", IsHTTP: true}
 	logs.LogHTTP(r)
-	var rp store.Resp
+	var rp cache.Resp
 
 	var tId uint64
 	team := r.URL.Query().Get("team")
 	tId, _ = strconv.ParseUint(team, 10, 64)
 
 	season := r.URL.Query().Get("season")
-	player := store.Unaccent(r.URL.Query().Get("player"))
-	pId, sId := store.GetpIdsId(app.players, player, season)
+	player := cache.Unaccent(r.URL.Query().Get("player"))
+	pId, sId := cache.GetpIdsId(app.players, player, season)
 
 	js, err := rp.GetPlayerDash(app.database, pId, sId, tId)
 	if err != nil {
 		e.Msg = "failed to get player dash"
-		errs.HTTPErr(w, e.Error(err))
+		e.MsgHTTP = fmt.Sprintf("server failed to return player dash for %s", player)
+		e.HTTPErr(w, e.BuildError(err))
 	}
 	app.JSONWriter(w, js)
 }
 
 func (app *application) getGamesRecentNew(w http.ResponseWriter, r *http.Request) {
-	e := errs.ErrInfo{Prefix: "recent games endpoint"}
+	e := apperr.AppErr{Process: "recent games endpoint"}
 	logs.LogHTTP(r)
-	rgs := store.RecentGames{}
+	rgs := cache.RecentGames{}
 	js, err := rgs.GetRecentGames(app.database)
 	if err != nil {
-		e.Msg = "failed to get games"
-		errs.HTTPErr(w, e.Error(err))
-	}
-	app.JSONWriter(w, js)
-}
-
-func (app *application) getTopScorerNew(w http.ResponseWriter, r *http.Request) {
-	e := errs.ErrInfo{Prefix: "top scorers endpoint"}
-	logs.LogHTTP(r)
-	ts := store.TopScorers{}
-	js, err := ts.GetTopScorers(app.database)
-	if err != nil {
-		e.Msg = ("failed to get top scorers")
-		errs.HTTPErr(w, e.Error(err))
+		e.Msg = "failed to get recent games"
+		e.MsgHTTP = "server failed to return recent games"
+		e.HTTPErr(w, e.BuildError(err))
 	}
 	app.JSONWriter(w, js)
 }
