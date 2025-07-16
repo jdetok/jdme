@@ -124,12 +124,14 @@ func CheckCache(
 			*teams = newTeams
 
 			// UPDATE THE STATS JSON FILES
-			updateTime, err := UpdateManyCache(db, paths)
-			if err != nil {
-				e.Msg = "cache update failed"
-				fmt.Println(e.Error(err))
-			}
-			*lastUpdate = *updateTime
+			/*
+				updateTime, err := UpdateManyCache(db, paths)
+				if err != nil {
+					e.Msg = "cache update failed"
+					fmt.Println(e.Error(err))
+				}*/
+			updateTime := time.Now()
+			*lastUpdate = updateTime
 			fmt.Printf("finished refreshing cache at %v\n", updateTime)
 		}
 	}
