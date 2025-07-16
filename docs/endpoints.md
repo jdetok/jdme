@@ -14,3 +14,6 @@
 - ### &team=
     - accepts a team id
     - pass 0 to bypass team query
+
+## /games/recent
+returns all games from the most recent game day (usually yesterday), along with the top scorer of each game. /player is called on the overall top scorerr from the day and their player dash is build on page load
