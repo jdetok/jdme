@@ -9,12 +9,10 @@ export async function clearSearch() {
     })
 }
 
-
 export async function checkBoxes(box, sel) {
     const b = document.getElementById(box);
     const s = document.getElementById(sel);
     if (b.checked) {
-        // console.log(s.value)
         return s.value
     }
 }
