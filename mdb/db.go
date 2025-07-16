@@ -1,4 +1,4 @@
-package mariadbconn
+package mdb
 
 import (
 	"database/sql"
