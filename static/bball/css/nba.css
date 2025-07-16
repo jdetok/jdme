@@ -130,10 +130,14 @@ table tr td {
 .sect_plr {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    gap: 4%;
+    max-width: 100%;
+    width: 75%;
+    margin-bottom: 15px;
+    
     /* max-width:50%; */
     /* height: auto; */
-    gap: 4%;
+    
 }
 
 .err {
@@ -149,7 +153,7 @@ caption {
 }
 
 .btm {
-    margin-top: 1%;
+    margin-top: 2%;
     font-size: 16px;
     color: rgb(236, 237, 255);
 }
