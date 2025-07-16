@@ -1,0 +1,14 @@
+@media (max-width: 600px) {
+    .hdr {
+        font-size: 8px;
+    }
+
+    .hdr div {
+       align-items: flex-end;
+       font-size: 14px;
+    }
+
+    .hidesmall {
+        display: none;
+    }
+}

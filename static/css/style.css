@@ -1,14 +1,30 @@
 /*PAGE HEADER*/
-header {
+/* header {
     font-size: 18px;
     padding: 5px;
     color: rgba(223, 206, 231, 0.822);
-}
+} */
 
 /*MAIN BODY*/
 body {
+    text-align: center;
     background-color: darkslategrey;
     color: white;
+    font-size: 18px;
+}
+
+.hidesmall {
+    display: block;
+}
+
+.hdr {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.hdr div {
+    align-items: flex-end;
     font-size: 18px;
 }
 

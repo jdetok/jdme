@@ -1,17 +1,5 @@
-.hdr {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.hdr div {
-    align-items: flex-end;
-    font-size: 18px;
-}
-
-body {
-    text-align: center;
-}
+/* body {
+} */
 
 .ui {
     margin: 0 auto;
