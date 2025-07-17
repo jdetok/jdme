@@ -9,6 +9,7 @@ import (
 const fsPath string = "/app/static"
 const bballPath string = "/app/static/bball/bball.html"
 const abtPath string = "/app/static/about/about.html"
+const brontoPath string = "/app/static/bronto/bronto.html"
 
 func (app *application) rootHandler(w http.ResponseWriter, r *http.Request) {
 	applog.LogHTTP(r)
@@ -19,6 +20,11 @@ func (app *application) rootHandler(w http.ResponseWriter, r *http.Request) {
 func (app *application) abtHandler(w http.ResponseWriter, r *http.Request) {
 	applog.LogHTTP(r)
 	http.ServeFile(w, r, abtPath)
+}
+
+func (app *application) brontoHandler(w http.ResponseWriter, r *http.Request) {
+	applog.LogHTTP(r)
+	http.ServeFile(w, r, brontoPath)
 }
 
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {

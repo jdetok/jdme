@@ -48,6 +48,7 @@ func (app *application) mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /about", app.abtHandler)
+	mux.HandleFunc("GET /bronto", app.brontoHandler)
 	mux.HandleFunc("GET /bball", app.bballHandler)
 	mux.HandleFunc("GET /bball/seasons", app.getSeasons)
 	mux.HandleFunc("GET /bball/teams", app.getTeams)
