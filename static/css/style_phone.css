@@ -11,4 +11,31 @@
     .hidesmall {
         display: none;
     }
+
+    .intro {
+        width: 90%
+    }
+    
+    .flexels {
+    flex-direction: column; 
+    align-items: center;
+    display: flex;
+
+    }
+
+    .flexel,
+    .emphitem {
+        width: 90%;
+        max-width: 100%;
+    }
+
+    ul.pics li {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    ul.pics li figure img {
+        width: fit-content;
+    }
 }
