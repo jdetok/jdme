@@ -11,13 +11,6 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/applog"
 )
 
-var bballPath string = "/app/static/bball/bball.html"
-
-func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
-	applog.LogHTTP(r)
-	http.ServeFile(w, r, bballPath)
-}
-
 func (app *application) getPlayerDash(w http.ResponseWriter, r *http.Request) {
 	e := applog.AppErr{Process: "player dash endpoint", IsHTTP: true}
 	applog.LogHTTP(r)

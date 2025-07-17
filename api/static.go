@@ -6,12 +6,24 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/applog"
 )
 
-var fsPath string = "/app/static"
+const fsPath string = "/app/static"
+const bballPath string = "/app/static/bball/bball.html"
+const abtPath string = "/app/static/about/about.html"
 
 func (app *application) rootHandler(w http.ResponseWriter, r *http.Request) {
 	applog.LogHTTP(r)
 	w.Header().Set("Cache-Control", "no-store")
 	http.FileServer(http.Dir(fsPath)).ServeHTTP(w, r)
+}
+
+func (app *application) abtHandler(w http.ResponseWriter, r *http.Request) {
+	applog.LogHTTP(r)
+	http.ServeFile(w, r, abtPath)
+}
+
+func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
+	applog.LogHTTP(r)
+	http.ServeFile(w, r, bballPath)
 }
 
 func (app *application) cssNoCache(w http.ResponseWriter, r *http.Request) {
