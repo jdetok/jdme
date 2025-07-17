@@ -11,7 +11,7 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/applog"
 )
 
-var bballPath string = "/app/static/bball/nba.html"
+var bballPath string = "/app/static/bball/bball.html"
 
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
 	applog.LogHTTP(r)

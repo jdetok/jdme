@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>jdeko nba!</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style_phn.css">
+  <link rel="stylesheet" href="/bball/css/bball.css">
+  <link rel="stylesheet" href="/bball/css/bball_phn.css">
+  <script type="module" src="/bball/js/listen.js" defer></script>
+</head>
+
+<body>
+  <header>
+    <div class="hdr">
+      <div>
+        <a href="https://www.nba.com/stats" target="_blank">
+          all data owned by the nba/wnba</a>
+      </div>
+      <div>
+        <a href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a>
+      </div>
+      <div>
+        <a href="../index.html">go to jdeko.me</a>
+      </div>
+      <div class="hidesmall">
+        <a href="../abt/about.html">about jdeko.me</a>
+      </div>
+    </div>
+  </header>
+  <h1>NBA/WNBA Statistics</h1>
+
+  <!-- SELECTS ========================================= -->
+  <form id="ui">
+    <div class="uirow"> 
+      <div class="uiopt"> 
+        <label for="career">career stats by season type</label>
+        <div class="uirow">
+          <input type="checkbox" id="career">
+          <select class="slct" id="cr_slct"></select>
+        </div>
+      </div>
+     </div>
+    <div class="uirowouter"> 
+      <div class="uiopt">
+        <label for="post">post-seasons:</label>
+        <div class="uirow"> 
+          <input type="checkbox" id="post">
+          <select id="ps_slct"></select>
+        </div>
+      </div>
+      <div class="uiopt">
+        <label for="reg">regular seasons:</label>
+        <div class="uirow">
+          <input type="checkbox" value="rs" id="reg">
+          <select id="rs_slct"></select>
+        </div>
+      </div>
+    </div> 
+    <div class="uirow" style="display: none;">
+      <div class="uiopt">
+        <select id="nba_teams"></select>
+        <label for="tm">nba teams:</label>
+        <input type="checkbox" id="tm">
+      </div>
+      <div class="uiopt">
+        <select id="wnba_teams"></select>
+        <label for="wtm">wnba teams:</label>
+        <input type="checkbox" id="wtm">
+      </div>
+      <div class="uiopt">
+        <select id="league">
+          <option value="all">NBA/WNBA</option>
+          <option value="nba">NBA</option>
+          <option value="wnba">WNBA</option>
+        </select>
+        <label for="league">league:</label>
+        <input type="checkbox" id="lg">
+      </div>
+    </div>
+    <div class="uisect">
+      <div class="err" id="sErr"></div>
+      <input type="text" style="display:none;" id="pHold">
+      <div class="uirow">
+        <input type="text" id="pSearch" placeholder="Search for a player">
+        <button type="button" id="clearS">clear search</button>
+      </div>
+      <div class="uirow">
+        <button type="submit" id="search">search player</button>
+        <button type="button" id="holdP">hold current player</button>
+      </div>
+      <div class="uirow">
+        <button type="button" id="randP">search for a random player</button>
+      </div>
+    </div>
+  </form>
+  <div class="respouter">
+    <div class="resptitle" id="player_title"></div>
+    <div class="resprow">
+      <div class="respsect">
+        <div class="respblk" id="player_szn"></div>
+        <div class="respimgs" id="imgs">
+          <div id="tm_img"></div>
+          <div id="pl_img"></div>
+        </div>
+      </div>
+      <div class="respsect" id="stats">
+        <div class="resptbls">
+          <div class="resptbl" id="box"></div>
+          <div class="resptbl" id="avg-box"></div>
+          <div class="resptbl" id="shooting"></div>
+          <div class="resptbl" id="avg-shooting"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="btm">
+    <i>there may be small inconsitencies with statistics at nba.com -- 
+      this is a personal passion project for learning more
+      about web development & database administration and not an official
+      source of nba/wnba data
+    </i>
+  </div>
+</body>
+</html>

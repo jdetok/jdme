@@ -1,0 +1,151 @@
+#ui {
+    /* border: 5px solid black; */
+    display: block;
+    margin: 0 auto;
+    margin-top: 10px;
+    gap: 10px;
+    max-width: 80%;
+}
+
+.uirowouter {
+    /* border: 1px solid black; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    max-width: 100%;
+    margin-bottom: 10px;
+}
+
+.uirow {
+    /* border: 1px solid black; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    max-width: 100%;
+    /* margin-bottom: 10px; */
+}
+
+.uisect {
+    /* border: 1px solid black; */
+    /* margin-bottom: 10px; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 100%;
+}
+
+.uiopt {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.err {
+    display: none;
+}
+
+/* meant to be outermost of response */
+.respouter {
+    /* border: 5px solid black; */
+    margin: 0 auto;
+    margin-bottom: 10px;
+} 
+
+.resptitle {
+    color: rgb(232, 225, 235);
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 1%;
+    margin-top: 1%;
+}
+
+/* for side by side divs */
+.resprow {
+    /* border: 2px solid pink; */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 95%;
+    gap: 1%;
+}
+
+.respsect {
+    /* border: 3px solid white; */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.respsect h2 {
+    color: rgb(236, 237, 255);
+    font-size: 30px;
+}
+
+.respsect h3 {
+    color: rgb(236, 237, 248);
+    font-size: 26px;
+} 
+
+.respblk {
+    /* border: 3px solid magenta; */
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.respimgs {
+    /* border: 3px solid black; */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.respimgs div {
+    /* border: 2px solid purple; */
+    width: 50%;
+}
+
+.respimgs img {
+    width: 100%;
+    max-width: 100%;
+}
+
+.resptbls {
+    /* border: 2px solid blue; */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    width: 90%;
+    max-width: 100%;
+}
+
+.resptbl {
+    /* border: 2px solid yellow; */
+    width: 100%;
+}
+
+.resptbls table {
+    color: rgb(236, 237, 255);
+    border: 3px solid black;
+    width: 100%;
+    
+}
+
+.resptbls table tr th,
+.resptbls table tr td {
+    border: 1px solid black;
+}
+
+.resptbls caption {
+    font-size: 24px;
+}
+
+.btm {
+    margin-top: 2%;
+    font-size: 16px;
+    color: rgb(236, 237, 255);
+}

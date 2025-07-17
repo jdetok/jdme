@@ -1,0 +1,13 @@
+@media (max-width: 600px) {
+    .uisect {
+        flex-direction: column;
+    }
+    
+    .resprow {
+        flex-direction: column;
+    }
+
+    .resptbls {
+        width: 100%;
+    }
+}

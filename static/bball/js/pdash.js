@@ -32,12 +32,11 @@ export async function getP(base, player, season, team, ts) { // add season & tea
 export async function buildPDash(data, ts) {
     await appendImg(data.player_meta.headshot_url, 'pl_img');
     await appendImg(data.player_meta.team_logo_url, 'tm_img');
-    await playerResTitle(data.player_meta, 'player_title', ts);
-    await sznInfo(data, 'player_szn');
+    await respPlayerTitle(data.player_meta, 'player_title', ts);
+    await respPlayerInfo(data, 'player_szn');
 
     // box stat tables
     await table.basicTable(data.totals.box_stats, data.player_meta.cap_box_tot, 'box');
-    // await table.basicTable(data.totals.box_stats, 'Total Box Stats', 'box');
     await table.basicTable(data.per_game.box_stats, data.player_meta.cap_box_avg, 'avg-box');
 
     // shooting stats tables
@@ -47,16 +46,17 @@ export async function buildPDash(data, ts) {
         'shot_type', 'avg-shooting');
 }
 
-async function appendImg(url, pElName) {
-    const pEl = document.getElementById(pElName);
-    const img = document.createElement('img');
-    pEl.textContent = ''; // clear child element
-    img.src = url;
-    img.alt = "image not found";
-    pEl.append(img);
+async function respPlayerTitle(data, elName, ts) {
+    const rTitle = document.getElementById(elName);
+    if (ts) {
+        rTitle.textContent = `Top Scorer (${ts.top_scorers[0].points} points)
+         from ${ts.recent_games[0].game_date}: ${data.caption}`;    
+    } else {
+        rTitle.textContent = data.caption;
+    }
 }
 
-async function sznInfo(data, elName) {
+async function respPlayerInfo(data, elName) {
     const cont = document.getElementById(elName);
     cont.textContent = '';
     const d = document.createElement('div');
@@ -71,18 +71,14 @@ async function sznInfo(data, elName) {
     cont.append(d);
 }
 
-async function playerResTitle(data, elName, ts) {
-    const cont = document.getElementById(elName);
-    cont.textContent = '';
-    const d = document.createElement('div');
-    const t = document.createElement('h1');
-    const s = document.createElement('h2');
-    if (ts) {
-        t.textContent = `Top Scorer (${ts.top_scorers[0].points} points)
-         from ${ts.recent_games[0].game_date}: ${data.caption}`;    
-    } else {
-        t.textContent = data.caption;
-    }
-    d.append(t);
-    cont.append(d);
+async function appendImg(url, pElName) {
+    const pEl = document.getElementById(pElName);
+    const img = document.createElement('img');
+    pEl.textContent = ''; // clear child element
+    img.src = url;
+    img.alt = "image not found";
+    pEl.append(img);
 }
+
+
+
