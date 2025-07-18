@@ -1,12 +1,10 @@
 // script to load in HTML -- all listener functions are called here 
 
-// import * as home from "./home.js";
 import * as buttons from "./buttons.js"
 import * as pdash from "./pdash.js"
 import * as selectors from "./selectors.js"
 
 export const base = "https://jdeko.me/bball";
-// export const dev = "https://jdeko.me/devl/bball";
 
 export async function showHideHvr(el, hvrName, msg) {
     const hvr = document.getElementById(hvrName);
