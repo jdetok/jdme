@@ -1,15 +1,31 @@
 import * as table from "./table.js"
+import { base } from "./listen.js"
+
+export async function buildPDash(data, ts) {
+    await appendImg(data.player_meta.headshot_url, 'pl_img');
+    await appendImg(data.player_meta.team_logo_url, 'tm_img');
+    await respPlayerTitle(data.player_meta, 'player_title', ts);
+    await respPlayerInfo(data, 'player_szn');
+
+    // box stat tables
+    await table.basicTable(data.totals.box_stats, data.player_meta.cap_box_tot, 'box');
+    await table.basicTable(data.per_game.box_stats, data.player_meta.cap_box_avg, 'avg-box');
+
+    // shooting stats tables
+    await table.rowHdrTable(data.totals.shooting, data.player_meta.cap_shtg_tot, 
+        'shot_type', 'shooting');
+    await table.rowHdrTable(data.per_game.shooting, data.player_meta.cap_shtg_avg, 
+        'shot_type', 'avg-shooting');
+}
 
 export async function getP(base, player, season, team, ts) { // add season & team
     const err = document.getElementById('sErr');
-    // const loading = document.getElementById('loading');
     if (err.style.display === "block") {
         err.style.display = 'none';
     }
 
     const s = encodeURIComponent(season)
     const p = encodeURIComponent(player).toLowerCase();
-    // loading.textContent = `loading player dash for ${player}...`;
     const r = await fetch(base + `/player?player=${p}&season=${s}&team=${team}`);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
@@ -29,21 +45,14 @@ export async function getP(base, player, season, team, ts) { // add season & tea
     document.getElementById('pHold').value = data.player_meta.player;
 }
 
-export async function buildPDash(data, ts) {
-    await appendImg(data.player_meta.headshot_url, 'pl_img');
-    await appendImg(data.player_meta.team_logo_url, 'tm_img');
-    await respPlayerTitle(data.player_meta, 'player_title', ts);
-    await respPlayerInfo(data, 'player_szn');
-
-    // box stat tables
-    await table.basicTable(data.totals.box_stats, data.player_meta.cap_box_tot, 'box');
-    await table.basicTable(data.per_game.box_stats, data.player_meta.cap_box_avg, 'avg-box');
-
-    // shooting stats tables
-    await table.rowHdrTable(data.totals.shooting, data.player_meta.cap_shtg_tot, 
-        'shot_type', 'shooting');
-    await table.rowHdrTable(data.per_game.shooting, data.player_meta.cap_shtg_avg, 
-        'shot_type', 'avg-shooting');
+export async function getRecGames() {
+    const r = await fetch(`${base}/games/recent`);
+    if (!r.ok) {
+        throw new Error(`${r.status}: error calling /games/recent`);
+    }
+    const data = await r.json();
+    const player = data.top_scorers[0].player_id;
+    await getP(base, player, 88888, 0, data);
 }
 
 async function respPlayerTitle(data, elName, ts) {
@@ -79,6 +88,3 @@ async function appendImg(url, pElName) {
     img.alt = "image not found";
     pEl.append(img);
 }
-
-
-
