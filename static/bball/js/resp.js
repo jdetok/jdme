@@ -58,8 +58,8 @@ export async function getRecGames() {
 async function respPlayerTitle(data, elName, ts) {
     const rTitle = document.getElementById(elName);
     if (ts) {
-        rTitle.textContent = `Top Scorer (${ts.top_scorers[0].points} points)
-         from ${ts.recent_games[0].game_date}: ${data.caption}`;    
+        rTitle.textContent = `${data.caption} - Top Scorer from 
+            ${ts.recent_games[0].game_date} - ${ts.top_scorers[0].points} points`;    
     } else {
         rTitle.textContent = data.caption;
     }
