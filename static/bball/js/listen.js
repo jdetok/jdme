@@ -8,6 +8,20 @@ import * as selectors from "./selectors.js"
 export const base = "https://jdeko.me/bball";
 // export const dev = "https://jdeko.me/devl/bball";
 
+export async function showHideHvr(el, hvrName, msg) {
+    const hvr = document.getElementById(hvrName);
+    el.addEventListener('mouseover', async (event) => {
+        event.preventDefault();
+        hvr.textContent = msg;
+        hvr.style.display = 'block'; 
+    })
+    el.addEventListener('mouseleave', async (event) => {
+        event.preventDefault();
+        hvr.textContent = '';
+        hvr.style.display = 'none'; 
+    })
+}
+
 export async function getRecGames() {
     const r = await fetch(`${base}/games/recent`);
     if (!r.ok) {
@@ -20,7 +34,8 @@ export async function getRecGames() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     await selectors.loadSznOptions();
-    await selectors.loadAllTeamOpts();
+    // await selectors.loadAllTeamOpts();
+    await selectors.selHvr();
     await buttons.randPlayerBtn();
     await buttons.search();
     await buttons.clearSearch();

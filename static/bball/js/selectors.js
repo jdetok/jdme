@@ -1,4 +1,4 @@
-import { base } from "./listen.js";
+import { base, showHideHvr } from "./listen.js";
 
 async function makeOption(slct, txt, val) {
     let opt = document.createElement('option');
@@ -29,41 +29,60 @@ async function buildSznSelects(data) {
             await makeOption(rs, s.season, s.season_id);
         }
     }
+
 }
 
-export async function loadAllTeamOpts() {
-    const r = await fetch(base + '/teams');
-    if (!r.ok) { 
-            throw new Error(`HTTP Error: ${r.status}`);
-        } // CONVERT SUCCESSFUL RESPONSE TO JSON
-    const data = await r.json();
-    if (data[0] == '') {
-        console.log('empty json');
-    }
-    const w = document.getElementById('wnba_teams');//.value.trim()
-    const n = document.getElementById('nba_teams');//.value.trim()
-    const def = document.createElement('option');
-    const defW= document.createElement('option');
+export async function selHvr() {
+    const rs = document.getElementById('rsdiv');
+    const ps = document.getElementById('psdiv');
+    const cr = document.getElementById('crdiv');
+    await showHideHvr(rs, 'selhvr',
+        `search for a specific regular-season. if the player being searched didn't
+        play in the selected season, their first or most recent season, whichever
+        is closer to the selected, will be used`);
+    await showHideHvr(ps, 'selhvr',
+        `search for a specific post-season. if the player being searched didn't
+        play in the selected season, their first or most recent season, whichever
+        is closer to the selected, will be used`);
+    await showHideHvr(cr, 'selhvr',
+        `search for a player's career statistics. see full career stats or stats
+        aggregated by season type (regular seasons/post seasons)`);
+}
 
-    def.textContent = `All NBA Teams`
-    def.value = 0;
-    n.appendChild(def);
-    defW.textContent = `All WNBA Teams`
-    defW.value = 0;
-    w.appendChild(defW);
-    let i;
-    for (i=0; i<data.length; i++){
-        let opt = document.createElement('option');
-        let optW = document.createElement('option');
-        if (data[i].league === "NBA") {
-            opt.textContent = data[i].team_long;
-            opt.value = data[i].team_id;
-            n.appendChild(opt);
-        }
-        if (data[i].league === "WNBA") {
-            optW.textContent = data[i].team_long;
-            optW.value = data[i].team_id;
-            w.appendChild(optW);
-        }
-    }   
-};
+
+// export async function loadAllTeamOpts() {
+//     const r = await fetch(base + '/teams');
+//     if (!r.ok) { 
+//             throw new Error(`HTTP Error: ${r.status}`);
+//         } // CONVERT SUCCESSFUL RESPONSE TO JSON
+//     const data = await r.json();
+//     if (data[0] == '') {
+//         console.log('empty json');
+//     }
+//     const w = document.getElementById('wnba_teams');//.value.trim()
+//     const n = document.getElementById('nba_teams');//.value.trim()
+//     const def = document.createElement('option');
+//     const defW= document.createElement('option');
+
+//     def.textContent = `All NBA Teams`
+//     def.value = 0;
+//     n.appendChild(def);
+//     defW.textContent = `All WNBA Teams`
+//     defW.value = 0;
+//     w.appendChild(defW);
+//     let i;
+//     for (i=0; i<data.length; i++){
+//         let opt = document.createElement('option');
+//         let optW = document.createElement('option');
+//         if (data[i].league === "NBA") {
+//             opt.textContent = data[i].team_long;
+//             opt.value = data[i].team_id;
+//             n.appendChild(opt);
+//         }
+//         if (data[i].league === "WNBA") {
+//             optW.textContent = data[i].team_long;
+//             optW.value = data[i].team_id;
+//             w.appendChild(optW);
+//         }
+//     }   
+// };

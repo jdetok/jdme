@@ -7,6 +7,21 @@ body {
     font-size: 18px;
 }
 
+.hvr {
+    border: 1px solid black;
+    display: none;
+    margin: 0 auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 5px;
+    width: fit-content;
+}
+
+/* .hvrmsg {
+    display: none;
+    background-color: aliceblue;
+} */
+
 .hidesmall {
     display: block;
 }

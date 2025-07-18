@@ -2,7 +2,15 @@
     .uisect {
         flex-direction: column;
     }
-    
+
+    .resptitle {
+        font-size: 30px;
+    }
+
+    .respsect h2 {
+        font-size: 26px;
+    }
+
     .resprow {
         flex-direction: column;
     }
