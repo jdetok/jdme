@@ -1,0 +1,18 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "100.81.56.39",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "nba",
+            "database": "nba",
+            "username": "root",
+            "password": "nbadbrt"
+        }
+    ]
+}
