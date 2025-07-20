@@ -26,10 +26,10 @@ func main() {
 		fmt.Println(e.BuildError(err).Error())
 	}
 
-	cacheP, err := getenv.GetEnvStr("CACHE_PATH")
-	if err != nil {
-		fmt.Println(e.BuildError(err).Error())
-	}
+	// cacheP, err := getenv.GetEnvStr("CACHE_PATH")
+	// if err != nil {
+	// 	fmt.Println(e.BuildError(err).Error())
+	// }
 
 	dbConnStr, err := getenv.GetEnvStr("DB_CONN_STR")
 	if err != nil {
@@ -43,8 +43,8 @@ func main() {
 
 	// configs go here - 8080 for testing, will derive real vals from environment
 	cfg := config{
-		addr:      hostaddr,
-		cachePath: cacheP,
+		addr: hostaddr,
+		// cachePath: cacheP,
 	}
 
 	// initialize the app with the configs

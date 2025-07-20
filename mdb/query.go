@@ -44,7 +44,13 @@ var RecentGamePlayers = Query{
 		limit 1
 	) e on e.game_id = a.game_id and e.team_id = a.team_id
 	inner join player f on f.player_id = e.player_id and f.team_id = a.team_id
-	where b.game_date = (select max(game_date) from game)
+	where b.game_date = (
+		select max(game_date) from game 
+		where left(season_id, 1) in ('2', '4')
+		and lg in ('NBA', 'WNBA')
+	)
+	and left(a.season_id, 1) in ('2', '4')
+	and b.lg in ('NBA', 'WNBA')
 	group by a.game_id, a.team_id
 	order by e.pts desc
 	`,
