@@ -11,6 +11,7 @@ import (
 const fsPath string = "/app/static"
 const bballPath string = "/app/static/bball/bball.html"
 const abtPath string = "/app/static/about/about.html"
+const bballAbtPath string = "/app/static/about/bball_about.html"
 const brontoPath string = "/app/static/bronto/bronto.html"
 
 // const fsPath string = "/static"
@@ -37,6 +38,11 @@ func (app *application) brontoHandler(w http.ResponseWriter, r *http.Request) {
 func (app *application) bballHandler(w http.ResponseWriter, r *http.Request) {
 	applog.LogHTTP(r)
 	http.ServeFile(w, r, bballPath)
+}
+
+func (app *application) bballAbtHandler(w http.ResponseWriter, r *http.Request) {
+	applog.LogHTTP(r)
+	http.ServeFile(w, r, bballAbtPath)
 }
 
 func (app *application) cssNoCache(w http.ResponseWriter, r *http.Request) {

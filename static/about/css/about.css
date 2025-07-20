@@ -9,6 +9,11 @@
     /* margin-right: 3%; */
 }
 
+.secel {
+    max-width: 60%;
+    margin: 0 auto;
+}
+
 .mainel img {
     /* width: 40%; */
     border: 4px solid black;

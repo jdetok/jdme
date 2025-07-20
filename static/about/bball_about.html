@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>about jdeko!</title>
+  <title>about jdeko.me/bball</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/style_phn.css">
   <link rel="stylesheet" href="/about/css/about.css">
@@ -23,34 +23,39 @@
 
 <body>
   <div class="intro">
-    <h1 style="margin-bottom: 0px">about jdeko.me</h1>
+    <h1 style="margin-bottom: 0px">about jdeko.me/bball</h1>
     <b>created & maintained by Justin DeKock</b><br>
   </div>
   <div class="decorator">/-|-\</div>
-  
-  <div class="mainel">
-    <img src="/about/img/piv.png">
-    <div class="abtmain">
-      <h3>hardware --</h3>    
-      <h2>
-        every aspect of this website (with the exception of SSL) 
-        is being served to your browser from this 
-        <a href="https://en.wikipedia.org/wiki/Raspberry_Pi" class="transpar" target="_blank">
-          raspberry pi</a> in my home office!
-      </h2>
-      <div class="abtp">
-        jdeko.me is entirely self-hosted - the single exception being 
-        SSL encryption/certification, which is provided via Cloudflare. i value my network security
-        enough to not delve into that until i have taken more time to learn the process
-      </div>
-      <div class="decorator">/-|-\</div>
-      <div class="abtp">
-        this raspberry pi 5 single-board-computer has a 4-core CPU & 16GB of RAM - more than enough
-        to handle far more traffic than this site will receive 
-        Go API, Apache web-server, & mariadb database server without issue
-      </div>
+
+  <div class="center">
+    <h3>preface</h3>
+    <div class="secel">
+      i'm a big basketball fan - the game is entertaining, easy to understand, & produces a 
+      <strong>ton</strong> of data. i'm also a grad student working toward a M.S. in information 
+      systems, eager for opportunities to gain experience designing, developing, & maintaining systems. 
+      jdeko.me/bball is the result of those two realities - a collection of systems designed & built 
+      to store and access basketball statistics.
     </div>
   </div>
+  <div class="center">
+    <h3>data origin</h3>
+    <div class="secel">
+      all data is sourced from 
+      <a target="_blank" href="https://www.nba.com/stats">nba.com</a>.
+      the majority of the seen on jdeko.me/bball is fetched and inserted 
+      via a python project i wrote using the nba_api python package.
+    </div>
+  </div>
+  <div class="center">
+    <h3>database</h3>
+    <div class="secel">
+      a mariadb database stores the fetched data after it is cleaned/transformed
+    </div>
+  </div>
+</body>
+</html>
+  <!-- 
   <div class="center"><h3>-- software --</h3></div>
   <div class="flexels">
     <div class="flexel"><h2>docker</h2>
@@ -100,5 +105,4 @@
       valid HTTPS requests to my API
     </div>
   </div>
-</body>
-</html>
+   -->

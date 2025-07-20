@@ -20,8 +20,8 @@ type application struct {
 }
 
 type config struct {
-	addr      string
-	cachePath string
+	addr string
+	// cachePath string
 }
 
 func (app *application) run(mux *http.ServeMux) error {
@@ -50,6 +50,7 @@ func (app *application) mount() *http.ServeMux {
 	mux.HandleFunc("GET /about", app.abtHandler)
 	mux.HandleFunc("GET /bronto", app.brontoHandler)
 	mux.HandleFunc("GET /bball", app.bballHandler)
+	mux.HandleFunc("GET /bball/about", app.bballAbtHandler)
 	mux.HandleFunc("GET /bball/seasons", app.getSeasons)
 	mux.HandleFunc("GET /bball/teams", app.getTeams)
 	mux.HandleFunc("GET /bball/player", app.getPlayerDash)
