@@ -164,7 +164,20 @@ func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 		lg, lg, tId)
 }
 
-func randPlayer(players []cache.Player) uint64 {
+func slicePlayersSzn(players []cache.Player, sId uint64) ([]cache.Player, error) {
+	var plslice []cache.Player
+	for _, p := range players {
+		if sId <= p.SeasonIdMax && sId >= p.SeasonIdMin {
+			plslice = append(plslice, p)
+		} else if sId >= 88888 {
+			plslice = append(plslice, p)
+		}
+	}
+	return plslice, nil
+}
+
+func randPlayer(pl []cache.Player, sId uint64) uint64 {
+	players, _ := slicePlayersSzn(pl, sId)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
 	return players[randNum].PlayerId
@@ -174,7 +187,7 @@ func GetpIdsId(players []cache.Player, player string, seasonId string) (uint64, 
 	var pId uint64
 
 	if player == "random" { // call randplayer function
-		pId = randPlayer(players)
+		pId = randPlayer(players, sId)
 	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
 		// if it's numeric keep it and convert to uint64
 		pId, _ = strconv.ParseUint(player, 10, 64)

@@ -93,7 +93,8 @@ export async function handleSeasonBoxes() {
     if (r) {
         return r;
     }
-    return 88888;
+    return `2${new Date().getFullYear() - 1}`;
+    // return 88888;
 }
 
 async function makeOption(slct, txt, val) {
