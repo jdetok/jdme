@@ -5,51 +5,59 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/jdetok/go-api-jdeko.me/applog"
-	"github.com/jdetok/go-api-jdeko.me/mdb"
+	"github.com/jdetok/go-api-jdeko.me/pgdb"
+	"github.com/jdetok/golib/errd"
+	"github.com/jdetok/golib/logd"
 )
 
 func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
-	e := applog.AppErr{Process: "GetPlayerDash()"}
+	e := errd.InitErr()
 	var q string
 	var p uint64
+
+	// if 0 is passed as tId, query by player_id. otherwise, query by team_id
 	switch tId {
 	case 0:
-		q = mdb.Player.Q
+		logd.Logc(fmt.Sprintf("querying player_id: %d | season_id: %d", pId, sId))
+		q = pgdb.PlayerDash.Q
 		p = pId
 	default:
-		q = mdb.TeamSeasonTopP.Q
+		logd.Logc(fmt.Sprintf("querying team_id: %d | season_id: %d", tId, sId))
+		q = pgdb.TeamTopScorerDash.Q
 		p = tId
 	}
 
+	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
 	rows, err := db.Query(q, p, sId)
 	if err != nil {
-		e.Msg = fmt.Sprintf(
-			`player dash query (player_id: %d | season_id: %d)`, pId, sId)
-		return nil, e.BuildError(err)
+		e.Msg = "error during player dash query"
+		return nil, e.BuildErr(err)
 	}
+
 	var t RespSeasonTmp // temp seasons for NBA/WNBA, handled after loop
 	var rp RespObj
 	for rows.Next() {
 		// temp structs, handled in hndlRespRow
 		var s RespPlayerStats
 		var p RespPlayerSznOvw
+		// 8/6 2PM - MOVED Season/WSeason FROM END TO AFTER SeasonId
 		rows.Scan( // MUST BE IN ORDER OF QUERY
 			&rp.Meta.PlayerId, &rp.Meta.TeamId, &rp.Meta.League,
-			&rp.Meta.SeasonId, &rp.Meta.StatType, &rp.Meta.Player,
-			&rp.Meta.Team, &rp.Meta.TeamName,
+			&rp.Meta.SeasonId, &t.Season, &t.WSeason, &rp.Meta.StatType,
+			&rp.Meta.Player, &rp.Meta.Team, &rp.Meta.TeamName,
 			&rp.SeasonOvw.GamesPlayed, &p.Minutes,
 			&s.Box.Points, &s.Box.Assists, &s.Box.Rebounds,
 			&s.Box.Steals, &s.Box.Blocks,
 			&s.Shtg.Fg.Makes, &s.Shtg.Fg.Attempts, &s.Shtg.Fg.Percent,
 			&s.Shtg.Fg3.Makes, &s.Shtg.Fg3.Attempts, &s.Shtg.Fg3.Percent,
-			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent,
-			&t.Season, &t.WSeason)
+			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent)
 		// switch on stat type to assign stats to appropriate struct
 		rp.hndlRespRow(&p, &s)
 	}
 	// handle aggregate season ids (all, regular season, playoffs)
 	hndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
+
+	// assign nba or wnba season only based on league
 	t.hndlSeason(&rp.Meta.League, &rp.Meta.Season)
 
 	// build table captions & image urls
@@ -58,10 +66,11 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 	rp.Meta.MakeTeamLogoUrl()
 	r.Results = append(r.Results, rp)
 
+	// marshal response & return json []byte
 	js, err := json.Marshal(r)
 	if err != nil {
 		e.Msg = "failed to marshal structs to json"
-		return nil, e.BuildError(err)
+		return nil, e.BuildErr(err)
 	}
 	return js, nil
 }

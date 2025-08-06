@@ -1,7 +1,7 @@
-# migrate to pg - copy dirs from dev-jdeko.me
+# migrate to pg - copy dirs from go-api-jdeko.me
 GODIR=/home/jdeto/go/github.com/jdetok
 PROD=$GODIR/go-api-jdeko.me
-DEV=$GODIR/dev-jdeko.me
+DEV=$GODIR/go-api-jdeko.me
 
 cd $PROD
 

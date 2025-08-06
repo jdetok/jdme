@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jdetok/go-api-jdeko.me/api/cache"
+	"github.com/jdetok/go-api-jdeko.me/api/store"
 )
 
 type Resp struct {
@@ -80,34 +80,6 @@ type ShootingStats struct {
 	FtPct   string `json:"ft_pct"`
 }
 
-type RecentGames struct {
-	TopScorers []PlayerBasic `json:"top_scorers"`
-	Games      []RecentGame  `json:"recent_games"`
-}
-
-type PlayerBasic struct {
-	PlayerId uint64 `json:"player_id"`
-	TeamId   uint64 `json:"team_id"`
-	Player   string `json:"player"`
-	League   string `json:"league"`
-	Points   uint16 `json:"points"`
-}
-
-type RecentGame struct {
-	GameId   uint64 `json:"game_id"`
-	TeamId   uint64 `json:"team_id"`
-	PlayerId uint64 `json:"player_id"`
-	Player   string `json:"player"`
-	League   string `json:"league"`
-	Team     string `json:"team"`
-	TeamName string `json:"team_name"`
-	GameDate string `json:"game_date"`
-	Matchup  string `json:"matchup"`
-	Final    string `json:"final"`
-	Overtime bool   `json:"overtime"`
-	Points   uint16 `json:"points"`
-}
-
 // outermost struct, returned to http handler as json string
 type RespPlayerSznOvw struct {
 	GamesPlayed   uint16  `json:"games_played"`
@@ -164,8 +136,8 @@ func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 		lg, lg, tId)
 }
 
-func slicePlayersSzn(players []cache.Player, sId uint64) ([]cache.Player, error) {
-	var plslice []cache.Player
+func slicePlayersSzn(players []store.Player, sId uint64) ([]store.Player, error) {
+	var plslice []store.Player
 	for _, p := range players {
 		if sId <= p.SeasonIdMax && sId >= p.SeasonIdMin {
 			plslice = append(plslice, p)
@@ -176,13 +148,15 @@ func slicePlayersSzn(players []cache.Player, sId uint64) ([]cache.Player, error)
 	return plslice, nil
 }
 
-func randPlayer(pl []cache.Player, sId uint64) uint64 {
+func randPlayer(pl []store.Player, sId uint64) uint64 {
 	players, _ := slicePlayersSzn(pl, sId)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
 	return players[randNum].PlayerId
 }
-func GetpIdsId(players []cache.Player, player string, seasonId string) (uint64, uint64) {
+
+// uses app.players
+func GetpIdsId(players []store.Player, player string, seasonId string) (uint64, uint64) {
 	sId, _ := strconv.ParseUint(seasonId, 10, 32)
 	var pId uint64
 
@@ -208,7 +182,7 @@ func GetpIdsId(players []cache.Player, player string, seasonId string) (uint64, 
 	return pId, sId
 }
 
-func handlesId(sId uint64, p *cache.Player) uint64 {
+func handlesId(sId uint64, p *store.Player) uint64 {
 	if sId > 99990 {
 		return sId
 	} else if sId >= 80000 && sId < 90000 {
@@ -236,7 +210,7 @@ func handlesId(sId uint64, p *cache.Player) uint64 {
 	return sId
 }
 
-func SearchPlayers(players []cache.Player, pSearch string) string {
+func SearchPlayers(players []store.Player, pSearch string) string {
 	for _, p := range players {
 		if p.Name == pSearch { // return match playerid (uint32) as string
 			return strconv.FormatUint(p.PlayerId, 10)
@@ -248,11 +222,11 @@ func SearchPlayers(players []cache.Player, pSearch string) string {
 // // seasons
 // func GetSeasons(db *sql.DB) ([]Season, error) {
 // 	fmt.Println("querying seasons & saving to struct")
-// 	e := applog.AppErr{Process: "saving seasons to struct"}
+// 	e := errd.InitErr()
 // 	rows, err := db.Query(mdb.RSeasons.Q)
 // 	if err != nil {
 // 		e.Msg = "error querying db"
-// 		e.BuildError(err)
+// 		e.BuildErr(err)
 // 	}
 
 // 	var seasons []Season
@@ -267,11 +241,11 @@ func SearchPlayers(players []cache.Player, pSearch string) string {
 
 // // teams
 // func GetTeams(db *sql.DB) ([]Team, error) {
-// 	e := applog.AppErr{Process: "saving teams to struct"}
+// 	e := errd.InitErr()
 // 	rows, err := db.Query(mdb.Teams.Q)
 // 	if err != nil {
 // 		e.Msg = "error querying db"
-// 		e.BuildError(err)
+// 		e.BuildErr(err)
 // 	}
 
 // 	var teams []Team
