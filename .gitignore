@@ -1,7 +1,9 @@
 .env
+*.env
 *gouser.sql
 *keys.txt
 .security
 *.png
 static/archive
+tmp/
 tmp/
