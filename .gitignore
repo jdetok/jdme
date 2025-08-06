@@ -4,4 +4,4 @@
 .security
 *.png
 static/archive
-tmp
+tmp/
