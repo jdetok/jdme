@@ -11,5 +11,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     await ui.search();
     await ui.clearSearch();
     await ui.holdPlayerBtn();
-    await resp.getRecGames();
+    await resp.getRecentTopScorer();
 });

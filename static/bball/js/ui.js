@@ -1,6 +1,20 @@
 import { getP } from "./resp.js";
 import { base } from "./listen.js";
 
+export async function search() {
+    const frm = document.getElementById('ui');
+    frm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const input = document.getElementById('pSearch');
+        const player = input.value.trim();
+        const season = await handleSeasonBoxes();
+        console.log(`searhing for season ${season}`)
+        await getP(base, player, season, '0');
+        input.value = ''; // clear input box after searching
+    }) 
+}
+
 export async function showHideHvr(el, hvrName, msg) {
     const hvr = document.getElementById(hvrName);
     el.addEventListener('mouseover', async (event) => {
@@ -16,9 +30,8 @@ export async function showHideHvr(el, hvrName, msg) {
 }
 
 export async function selHvr() {
-    const rs = document.getElementById('rsdiv');
-    const ps = document.getElementById('psdiv');
-    const cr = document.getElementById('crdiv');
+    const rs = document.getElementById('hlpRs');
+    const ps = document.getElementById('hlpPs');
     await showHideHvr(rs, 'selhvr',
         `search for a specific regular-season. if the player being searched didn't
         play in the selected season, their first or most recent season, whichever
@@ -27,22 +40,19 @@ export async function selHvr() {
         `search for a specific post-season. if the player being searched didn't
         play in the selected season, their first or most recent season, whichever
         is closer to the selected, will be used`);
-    await showHideHvr(cr, 'selhvr',
-        `search for a player's career statistics. see full career stats or stats
-        aggregated by season type (regular seasons/post seasons)`);
 }
 
 // read pHold invisible val to add on-screen player's name to search bar
 export async function holdPlayerBtn() {
     const btn = document.getElementById('holdP');
-    
+    const hlp = document.getElementById('hlpHld');
     btn.addEventListener('click', async (event) => {
         event.preventDefault();
         let player = document.getElementById('pHold').value;
         document.getElementById('pSearch').value = player;
     })
     await showHideHvr(
-        btn, 
+        hlp, 
         'hvrmsg',
         `fill the input box with the current player's name`
     )
@@ -50,6 +60,7 @@ export async function holdPlayerBtn() {
 
 export async function randPlayerBtn() {
     const btn = document.getElementById('randP');
+    const hlp = document.getElementById('hlpRnd');
     btn.addEventListener('click', async (event) => {        
         event.preventDefault();
         const season = await handleSeasonBoxes();
@@ -57,7 +68,7 @@ export async function randPlayerBtn() {
         await getP(base, 'random', season, 0);
     })
     await showHideHvr(
-        btn, 
+        hlp, 
         'hvrmsg',
         `get the stats for a random player in the selected season. if no season 
         is specified, the current/most recent season will be used. if the 
@@ -66,19 +77,6 @@ export async function randPlayerBtn() {
     )
 }
 
-export async function search() {
-    const frm = document.getElementById('ui');
-    frm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        const input = document.getElementById('pSearch');
-        const player = input.value.trim();
-        const season = await handleSeasonBoxes();
-        console.log(`searhing for season ${season}`)
-        await getP(base, player, season, '0');
-        input.value = ''; // clear input box after searching
-    }) 
-}
 
 export async function handleSeasonBoxes() {
     const c = await checkBoxes('career', 'cr_slct')

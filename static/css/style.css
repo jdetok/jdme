@@ -17,6 +17,13 @@ body {
     width: fit-content;
 }
 
+.hlp {
+    padding: 2px;
+    font-size: 18px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
 /* .hvrmsg {
     display: none;
     background-color: aliceblue;

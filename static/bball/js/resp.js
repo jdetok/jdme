@@ -45,7 +45,7 @@ export async function getP(base, player, season, team, ts) { // add season & tea
     document.getElementById('pHold').value = data.player_meta.player;
 }
 
-export async function getRecGames() {
+export async function getRecentTopScorer() {
     const r = await fetch(`${base}/games/recent`);
     if (!r.ok) {
         throw new Error(`${r.status}: error calling /games/recent`);
@@ -55,11 +55,13 @@ export async function getRecGames() {
     await getP(base, player, 88888, 0, data);
 }
 
+// RESULT TITLE - LIKE `LeBron James - Los Angeles Lakers`
 async function respPlayerTitle(data, elName, ts) {
     const rTitle = document.getElementById(elName);
     if (ts) {
-        rTitle.textContent = `${data.caption} - Top Scorer from 
-            ${ts.recent_games[0].game_date} - ${ts.top_scorers[0].points} points`;    
+        rTitle.innerHTML = `
+        Top Scorer from ${ts.recent_games[0].game_date}<br>${data.caption}
+         | ${ts.top_scorers[0].points} points`;    
     } else {
         rTitle.textContent = data.caption;
     }

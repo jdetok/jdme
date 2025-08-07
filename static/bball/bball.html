@@ -48,8 +48,9 @@
       <div class="uiopt" id="psdiv">
         <label for="post">post-seasons:</label>
         <div class="uirow"> 
-          <input type="checkbox" id="post">
+          <div class="hlp" id="hlpPs">?</div>
           <select id="ps_slct"></select>
+          <input type="checkbox" id="post">
         </div>
       </div>
       <div class="uiopt" id="rsdiv">
@@ -57,6 +58,7 @@
         <div class="uirow">
           <input type="checkbox" value="rs" id="reg">
           <select id="rs_slct"></select>
+          <div class="hlp" id="hlpRs">?</div>
         </div>
       </div>
     </div> 
@@ -71,10 +73,12 @@
       <div class="uirow">
         <button type="submit" id="search">search player</button>
         <button type="button" id="holdP">hold current player</button>
+        <div class="hlp" id="hlpHld">?</div>
       </div>
       
       <div class="uirow">
         <button type="button" id="randP">search for a random player</button>
+        <div class="hlp" id="hlpRnd">?</div>
       </div>
     </div>
     <div class="hvr" id="hvrmsg"></div>
