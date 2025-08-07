@@ -118,7 +118,7 @@ async function buildSznSelects(data) {
     const ps = document.getElementById('ps_slct');
     const cr = document.getElementById('cr_slct');
     for (let s of data) {
-        if (s.season_id > 99990) {
+        if (s.season_id.substring(1, 4) === '9999') {
             await makeOption(cr, s.season, s.season_id);
         } else if (s.season_id.substring(0, 1) === '4') {
             await makeOption(ps, s.season, s.season_id);

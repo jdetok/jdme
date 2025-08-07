@@ -183,14 +183,17 @@ func GetpIdsId(players []store.Player, player string, seasonId string) (uint64, 
 }
 
 func handlesId(sId uint64, p *store.Player) uint64 {
-	if sId > 99990 {
+	if sId == 99999 { // career combined
 		return sId
 	} else if sId >= 80000 && sId < 90000 {
 		return p.SeasonIdMax // return most recent season
 	} else if sId >= 70000 && sId < 80000 {
 		return p.PSeasonIdMax // return most recent season
 	} else if sId >= 40000 && sId < 50000 {
-		if p.PSeasonIdMax == 40001 {
+		if sId == 49999 { // playoff career
+			return sId
+		}
+		if p.PSeasonIdMax < 40000 { // player has no playeroff, return max reg season
 			return p.SeasonIdMax // return reg season if player has no playoffs
 		}
 		if sId > p.PSeasonIdMax {
@@ -201,6 +204,9 @@ func handlesId(sId uint64, p *store.Player) uint64 {
 		}
 	} else if sId >= 20000 && sId < 30000 {
 		if sId > p.SeasonIdMax {
+			if sId == 29999 { // reg season career
+				return sId
+			}
 			return p.SeasonIdMax
 		}
 		if sId < p.SeasonIdMin {
