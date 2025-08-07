@@ -60,7 +60,7 @@ var RecGameTopScorers = Query{
 			end as lg, 
 		c.team,
 		c.team_long,
-		a.gdate,
+		to_char(a.gdate, 'MM/DD/YYYY'),
 		a.matchup, 
 		a.wl, 
 		a.pts as tm_pts, 
