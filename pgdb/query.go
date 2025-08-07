@@ -1,3 +1,5 @@
+//POSTGRES `bball` QUERIES: MIGRATED TO POSTGRES FROM MARIADB 08/06/2025
+
 package pgdb
 
 type Query struct {

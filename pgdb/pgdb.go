@@ -8,6 +8,7 @@ import (
 	"github.com/jdetok/golib/pgresd"
 )
 
+// CONNECTION TO POSTGRES SERVER: MIGRATED TO POSTGRES FROM MARIADB 08/06/2025
 func PostgresConn() (*sql.DB, error) {
 	e := errd.InitErr()
 	pg := pgresd.GetEnvPG()

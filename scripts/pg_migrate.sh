@@ -1,7 +1,8 @@
-# migrate to pg - copy dirs from go-api-jdeko.me
+# SCRIPT USED TO BEGIN DEV-PROD MIGRATION AFTER DATABASE MIGRATION
+# (POSTGRES FROM MARIADB) ON 08/06/2025
 GODIR=/home/jdeto/go/github.com/jdetok
 PROD=$GODIR/go-api-jdeko.me
-DEV=$GODIR/go-api-jdeko.me
+DEV=$GODIR/dev-jdeko.me
 
 cd $PROD
 

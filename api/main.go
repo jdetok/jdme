@@ -1,3 +1,9 @@
+/*
+MIGRATION FROM MARIADB DATABASE SERVER TO POSTGRES DATABASE SERVER 08/06/2025
+ALSO SWITCHED FROM PROJECT-SPECIFIC LOGGER, ERROR HANDLING TO PACKAGES IN
+github.com/jdetok/golib
+*/
+
 package main
 
 import (
@@ -32,12 +38,6 @@ func main() {
 		fmt.Println(e.BuildErr(err).Error())
 	}
 
-	// configs go here - 8080 for testing, will derive real vals from environment
-	/*
-		cfg := config{
-			addr: hostaddr,
-		}
-	*/
 	// initialize the app with the configs
 	app := &application{
 		config:   config{addr: hostaddr},
