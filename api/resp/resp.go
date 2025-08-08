@@ -138,8 +138,8 @@ func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 
 func slicePlayersSzn(players []store.Player, sId uint64) ([]store.Player, error) {
 	var plslice []store.Player
-	for _, p := range players {
-		if sId <= p.SeasonIdMax && sId >= p.SeasonIdMin {
+	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
+		if (sId >= 20000 && sId < 30000) && (sId <= p.SeasonIdMax && sId >= p.SeasonIdMin) || (sId >= 40000 && sId < 50000) && (sId <= p.PSeasonIdMax && sId >= p.PSeasonIdMin) {
 			plslice = append(plslice, p)
 		} else if sId >= 88888 {
 			plslice = append(plslice, p)
@@ -182,20 +182,22 @@ func GetpIdsId(players []store.Player, player string, seasonId string) (uint64, 
 	return pId, sId
 }
 
+// HANDLE REQUEST FOR SEASON PLAYER DID NOT PLAY IN
 func handlesId(sId uint64, p *store.Player) uint64 {
-	if sId == 99999 { // career combined
+	if strconv.FormatUint(sId, 10)[1:] == "9999" { // agg seasons
 		return sId
 	} else if sId >= 80000 && sId < 90000 {
 		return p.SeasonIdMax // return most recent season
 	} else if sId >= 70000 && sId < 80000 {
 		return p.PSeasonIdMax // return most recent season
 	} else if sId >= 40000 && sId < 50000 {
-		if sId == 49999 { // playoff career
-			return sId
-		}
 		if p.PSeasonIdMax < 40000 { // player has no playeroff, return max reg season
 			return p.SeasonIdMax // return reg season if player has no playoffs
 		}
+		if sId == 49999 { // playoff career
+			return sId
+		}
+
 		if sId > p.PSeasonIdMax {
 			return p.PSeasonIdMax
 		}

@@ -77,21 +77,23 @@ export async function randPlayerBtn() {
     )
 }
 
-
 export async function handleSeasonBoxes() {
-    const c = await checkBoxes('career', 'cr_slct')
+    // const c = await checkBoxes('career', 'cr_slct')
     const p = await checkBoxes('post', 'ps_slct')
     const r = await checkBoxes('reg', 'rs_slct')
-    if (c) {
-        return c;
-    }
+
     if (p) {
         return p;
     }
     if (r) {
         return r;
     }
-    return `2${new Date().getFullYear() - 1}`;
+    if (new Date().getMonth() < 7) {
+        return `2${new Date().getFullYear() - 1}`;
+    } else {
+        return `2${new Date().getFullYear()}`;
+    }
+    
     // return 88888;
 }
 
@@ -114,11 +116,11 @@ export async function loadSznOptions() {
 async function buildSznSelects(data) {
     const rs = document.getElementById('rs_slct');
     const ps = document.getElementById('ps_slct');
-    const cr = document.getElementById('cr_slct');
+    // const cr = document.getElementById('cr_slct');
     for (let s of data) {
-        if (s.season_id.substring(1, 4) === '9999') {
-            await makeOption(cr, s.season, s.season_id);
-        } else if (s.season_id.substring(0, 1) === '4') {
+        // if (s.season_id.substring(1, 4) === '9999') {
+        //     await makeOption(cr, s.season, s.season_id);
+        if (s.season_id.substring(0, 1) === '4') {
             await makeOption(ps, s.season, s.season_id);
         } else if (s.season_id.substring(0, 1) === '2') {
             await makeOption(rs, s.season, s.season_id);
