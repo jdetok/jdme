@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,13 +13,16 @@
 
 <header class="hdr">
   <div><a href="https://jdeko.me">jdeko.me</a></div>
-  <div><a href="https://jdeko.me/bball">jdeko.me/bball</a></div>
+
   <div><a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">
-    jdeko.me source code</a></div>
+      jdeko.me source code</a></div>
+  <div><a href="https://jdeko.me/bball">jdeko.me/bball</a></div>
+  <div><a href="https://jdeko.me/bball/about">about jdeko.me/bball</a></div>
   <div><a target="_blank" href="https://github.com/jdetok">
-    jdetok on github</a></div>
-  <div><a target="_blank" href="https://www.linkedin.com/in/justin-dekock-257879185">
-    linkedin</a></div>
+      jdetok on github</a></div>
+  <div><a target="_blank"
+      href="https://www.linkedin.com/in/justin-dekock-257879185">
+      linkedin</a></div>
 </header>
 
 <body>
@@ -27,78 +31,92 @@
     <b>created & maintained by Justin DeKock</b><br>
   </div>
   <div class="decorator">/-|-\</div>
-  
-  <div class="mainel">
-    <img src="/about/img/piv.png">
-    <div class="abtmain">
-      <h3>hardware --</h3>    
-      <h2>
-        every aspect of this website (with the exception of SSL) 
-        is being served to your browser from this 
-        <a href="https://en.wikipedia.org/wiki/Raspberry_Pi" class="transpar" target="_blank">
-          raspberry pi</a> in my home office!
-      </h2>
-      <div class="abtp">
-        jdeko.me is entirely self-hosted - the single exception being 
-        SSL encryption/certification, which is provided via Cloudflare. i value my network security
-        enough to not delve into that until i have taken more time to learn the process
-      </div>
-      <div class="decorator">/-|-\</div>
-      <div class="abtp">
-        this raspberry pi 5 single-board-computer has a 4-core CPU & 16GB of RAM - more than enough
-        to handle far more traffic than this site will receive 
-        Go API, Apache web-server, & mariadb database server without issue
-      </div>
-    </div>
+
+  <div class="pagedesc">
+    jdeko.me is almost entirely self hosted - every aspect of this website (with
+    the exception of ssl encryption, which is provided by cloudflare) is served
+    from a <a href="https://en.wikipedia.org/wiki/Raspberry_Pi" class="transpar"
+      target="_blank">raspberry pi 5</a> single-board-computer in my home
+    office!
+    this particular
+    raspberry pi 5</a> has a 4-core CPU & 16GB of RAM, which is more than enough
+    to handle any traffic this site receives
   </div>
-  <div class="center"><h3>-- software --</h3></div>
+  <div class="center">
+    <h3>-- technologies used --</h3>
+  </div>
   <div class="flexels">
-    <div class="flexel"><h2>docker</h2>
+    <div class="flexel">
+      <h2>go programming langauge</h2>
       <div class="abtp">
-        each software element that supports this website has been containerized via 
-        <a href="https://en.wikipedia.org/wiki/Docker_(software)">Docker</a>,
-        allowing them to all run independently on the same host machine. docker networks provide
-        an additional level of isolation, enabling me to host apache web-server & mariadb database
-        on separate networks. i used <a href="https://docs.docker.com/build/concepts/dockerfile/">
-        dockerfile</a> to create custom docker images and <a href="https://docs.docker.com/compose/">
-        docker compose</a> to enable starting & stopping entire replicable environments with a single command
+        the jdeko.me backend is written entirely in the go programming language.
+        i mainly chose to write the backend in go to take advantage of the
+        concurrency features that make the standard net/http library so
+        powerful. i paid for
+        all four cpu cores, i want to utilze all four!
       </div>
     </div>
-    <div class="flexel"><h2>go programming langauge</h2>
+    <div class="flexel">
+      <h2>postgres database</h2>
+      <div>
+        a postgres database serves <a
+          href="https://jdeko.me/bball">jdeko.me/bball</a> - the
+        basketball stats site that uses the jdeko.me api. the data in this
+        database
+        is sourced from nba.com with <a target="_blank"
+          href="https://github.com/jdetok/bball-etl-go">another go program</a>
+      </div>
+      
+      <div>
+        <a href="https://jdeko.me/bball/about">learn more about jdeko.me/bball</a>
+      </div>
+    </div>
+        <div class="flexel">
+      <h2>docker</h2>
       <div class="abtp">
-        every HTTPS request to jdeko.me is routed and handled through an API that i wrote in Go. 
-        this API is connected to the same backend docker network as my mariadb database, and serves
-        all interaction with my <a href="https://jdeko.me/bball">jdeko.me/bball</a><br>
-        <a href="https://github.com/jdetok/go-api-jdeko.me/tree/main/api">api source code (go)</a>
+        each software element that supports this website has been containerized
+        with
+        <a href="https://en.wikipedia.org/wiki/Docker_(software)">docker</a>,
+        allowing them to all run independently on the same host machine. docker
+        networks provide
+        an additional level of isolation, which allows me to host the apache
+        web-server
+        & postgres database on separate networks. i used <a
+          href="https://docs.docker.com/build/concepts/dockerfile/">
+          dockerfile</a> to create custom docker images and <a
+          href="https://docs.docker.com/compose/">
+          docker compose</a> to enable starting & stopping each environment with
+        a single command
       </div>
     </div>
-    <div class="flexel"><h2>mariadb database</h2>
-    <div class="abtp">
-        mariadb is the database server that powers my <a href="https://jdeko.me/bball">jdeko.me/bball</a>.
-        mariadb is a fork of mysql, with nearly identical syntax. new stats are inserted into this database
-        nightly with the execution of a <a href="https://github.com/jdetok/py-nba-mdb">python script</a>.
-        a daily cronjob runs a shell script that runs my docker compose file, which then runs the python
-        script in an isolated environment.
-      </div>
-    </div>
-    <div class="flexel"><h2>javascript</h2>
-      javascript powers the frontend of my <a href="https://jdeko.me/bball">jdeko.me/bball</a>.
-      all interactions with any of the buttons/selectors/text-boxes on this page are handled
+    <div class="flexel">
+      <h2>javascript</h2>
+      javascript powers the frontend of <a
+        href="https://jdeko.me/bball">jdeko.me/bball</a>.
+      all interactions with any of the buttons/selectors/text-boxes on this page
+      are handled
       with javascript event handlers that call endpoints from my API<br>
       <a href="https://github.com/jdetok/go-api-jdeko.me/tree/main/www/src/js">
         javascript source code</a>
     </div>
-    <div class="flexel"><h2>html/css</h2>
-      all visual elements of this website are written in pure html & css. i've always preferred 
-      clean and to-the-point websites, and i miss the more simplistic look of the internet of my youth
+    <div class="flexel">
+      <h2>html/css</h2>
+      all visual elements of this website are written in pure html & css. i've
+      always preferred
+      clean and to-the-point websites, and i miss the more simplistic look of
+      the internet of my youth
     </div>
-    <div class="flexel"><h2>apache web server</h2>
-      a containerized <a href="https://httpd.apache.org/">apache web server</a> is used as a 
-      <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">reverse-proxy</a> 
-      to provide another security layer from the external internet. this web server declines 
-      any invalid requests, forwards any HTTP requests to HTTPS, & then forwards any 
-      valid HTTPS requests to my API
+    <div class="flexel">
+      <h2>apache web server</h2>
+      a containerized <a href="https://httpd.apache.org/">apache web server</a>
+      is used as a
+      <a
+        href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">reverse-proxy</a>
+      to provide another security layer from the external internet. this web
+      server declines any invalid requests, forwards any http request to https, 
+      & then forwards valid https requests to the jdeko.me api
     </div>
   </div>
 </body>
+
 </html>

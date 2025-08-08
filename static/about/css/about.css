@@ -62,6 +62,10 @@ about element that has a header, short description, and a button to expose a lon
     flex-wrap: wrap;
 }
 
+.mainel img {
+    display: none;
+}
+
 .secel {
     margin: 0 auto;
     align-items: center;
