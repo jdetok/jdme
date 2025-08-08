@@ -35,6 +35,23 @@
 .linkurl {
     grid-column: 3;
 }
+/* FLEX SIDE BY SIDE FOR INFO SECTIONS */
+
+.infoflex {
+    border: 1px solid black;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    max-width: 90%;
+}
+
+.infoflex > div {
+    margin: 0 auto;
+    border: 1px dashed rgb(238, 168, 168);
+    max-width: 45%;
+}
+
 /*
 about element that has a header, short description, and a button to expose a longer description
 */
@@ -53,3 +70,4 @@ about element that has a header, short description, and a button to expose a lon
 .mainel .secel > div {
     margin-bottom: 30px;
 }
+
