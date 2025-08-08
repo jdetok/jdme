@@ -9,7 +9,7 @@
 
 /*repo section*/
 .links {
-    border: 3px solid rgba(0, 0, 0, 0.61);
+    /* border: 3px solid rgba(0, 0, 0, 0.61); */
     display: grid;
     grid-template-columns: 1fr 2fr 1fr;
     padding: 5px;
@@ -18,7 +18,8 @@
 }
 
 .links > div {
-    border: 1px dashed rgb(238, 168, 168);
+    /* border: 1px dashed rgb(238, 168, 168); */
+    border: 1px dashed rgba(8, 7, 6, 0.899);
     padding: 10px;
     max-width: 100%;
 }
@@ -38,7 +39,7 @@
 /* FLEX SIDE BY SIDE FOR INFO SECTIONS */
 
 .infoflex {
-    border: 1px solid black;
+    /* border: 1px solid black; */
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -48,7 +49,7 @@
 
 .infoflex > div {
     margin: 0 auto;
-    border: 1px dashed rgb(238, 168, 168);
+    /* border: 1px dashed rgb(238, 168, 168); */
     max-width: 45%;
 }
 
@@ -68,6 +69,6 @@ about element that has a header, short description, and a button to expose a lon
 }
 
 .mainel .secel > div {
-    margin-bottom: 30px;
+    margin: 10px;
 }
 

@@ -67,16 +67,15 @@
         <h3>sourcing nba/wnba stats with go-etl package</h3>
         <!-- TODO: under links, side by side etl and postgres blocks -->
         all data is sourced from
-        <a target="_blank" href="https://www.nba.com/stats">nba.com</a> via an
-        automated extract-transform-load (ETL) program I wrote in Go. the Go
-        code
-        sends http requests to stats.nba.com, transforms the returned json into
-        Go
-        structs matching the databaes design, & inserts the data into the
-        appropriate
-        database tables.<br>*<a target="_blank"
-          href="https://github.com/jdetok/nightly-bball-etl">
-          Go ETL source code | github | nightly-bball-etl</a>*<br>
+        <a target="_blank" href="https://www.nba.com/stats">nba.com</a> via the
+        go-etl package. the postgres build etl uses this package to fetch &
+        insert data for every
+        nba & wnba regular season/post season game since 1970. the nightly etl
+        process is run at approximately 12am every day, and uses the package to
+        fetch & insert data only for the previous day
+        <div class="decorator">/-|-\</div>
+        the go-etl process takes advantage of go's concurrency features to make several http requests to nba.com in quick succession. the package then processes and structures the data to match the postgres database design, chunks the large volume
+        of data into small chunks, and inserts the chunks concurrently
         <div class="decorator">/-|-\</div>
         this site was originally powered by a MariaDB database with an ETL
         program
@@ -89,39 +88,42 @@
         process
         in Go using (mostly) only the standard Go library. the documentation
         from
-        the nba_api was incredibly helpful in this process.<br>*<a
+        the nba_api was incredibly helpful in this process.<br><a
           target="_blank" href="https://github.com/jdetok/py-nba-mdb">
-          legacy python ETL | github | py-nba-mdb</a>*
+          legacy python ETL | github | py-nba-mdb</a>
       </div>
 
       <!-- DATABASE SECTION -->
 
       <div class="secel">
         <h3>postgres database</h3>
-        the NBA/WNBA stats from jdeko.me/bball are served from a containerized
-        postgres database server. the database was designed by myself and
-        attempts
-        to meet
+        all stats on the site are served from a postgres database server running
+        in a docker container. the database was designed by myself following
+        the data normalization principles outlined in 
         <a target="_blank"
           href="https://en.wikipedia.org/wiki/Third_normal_form">
-          Codd's third normal form</a>. the database build is fully automated
-        in
-        a shell script that builds & runs the postgres docker container, runs
-        the Go ETL process, and executes several stored procedures.
-        all SQL (DDL) statements to build the database are executed when the
-        container is built. once the docker container is running and the
-        database finishes building, the Go ETL process is used to source
-        & insert data for every NBA/WNBA regular season/playoff game since 1970.
-        the data is inserted into intake tables, which match the structure of
-        the json from stats.nba.com exactly. after the Go program completes,
-        a number of plpgsql stored procedures/functions are executed to insert
-        the data from the intake tables into the 'lg', 'stats', and 'api'
-        schemas of the postgres databse. these schemas make up the core of the
-        normalized/relational design<br>*<a target="_blank"
-          href="https://github.com/jdetok/bball-postgres-bld-etl">
-          postgres database source code | github | bball-postgres-bld-etl</a>*
+          Codd's third normal form
+        </a>
+        <div class="decorator">/-|-\</div> 
+        the entire database is built by a script in the postgres build etl repo.
+        the script builds & runs the docker container, executes SQL statements 
+        to create all schemas, tables, procedures, etc., uses the go-etl
+        package to source & insert nba/wnba data since 1970, and runs several
+        stored procedures to process & load the inserted data into their
+        destination tables
+        <div class="decorator">/-|-\</div>
+        the go-etl package inserts data only into the tables in the intake 
+        schema. each table in this schema is designed to match the structure of
+        the json response from a specific endpoint on nba.com. this keeps the 
+        changes made to the source data minimal before being inserted, which
+        makes errors less likely and the pipeline more maintainable.
+        the jdeko.me/bball api primarily interacts with tables in the database's
+        api schema. this schema contains tables specifically designed for
+        quickly accessing aggregated player stats - their data is aggregated
+        and inserted from the stats schema in a stored procedure every night
       </div>
     </div>
+  </div>
 </body>
 <!-- END -->
 
