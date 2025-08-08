@@ -1,43 +1,11 @@
 .mainel {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
-    gap: 20px;
-    margin-top: 2%;
-    margin-left: 5%;
-    margin-right: 2%;
-    /* margin-right: 3%; */
+    flex-wrap: wrap;
 }
 
 .secel {
-    max-width: 60%;
     margin: 0 auto;
-}
-
-.mainel img {
-    /* width: 40%; */
-    border: 4px solid black;
-    max-width: 15%;
-    height: auto;
-    margin: 0 auto;
-}
-
-.sec h3 {
-    margin-left: 10%;
-}
-
-.abtmain {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    
-}
-
-.aptmain .abtp {
-    margin-top: 15px;
-}
-
-.abtp {
-    color: rgb(243, 245, 227);
-    font-size: 20px;
+    align-items: center;
+    width: 60%;
 }
