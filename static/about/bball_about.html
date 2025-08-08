@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,131 +9,104 @@
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/style_phn.css">
   <link rel="stylesheet" href="/about/css/about.css">
+  <link rel="stylesheet" href="/about/css/about_phn.css">
 </head>
-
+<!-- HEADER -->
 <header class="hdr">
   <div><a href="https://jdeko.me">jdeko.me</a></div>
   <div><a href="https://jdeko.me/bball">jdeko.me/bball</a></div>
   <div><a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">
-    jdeko.me source code</a></div>
+      jdeko.me source code</a></div>
   <div><a target="_blank" href="https://github.com/jdetok">
-    jdetok on github</a></div>
-  <div><a target="_blank" href="https://www.linkedin.com/in/justin-dekock-257879185">
-    linkedin</a></div>
+      jdetok on github</a></div>
+  <div><a target="_blank"
+      href="https://www.linkedin.com/in/justin-dekock-257879185">
+      linkedin</a></div>
 </header>
 
 <body>
+  <!-- INTRO -->
   <div class="intro">
     <h1 style="margin-bottom: 0px">about jdeko.me/bball</h1>
-    <b>created & maintained by Justin DeKock</b><br>
+    <b>created & maintained by Justin DeKock</b>
   </div>
   <div class="decorator">/-|-\</div>
-
-  <div class="mainel">
-  <div class="center" style="display:none">
-    <h3>preface</h3>
-    <div class="secel">
-      i'm a big basketball fan - the game is entertaining, easy to understand, & produces a 
-      <strong>ton</strong> of data. i'm also a grad student working toward a M.S. in information 
-      systems, eager for opportunities to gain experience designing, developing, & maintaining systems. 
-      jdeko.me/bball is the marriage of those two realities - a collection of systems designed & built 
-      to store and access basketball statistics.
-    </div>
+  <div class="pagedesc">
+    jdeko.me/bball is a site i created to meld my love for the nba/wnba with
+    my desire to design, build & maintain information systems. learn more about
+    the systems i designed to support this site below
   </div>
+  <div class="decorator">/-|-\</div>
+    <!-- ETL PROCESSES -->
     <div class="secel">
-    <h3>sourcing the data</h3>
-      all data is sourced from 
-      <a target="_blank" href="https://www.nba.com/stats">nba.com</a> via an 
-      automated extract-transform-load (ETL) program I wrote in Go. the Go code 
+      <h3>sourcing & storing the data</h3>
+        <!-- GITHUB LINKS -->
+      <div class="links"><!-- ETL GO PACKAGE -->
+        <div class="linkname">go-etl package</div>
+        <div class="linkdesc">go (<i>formerly Golang</i>) etl (<i>extract-transform-load</i>) package repository</div>
+        <div class="linkurl"><a target="_blank"
+            href="https://github.com/jdetok/bball-etl-go">github.com/jdetok/bball-etl-go</a>
+        </div><!-- DATABASE BUILD ETL -->
+        <div class="linkname">postgres build etl</div>
+        <div class="linkdesc">postgres database build repository (using go-etl package)</div>
+        <div class="linkurl"><a target="_blank"
+            href="https://github.com/jdetok/bball-postgres-bld-etl">github.com/jdetok/bball-postgres-bld-etl</a>
+        </div><!-- NIGHTLY ETL -->
+        <div class="linkname">nightly etl</div>
+        <div class="linkdesc">automated nightly etl repository (using go-etl package)</div>
+        <div class="linkurl"><a target="_blank"
+            href="https://github.com/jdetok/nightly-bball-etl">github.com/jdetok/nightly-bball-etl</a>
+        </div>
+      </div>
+      <!-- TODO: under links, side by side etl and postgres blocks -->
+      all data is sourced from
+      <a target="_blank" href="https://www.nba.com/stats">nba.com</a> via an
+      automated extract-transform-load (ETL) program I wrote in Go. the Go code
       sends http requests to stats.nba.com, transforms the returned json into Go
-      structs matching the databaes design, & inserts the data into the appropriate
-      database tables.<br>*<a target="_blank" 
-      href="https://github.com/jdetok/nightly-bball-etl">
-      Go ETL source code | github | nightly-bball-etl</a>*<br>
+      structs matching the databaes design, & inserts the data into the
+      appropriate
+      database tables.<br>*<a target="_blank"
+        href="https://github.com/jdetok/nightly-bball-etl">
+        Go ETL source code | github | nightly-bball-etl</a>*<br>
       <div class="decorator">/-|-\</div>
       this site was originally powered by a MariaDB database with an ETL program
       written in Python. the Python program utilized the <a target="_blank"
-      href="https://github.com/swar/nba_api">nba_api</a> package to make http
-      requests the stats.nba.com. I wanted to learn more of the lower-level concepts
-      abstracted away by this package, so I decided to rewrite the entire ETL process
-      in Go using (mostly) only the standard Go library. the documentation from 
-      the nba_api was incredibly helpful in this process.<br>*<a target="_blank" 
-      href="https://github.com/jdetok/py-nba-mdb">
-      legacy python ETL | github | py-nba-mdb</a>*
-    
+        href="https://github.com/swar/nba_api">nba_api</a> package to make http
+      requests the stats.nba.com. I wanted to learn more of the lower-level
+      concepts
+      abstracted away by this package, so I decided to rewrite the entire ETL
+      process
+      in Go using (mostly) only the standard Go library. the documentation from
+      the nba_api was incredibly helpful in this process.<br>*<a target="_blank"
+        href="https://github.com/jdetok/py-nba-mdb">
+        legacy python ETL | github | py-nba-mdb</a>*
+
     </div>
-  <div class="secel">
-    <h3>postgres database</h3>
-      the NBA/WNBA stats from jdeko.me/bball are served from a containerized 
-      postgres database server. the database was designed by myself and attempts to meet
+    <!-- DATABASE SECTION -->
+    
+    <div class="secel">
+      <h3>postgres database</h3>
+      the NBA/WNBA stats from jdeko.me/bball are served from a containerized
+      postgres database server. the database was designed by myself and attempts
+      to meet
       <a target="_blank" href="https://en.wikipedia.org/wiki/Third_normal_form">
-        Codd's third normal form</a>. the database build is fully automated in 
-        a shell script that builds & runs the postgres docker container, runs 
-        the Go ETL process, and executes several stored procedures. 
-        all SQL (DDL) statements to build the database are executed when the 
-        container is built. once the docker container is running and the 
-        database finishes building, the Go ETL process is used to source 
-        & insert data for every NBA/WNBA regular season/playoff game since 1970. 
-        the data is inserted into intake tables, which match the structure of 
-        the json from stats.nba.com exactly. after the Go program completes, 
-        a number of plpgsql stored procedures/functions are executed to insert 
-        the data from the intake tables into the 'lg', 'stats', and 'api' 
-        schemas of the postgres databse. these schemas make up the core of the
-        normalized/relational design<br>*<a target="_blank" 
+        Codd's third normal form</a>. the database build is `fully automated in
+      a shell script that builds & runs the postgres docker container, runs
+      the Go ETL process, and executes several stored procedures.
+      all SQL (DDL) statements to build the database are executed when the
+      container is built. once the docker container is running and the
+      database finishes building, the Go ETL process is used to source
+      & insert data for every NBA/WNBA regular season/playoff game since 1970.
+      the data is inserted into intake tables, which match the structure of
+      the json from stats.nba.com exactly. after the Go program completes,
+      a number of plpgsql stored procedures/functions are executed to insert
+      the data from the intake tables into the 'lg', 'stats', and 'api'
+      schemas of the postgres databse. these schemas make up the core of the
+      normalized/relational design<br>*<a target="_blank"
         href="https://github.com/jdetok/bball-postgres-bld-etl">
         postgres database source code | github | bball-postgres-bld-etl</a>*
     </div>
   </div>
 </body>
+<!-- END -->
 </html>
-  <!-- 
-  <div class="center"><h3>-- software --</h3></div>
-  <div class="flexels">
-    <div class="flexel"><h2>docker</h2>
-      <div class="abtp">
-        each software element that supports this website has been containerized via 
-        <a href="https://en.wikipedia.org/wiki/Docker_(software)">Docker</a>,
-        allowing them to all run independently on the same host machine. docker networks provide
-        an additional level of isolation, enabling me to host apache web-server & mariadb database
-        on separate networks. i used <a href="https://docs.docker.com/build/concepts/dockerfile/">
-        dockerfile</a> to create custom docker images and <a href="https://docs.docker.com/compose/">
-        docker compose</a> to enable starting & stopping entire replicable environments with a single command
-      </div>
-    </div>
-    <div class="flexel"><h2>go programming langauge</h2>
-      <div class="abtp">
-        every HTTPS request to jdeko.me is routed and handled through an API that i wrote in Go. 
-        this API is connected to the same backend docker network as my mariadb database, and serves
-        all interaction with my <a href="https://jdeko.me/bball">jdeko.me/bball</a><br>
-        <a href="https://github.com/jdetok/go-api-jdeko.me/tree/main/api">api source code (go)</a>
-      </div>
-    </div>
-    <div class="flexel"><h2>mariadb database</h2>
-    <div class="abtp">
-        mariadb is the database server that powers my <a href="https://jdeko.me/bball">jdeko.me/bball</a>.
-        mariadb is a fork of mysql, with nearly identical syntax. new stats are inserted into this database
-        nightly with the execution of a <a href="https://github.com/jdetok/py-nba-mdb">python script</a>.
-        a daily cronjob runs a shell script that runs my docker compose file, which then runs the python
-        script in an isolated environment.
-      </div>
-    </div>
-    <div class="flexel"><h2>javascript</h2>
-      javascript powers the frontend of my <a href="https://jdeko.me/bball">jdeko.me/bball</a>.
-      all interactions with any of the buttons/selectors/text-boxes on this page are handled
-      with javascript event handlers that call endpoints from my API<br>
-      <a href="https://github.com/jdetok/go-api-jdeko.me/tree/main/www/src/js">
-        javascript source code</a>
-    </div>
-    <div class="flexel"><h2>html/css</h2>
-      all visual elements of this website are written in pure html & css. i've always preferred 
-      clean and to-the-point websites, and i miss the more simplistic look of the internet of my youth
-    </div>
-    <div class="flexel"><h2>apache web server</h2>
-      a containerized <a href="https://httpd.apache.org/">apache web server</a> is used as a 
-      <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">reverse-proxy</a> 
-      to provide another security layer from the external internet. this web server declines 
-      any invalid requests, forwards any HTTP requests to HTTPS, & then forwards any 
-      valid HTTPS requests to my API
-    </div>
-  </div>
-   -->

@@ -1,0 +1,6 @@
+/* about pages smaller screens */
+@media (max-width: 600px) {
+    .links {
+        max-width: 100%;
+    }
+}

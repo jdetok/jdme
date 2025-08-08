@@ -96,6 +96,7 @@ a.med {
 
 /*FOR THE SEPARATOR*/
 .decorator {
+    margin: 10px;
     text-align: center;
 }
 

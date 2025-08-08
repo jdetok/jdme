@@ -1,3 +1,43 @@
+.pagedesc {
+    color: rgb(168, 189, 224);
+    margin: 0 auto;
+    /* margin-top: 10px; */
+    font-size: 24px;
+    font-weight: bold;
+    max-width: 70%;
+}
+
+/*repo section*/
+.links {
+    border: 3px solid rgba(0, 0, 0, 0.61);
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    padding: 5px;
+    margin: 0 auto;
+    width: 90%;
+}
+
+.links > div {
+    border: 1px dashed rgb(238, 168, 168);
+    padding: 10px;
+    max-width: 100%;
+}
+
+/* grid columns - hide different classes to expand for smaller screens */
+.linkname {
+    grid-column: 1;
+}
+
+.linkdesc {
+    grid-column: 2;
+}
+
+.linkurl {
+    grid-column: 3;
+}
+/*
+about element that has a header, short description, and a button to expose a longer description
+*/
 .mainel {
     display: flex;
     flex-direction: row;
@@ -7,5 +47,9 @@
 .secel {
     margin: 0 auto;
     align-items: center;
-    width: 60%;
+    /* width: 60%; */
+}
+
+.mainel .secel > div {
+    margin-bottom: 30px;
 }
