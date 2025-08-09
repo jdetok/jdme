@@ -68,8 +68,8 @@
         <h3>sourcing nba/wnba stats with go-etl package</h3>
         <!-- TODO: under links, side by side etl and postgres blocks -->
         all data is sourced from
-        <a target="_blank" href="https://www.nba.com/stats">nba.com</a> via the
-        go-etl package. the postgres build etl uses this package to fetch &
+        <a target="_blank" href="https://www.nba.com/stats">nba.com</a> with the
+        go-etl package referenced above. the postgres build etl uses this package to fetch &
         insert data for every
         nba & wnba regular season/post season game since 1970. the nightly etl
         process is run at approximately 12am every day, and uses the package to
@@ -78,20 +78,14 @@
         the go-etl process takes advantage of go's concurrency features to make several http requests to nba.com in quick succession. the package then processes and structures the data to match the postgres database design, chunks the large volume
         of data into small chunks, and inserts the chunks concurrently
         <div class="decorator">/-|-\</div>
-        this site was originally powered by a MariaDB database with an ETL
-        program
-        written in Python. the Python program utilized the <a target="_blank"
-          href="https://github.com/swar/nba_api">nba_api</a> package to make
-        http
-        requests the stats.nba.com. I wanted to learn more of the lower-level
-        concepts
-        abstracted away by this package, so I decided to rewrite the entire ETL
-        process
-        in Go using (mostly) only the standard Go library. the documentation
-        from
-        the nba_api was incredibly helpful in this process.<br><a
+        this site was originally powered by a MariaDB database with data sourced
+        from nba.com using the <a target="_blank" href="https://github.com/swar/nba_api">nba_api</a> 
+        python package. this system worked well, but i wanted to learn more of the lower-level
+        concepts of http requests abstracted away by this package, so i decided 
+        to rewrite the entire etl process, with my own http requests, in Go. the documentation
+        from the nba_api was incredibly helpful in figuring out this process<br><a
           target="_blank" href="https://github.com/jdetok/py-nba-mdb">
-          legacy python ETL | github | py-nba-mdb</a>
+          legacy python ETL | py-nba-mdb</a>
       </div>
 
       <!-- DATABASE SECTION -->
@@ -99,14 +93,14 @@
       <div class="secel">
         <h3>postgres database</h3>
         all stats on the site are served from a postgres database server running
-        in a docker container. the database was designed by myself following
+        in a docker container. the database was designed following
         the data normalization principles outlined in 
         <a target="_blank"
           href="https://en.wikipedia.org/wiki/Third_normal_form">
           Codd's third normal form
         </a>
         <div class="decorator">/-|-\</div> 
-        the entire database is built by a script in the postgres build etl repo.
+        the database can be built by a single shell script in the postgres build etl repo.
         the script builds & runs the docker container, executes SQL statements 
         to create all schemas, tables, procedures, etc., uses the go-etl
         package to source & insert nba/wnba data since 1970, and runs several
