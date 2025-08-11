@@ -1,0 +1,8 @@
+# ignore symlinks, add submodules
+ZLOCAL.md
+*.*env*
+/z_env
+/prod-api
+/dev-api
+/dkr-env
+/etl-cli

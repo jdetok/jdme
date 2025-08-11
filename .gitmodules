@@ -1,0 +1,12 @@
+[submodule "dev-jdeko.me"]
+	path = dev-jdeko.me
+	url = https://github.com/jdetok/dev-jdeko.me
+[submodule "go-api-jdeko.me"]
+	path = go-api-jdeko.me
+	url = https://github.com/jdetok/go-api-jdeko.me
+[submodule "docker-jdeko.me"]
+	path = docker-jdeko.me
+	url = https://github.com/jdetok/docker-jdeko.me
+[submodule "bball-etl-cli"]
+	path = bball-etl-cli
+	url = https://github.com/jdetok/bball-etl-cli
