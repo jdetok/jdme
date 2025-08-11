@@ -2,7 +2,10 @@ package store
 
 import (
 	"database/sql"
+	"fmt"
+	"strconv"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
@@ -34,6 +37,58 @@ type Team struct {
 	TeamAbbr string `json:"team"`
 	CityTeam string `json:"team_long"`
 	LogoUrl  string `json:"-"`
+}
+
+type SeasonLeague struct {
+	Szn  string
+	WSzn string
+}
+
+/*
+returns slice of season strings for date (generally pass time.Now())
+calling in 2025 will return 2024-25 and 2025-26 and so on
+*/
+func CurrentSzns(dt time.Time) []string {
+	var cyyy string = dt.Format("2006")
+	var cy string = dt.AddDate(1, 0, 0).Format("06")
+
+	var pyyy string = dt.AddDate(-1, 0, 0).Format("2006")
+	var py string = dt.Format("06")
+
+	return []string{
+		fmt.Sprint(pyyy, "-", py),
+		fmt.Sprint(cyyy, "-", cy),
+	}
+}
+
+func LgSeasons() SeasonLeague {
+	e := errd.InitErr()
+	var sl SeasonLeague
+	var crnt []string = CurrentSzns(time.Now())
+
+	m, err := strconv.Atoi(time.Now().Format("1"))
+	if err != nil {
+		e.Msg = "error converting year to int"
+		fmt.Println(e.BuildErr(err))
+	}
+
+	// beginning of year through april
+	sl.Szn = crnt[0]
+	sl.WSzn = crnt[0]
+
+	// may through september
+	if m > 5 && m < 10 {
+		sl.WSzn = crnt[1]
+	}
+
+	// october through end of year
+	if m > 10 {
+		sl.Szn = crnt[1]
+		sl.WSzn = crnt[1]
+	}
+
+	// fmt.Printf("NBA Season: %s | WNBA Season: %s\n", sl.Szn, sl.WSzn)
+	return sl
 }
 
 // REMOVE NON SPACING CHARACTERS -- e.g. Dončić becomes doncic

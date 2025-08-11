@@ -99,6 +99,7 @@ func (t *RespSeasonTmp) hndlSeason(league *string, season *string) {
 }
 
 // accept pointers of season_id and stat type, switch season to handle stat type
+// NEED TO LOOK INTO THIS
 func hndlAggsIds(sId *uint64, sType *string) {
 	switch *sId {
 	case 99999:

@@ -88,13 +88,16 @@ export async function handleSeasonBoxes() {
     if (r) {
         return r;
     }
+    // return 77777;
+    return `2${new Date().getFullYear() - 1}`;
+/* FIX THIS - PASS 77777 after figuring out how to handle on server
     if (new Date().getMonth() < 7) {
         return `2${new Date().getFullYear() - 1}`;
     } else {
         return `2${new Date().getFullYear()}`;
     }
     
-    // return 88888;
+    // return 88888; */
 }
 
 async function makeOption(slct, txt, val) {
