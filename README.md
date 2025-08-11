@@ -1,18 +1,10 @@
 # jdeko.me master directory
 includes symlinks to the following directories:
-- ## api
+- ## go-api-jdeko.me
 	production go api & frontend
-	- #### local: `~/go/github.com/jdetok/go-api-jdeko.me`
-	- #### remote: https://github.com/jdetok/go-api-jdeko.me
-- ## dev-api
+- ## dev-jdeko.me
 	- development go api & frontend
-	- #### local: `~/go/github.com/jdetok/dev-jdeko.me`
-	- #### remote: https://github.com/jdetok/dev-jdeko.me
-- ## dkr-env
+- ## docker-jdeko.me
 	- apache web server/go api configs for docker containers
-	- #### local: `~/dkr/jdme_env`
-	- #### remote: https://github.com/jdetok/docker-jdeko.me
-- ## etl-cli
+- ## bball-etl-cli
 	- go app to fetch nba/wnba data & insert into postgres
-	- #### local: `~/go/github.com/jdetok/bball-etl-cli`
-	- #### remote: https://github.com/jdetok/bball-etl-cli
