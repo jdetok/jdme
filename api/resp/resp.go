@@ -5,6 +5,7 @@ import (
 	"math/rand/v2"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api/store"
 )
@@ -136,9 +137,17 @@ func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 		lg, lg, tId)
 }
 
-func slicePlayersSzn(players []store.Player, sId uint64) ([]store.Player, error) {
+func slicePlayersSzn(players []store.Player, seasonId uint64) ([]store.Player, error) {
 	var plslice []store.Player
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
+
+		var sId uint64 = seasonId
+		if uint64(time.Now().Month()) <= 10 {
+			if p.League == "nba" {
+				sId--
+			}
+		}
+
 		if (sId >= 20000 && sId < 30000) && (sId <= p.SeasonIdMax && sId >= p.SeasonIdMin) || (sId >= 40000 && sId < 50000) && (sId <= p.PSeasonIdMax && sId >= p.PSeasonIdMin) {
 			plslice = append(plslice, p)
 		} else if sId >= 88888 {

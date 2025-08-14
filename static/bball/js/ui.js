@@ -89,7 +89,7 @@ export async function handleSeasonBoxes() {
         return r;
     }
     // return 77777;
-    return `2${new Date().getFullYear() - 1}`;
+    return `2${new Date().getFullYear()}`;
 /* FIX THIS - PASS 77777 after figuring out how to handle on server
     if (new Date().getMonth() < 7) {
         return `2${new Date().getFullYear() - 1}`;
