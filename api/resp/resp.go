@@ -141,6 +141,7 @@ func slicePlayersSzn(players []store.Player, seasonId uint64) ([]store.Player, e
 	var plslice []store.Player
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
 
+		// if nba & pre october, subtract 1 from season id
 		var sId uint64 = seasonId
 		if uint64(time.Now().Month()) <= 10 {
 			if p.League == "nba" {
@@ -148,6 +149,7 @@ func slicePlayersSzn(players []store.Player, seasonId uint64) ([]store.Player, e
 			}
 		}
 
+		// append players to the random slice if the passed season id between player min and max season
 		if (sId >= 20000 && sId < 30000) && (sId <= p.SeasonIdMax && sId >= p.SeasonIdMin) || (sId >= 40000 && sId < 50000) && (sId <= p.PSeasonIdMax && sId >= p.PSeasonIdMin) {
 			plslice = append(plslice, p)
 		} else if sId >= 88888 {

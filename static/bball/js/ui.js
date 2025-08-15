@@ -78,7 +78,6 @@ export async function randPlayerBtn() {
 }
 
 export async function handleSeasonBoxes() {
-    // const c = await checkBoxes('career', 'cr_slct')
     const p = await checkBoxes('post', 'ps_slct')
     const r = await checkBoxes('reg', 'rs_slct')
 
@@ -87,19 +86,11 @@ export async function handleSeasonBoxes() {
     }
     if (r) {
         return r;
-    }
-    // return 77777;
+    } // 2{current year} i.e. 22025 during 2025
     return `2${new Date().getFullYear()}`;
-/* FIX THIS - PASS 77777 after figuring out how to handle on server
-    if (new Date().getMonth() < 7) {
-        return `2${new Date().getFullYear() - 1}`;
-    } else {
-        return `2${new Date().getFullYear()}`;
-    }
-    
-    // return 88888; */
 }
 
+// append options to select
 async function makeOption(slct, txt, val) {
     let opt = document.createElement('option');
     opt.textContent = txt;
@@ -107,6 +98,7 @@ async function makeOption(slct, txt, val) {
     slct.appendChild(opt);
 }
 
+// call seaons endpoint for the opts
 export async function loadSznOptions() {
     const r = await fetch(base + '/seasons');
     if (!r.ok) { 
@@ -119,17 +111,13 @@ export async function loadSznOptions() {
 async function buildSznSelects(data) {
     const rs = document.getElementById('rs_slct');
     const ps = document.getElementById('ps_slct');
-    // const cr = document.getElementById('cr_slct');
     for (let s of data) {
-        // if (s.season_id.substring(1, 4) === '9999') {
-        //     await makeOption(cr, s.season, s.season_id);
         if (s.season_id.substring(0, 1) === '4') {
             await makeOption(ps, s.season, s.season_id);
         } else if (s.season_id.substring(0, 1) === '2') {
             await makeOption(rs, s.season, s.season_id);
         }
     }
-
 }
 
 export async function clearSearch() {
