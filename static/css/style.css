@@ -108,7 +108,7 @@ a.med {
 
 /*INTRO BLOCK OF MAIN PAGE*/
 .intro {
-    width: 60%;
+    width: 65%;
     max-width: 100%;
     margin: 0 auto;/* centers the div */
     text-align: center;
@@ -204,4 +204,10 @@ footer {
     width: 30%;
     max-width: 100%;
     text-align: center;
+}
+
+/* schematic screenshot */
+.sch img{
+    max-width: 60%;
+    height: auto;
 }
