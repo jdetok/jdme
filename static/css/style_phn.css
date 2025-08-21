@@ -1,4 +1,17 @@
 @media (max-width: 600px) {
+    iframe {
+        width: 95%;
+        height: auto;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+    
     .hdr {
         font-size: 8px;
     }
@@ -13,7 +26,7 @@
     }
 
     .intro {
-        width: 90%
+        width: 95%
     }
     
     .flexels {
@@ -25,7 +38,7 @@
 
     .flexel,
     .emphitem {
-        width: 90%;
+        width: 95%;
         max-width: 100%;
     }
 
@@ -36,6 +49,6 @@
     }
 
     ul.pics li figure img {
-        width: fit-content;
+        width: 100%;
     }
 }
