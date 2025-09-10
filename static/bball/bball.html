@@ -29,48 +29,57 @@
   <h1>jdeko.me/bball<br>nba/wnba statistics</h1>
 
   <!-- SELECTS ========================================= -->
-  <form id="ui">
-    <div class="uirowouter"> 
-      <div class="uiopt" id="psdiv">
-        <label for="post">post-seasons:</label>
-        <div class="uirow"> 
-          <div class="hlp" id="hlpPs">?</div>
-          <select id="ps_slct"></select>
-          <input type="checkbox" id="post">
+    <form id="ui">
+      <div class="uirowouter"> 
+        <div class="uiopt" id="psdiv">
+          <label for="post">post-seasons:</label>
+          <div class="uirow"> 
+            <div class="hlp" id="hlpPs">?</div>
+            <select id="ps_slct"></select>
+            <input type="checkbox" id="post">
+          </div>
         </div>
-      </div>
-      <div class="uiopt" id="rsdiv">
-        <label for="reg">regular seasons:</label>
+        <div class="uiopt" id="rsdiv">
+          <label for="reg">regular seasons:</label>
+          <div class="uirow">
+            <input type="checkbox" value="rs" id="reg">
+            <select id="rs_slct"></select>
+            <div class="hlp" id="hlpRs">?</div>
+          </div>
+        </div>
+      </div> 
+      <div class="hvr" id="selhvr"></div>
+      <div class="uisect">
+        <div class="err" id="sErr"></div>
+        <input type="text" style="display:none;" id="pHold">
         <div class="uirow">
-          <input type="checkbox" value="rs" id="reg">
-          <select id="rs_slct"></select>
-          <div class="hlp" id="hlpRs">?</div>
+          <input type="text" id="pSearch" placeholder="Search for a player">
+          <button type="button" id="clearS">clear search</button>
+        </div>
+        <div class="uirow">
+          <button type="submit" id="search">search player</button>
+          <button type="button" id="holdP">hold current player</button>
+          <div class="hlp" id="hlpHld">?</div>
+        </div>
+        
+        <div class="uirow">
+          <button type="button" id="randP">search for a random player</button>
+          <div class="hlp" id="hlpRnd">?</div>
         </div>
       </div>
-    </div> 
-    <div class="hvr" id="selhvr"></div>
-    <div class="uisect">
-      <div class="err" id="sErr"></div>
-      <input type="text" style="display:none;" id="pHold">
-      <div class="uirow">
-        <input type="text" id="pSearch" placeholder="Search for a player">
-        <button type="button" id="clearS">clear search</button>
-      </div>
-      <div class="uirow">
-        <button type="submit" id="search">search player</button>
-        <button type="button" id="holdP">hold current player</button>
-        <div class="hlp" id="hlpHld">?</div>
-      </div>
-      
-      <div class="uirow">
-        <button type="button" id="randP">search for a random player</button>
-        <div class="hlp" id="hlpRnd">?</div>
-      </div>
-    </div>
-    <div class="hvr" id="hvrmsg"></div>
-  </form>
+      <div class="hvr" id="hvrmsg"></div>
+    </form>
+
+
+
+  <!-- RESPONSE -->
   <div class="respouter">
-    <div class="resptitle" id="player_title"></div>
+    <div id="titlesect">
+      <div class="resptbl" id="top_players"></div>
+      <div class="resptitle" id="player_title"></div>
+      <div></div>
+    </div>
+
     <div class="resprow">
       <div class="respsect">
         <div class="respblk" id="player_szn"></div>
@@ -98,27 +107,3 @@
   </div>
 </body>
 </html>
-
-<!-- 
-<div class="uirow" style="display: none;">
-<div class="uiopt">
-  <select id="nba_teams"></select>
-  <label for="tm">nba teams:</label>
-  <input type="checkbox" id="tm">
-</div>
-<div class="uiopt">
-  <select id="wnba_teams"></select>
-  <label for="wtm">wnba teams:</label>
-  <input type="checkbox" id="wtm">
-</div>
-<div class="uiopt">
-  <select id="league">
-    <option value="all">NBA/WNBA</option>
-    <option value="nba">NBA</option>
-    <option value="wnba">WNBA</option>
-  </select>
-  <label for="league">league:</label>
-  <input type="checkbox" id="lg">
-</div>
-</div>
--->

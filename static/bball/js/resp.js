@@ -7,6 +7,8 @@ export async function buildPDash(data, ts) {
     await respPlayerTitle(data.player_meta, 'player_title', ts);
     await respPlayerInfo(data, 'player_szn');
 
+    
+
     // box stat tables
     await table.basicTable(data.totals.box_stats, data.player_meta.cap_box_tot, 'box');
     await table.basicTable(data.per_game.box_stats, data.player_meta.cap_box_avg, 'avg-box');
@@ -18,6 +20,7 @@ export async function buildPDash(data, ts) {
         'shot_type', 'avg-shooting');
 }
 
+// ts indicates 'top scorer' - used when called on page refresh to get recent game
 export async function getP(base, player, season, team, ts) { // add season & team
     const err = document.getElementById('sErr');
     if (err.style.display === "block") {
@@ -45,14 +48,51 @@ export async function getP(base, player, season, team, ts) { // add season & tea
     document.getElementById('pHold').value = data.player_meta.player;
 }
 
+export async function otherTopPlayersTable(data, elName) {
+    const tblcont = document.getElementById(elName);
+
+    // loop through top players array, add row each iter
+    const tbl = document.createElement('tbl');
+    const lbl = document.createElement('caption');
+    lbl.textContent = `Other Top Scorers from ${data.recent_games[0].game_date}`;
+    tbl.appendChild(lbl);
+    for (let i = 0; i < data.top_scorers.length; i++) {
+        let r = document.createElement('tr');
+        let pName = document.createElement('td');
+        let pts = document.createElement('td');
+
+        pName.textContent = data.top_scorers[i].player;
+        pts.textContent = data.top_scorers[i].points;
+        r.appendChild(pName);
+        r.appendChild(pts);
+        tbl.appendChild(r);
+    }
+
+    tblcont.appendChild(tbl);
+    
+    // await table.basicTable(data, "Other Top Scorers", elName)
+}
+
 export async function getRecentTopScorer() {
     const r = await fetch(`${base}/games/recent`);
     if (!r.ok) {
         throw new Error(`${r.status}: error calling /games/recent`);
     }
     const data = await r.json();
-    const player = data.top_scorers[0].player_id;
-    await getP(base, player, 88888, 0, data);
+    const top_scorer = data.top_scorers[0].player_id;
+    /* TODO: BUILD A TABLE OF THE OTHER TOP PLAYERS, LINK THE PLAYERS' NAMES TO
+    CALL getP FOR THAT PLAYER
+    */
+
+    const plrs = data.top_scorers.slice(1);
+    console.log(plrs);
+    console.log("FULL DATA: ");
+    console.log(data);
+    
+    await otherTopPlayersTable(data, 'top_players');
+
+    await getP(base, top_scorer, 88888, 0, data);
+
 }
 
 // RESULT TITLE - LIKE `LeBron James - Los Angeles Lakers`

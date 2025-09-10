@@ -1,3 +1,17 @@
+#titlesect {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+#titlesect > div {
+    width: 100%;
+    border: 1px solid black;
+}
+
+#top_players {
+    border: 1px solid black;
+}
+
 #ui {
     /* border: 5px solid black; */
     display: block;

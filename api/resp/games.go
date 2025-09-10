@@ -57,6 +57,7 @@ func MakeRgs(rows *sql.Rows) RecentGames {
 	return rgs
 }
 
+// returns the top scorer (regardless of team) from each of last night's games
 func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
 	e := errd.InitErr()
 	rows, err := db.Query(pgdb.RecGameTopScorers.Q)
