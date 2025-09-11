@@ -1,4 +1,16 @@
 @media (max-width: 600px) {
+    #top_players {
+        display: none;;
+    }
+    #titlesect {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    #titlesect > div {
+        width: 100%;
+        /* border: 1px solid black; */
+    }
     .uisect {
         flex-direction: column;
     }
