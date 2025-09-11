@@ -50,21 +50,66 @@ export async function getP(base, player, season, team, ts) { // add season & tea
 
 export async function otherTopPlayersTable(data, elName) {
     const tblcont = document.getElementById(elName);
+    const tbl = document.getElementById('tstbl');
 
-    // loop through top players array, add row each iter
-    const tbl = document.createElement('tbl');
     const lbl = document.createElement('caption');
     lbl.textContent = `Other Top Scorers from ${data.recent_games[0].game_date}`;
     tbl.appendChild(lbl);
-    for (let i = 0; i < data.top_scorers.length; i++) {
+
+    const thead = document.createElement('thead');
+    
+    const nameH = document.createElement('td');
+    const lgH = document.createElement('td');
+    const ptsH = document.createElement('td');
+    const gmH = document.createElement('td');
+    const wlH = document.createElement('td');
+    const teamH = document.createElement('td');
+
+    nameH.textContent = 'name';
+    lgH.textContent = 'league';
+    ptsH.textContent = 'points';
+    gmH.textContent = 'game';
+    wlH.textContent = 'win/loss';
+    teamH.textContent = 'team';
+
+    thead.appendChild(nameH);
+    thead.appendChild(lgH);
+    thead.appendChild(teamH);
+    thead.appendChild(gmH);
+    thead.appendChild(wlH);
+    thead.appendChild(ptsH);
+
+    tbl.appendChild(thead);
+    
+    const scorers = data.top_scorers.slice(1);
+
+    for (let i = 0; i < scorers.length; i++) {
+        let scorer = scorers[i];
+        let game = data.recent_games.find(g => g.player_id === scorer.player_id);
+
         let r = document.createElement('tr');
+
         let pName = document.createElement('td');
+        let pTeam = document.createElement('td');
+        let pLg = document.createElement('td');
+        let pGm = document.createElement('td');
+        let pWl = document.createElement('td');
         let pts = document.createElement('td');
 
-        pName.textContent = data.top_scorers[i].player;
-        pts.textContent = data.top_scorers[i].points;
+        pName.textContent = scorer.player;
+        pTeam.textContent = game ? game.team_name : "";
+        pLg.textContent = scorer.league;
+        pGm.textContent = game ? game.matchup : "";
+        pWl.textContent = game ? game.wl : "";
+        pts.textContent = scorer.points;
+
         r.appendChild(pName);
+        r.appendChild(pTeam);
+        r.appendChild(pLg);
+        r.appendChild(pGm);
+        r.appendChild(pWl);
         r.appendChild(pts);
+
         tbl.appendChild(r);
     }
 
