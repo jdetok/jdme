@@ -1,5 +1,6 @@
 import * as table from "./table.js"
 import { base } from "./listen.js"
+import { search } from "./ui.js";
 
 export async function buildPDash(data, ts) {
     await appendImg(data.player_meta.headshot_url, 'pl_img');
@@ -48,16 +49,17 @@ export async function getP(base, player, season, team, ts) { // add season & tea
     document.getElementById('pHold').value = data.player_meta.player;
 }
 
-export async function otherTopPlayersTable(data, elName) {
+export async function tsTable(data, elName, exclude_first) {
     const tblcont = document.getElementById(elName);
     const tbl = document.getElementById('tstbl');
 
+    // table captions
     const lbl = document.createElement('caption');
     lbl.textContent = `Other Top Scorers from ${data.recent_games[0].game_date}`;
     tbl.appendChild(lbl);
 
+    // table headers
     const thead = document.createElement('thead');
-    
     const nameH = document.createElement('td');
     const lgH = document.createElement('td');
     const ptsH = document.createElement('td');
@@ -81,8 +83,12 @@ export async function otherTopPlayersTable(data, elName) {
 
     tbl.appendChild(thead);
     
-    const scorers = data.top_scorers.slice(1);
-
+    // 
+    let scorers = data.top_scorers;
+    if (exclude_first) {
+        scorers = scorers.slice(1);
+    }
+    
     for (let i = 0; i < scorers.length; i++) {
         let scorer = scorers[i];
         let game = data.recent_games.find(g => g.player_id === scorer.player_id);
@@ -96,7 +102,20 @@ export async function otherTopPlayersTable(data, elName) {
         let pWl = document.createElement('td');
         let pts = document.createElement('td');
 
-        pName.textContent = scorer.player;
+        let btn = document.createElement('button');
+        btn.textContent = scorer.player;
+        btn.addEventListener('click', async () => {
+            let searchB = document.getElementById('pSearch');
+            if (searchB) {
+                searchB.value = scorer.player;
+                searchB.focus();
+                await getP(base, scorer.player, 88888, 0, data);
+
+            }
+        });
+
+
+        pName.appendChild(btn);
         pTeam.textContent = game ? game.team_name : "";
         pLg.textContent = scorer.league;
         pGm.textContent = game ? game.matchup : "";
@@ -134,7 +153,7 @@ export async function getRecentTopScorer() {
     console.log("FULL DATA: ");
     console.log(data);
     
-    await otherTopPlayersTable(data, 'top_players');
+    await tsTable(data, 'top_players', 0);
 
     await getP(base, top_scorer, 88888, 0, data);
 

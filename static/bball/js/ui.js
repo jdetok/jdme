@@ -9,7 +9,7 @@ export async function search() {
         const input = document.getElementById('pSearch');
         const player = input.value.trim();
         const season = await handleSeasonBoxes();
-        console.log(`searhing for season ${season}`)
+        console.log(`searching for season ${season}`)
         await getP(base, player, season, '0');
         input.value = ''; // clear input box after searching
     }) 
