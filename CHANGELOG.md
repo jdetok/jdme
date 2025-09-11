@@ -4,3 +4,5 @@
 - ### database switched from MariaDB to Postgres
     - redesigned database
     - migration complete August 6, 2025
+
+- ### 9/10/2025 added top scorers interactive box
