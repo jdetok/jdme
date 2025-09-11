@@ -55,30 +55,21 @@ export async function tsTable(data, elName, exclude_first) {
 
     // table captions
     const lbl = document.createElement('caption');
-    lbl.textContent = `Other Top Scorers from ${data.recent_games[0].game_date}`;
+    lbl.textContent = `Top Scorers from ${data.recent_games[0].game_date}`;
     tbl.appendChild(lbl);
 
     // table headers
     const thead = document.createElement('thead');
     const nameH = document.createElement('td');
-    const lgH = document.createElement('td');
     const ptsH = document.createElement('td');
-    const gmH = document.createElement('td');
-    const wlH = document.createElement('td');
     const teamH = document.createElement('td');
 
     nameH.textContent = 'name';
-    lgH.textContent = 'league';
     ptsH.textContent = 'points';
-    gmH.textContent = 'game';
-    wlH.textContent = 'win/loss';
-    teamH.textContent = 'team';
+    teamH.textContent = 'team | matchup | win-loss';
 
     thead.appendChild(nameH);
-    thead.appendChild(lgH);
     thead.appendChild(teamH);
-    thead.appendChild(gmH);
-    thead.appendChild(wlH);
     thead.appendChild(ptsH);
 
     tbl.appendChild(thead);
@@ -97,13 +88,11 @@ export async function tsTable(data, elName, exclude_first) {
 
         let pName = document.createElement('td');
         let pTeam = document.createElement('td');
-        let pLg = document.createElement('td');
-        let pGm = document.createElement('td');
-        let pWl = document.createElement('td');
         let pts = document.createElement('td');
 
         let btn = document.createElement('button');
         btn.textContent = scorer.player;
+        btn.type = 'button';
         btn.addEventListener('click', async () => {
             let searchB = document.getElementById('pSearch');
             if (searchB) {
@@ -114,19 +103,13 @@ export async function tsTable(data, elName, exclude_first) {
             }
         });
 
-
         pName.appendChild(btn);
-        pTeam.textContent = game ? game.team_name : "";
-        pLg.textContent = scorer.league;
-        pGm.textContent = game ? game.matchup : "";
-        pWl.textContent = game ? game.wl : "";
+        pTeam.textContent = `${game ? game.team_name : ""} | \
+        ${game ? game.matchup : ""} | ${game ? game.wl : ""}`;
         pts.textContent = scorer.points;
 
         r.appendChild(pName);
         r.appendChild(pTeam);
-        r.appendChild(pLg);
-        r.appendChild(pGm);
-        r.appendChild(pWl);
         r.appendChild(pts);
 
         tbl.appendChild(r);
