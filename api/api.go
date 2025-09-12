@@ -13,7 +13,7 @@ import (
 main struct referenced through the app. contains configs, database pool,
 in-memory player, season, team slices
 */
-type application struct {
+type App struct {
 	config     config
 	database   *sql.DB
 	StartTime  time.Time
@@ -28,8 +28,8 @@ type config struct {
 	addr string
 }
 
-func (app *application) JSONWriter(w http.ResponseWriter, js []byte) {
-	w.Header().Set("Content-Type", "application/json")
+func (app *App) JSONWriter(w http.ResponseWriter, js []byte) {
+	w.Header().Set("Content-Type", "App/json")
 	w.Write(js)
 }
 
@@ -39,7 +39,7 @@ all endpoints need to be defined in the mount function with their HTTP request
 method/endpoint name and their corresponding HandleFunc
 the root handler "/" must remain at the end of the function
 */
-func (app *application) mount() *http.ServeMux {
+func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// define endpoints
@@ -61,7 +61,7 @@ func (app *application) mount() *http.ServeMux {
 }
 
 // runs the http server - must be called after mount is successfully executed
-func (app *application) run(mux *http.ServeMux) error {
+func (app *App) Run(mux *http.ServeMux) error {
 
 	// server configuration
 	srv := &http.Server{

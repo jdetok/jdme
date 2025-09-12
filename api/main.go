@@ -39,7 +39,7 @@ func main() {
 	}
 
 	// initialize the app with the configs
-	app := &application{
+	app := &App{
 		config:   config{addr: hostaddr},
 		database: db,
 	}
@@ -67,8 +67,8 @@ func main() {
 		30*time.Second, 300*time.Second)
 
 	// MOUNT & RUN HTTP SERVER
-	mux := app.mount()
-	if err := app.run(mux); err != nil {
+	mux := app.Mount()
+	if err := app.Run(mux); err != nil {
 		e.Msg = "error mounting api/http server"
 		log.Fatal(e.BuildErr(err).Error())
 	}

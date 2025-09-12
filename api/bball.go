@@ -11,7 +11,7 @@ import (
 	"github.com/jdetok/golib/errd"
 )
 
-func (app *application) playerDashHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) playerDashHndl(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 
@@ -34,7 +34,7 @@ func (app *application) playerDashHndl(w http.ResponseWriter, r *http.Request) {
 }
 
 // come back to this - used in top scorer maybe?
-func (app *application) recGameHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) recGameHndl(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 	rgs := resp.RecentGames{}
@@ -48,10 +48,10 @@ func (app *application) recGameHndl(w http.ResponseWriter, r *http.Request) {
 }
 
 // FOR SEASONS SELECTOR - CALLED ON PAGE LOAD
-func (app *application) seasonsHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) seasonsHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	season := r.URL.Query().Get("szn")
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "App/json")
 	if season == "" { // send all szns when szn is not in q str, used most often
 		json.NewEncoder(w).Encode(app.seasons)
 	} else {
@@ -66,10 +66,10 @@ func (app *application) seasonsHndl(w http.ResponseWriter, r *http.Request) {
 }
 
 // FOR TEAMS SELECTOR - CALLED ON PAGE LOAD
-func (app *application) teamsHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) teamsHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	team := r.URL.Query().Get("team")
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "App/json")
 	if team == "" { // send all teams when team is not in q str, used most often
 		json.NewEncoder(w).Encode(app.teams)
 	} else { // read & valid team from q string, not yet used 8/6
