@@ -10,6 +10,7 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/api/store"
 )
 
+// outer response struct
 type Resp struct {
 	Results []RespObj `json:"player"`
 }
@@ -41,7 +42,7 @@ type RespPlayerMeta struct {
 	TeamLogoUrl  string `json:"team_logo_url"`
 }
 
-// idea: break out box and shooting
+// all player statistics (strings)
 type Stats struct {
 	Minutes  string `json:"minutes"`
 	Points   string `json:"points"`
@@ -60,6 +61,7 @@ type Stats struct {
 	FtPct    string `json:"ft_pct"`
 }
 
+// only box stats (strings)
 type BoxStats struct {
 	Minutes  string `json:"minutes"`
 	Points   string `json:"points"`
@@ -69,6 +71,7 @@ type BoxStats struct {
 	Blocks   string `json:"blocks"`
 }
 
+// only shooting stats (strings)
 type ShootingStats struct {
 	FgMade  string `json:"fg_made"`
 	FgAtpt  string `json:"fg_atpt"`
@@ -88,11 +91,13 @@ type RespPlayerSznOvw struct {
 	MinutsPerGame float32 `json:"minutes_pg"`
 }
 
+// struct that holds both box and shooting stats
 type RespPlayerStats struct {
 	Box  RespPlayerStatsBox  `json:"box_stats"`
 	Shtg RespPlayerStatsShtg `json:"shooting"`
 }
 
+// box stats as floats
 type RespPlayerStatsBox struct {
 	Points   float32 `json:"points"`
 	Assists  float32 `json:"assists"`
@@ -101,26 +106,28 @@ type RespPlayerStatsBox struct {
 	Blocks   float32 `json:"blocks"`
 }
 
-// struct to wrap shooting stats
+// shooting stats wrapper struct - holds shtg type structs for twos, three, free throws
 type RespPlayerStatsShtg struct {
 	Fg  RespPlayerStatsShtgType `json:"field_goals"`
 	Fg3 RespPlayerStatsShtgType `json:"three_pointers"`
 	Ft  RespPlayerStatsShtgType `json:"free_throws"`
 }
 
-// change these to just made atpt pct cause putting in parent struct
+// struct to hold a category of shooting stats - should be stored in wrapper struct
+// for twos, threes, free throws
 type RespPlayerStatsShtgType struct {
 	Makes    float32 `json:"made"`
 	Attempts float32 `json:"attempted"`
 	Percent  string  `json:"percentage"`
 }
 
-// temporary struct used in GetPlayerDash
+// temporary struct used in GetPlayerDash to assign appropriate league for each player
 type RespSeasonTmp struct {
 	Season  string
 	WSeason string
 }
 
+// use league and player id to build the URL containing a player's headshot
 func (m *RespPlayerMeta) MakeHeadshotUrl() {
 	lg := strings.ToLower(m.League)
 	pId := strconv.Itoa(int(m.PlayerId))
@@ -129,6 +136,7 @@ func (m *RespPlayerMeta) MakeHeadshotUrl() {
 		lg, lg, pId)
 }
 
+// use league and team id to build team logo URLs
 func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 	lg := strings.ToLower(m.League)
 	tId := strconv.Itoa(int(m.TeamId))
@@ -137,6 +145,8 @@ func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 		lg, lg, tId)
 }
 
+// accept the slice of all players and a seasonId, return a slice with just the
+// active players from the passed season id
 func slicePlayersSzn(players []store.Player, seasonId uint64) ([]store.Player, error) {
 	var plslice []store.Player
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
@@ -159,6 +169,9 @@ func slicePlayersSzn(players []store.Player, seasonId uint64) ([]store.Player, e
 	return plslice, nil
 }
 
+// accept slice of Player structs and a season id, call slicePlayerSzn to create
+// a new slice with only players from the specified season. then, generate a
+// random number and return the player at that index in the slice
 func randPlayer(pl []store.Player, sId uint64) uint64 {
 	players, _ := slicePlayersSzn(pl, sId)
 	numPlayers := len(players)
@@ -166,7 +179,10 @@ func randPlayer(pl []store.Player, sId uint64) uint64 {
 	return players[randNum].PlayerId
 }
 
-// uses app.players
+// player name and season ID from get request passed here, returns the player's
+// ID and the season ID. if 'player' variable == "random", the randPlayer function
+// is called. a player ID also can be passed as the player parameter, it will just
+// be converted to an int and returned
 func GetpIdsId(players []store.Player, player string, seasonId string) (uint64, uint64) {
 	sId, _ := strconv.ParseUint(seasonId, 10, 32)
 	var pId uint64
@@ -187,14 +203,22 @@ func GetpIdsId(players []store.Player, player string, seasonId string) (uint64, 
 	// loop through players to check that queried season is within min-max seasons
 	for _, p := range players {
 		if p.PlayerId == pId {
-			return pId, handlesId(sId, &p)
+			return pId, HandlesId(sId, &p)
 		}
 	}
 	return pId, sId
 }
 
-// HANDLE REQUEST FOR SEASON PLAYER DID NOT PLAY IN
-func handlesId(sId uint64, p *store.Player) uint64 {
+// accept a season id and a pointer to a Player struct, validate the player was active
+// in the passed season, return a valid season ID if not. if season id starts with an
+// 8 the player's max regular season will be returned. if it starts with a 7, their
+// max playoff season will be returned. if it starts with a 4, it will first verify
+// player has played in a playoff game, and will return their max regular season if
+// they haven't. a season id starting with 2 will return a regular season. for both
+// regular season and playoffs, the function will verify the player played in said
+// season, and return either their max or min (whichever is closer) season  if they
+// did not
+func HandlesId(sId uint64, p *store.Player) uint64 {
 	if strconv.FormatUint(sId, 10)[1:] == "9999" { // agg seasons
 		return sId
 	} else if sId >= 80000 && sId < 90000 {
@@ -229,6 +253,7 @@ func handlesId(sId uint64, p *store.Player) uint64 {
 	return sId
 }
 
+// search player by name, return player id int if found
 func SearchPlayers(players []store.Player, pSearch string) string {
 	for _, p := range players {
 		if p.Name == pSearch { // return match playerid (uint32) as string
@@ -237,41 +262,3 @@ func SearchPlayers(players []store.Player, pSearch string) string {
 	}
 	return ""
 }
-
-// // seasons
-// func GetSeasons(db *sql.DB) ([]Season, error) {
-// 	fmt.Println("querying seasons & saving to struct")
-// 	e := errd.InitErr()
-// 	rows, err := db.Query(mdb.RSeasons.Q)
-// 	if err != nil {
-// 		e.Msg = "error querying db"
-// 		e.BuildErr(err)
-// 	}
-
-// 	var seasons []Season
-// 	for rows.Next() {
-// 		var szn Season
-// 		rows.Scan(&szn.SeasonId, &szn.Season, &szn.WSeason)
-// 		seasons = append(seasons, szn)
-// 	}
-
-// 	return seasons, nil
-// }
-
-// // teams
-// func GetTeams(db *sql.DB) ([]Team, error) {
-// 	e := errd.InitErr()
-// 	rows, err := db.Query(mdb.Teams.Q)
-// 	if err != nil {
-// 		e.Msg = "error querying db"
-// 		e.BuildErr(err)
-// 	}
-
-// 	var teams []Team
-// 	for rows.Next() {
-// 		var tm Team
-// 		rows.Scan(&tm.League, &tm.TeamId, &tm.TeamAbbr, &tm.CityTeam)
-// 		teams = append(teams, tm)
-// 	}
-// 	return teams, nil
-// }
