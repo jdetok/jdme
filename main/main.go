@@ -11,6 +11,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/jdetok/go-api-jdeko.me/api"
 	"github.com/jdetok/go-api-jdeko.me/api/store"
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/envd"
@@ -39,31 +40,31 @@ func main() {
 	}
 
 	// initialize the app with the configs
-	app := &App{
-		config:   config{addr: hostaddr},
-		database: db,
+	app := &api.App{
+		Config:   api.Config{Addr: hostaddr},
+		Database: db,
 	}
 	// create array of player structs
-	if app.players, err = store.GetPlayers(app.database); err != nil {
+	if app.Players, err = store.GetPlayers(app.Database); err != nil {
 		e.Msg = "failed creating players array"
 		fmt.Println(e.BuildErr(err).Error())
 	}
 
 	// create array of season structs
-	if app.seasons, err = store.GetSeasons(app.database); err != nil {
+	if app.Seasons, err = store.GetSeasons(app.Database); err != nil {
 		e.Msg = "failed creating seasons array"
 		fmt.Println(e.BuildErr(err).Error())
 	}
 
 	// create array of season structs
-	if app.teams, err = store.GetTeams(app.database); err != nil {
+	if app.Teams, err = store.GetTeams(app.Database); err != nil {
 		e.Msg = "failed creating teams array"
 		fmt.Println(e.BuildErr(err).Error())
 	}
 
 	// checks if store needs refreshed every 30 seconds, refreshes if 60 sec since last
-	go store.UpdateStructs(app.database, &app.lastUpdate,
-		&app.players, &app.seasons, &app.teams,
+	go store.UpdateStructs(app.Database, &app.LastUpdate,
+		&app.Players, &app.Seasons, &app.Teams,
 		30*time.Second, 300*time.Second)
 
 	// MOUNT & RUN HTTP SERVER

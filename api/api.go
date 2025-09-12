@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"database/sql"
@@ -10,26 +10,26 @@ import (
 )
 
 /*
-main struct referenced through the app. contains configs, database pool,
+main struct referenced through the app. contains configs, , pool,
 in-memory player, season, team slices
 */
 type App struct {
-	config     config
-	database   *sql.DB
+	Config     Config
+	Database   *sql.DB
 	StartTime  time.Time
-	lastUpdate time.Time
-	players    []store.Player
-	seasons    []store.Season
-	teams      []store.Team
+	LastUpdate time.Time
+	Players    []store.Player
+	Seasons    []store.Season
+	Teams      []store.Team
 }
 
 // configs, currently only contains server address
-type config struct {
-	addr string
+type Config struct {
+	Addr string
 }
 
 func (app *App) JSONWriter(w http.ResponseWriter, js []byte) {
-	w.Header().Set("Content-Type", "App/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
 }
 
@@ -65,7 +65,7 @@ func (app *App) Run(mux *http.ServeMux) error {
 
 	// server configuration
 	srv := &http.Server{
-		Addr:         app.config.addr,
+		Addr:         app.Config.Addr,
 		Handler:      mux,
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 10,

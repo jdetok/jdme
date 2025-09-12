@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -23,9 +23,9 @@ func (app *App) playerDashHndl(w http.ResponseWriter, r *http.Request) {
 
 	season := r.URL.Query().Get("season")
 	player := store.Unaccent(r.URL.Query().Get("player"))
-	pId, sId := resp.GetpIdsId(app.players, player, season)
+	pId, sId := resp.GetpIdsId(app.Players, player, season)
 
-	js, err := rp.GetPlayerDash(app.database, pId, sId, tId)
+	js, err := rp.GetPlayerDash(app.Database, pId, sId, tId)
 	if err != nil {
 		msg := fmt.Sprintf("server failed to return player dash for %s", player)
 		e.HTTPErr(w, msg, err)
@@ -38,7 +38,7 @@ func (app *App) recGameHndl(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 	rgs := resp.RecentGames{}
-	js, err := rgs.GetRecentGames(app.database)
+	js, err := rgs.GetRecentGames(app.Database)
 	if err != nil {
 		e.Msg = "failed to get recent games"
 		msg := "server failed to return recent games"
@@ -53,9 +53,9 @@ func (app *App) seasonsHndl(w http.ResponseWriter, r *http.Request) {
 	season := r.URL.Query().Get("szn")
 	w.Header().Set("Content-Type", "App/json")
 	if season == "" { // send all szns when szn is not in q str, used most often
-		json.NewEncoder(w).Encode(app.seasons)
+		json.NewEncoder(w).Encode(app.Seasons)
 	} else {
-		for _, szn := range app.seasons {
+		for _, szn := range app.Seasons {
 			if season == szn.SeasonId { // validate szn from q string
 				json.NewEncoder(w).Encode(map[string]string{
 					"szn": season,
@@ -71,9 +71,9 @@ func (app *App) teamsHndl(w http.ResponseWriter, r *http.Request) {
 	team := r.URL.Query().Get("team")
 	w.Header().Set("Content-Type", "App/json")
 	if team == "" { // send all teams when team is not in q str, used most often
-		json.NewEncoder(w).Encode(app.teams)
+		json.NewEncoder(w).Encode(app.Teams)
 	} else { // read & valid team from q string, not yet used 8/6
-		for _, tm := range app.teams {
+		for _, tm := range app.Teams {
 			if team == tm.TeamAbbr {
 				tm.LogoUrl = tm.MakeLogoUrl()
 				json.NewEncoder(w).Encode(tm)
