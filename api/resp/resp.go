@@ -169,9 +169,11 @@ func slicePlayersSzn(players []store.Player, seasonId uint64) ([]store.Player, e
 	return plslice, nil
 }
 
-// accept slice of Player structs and a season id, call slicePlayerSzn to create
-// a new slice with only players from the specified season. then, generate a
-// random number and return the player at that index in the slice
+/*
+accept slice of Player structs and a season id, call slicePlayerSzn to create
+a new slice with only players from the specified season. then, generate a
+random number and return the player at that index in the slice
+*/
 func randPlayer(pl []store.Player, sId uint64) uint64 {
 	players, _ := slicePlayersSzn(pl, sId)
 	numPlayers := len(players)
@@ -179,10 +181,12 @@ func randPlayer(pl []store.Player, sId uint64) uint64 {
 	return players[randNum].PlayerId
 }
 
-// player name and season ID from get request passed here, returns the player's
-// ID and the season ID. if 'player' variable == "random", the randPlayer function
-// is called. a player ID also can be passed as the player parameter, it will just
-// be converted to an int and returned
+/*
+player name and season ID from get request passed here, returns the player's
+ID and the season ID. if 'player' variable == "random", the randPlayer function
+is called. a player ID also can be passed as the player parameter, it will just
+be converted to an int and returned
+*/
 func GetpIdsId(players []store.Player, player string, seasonId string) (uint64, uint64) {
 	sId, _ := strconv.ParseUint(seasonId, 10, 32)
 	var pId uint64
@@ -209,15 +213,17 @@ func GetpIdsId(players []store.Player, player string, seasonId string) (uint64, 
 	return pId, sId
 }
 
-// accept a season id and a pointer to a Player struct, validate the player was active
-// in the passed season, return a valid season ID if not. if season id starts with an
-// 8 the player's max regular season will be returned. if it starts with a 7, their
-// max playoff season will be returned. if it starts with a 4, it will first verify
-// player has played in a playoff game, and will return their max regular season if
-// they haven't. a season id starting with 2 will return a regular season. for both
-// regular season and playoffs, the function will verify the player played in said
-// season, and return either their max or min (whichever is closer) season  if they
-// did not
+/*
+accept a season id and a pointer to a Player struct, validate the player was active
+in the passed season, return a valid season ID if not. if season id starts with an
+8 the player's max regular season will be returned. if it starts with a 7, their
+max playoff season will be returned. if it starts with a 4, it will first verify
+player has played in a playoff game, and will return their max regular season if
+they haven't. a season id starting with 2 will return a regular season. for both
+regular season and playoffs, the function will verify the player played in said
+season, and return either their max or min (whichever is closer) season  if they
+did not
+*/
 func HandlesId(sId uint64, p *store.Player) uint64 {
 	if strconv.FormatUint(sId, 10)[1:] == "9999" { // agg seasons
 		return sId
