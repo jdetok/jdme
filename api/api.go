@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"database/sql"
@@ -9,45 +9,40 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/api/store"
 )
 
-type application struct {
-	config     config
-	database   *sql.DB
+/*
+main struct referenced through the app. contains configs, , pool,
+in-memory player, season, team slices
+*/
+type App struct {
+	Config     Config
+	Database   *sql.DB
 	StartTime  time.Time
-	lastUpdate time.Time
-	players    []store.Player
-	seasons    []store.Season
-	teams      []store.Team
+	LastUpdate time.Time
+	Players    []store.Player
+	Seasons    []store.Season
+	Teams      []store.Team
 }
 
-type config struct {
-	addr string
-	// storePath string
+// configs, currently only contains server address
+type Config struct {
+	Addr string
 }
 
-func (app *application) run(mux *http.ServeMux) error {
-
-	// server configuration
-	srv := &http.Server{
-		Addr:         app.config.addr,
-		Handler:      mux,
-		WriteTimeout: time.Second * 30,
-		ReadTimeout:  time.Second * 10,
-		IdleTimeout:  time.Minute,
-	}
-
-	// set the time for caching
-	app.setStartTime()
-	fmt.Printf("http server configured and starting at %v...\n",
-		app.StartTime.Format("2006-01-02 15:04:05"))
-
-	return srv.ListenAndServe()
+func (app *App) JSONWriter(w http.ResponseWriter, js []byte) {
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
 }
 
-// returns type ServeMux for a router
-func (app *application) mount() *http.ServeMux {
+/*
+create a mux server type & return to be run
+all endpoints need to be defined in the mount function with their HTTP request
+method/endpoint name and their corresponding HandleFunc
+the root handler "/" must remain at the end of the function
+*/
+func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	// standardize handlers: end with Hndl e.g. abtHndl, brontoHndl
+	// define endpoints
 	mux.HandleFunc("GET /about", app.abtHndl)
 	mux.HandleFunc("GET /bronto", app.brontoHndl)
 	mux.HandleFunc("GET /bball", app.bballHndl)
@@ -57,6 +52,7 @@ func (app *application) mount() *http.ServeMux {
 	mux.HandleFunc("GET /bball/player", app.playerDashHndl)
 	mux.HandleFunc("GET /bball/games/recent", app.recGameHndl)
 
+	// serve static files
 	mux.Handle("/js/", http.HandlerFunc(app.jsNostore))
 	mux.Handle("/css/", http.HandlerFunc(app.cssNostore))
 	mux.HandleFunc("/", app.rootHndl)
@@ -64,11 +60,24 @@ func (app *application) mount() *http.ServeMux {
 	return mux
 }
 
-func (app *application) setStartTime() {
-	app.StartTime = time.Now()
-}
+// runs the http server - must be called after mount is successfully executed
+func (app *App) Run(mux *http.ServeMux) error {
 
-func (app *application) JSONWriter(w http.ResponseWriter, js []byte) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	// server configuration
+	srv := &http.Server{
+		Addr:         app.Config.Addr,
+		Handler:      mux,
+		WriteTimeout: time.Second * 30,
+		ReadTimeout:  time.Second * 10,
+		IdleTimeout:  time.Minute,
+	}
+
+	// set the time for caching
+	app.StartTime = time.Now()
+
+	fmt.Printf("http server configured and starting at %v...\n",
+		app.StartTime.Format("2006-01-02 15:04:05"))
+
+	// run the HTTP server
+	return srv.ListenAndServe()
 }

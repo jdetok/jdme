@@ -1,10 +1,8 @@
-package main
+package api
 
 import (
 	"net/http"
 )
-
-// testing 7/20/25 with frontend in separate directory
 
 const fsPath string = "/app/static"
 const bballPath string = "/app/static/bball/bball.html"
@@ -12,45 +10,46 @@ const abtPath string = "/app/static/about/about.html"
 const bballAbtPath string = "/app/static/about/bball_about.html"
 const brontoPath string = "/app/static/bronto/bronto.html"
 
-// const fsPath string = "/static"
-// const bballPath string = "/static/bball/bball.html"
-// const abtPath string = "/static/about/about.html"
-// const bballAbtPath string = "/static/about/bball_about.html"
-// const brontoPath string = "/static/bronto/bronto.html"
-
-func (app *application) rootHndl(w http.ResponseWriter, r *http.Request) {
+// root URL, serve static directly
+func (app *App) rootHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	w.Header().Set("Cache-Control", "no-store")
 	http.FileServer(http.Dir(fsPath)).ServeHTTP(w, r)
 }
 
-func (app *application) abtHndl(w http.ResponseWriter, r *http.Request) {
+// /about handler, serves static files from the about directory
+func (app *App) abtHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	http.ServeFile(w, r, abtPath)
 }
 
-func (app *application) brontoHndl(w http.ResponseWriter, r *http.Request) {
+// /bronto handler, serves static files from the bronto directory
+func (app *App) brontoHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	http.ServeFile(w, r, brontoPath)
 }
 
-func (app *application) bballHndl(w http.ResponseWriter, r *http.Request) {
+// /bball base handler, serves bball.html
+func (app *App) bballHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	http.ServeFile(w, r, bballPath)
 }
 
-func (app *application) bballAbtHndl(w http.ResponseWriter, r *http.Request) {
+// /bball/about handler, serves bball_about.html
+func (app *App) bballAbtHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	http.ServeFile(w, r, bballAbtPath)
 }
 
-func (app *application) cssNostore(w http.ResponseWriter, r *http.Request) {
+// prevent css files from caching
+func (app *App) cssNostore(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	w.Header().Set("Cache-Control", "no-store")
 	http.StripPrefix("/css/", http.FileServer(http.Dir(fsPath+"/css"))).ServeHTTP(w, r)
 }
 
-func (app *application) jsNostore(w http.ResponseWriter, r *http.Request) {
+// prevent js files from caching
+func (app *App) jsNostore(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	w.Header().Set("Cache-Control", "no-store")
 	http.StripPrefix("/js/", http.FileServer(http.Dir(fsPath+"**/js"))).ServeHTTP(w, r)

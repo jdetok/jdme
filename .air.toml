@@ -2,7 +2,7 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  cmd = "go build -buildvcs=false -o ./tmp/main ./api"
+  cmd = "go build -buildvcs=false -o ./tmp/main ./main"
   bin = "tmp/main"
   include_ext = ["go", "tpl", "html", "env", "css", "js"]
   exclude_dir = ["tmp", "vendor", "testdata", "test"]
@@ -21,7 +21,8 @@ tmp_dir = "tmp"
     "./api/store",
     "./api/resp",
     "./pgdb",
-    "./static"  
+    "./static",  
+    "./main"
   ]
 
   exclude = ["**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.svg", "**/test*.go"]

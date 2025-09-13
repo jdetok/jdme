@@ -8,6 +8,10 @@ import (
 	"github.com/jdetok/golib/errd"
 )
 
+/*
+launch goroutines to update the global players, seasons, and team stores
+updates at every interval
+*/
 func UpdateStructs(
 	db *sql.DB,
 	lastUpdate *time.Time,

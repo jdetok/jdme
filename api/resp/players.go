@@ -10,6 +10,14 @@ import (
 	"github.com/jdetok/golib/logd"
 )
 
+/*
+primary database query function for the /players endpoint. queries the api
+tables in the database sing the passed player, season, team ID to get the
+player's stats. defaults to TeamTopScorerDash query, which gets the dash for
+the top scorer of the most recent night's games. this is called when the site
+loads. the response is scanned into the structs defined in resp.go, before being
+marshalled into json and returned to write as the http response
+*/
 func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
 	e := errd.InitErr()
 	var q string
@@ -52,13 +60,13 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 			&s.Shtg.Fg3.Makes, &s.Shtg.Fg3.Attempts, &s.Shtg.Fg3.Percent,
 			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent)
 		// switch on stat type to assign stats to appropriate struct
-		rp.hndlRespRow(&p, &s)
+		rp.HndlRespRow(&p, &s)
 	}
 	// handle aggregate season ids (all, regular season, playoffs)
-	hndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
+	HndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
 
 	// assign nba or wnba season only based on league
-	t.hndlSeason(&rp.Meta.League, &rp.Meta.Season)
+	t.HndlSeason(&rp.Meta.League, &rp.Meta.Season)
 
 	// build table captions & image urls
 	rp.Meta.MakeCaptions()
@@ -75,7 +83,11 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 	return js, nil
 }
 
-func (rp *RespObj) hndlRespRow(p *RespPlayerSznOvw, s *RespPlayerStats) {
+/*
+switch between totals (sums) and pergame (averages) stats based on the
+Meta.StatType field
+*/
+func (rp *RespObj) HndlRespRow(p *RespPlayerSznOvw, s *RespPlayerStats) {
 	switch rp.Meta.StatType {
 	case "avg":
 		rp.SeasonOvw.MinutsPerGame = p.Minutes
@@ -89,7 +101,7 @@ func (rp *RespObj) hndlRespRow(p *RespPlayerSznOvw, s *RespPlayerStats) {
 }
 
 // accept pointers of league and season, switch season/wseason on league
-func (t *RespSeasonTmp) hndlSeason(league *string, season *string) {
+func (t *RespSeasonTmp) HndlSeason(league *string, season *string) {
 	switch *league {
 	case "NBA":
 		*season = t.Season
@@ -98,9 +110,11 @@ func (t *RespSeasonTmp) hndlSeason(league *string, season *string) {
 	}
 }
 
-// accept pointers of season_id and stat type, switch season to handle stat type
-// NEED TO LOOK INTO THIS
-func hndlAggsIds(sId *uint64, sType *string) {
+/*
+accept pointers of season_id and stat type, switch season to handle stat type
+used for aggregate seasons, deprecated
+*/
+func HndlAggsIds(sId *uint64, sType *string) {
 	switch *sId {
 	case 99999:
 		*sType = "career regular season + playoffs"
