@@ -33,10 +33,9 @@ type RecentGame struct {
 	Matchup  string `json:"matchup"`
 	WinLoss  string `json:"wl"`
 	Points   uint16 `json:"points"`
-	// Final    string `json:"final"`
-	// Overtime bool   `json:"overtime"`
 }
 
+// accepts a sql.Rows pointer and scans it to a RecentGames struct
 func MakeRgs(rows *sql.Rows) RecentGames {
 	var rgs RecentGames
 	for rows.Next() {
@@ -57,7 +56,10 @@ func MakeRgs(rows *sql.Rows) RecentGames {
 	return rgs
 }
 
-// returns the top scorer (regardless of team) from each of last night's games
+/*
+returns json of the top scorer (regardless of team) stats from each of most
+recent night's games. used on page load and to populate recent top scorers table
+*/
 func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
 	e := errd.InitErr()
 	rows, err := db.Query(pgdb.RecGameTopScorers.Q)

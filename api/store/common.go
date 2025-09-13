@@ -61,6 +61,15 @@ func CurrentSzns(dt time.Time) []string {
 	}
 }
 
+/*
+return SeasonLeague struct with current wnba and nba season based on the current
+month. for any given year there will be two season combinations that can exist be
+created using only the year as an int. for example, in 2025, both "2024-25" and
+"2025-26" can be generated from the year. since the WNBA season starts and ends
+in the same calendar year and the NBA season spans two calendar years, there are
+times of year in which the "current" WNBA season is different than the current
+NBA season.
+*/
 func LgSeasons() SeasonLeague {
 	e := errd.InitErr()
 	var sl SeasonLeague
@@ -91,7 +100,10 @@ func LgSeasons() SeasonLeague {
 	return sl
 }
 
-// REMOVE NON SPACING CHARACTERS -- e.g. Dončić becomes doncic
+/*
+use the transform package to remove accidentals
+e.g. Dončić becomes doncic
+*/
 func Unaccent(input string) string {
 	t := transform.Chain(
 		norm.NFD,
@@ -102,14 +114,19 @@ func Unaccent(input string) string {
 	return output
 }
 
-// makes src url for team img
+/*
+use league and team id to generate URL with team's logo
+*/
 func (t Team) MakeLogoUrl() string {
 	lg := strings.ToLower(t.League)
 	return ("https://cdn." + lg + ".com/logos/" +
 		lg + "/" + t.TeamId + "/primary/L/logo.svg")
 }
 
-// QUERY FOR PLAYER ID, PLAYER AND SAVE TO A LIST OF PLAYER STRUCTS
+/*
+query the database to update global slice of player structs (in memory player store)
+query also gets player's min and max seasons (reg season and playoffs)
+*/
 func GetPlayers(db *sql.DB) ([]Player, error) {
 	e := errd.InitErr()
 	// rows, err := db.Query(mdb.PlayersSeason.Q)
@@ -128,7 +145,10 @@ func GetPlayers(db *sql.DB) ([]Player, error) {
 	return players, nil
 }
 
-// seasons
+/*
+query the database for all seasons, populates global seasons store
+example: seasonId: 22025 | season: 2024-25 | WSeason: 2025-26
+*/
 func GetSeasons(db *sql.DB) ([]Season, error) {
 	// fmt.Println("querying seasons & saving to struct")
 	e := errd.InitErr()
@@ -149,7 +169,7 @@ func GetSeasons(db *sql.DB) ([]Season, error) {
 	return seasons, nil
 }
 
-// teams
+// query database for global teams store
 func GetTeams(db *sql.DB) ([]Team, error) {
 	e := errd.InitErr()
 	// rows, err := db.Query(mdb.Teams.Q)

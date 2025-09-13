@@ -6,3 +6,5 @@
     - migration complete August 6, 2025
 
 - ### 9/10/2025 added top scorers interactive box
+- ### 9/12/2025 created documentation with go doc
+    - moved api to its own package, isolated main

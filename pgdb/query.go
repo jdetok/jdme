@@ -7,15 +7,7 @@ type Query struct {
 	Q    string   // query
 }
 
-/*
-select szn_id, szn_desc, wszn_desc
-	from lg.szn
-	where left(cast(szn_id as varchar(5)), 1) in ('2', '4')
-	and right(cast(szn_id as varchar(5)), 4) != '9999'
-	order by right(cast(szn_id as varchar(5)), 4) desc,
-	left(cast(szn_id as varchar(5)), 1)
-*/
-// GetSeasons
+// query all seasons in database, populates global seasons struct
 var AllSeasons = Query{
 	Args: []string{},
 	Q: `
@@ -27,12 +19,14 @@ var AllSeasons = Query{
 	`,
 }
 
-// GetPlayerDash
+// player dash from api table from passed player and season
 var PlayerDash = Query{
 	Q: `select * from api.plr_agg where player_id = $1 and season_id = $2`,
 }
 
-// GetPlayerDash
+/*
+get the player dash for most recent night's games top scorer
+*/
 var TeamTopScorerDash = Query{
 	Q: `
 	with tstot as ( 
@@ -53,6 +47,9 @@ var TeamTopScorerDash = Query{
 	`,
 }
 
+/*
+team and top player stats from most recent night's games
+*/
 var RecGameTopScorers = Query{
 	Q: `
 	select * from (
@@ -85,6 +82,10 @@ var RecGameTopScorers = Query{
 	`,
 }
 
+/*
+select each player and the min max reg/post season stats. used to populate global
+player store
+*/
 var PlayersSeason = Query{
 	Q: `
 	select 
@@ -116,6 +117,9 @@ var PlayersSeason = Query{
 	`,
 }
 
+/*
+query database for all teams, used to populate global teams store
+*/
 var Teams = Query{
 	Args: []string{},
 	Q: `
