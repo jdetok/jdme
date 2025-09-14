@@ -28,6 +28,7 @@ type Config struct {
 	Addr string
 }
 
+// accept slice of bytes in JSON structure and write to response writers
 func (app *App) JSONWriter(w http.ResponseWriter, js []byte) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(js)
@@ -43,19 +44,19 @@ func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// define endpoints
-	mux.HandleFunc("GET /about", app.abtHndl)
-	mux.HandleFunc("GET /bronto", app.brontoHndl)
-	mux.HandleFunc("GET /bball", app.bballHndl)
-	mux.HandleFunc("GET /bball/about", app.bballAbtHndl)
-	mux.HandleFunc("GET /bball/seasons", app.seasonsHndl)
-	mux.HandleFunc("GET /bball/teams", app.teamsHndl)
-	mux.HandleFunc("GET /bball/player", app.playerDashHndl)
-	mux.HandleFunc("GET /bball/games/recent", app.recGameHndl)
+	mux.HandleFunc("GET /about", app.AboutHndl)
+	mux.HandleFunc("GET /bronto", app.BrontoHndl)
+	mux.HandleFunc("GET /bball", app.BBallHndl)
+	mux.HandleFunc("GET /bball/about", app.BballAbtHndl)
+	mux.HandleFunc("GET /bball/seasons", app.SeasonsHndl)
+	mux.HandleFunc("GET /bball/teams", app.TeamsHndl)
+	mux.HandleFunc("GET /bball/player", app.PlayerDashHndl)
+	mux.HandleFunc("GET /bball/games/recent", app.RecentGameHndl)
 
 	// serve static files
-	mux.Handle("/js/", http.HandlerFunc(app.jsNostore))
-	mux.Handle("/css/", http.HandlerFunc(app.cssNostore))
-	mux.HandleFunc("/", app.rootHndl)
+	mux.Handle("/js/", http.HandlerFunc(app.JSNostore))
+	mux.Handle("/css/", http.HandlerFunc(app.CSSNostore))
+	mux.HandleFunc("/", app.RootHndl)
 
 	return mux
 }

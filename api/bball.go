@@ -12,7 +12,7 @@ import (
 )
 
 // /player handler
-func (app *App) playerDashHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) PlayerDashHndl(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 
@@ -35,7 +35,7 @@ func (app *App) playerDashHndl(w http.ResponseWriter, r *http.Request) {
 }
 
 // /games/recent handler
-func (app *App) recGameHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) RecentGameHndl(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 	rgs := resp.RecentGames{}
@@ -50,7 +50,7 @@ func (app *App) recGameHndl(w http.ResponseWriter, r *http.Request) {
 
 // /seasons handler
 // FOR SEASONS SELECTOR - CALLED ON PAGE LOAD
-func (app *App) seasonsHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) SeasonsHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	season := r.URL.Query().Get("szn")
 	w.Header().Set("Content-Type", "application/json")
@@ -69,7 +69,7 @@ func (app *App) seasonsHndl(w http.ResponseWriter, r *http.Request) {
 
 // /teams handler
 // FOR TEAMS SELECTOR - CALLED ON PAGE LOAD
-func (app *App) teamsHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) TeamsHndl(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	team := r.URL.Query().Get("team")
 	w.Header().Set("Content-Type", "application/json")
