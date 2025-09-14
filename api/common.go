@@ -1,4 +1,4 @@
-package store
+package api
 
 import (
 	"database/sql"
@@ -45,16 +45,19 @@ type SeasonLeague struct {
 }
 
 /*
-returns slice of season strings for date (generally pass time.Now())
+returns slice of two season strings for date (generally pass time.Now())
 calling in 2025 will return 2024-25 and 2025-26 and so on
 */
 func CurrentSzns(dt time.Time) []string {
+	// current year | year + 1 || e.g. 2025: cyyy=2025, cy=26
 	var cyyy string = dt.Format("2006")
 	var cy string = dt.AddDate(1, 0, 0).Format("06")
 
+	// year - 1 | current year || e.g. 2025: pyyy=2024, py=25
 	var pyyy string = dt.AddDate(-1, 0, 0).Format("2006")
 	var py string = dt.Format("06")
 
+	// in 2025: "2024-25", "2025-26"
 	return []string{
 		fmt.Sprint(pyyy, "-", py),
 		fmt.Sprint(cyyy, "-", cy),
@@ -75,22 +78,23 @@ func LgSeasons() SeasonLeague {
 	var sl SeasonLeague
 	var crnt []string = CurrentSzns(time.Now())
 
+	// convert current month to int
 	m, err := strconv.Atoi(time.Now().Format("1"))
 	if err != nil {
-		e.Msg = "error converting year to int"
+		e.Msg = "error converting month to int"
 		fmt.Println(e.BuildErr(err))
 	}
 
-	// beginning of year through april
+	// beginning of year through april - both previous
 	sl.Szn = crnt[0]
 	sl.WSzn = crnt[0]
 
-	// may through september
+	// may through september - WNBA gets current szn, NBA gets previous
 	if m > 5 && m < 10 {
 		sl.WSzn = crnt[1]
 	}
 
-	// october through end of year
+	// october through end of year - both leagues get current szn
 	if m > 10 {
 		sl.Szn = crnt[1]
 		sl.WSzn = crnt[1]
@@ -138,7 +142,8 @@ func GetPlayers(db *sql.DB) ([]Player, error) {
 	var players []Player
 	for rows.Next() {
 		var p Player
-		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax, &p.SeasonIdMin, &p.PSeasonIdMax, &p.PSeasonIdMin)
+		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax,
+			&p.SeasonIdMin, &p.PSeasonIdMax, &p.PSeasonIdMin)
 		p.Name = Unaccent(p.Name) // REMOVE ACCENTS FROM NAMES
 		players = append(players, p)
 	}
@@ -150,9 +155,7 @@ query the database for all seasons, populates global seasons store
 example: seasonId: 22025 | season: 2024-25 | WSeason: 2025-26
 */
 func GetSeasons(db *sql.DB) ([]Season, error) {
-	// fmt.Println("querying seasons & saving to struct")
 	e := errd.InitErr()
-	// rows, err := db.Query(mdb.RSeasons.Q)
 	rows, err := db.Query(pgdb.AllSeasons.Q)
 	if err != nil {
 		e.Msg = "error querying db"
@@ -165,14 +168,12 @@ func GetSeasons(db *sql.DB) ([]Season, error) {
 		rows.Scan(&szn.SeasonId, &szn.Season, &szn.WSeason)
 		seasons = append(seasons, szn)
 	}
-
 	return seasons, nil
 }
 
 // query database for global teams store
 func GetTeams(db *sql.DB) ([]Team, error) {
 	e := errd.InitErr()
-	// rows, err := db.Query(mdb.Teams.Q)
 	rows, err := db.Query(pgdb.Teams.Q)
 	if err != nil {
 		e.Msg = "error querying db"

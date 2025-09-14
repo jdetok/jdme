@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/jdetok/go-api-jdeko.me/api/resp"
-	"github.com/jdetok/go-api-jdeko.me/api/store"
+	// "github.com/jdetok/go-api-jdeko.me/api/resp"
+	// "github.com/jdetok/go-api-jdeko.me/api/store"
 	"github.com/jdetok/golib/errd"
 )
 
@@ -16,15 +16,15 @@ func (app *App) PlayerDashHndl(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 
-	var rp resp.Resp
+	var rp Resp
 	var tId uint64
 
 	team := r.URL.Query().Get("team")
 	tId, _ = strconv.ParseUint(team, 10, 64)
 
 	season := r.URL.Query().Get("season")
-	player := store.Unaccent(r.URL.Query().Get("player"))
-	pId, sId := resp.GetpIdsId(app.Players, player, season)
+	player := Unaccent(r.URL.Query().Get("player"))
+	pId, sId := GetpIdsId(app.Players, player, season)
 
 	js, err := rp.GetPlayerDash(app.Database, pId, sId, tId)
 	if err != nil {
@@ -38,7 +38,7 @@ func (app *App) PlayerDashHndl(w http.ResponseWriter, r *http.Request) {
 func (app *App) RecentGameHndl(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
-	rgs := resp.RecentGames{}
+	rgs := RecentGames{}
 	js, err := rgs.GetRecentGames(app.Database)
 	if err != nil {
 		e.Msg = "failed to get recent games"

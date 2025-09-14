@@ -1,4 +1,4 @@
-package resp
+package api
 
 import (
 	"fmt"
@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/jdetok/go-api-jdeko.me/api/store"
 )
 
 // outer response struct
@@ -147,8 +145,8 @@ func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 
 // accept the slice of all players and a seasonId, return a slice with just the
 // active players from the passed season id
-func slicePlayersSzn(players []store.Player, seasonId uint64) ([]store.Player, error) {
-	var plslice []store.Player
+func slicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
+	var plslice []Player
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
 
 		// if nba & pre october, subtract 1 from season id
@@ -174,7 +172,7 @@ accept slice of Player structs and a season id, call slicePlayerSzn to create
 a new slice with only players from the specified season. then, generate a
 random number and return the player at that index in the slice
 */
-func randPlayer(pl []store.Player, sId uint64) uint64 {
+func randPlayer(pl []Player, sId uint64) uint64 {
 	players, _ := slicePlayersSzn(pl, sId)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
@@ -187,7 +185,7 @@ ID and the season ID. if 'player' variable == "random", the randPlayer function
 is called. a player ID also can be passed as the player parameter, it will just
 be converted to an int and returned
 */
-func GetpIdsId(players []store.Player, player string, seasonId string) (uint64, uint64) {
+func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64) {
 	sId, _ := strconv.ParseUint(seasonId, 10, 32)
 	var pId uint64
 
@@ -224,7 +222,7 @@ regular season and playoffs, the function will verify the player played in said
 season, and return either their max or min (whichever is closer) season  if they
 did not
 */
-func HandlesId(sId uint64, p *store.Player) uint64 {
+func HandlesId(sId uint64, p *Player) uint64 {
 	if strconv.FormatUint(sId, 10)[1:] == "9999" { // agg seasons
 		return sId
 	} else if sId >= 80000 && sId < 90000 {
@@ -260,7 +258,7 @@ func HandlesId(sId uint64, p *store.Player) uint64 {
 }
 
 // search player by name, return player id int if found
-func SearchPlayers(players []store.Player, pSearch string) string {
+func SearchPlayers(players []Player, pSearch string) string {
 	for _, p := range players {
 		if p.Name == pSearch { // return match playerid (uint32) as string
 			return strconv.FormatUint(p.PlayerId, 10)

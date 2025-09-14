@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/jdetok/go-api-jdeko.me/api/resp"
-	"github.com/jdetok/go-api-jdeko.me/api/store"
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/envd"
 	"github.com/jdetok/golib/errd"
@@ -38,7 +36,7 @@ func TestGetPlayerDash(t *testing.T) {
 	var tIds = []uint64{0, 1610612743} // first should be plr query, second tm
 
 	for i := range pIds {
-		var rp resp.Resp
+		var rp Resp
 		plr := pIds[i]
 		szn := sIds[i]
 		tm := tIds[i]
@@ -56,14 +54,14 @@ func TestGetPlayerDash(t *testing.T) {
 func TestPlayerStore(t *testing.T) {
 	e := errd.InitErr()
 	db := StartupTest(t)
-	var ps []store.Player
+	var ps []Player
 	rows, err := db.Query(pgdb.PlayersSeason.Q)
 	if err != nil {
 		e.Msg = "failed getting players"
 		t.Error(e.BuildErr(err))
 	}
 	for rows.Next() {
-		var p store.Player
+		var p Player
 		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax, &p.SeasonIdMin,
 			&p.PSeasonIdMax, &p.PSeasonIdMin)
 		ps = append(ps, p)
@@ -75,7 +73,7 @@ func TestPlayerStore(t *testing.T) {
 func TestTeamStore(t *testing.T) {
 	e := errd.InitErr()
 	db := StartupTest(t)
-	var ts []store.Team
+	var ts []Team
 	rows, err := db.Query(pgdb.Teams.Q)
 	if err != nil {
 		e.Msg = "failed getting teams"
@@ -83,7 +81,7 @@ func TestTeamStore(t *testing.T) {
 	}
 
 	for rows.Next() {
-		var t store.Team
+		var t Team
 		rows.Scan(&t.League, &t.TeamId, &t.TeamAbbr, &t.CityTeam)
 		ts = append(ts, t)
 	}
@@ -94,7 +92,7 @@ func TestTeamStore(t *testing.T) {
 func TestSeasonStore(t *testing.T) {
 	e := errd.InitErr()
 	db := StartupTest(t)
-	var sz []store.Season
+	var sz []Season
 	rows, err := db.Query(pgdb.AllSeasons.Q)
 	if err != nil {
 		e.Msg = "failed getting seasons"
@@ -102,7 +100,7 @@ func TestSeasonStore(t *testing.T) {
 	}
 
 	for rows.Next() {
-		var s store.Season
+		var s Season
 		rows.Scan(&s.SeasonId, &s.Season, &s.WSeason)
 		sz = append(sz, s)
 	}

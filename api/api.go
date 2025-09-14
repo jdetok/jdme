@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/jdetok/go-api-jdeko.me/api/store"
 )
 
 /*
@@ -18,9 +16,10 @@ type App struct {
 	Database   *sql.DB
 	StartTime  time.Time
 	LastUpdate time.Time
-	Players    []store.Player
-	Seasons    []store.Season
-	Teams      []store.Team
+	Started    uint8
+	Players    []Player
+	Seasons    []Season
+	Teams      []Team
 }
 
 // configs, currently only contains server address

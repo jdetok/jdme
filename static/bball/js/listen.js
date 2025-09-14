@@ -2,7 +2,7 @@
 import * as ui from "./ui.js"
 import * as resp from "./resp.js"
 
-export const base = "https:jdeko.me/bball";
+export const base = "http://localhost:8080/bball";
 
 document.addEventListener('DOMContentLoaded', async () => {
     await ui.loadSznOptions();
