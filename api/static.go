@@ -11,32 +11,32 @@ const bballAbtPath string = "/app/static/about/bball_about.html"
 const brontoPath string = "/app/static/bronto/bronto.html"
 
 // root URL, serve static directly
-func (app *App) RootHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlRoot(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	w.Header().Set("Cache-Control", "no-store")
 	http.FileServer(http.Dir(fsPath)).ServeHTTP(w, r)
 }
 
 // /about handler, serves static files from the about directory
-func (app *App) AboutHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlAbt(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	http.ServeFile(w, r, abtPath)
 }
 
 // /bronto handler, serves static files from the bronto directory
-func (app *App) BrontoHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlBronto(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	http.ServeFile(w, r, brontoPath)
 }
 
 // /bball base handler, serves bball.html
-func (app *App) BBallHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlBBall(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	http.ServeFile(w, r, bballPath)
 }
 
 // /bball/about handler, serves bball_about.html
-func (app *App) BballAbtHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlBBallAbt(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	http.ServeFile(w, r, bballAbtPath)
 }

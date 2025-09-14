@@ -1,0 +1,130 @@
+package api
+
+import (
+	"database/sql"
+	"fmt"
+	"time"
+
+	"github.com/jdetok/go-api-jdeko.me/pgdb"
+	"github.com/jdetok/golib/errd"
+)
+
+/*
+launch goroutines to update the global players, seasons, and team stores
+updates at every interval
+*/
+func CheckInMemStructs(app *App, interval, threshold time.Duration) {
+	e := errd.InitErr()
+
+	// call update func on intial run
+	if app.Started == 0 {
+		UpdateStructs(app, &e)
+		app.Started = 1
+	}
+
+	// update structs every interval
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for range ticker.C {
+		if time.Since(app.LastUpdate) > threshold {
+			fmt.Printf("refreshing store at %v\n", time.Now().Format(
+				"2006-01-02 15:04:05"),
+			)
+
+			UpdateStructs(app, &e)
+		}
+	}
+}
+
+// update players, seasons, and teams in memory structs slices
+func UpdateStructs(app *App, e *errd.Err) {
+	var err error
+
+	// update in memory players slice
+	app.Players, err = UpdatePlayers(app.Database)
+	if err != nil {
+		e.Msg = "failed to get players"
+		fmt.Println(e.BuildErr(err))
+	}
+
+	// update in memory seasons slice
+	app.Seasons, err = UpdateSeasons(app.Database)
+	if err != nil {
+		e.Msg = "failed to get seasons"
+		fmt.Println(e.BuildErr(err))
+	}
+
+	// update in memory teams slice
+	app.Teams, err = UpdateTeams(app.Database)
+	if err != nil {
+		e.Msg = "failed to get teams"
+		fmt.Println(e.BuildErr(err))
+	}
+
+	updateTime := time.Now()
+	app.LastUpdate = updateTime
+	fmt.Printf("finished refreshing store at %v\n", app.LastUpdate)
+}
+
+/*
+query the database to update global slice of player structs (in memory player store)
+query also gets player's min and max seasons (reg season and playoffs)
+*/
+func UpdatePlayers(db *sql.DB) ([]Player, error) {
+	e := errd.InitErr()
+	rows, err := db.Query(pgdb.PlayersSeason.Q)
+	if err != nil {
+		e.Msg = "query failed"
+		return nil, e.BuildErr(err)
+	}
+	var players []Player
+	for rows.Next() {
+		var p Player
+		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax,
+			&p.SeasonIdMin, &p.PSeasonIdMax, &p.PSeasonIdMin)
+
+		// remove diacritics from names in database for imrpvoved searching
+		p.Name = RemoveDiacritics(p.Name)
+		players = append(players, p)
+	}
+	return players, nil
+}
+
+/*
+query the database for all seasons, populates global seasons store
+example: seasonId: 22025 | season: 2024-25 | WSeason: 2025-26
+*/
+func UpdateSeasons(db *sql.DB) ([]Season, error) {
+	e := errd.InitErr()
+	rows, err := db.Query(pgdb.AllSeasons.Q)
+	if err != nil {
+		e.Msg = "error querying db"
+		e.BuildErr(err)
+	}
+
+	var seasons []Season
+	for rows.Next() {
+		var szn Season
+		rows.Scan(&szn.SeasonId, &szn.Season, &szn.WSeason)
+		seasons = append(seasons, szn)
+	}
+	return seasons, nil
+}
+
+// query database for global teams store
+func UpdateTeams(db *sql.DB) ([]Team, error) {
+	e := errd.InitErr()
+	rows, err := db.Query(pgdb.Teams.Q)
+	if err != nil {
+		e.Msg = "error querying db"
+		e.BuildErr(err)
+	}
+
+	var teams []Team
+	for rows.Next() {
+		var tm Team
+		rows.Scan(&tm.League, &tm.TeamId, &tm.TeamAbbr, &tm.CityTeam)
+		teams = append(teams, tm)
+	}
+	return teams, nil
+}
