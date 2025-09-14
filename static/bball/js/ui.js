@@ -87,7 +87,8 @@ export async function handleSeasonBoxes() {
     if (r) {
         return r;
     } // 2{current year} i.e. 22025 during 2025
-    return `2${new Date().getFullYear()}`;
+    return 88888;
+    // return `2${new Date().getFullYear()}`;
 }
 
 // append options to select
