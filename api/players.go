@@ -10,6 +10,16 @@ import (
 	"github.com/jdetok/golib/logd"
 )
 
+type Player struct {
+	PlayerId     uint64
+	Name         string
+	League       string
+	SeasonIdMax  uint64
+	SeasonIdMin  uint64
+	PSeasonIdMax uint64
+	PSeasonIdMin uint64
+}
+
 /*
 primary database query function for the /players endpoint. queries the api
 tables in the database sing the passed player, season, team ID to get the

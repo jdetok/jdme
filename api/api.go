@@ -43,19 +43,19 @@ func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	// define endpoints
-	mux.HandleFunc("GET /about", app.AboutHndl)
-	mux.HandleFunc("GET /bronto", app.BrontoHndl)
-	mux.HandleFunc("GET /bball", app.BBallHndl)
-	mux.HandleFunc("GET /bball/about", app.BballAbtHndl)
-	mux.HandleFunc("GET /bball/seasons", app.SeasonsHndl)
-	mux.HandleFunc("GET /bball/teams", app.TeamsHndl)
-	mux.HandleFunc("GET /bball/player", app.PlayerDashHndl)
-	mux.HandleFunc("GET /bball/games/recent", app.RecentGameHndl)
+	mux.HandleFunc("GET /about", app.HndlAbt)
+	mux.HandleFunc("GET /bronto", app.HndlBronto)
+	mux.HandleFunc("GET /bball", app.HndlBBall)
+	mux.HandleFunc("GET /bball/about", app.HndlBBallAbt)
+	mux.HandleFunc("GET /bball/seasons", app.HndlSeasons)
+	mux.HandleFunc("GET /bball/teams", app.HndlTeams)
+	mux.HandleFunc("GET /bball/player", app.HndlPlayer)
+	mux.HandleFunc("GET /bball/games/recent", app.HndlRecentGames)
 
 	// serve static files
 	mux.Handle("/js/", http.HandlerFunc(app.JSNostore))
 	mux.Handle("/css/", http.HandlerFunc(app.CSSNostore))
-	mux.HandleFunc("/", app.RootHndl)
+	mux.HandleFunc("/", app.HndlRoot)
 
 	return mux
 }

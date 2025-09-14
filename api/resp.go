@@ -5,7 +5,6 @@ import (
 	"math/rand/v2"
 	"strconv"
 	"strings"
-	"time"
 )
 
 // outer response struct
@@ -143,24 +142,32 @@ func (m *RespPlayerMeta) MakeTeamLogoUrl() {
 		lg, lg, tId)
 }
 
-// accept the slice of all players and a seasonId, return a slice with just the
-// active players from the passed season id
-func slicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
+/*
+accept the slice of all players and a seasonId, return a slice with just the
+active players from the passed season id
+*/
+// func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
+func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
 	var plslice []Player
+
+	sl := LgSznsByMonth()
+
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
 
-		// if nba & pre october, subtract 1 from season id
-		var sId uint64 = seasonId
-		if uint64(time.Now().Month()) <= 10 {
-			if p.League == "nba" {
-				sId--
+		// handle random season id
+		if seasonId == 88888 {
+			switch p.League {
+			case "nba":
+				seasonId = sl.SznId
+			case "wnba":
+				seasonId = sl.WSznId
 			}
 		}
-
 		// append players to the random slice if the passed season id between player min and max season
-		if (sId >= 20000 && sId < 30000) && (sId <= p.SeasonIdMax && sId >= p.SeasonIdMin) || (sId >= 40000 && sId < 50000) && (sId <= p.PSeasonIdMax && sId >= p.PSeasonIdMin) {
-			plslice = append(plslice, p)
-		} else if sId >= 88888 {
+		if (seasonId >= 20000 && seasonId < 30000) &&
+			(seasonId <= p.SeasonIdMax && seasonId >= p.SeasonIdMin) ||
+			(seasonId >= 40000 && seasonId < 50000) &&
+				(seasonId <= p.PSeasonIdMax && seasonId >= p.PSeasonIdMin) {
 			plslice = append(plslice, p)
 		}
 	}
@@ -172,8 +179,8 @@ accept slice of Player structs and a season id, call slicePlayerSzn to create
 a new slice with only players from the specified season. then, generate a
 random number and return the player at that index in the slice
 */
-func randPlayer(pl []Player, sId uint64) uint64 {
-	players, _ := slicePlayersSzn(pl, sId)
+func RandPlayer(pl []Player, sId uint64) uint64 {
+	players, _ := SlicePlayersSzn(pl, sId)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
 	return players[randNum].PlayerId
@@ -190,7 +197,7 @@ func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64
 	var pId uint64
 
 	if player == "random" { // call randplayer function
-		pId = randPlayer(players, sId)
+		pId = RandPlayer(players, sId)
 	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
 		// if it's numeric keep it and convert to uint64
 		pId, _ = strconv.ParseUint(player, 10, 64)

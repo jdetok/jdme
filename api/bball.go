@@ -6,13 +6,11 @@ import (
 	"net/http"
 	"strconv"
 
-	// "github.com/jdetok/go-api-jdeko.me/api/resp"
-	// "github.com/jdetok/go-api-jdeko.me/api/store"
 	"github.com/jdetok/golib/errd"
 )
 
 // /player handler
-func (app *App) PlayerDashHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 
@@ -23,7 +21,7 @@ func (app *App) PlayerDashHndl(w http.ResponseWriter, r *http.Request) {
 	tId, _ = strconv.ParseUint(team, 10, 64)
 
 	season := r.URL.Query().Get("season")
-	player := Unaccent(r.URL.Query().Get("player"))
+	player := RemoveDiacritics(r.URL.Query().Get("player"))
 	pId, sId := GetpIdsId(app.Players, player, season)
 
 	js, err := rp.GetPlayerDash(app.Database, pId, sId, tId)
@@ -35,7 +33,7 @@ func (app *App) PlayerDashHndl(w http.ResponseWriter, r *http.Request) {
 }
 
 // /games/recent handler
-func (app *App) RecentGameHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlRecentGames(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 	rgs := RecentGames{}
@@ -50,7 +48,7 @@ func (app *App) RecentGameHndl(w http.ResponseWriter, r *http.Request) {
 
 // /seasons handler
 // FOR SEASONS SELECTOR - CALLED ON PAGE LOAD
-func (app *App) SeasonsHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlSeasons(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	season := r.URL.Query().Get("szn")
 	w.Header().Set("Content-Type", "application/json")
@@ -69,7 +67,7 @@ func (app *App) SeasonsHndl(w http.ResponseWriter, r *http.Request) {
 
 // /teams handler
 // FOR TEAMS SELECTOR - CALLED ON PAGE LOAD
-func (app *App) TeamsHndl(w http.ResponseWriter, r *http.Request) {
+func (app *App) HndlTeams(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	team := r.URL.Query().Get("team")
 	w.Header().Set("Content-Type", "application/json")

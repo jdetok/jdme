@@ -66,7 +66,7 @@ func TestPlayerStore(t *testing.T) {
 			&p.PSeasonIdMax, &p.PSeasonIdMin)
 		ps = append(ps, p)
 	}
-	fmt.Println(ps)
+	// fmt.Println(ps)
 }
 
 // TEST TEAMS STORE QUERY
@@ -85,7 +85,7 @@ func TestTeamStore(t *testing.T) {
 		rows.Scan(&t.League, &t.TeamId, &t.TeamAbbr, &t.CityTeam)
 		ts = append(ts, t)
 	}
-	fmt.Println(ts)
+	// fmt.Println(ts)
 }
 
 // TEST SEASONS STORE QUERY
@@ -104,5 +104,5 @@ func TestSeasonStore(t *testing.T) {
 		rows.Scan(&s.SeasonId, &s.Season, &s.WSeason)
 		sz = append(sz, s)
 	}
-	fmt.Println(sz)
+	// fmt.Println(sz)
 }
