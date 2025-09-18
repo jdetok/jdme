@@ -8,7 +8,7 @@
     /* border: 1px solid black; */
 }
 
-#top_players button {
+.top_players button {
     /* border: 1px solid black; */
     border: none;
     color: rgba(212, 128, 177, 0.779);
@@ -19,7 +19,7 @@
     height: 100%;
     box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.449);}
 
-#tstbl {
+.tstbl {
     width: 95%;
     margin: 0 auto;
     margin-top: 20px;

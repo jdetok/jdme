@@ -107,14 +107,22 @@ async function appendImg(url, pElName) {
     pEl.append(img);
 }
 
+// replacement to tsTable, should work for both recent game and league top scorer
+export async function buildTopScorersTable(data, outerEl, tblEl, caption, exclude_first) {
+    const tblcont = document.getElementById(outerEl);
+    const tbl = document.getElementById(tblEl);
+    table.tblCaption(tbl, caption);
+
+}
+
+
 export async function tsTable(data, elName, exclude_first) {
     const tblcont = document.getElementById(elName);
     const tbl = document.getElementById('tstbl');
 
     // table captions
-    const lbl = document.createElement('caption');
-    lbl.textContent = `Top Scorers from ${data.recent_games[0].game_date}`;
-    tbl.appendChild(lbl);
+    const caption = `Top Scorers from ${data.recent_games[0].game_date}`;
+    table.tblCaption(tbl, caption);
 
     // table headers
     const thead = document.createElement('thead');
@@ -139,37 +147,10 @@ export async function tsTable(data, elName, exclude_first) {
     }
     
     for (let i = 0; i < scorers.length; i++) {
-        let scorer = scorers[i];
-        let game = data.recent_games.find(g => g.player_id === scorer.player_id);
-
-        let r = document.createElement('tr');
-
-        let pName = document.createElement('td');
-        let pTeam = document.createElement('td');
-        let pts = document.createElement('td');
-
-        let btn = document.createElement('button');
-        btn.textContent = scorer.player;
-        btn.type = 'button';
-        btn.addEventListener('click', async () => {
-            await playerLinkSearch(scorer.player, data);
-        }); 
-
-        pName.appendChild(btn);
-        pTeam.textContent = `${game ? game.team_name : ""} | \
-        ${game ? game.matchup : ""} | ${game ? game.wl : ""}`;
-        pts.textContent = scorer.points;
-
-        r.appendChild(pName);
-        r.appendChild(pTeam);
-        r.appendChild(pts);
-
-        tbl.appendChild(r);
+        await table.topPlayerRow(tbl, scorers[i], data, 'recent');
     }
 
     tblcont.appendChild(tbl);
-    
-    // await table.basicTable(data, "Other Top Scorers", elName)
 }
 
 export async function playerLinkSearch(player, data) {

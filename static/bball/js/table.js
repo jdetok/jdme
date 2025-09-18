@@ -7,6 +7,57 @@ export async function tblCaption(tbl, caption) {
     tbl.appendChild(capt);
 } 
 
+// call in top scorer table loop for each player
+export async function topPlayerRow(tbl, scorer, data, mode) {
+    let game = data.recent_games.find(g => g.player_id === scorer.player_id);
+    let r = document.createElement('tr');
+
+    let pName = document.createElement('td');
+    let pTeam = document.createElement('td');
+    let pts = document.createElement('td');
+
+    let btn = document.createElement('button');
+    btn.textContent = scorer.player;
+    btn.type = 'button';
+    btn.addEventListener('click', async () => {
+        await playerLinkSearch(scorer.player, data);
+    }); 
+
+    pName.appendChild(btn);
+    if (mode == 'recent') {
+        pTeam.textContent = `${game ? game.team_name : ""} | \
+        ${game ? game.matchup : ""} | ${game ? game.wl : ""}`;
+    } else if (mode == 'league') {
+        pTeam.textContent = scorer.team;
+    }
+    pts.textContent = scorer.points;
+    r.appendChild(pName);
+    r.appendChild(pTeam);
+    r.appendChild(pts);
+
+    tbl.appendChild(r);
+}
+
+export async function recGamesTbl(tbl) {
+    // table headers
+    const thead = document.createElement('thead');
+    const nameH = document.createElement('td');
+    const ptsH = document.createElement('td');
+    const teamH = document.createElement('td');
+
+    nameH.textContent = 'name';
+    ptsH.textContent = 'points';
+    teamH.textContent = 'team | matchup | win-loss';
+
+    thead.appendChild(nameH);
+    thead.appendChild(teamH);
+    thead.appendChild(ptsH);
+
+    tbl.appendChild(thead);
+    
+}
+
+
 // FIRST ROW CONTAINS HEADERS. ALL COLUMNS CONTAIN A HEADER AND DATA
 export async function basicTable(data, caption, pElName) {
     // parent element
