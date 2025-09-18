@@ -124,39 +124,38 @@ export async function getLeagueTop5() {
 export async function tsLgTable(data, elName, caption) {
     const tblcont = document.getElementById(elName);
 
-    const nbatbl = document.getElementById('nba_tstbl');
+    const tbl = document.getElementById('nba_tstbl');
     const wnbatbl = document.getElementById('wnba_tstbl');
 
-    // table.tblCaption(tbl, caption);
-    // const title = document.getElementById('lgts_title');
-    // title.textContent = caption;
-    // tblcont.appendChild(title);
-    // table headers
+    table.tblCaption(tbl, caption);
+    
     const thead = document.createElement('thead');
-    const wthead = document.createElement('thead');
 
-    const nameH = document.createElement('td');
-    nameH.textContent = 'name | team';
+    const nbaH = document.createElement('td');
+    nbaH.textContent = 'nba top 5';
 
     const ptsH = document.createElement('td');
     ptsH.textContent = 'points';
 
-    thead.appendChild(nameH);
+    const wnbaH = document.createElement('td');
+    wnbaH.textContent = 'wnba top 5';
+
+    const wptsH = document.createElement('td');
+    wptsH.textContent = 'points';
+
+    thead.appendChild(nbaH);
     thead.appendChild(ptsH);
+    thead.appendChild(wnbaH);
+    thead.appendChild(wptsH);
 
-    wthead.appendChild(nameH);
-    wthead.appendChild(ptsH);
-
-    nbatbl.appendChild(thead);
-    wnbatbl.appendChild(thead);
+    tbl.appendChild(thead);
     
     for (let i = 0; i < 5; i++) {
         let r = document.createElement('tr');
-        let wr = document.createElement('tr');
 
         let pName = document.createElement('td');
-        let wpName = document.createElement('td');
         let pts = document.createElement('td');
+        let wpName = document.createElement('td');
         let wpts = document.createElement('td');
 
         let btn = document.createElement('button');
@@ -179,12 +178,11 @@ export async function tsLgTable(data, elName, caption) {
         pts.textContent = data.nba[i].points;
         wpts.textContent = data.wnba[i].points;
         r.appendChild(pName);
-        wr.appendChild(wpName);
         r.appendChild(pts);
-        wr.appendChild(wpts);
+        r.appendChild(wpName);
+        r.appendChild(wpts);
 
-        nbatbl.appendChild(r);
-        wnbatbl.appendChild(wr);
+        tbl.appendChild(r);
     }
 
     tblcont.appendChild(tbl);
