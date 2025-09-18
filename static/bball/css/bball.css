@@ -8,6 +8,15 @@
     /* border: 1px solid black; */
 }
 
+.lg_tbls {
+    display: flex;
+    flex-direction: row;
+}
+
+.lg_tbls table {
+    max-width: 50%;
+}
+
 .top_players button {
     /* border: 1px solid black; */
     border: none;
@@ -33,6 +42,11 @@ table thead {
     font-size: 24px;
 } */
 
+#lgts_title {
+    margin: 0 auto;
+    font-size: 24px;
+    color: white;
+}
 #ui {
     /* border: 5px solid black; */
     display: block;
