@@ -13,6 +13,7 @@ import (
 type Top5 struct {
 	PlayerId uint64 `json:"player_id"`
 	Player   string `json:"player"`
+	Season   string `json:"season"`
 	Team     string `json:"team"`
 	Points   uint32 `json:"points"`
 }
@@ -52,7 +53,7 @@ func QueryTopLgPlayers(db *sql.DB) (LgTop5, error) {
 		// create a Top5 struct for each row, append to appropriate NBA/WNBA member
 		for r.Next() {
 			var t Top5
-			r.Scan(&t.PlayerId, &t.Player, &t.Team, &t.Points)
+			r.Scan(&t.PlayerId, &t.Player, &t.Season, &t.Team, &t.Points)
 			switch lg {
 			case "nba":
 				lt.NBATop5 = append(lt.NBATop5, t)

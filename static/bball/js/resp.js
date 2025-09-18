@@ -118,7 +118,7 @@ export async function getLeagueTop5() {
     }
     const data = await r.json();
     console.log(data);
-    await tsLgTable(data, 'top_lg_players', 'NBA/WNBA Top Players')
+    await tsLgTable(data, 'top_lg_players', 'Top 5 NBA/WNBA Scorers')
 }
 
 export async function tsLgTable(data, elName, caption) {
@@ -132,13 +132,13 @@ export async function tsLgTable(data, elName, caption) {
     const thead = document.createElement('thead');
 
     const nbaH = document.createElement('td');
-    nbaH.textContent = 'nba top 5';
+    nbaH.textContent = `nba | ${data.nba[0].season}`;
 
     const ptsH = document.createElement('td');
     ptsH.textContent = 'points';
 
     const wnbaH = document.createElement('td');
-    wnbaH.textContent = 'wnba top 5';
+    wnbaH.textContent = `wnba | ${data.wnba[0].season}`;
 
     const wptsH = document.createElement('td');
     wptsH.textContent = 'points';
@@ -231,6 +231,8 @@ export async function playerLinkSearch(player, data) {
         searchB.value = player;
         searchB.focus();
         await getP(base, player, 88888, 0, data);
+        searchB.value = '';
+
     }
 }
 
