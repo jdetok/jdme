@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
@@ -18,5 +19,13 @@ func TestQueryTopLgPlayers(t *testing.T) {
 	if err != nil {
 		t.Error(e.BuildErr(err).Error())
 	}
-	QueryTopLgPlayers(db)
+	lt, err := QueryTopLgPlayers(db)
+	if err != nil {
+		t.Error(e.BuildErr(err).Error())
+	}
+	js, err := MarshalTop5(&lt)
+	if err != nil {
+		t.Error(e.BuildErr(err).Error())
+	}
+	fmt.Println(string(js))
 }
