@@ -49,77 +49,6 @@ export async function getP(base, player, season, team, ts) { // add season & tea
     document.getElementById('pHold').value = data.player_meta.player;
 }
 
-export async function tsTable(data, elName, exclude_first) {
-    const tblcont = document.getElementById(elName);
-    const tbl = document.getElementById('tstbl');
-
-    // table captions
-    const lbl = document.createElement('caption');
-    lbl.textContent = `Top Scorers from ${data.recent_games[0].game_date}`;
-    tbl.appendChild(lbl);
-
-    // table headers
-    const thead = document.createElement('thead');
-    const nameH = document.createElement('td');
-    const ptsH = document.createElement('td');
-    const teamH = document.createElement('td');
-
-    nameH.textContent = 'name';
-    ptsH.textContent = 'points';
-    teamH.textContent = 'team | matchup | win-loss';
-
-    thead.appendChild(nameH);
-    thead.appendChild(teamH);
-    thead.appendChild(ptsH);
-
-    tbl.appendChild(thead);
-    
-    // 
-    let scorers = data.top_scorers;
-    if (exclude_first) {
-        scorers = scorers.slice(1);
-    }
-    
-    for (let i = 0; i < scorers.length; i++) {
-        let scorer = scorers[i];
-        let game = data.recent_games.find(g => g.player_id === scorer.player_id);
-
-        let r = document.createElement('tr');
-
-        let pName = document.createElement('td');
-        let pTeam = document.createElement('td');
-        let pts = document.createElement('td');
-
-        let btn = document.createElement('button');
-        btn.textContent = scorer.player;
-        btn.type = 'button';
-        btn.addEventListener('click', async () => {
-            let searchB = document.getElementById('pSearch');
-            if (searchB) {
-                searchB.value = scorer.player;
-                searchB.focus();
-                await getP(base, scorer.player, 88888, 0, data);
-
-            }
-        });
-
-        pName.appendChild(btn);
-        pTeam.textContent = `${game ? game.team_name : ""} | \
-        ${game ? game.matchup : ""} | ${game ? game.wl : ""}`;
-        pts.textContent = scorer.points;
-
-        r.appendChild(pName);
-        r.appendChild(pTeam);
-        r.appendChild(pts);
-
-        tbl.appendChild(r);
-    }
-
-    tblcont.appendChild(tbl);
-    
-    // await table.basicTable(data, "Other Top Scorers", elName)
-}
-
 export async function getRecentTopScorer() {
     const r = await fetch(`${base}/games/recent`);
     if (!r.ok) {
@@ -176,4 +105,78 @@ async function appendImg(url, pElName) {
     img.src = url;
     img.alt = "image not found";
     pEl.append(img);
+}
+
+export async function tsTable(data, elName, exclude_first) {
+    const tblcont = document.getElementById(elName);
+    const tbl = document.getElementById('tstbl');
+
+    // table captions
+    const lbl = document.createElement('caption');
+    lbl.textContent = `Top Scorers from ${data.recent_games[0].game_date}`;
+    tbl.appendChild(lbl);
+
+    // table headers
+    const thead = document.createElement('thead');
+    const nameH = document.createElement('td');
+    const ptsH = document.createElement('td');
+    const teamH = document.createElement('td');
+
+    nameH.textContent = 'name';
+    ptsH.textContent = 'points';
+    teamH.textContent = 'team | matchup | win-loss';
+
+    thead.appendChild(nameH);
+    thead.appendChild(teamH);
+    thead.appendChild(ptsH);
+
+    tbl.appendChild(thead);
+    
+    // 
+    let scorers = data.top_scorers;
+    if (exclude_first) {
+        scorers = scorers.slice(1);
+    }
+    
+    for (let i = 0; i < scorers.length; i++) {
+        let scorer = scorers[i];
+        let game = data.recent_games.find(g => g.player_id === scorer.player_id);
+
+        let r = document.createElement('tr');
+
+        let pName = document.createElement('td');
+        let pTeam = document.createElement('td');
+        let pts = document.createElement('td');
+
+        let btn = document.createElement('button');
+        btn.textContent = scorer.player;
+        btn.type = 'button';
+        btn.addEventListener('click', async () => {
+            await playerLinkSearch(scorer.player, data);
+        }); 
+
+        pName.appendChild(btn);
+        pTeam.textContent = `${game ? game.team_name : ""} | \
+        ${game ? game.matchup : ""} | ${game ? game.wl : ""}`;
+        pts.textContent = scorer.points;
+
+        r.appendChild(pName);
+        r.appendChild(pTeam);
+        r.appendChild(pts);
+
+        tbl.appendChild(r);
+    }
+
+    tblcont.appendChild(tbl);
+    
+    // await table.basicTable(data, "Other Top Scorers", elName)
+}
+
+export async function playerLinkSearch(player, data) {
+    let searchB = document.getElementById('pSearch');
+    if (searchB) {
+        searchB.value = player;
+        searchB.focus();
+        await getP(base, player, 88888, 0, data);
+    }
 }
