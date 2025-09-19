@@ -37,11 +37,11 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 	switch tId {
 	case 0:
 		logd.Logc(fmt.Sprintf("querying player_id: %d | season_id: %d", pId, sId))
-		q = pgdb.PlayerDash.Q
+		q = pgdb.PlayerDash
 		p = pId
 	default:
 		logd.Logc(fmt.Sprintf("querying team_id: %d | season_id: %d", tId, sId))
-		q = pgdb.TeamTopScorerDash.Q
+		q = pgdb.TeamTopScorerDash
 		p = tId
 	}
 

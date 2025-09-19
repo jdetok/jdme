@@ -62,7 +62,7 @@ recent night's games. used on page load and to populate recent top scorers table
 */
 func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
 	e := errd.InitErr()
-	rows, err := db.Query(pgdb.RecGameTopScorers.Q)
+	rows, err := db.Query(pgdb.RecGameTopScorers)
 	if err != nil {
 		e.Msg = "query failed"
 		return nil, e.BuildErr(err)

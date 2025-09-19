@@ -1,4 +1,4 @@
-import { getP } from "./resp.js";
+import { makePlayerDash } from "./resp.js";
 import { base } from "./listen.js";
 
 export async function search() {
@@ -10,7 +10,7 @@ export async function search() {
         const player = input.value.trim();
         const season = await handleSeasonBoxes();
         console.log(`searching for season ${season}`)
-        await getP(base, player, season, '0');
+        await makePlayerDash(base, player, season, '0');
         input.value = ''; // clear input box after searching
     }) 
 }
@@ -42,6 +42,24 @@ export async function selHvr() {
         is closer to the selected, will be used`);
 }
 
+
+/* 
+adds a button listener to each individual player button in the leading scorers
+tables. have to create a button, do btn.AddEventListener, and call this function
+within that listener. will insert the player's name in the search bar and call 
+getP
+*/
+export async function playerBtnListener(player) {
+    let searchB = document.getElementById('pSearch');
+    if (searchB) {
+        searchB.value = player;
+        searchB.focus();
+        await makePlayerDash(base, player, 88888, 0, 0);
+        searchB.value = '';
+    }
+}
+
+
 // read pHold invisible val to add on-screen player's name to search bar
 export async function holdPlayerBtn() {
     const btn = document.getElementById('holdP');
@@ -58,6 +76,9 @@ export async function holdPlayerBtn() {
     )
 }
 
+/*
+get a random player from the API and makePlayerDash
+*/
 export async function randPlayerBtn() {
     const btn = document.getElementById('randP');
     const hlp = document.getElementById('hlpRnd');
@@ -65,7 +86,7 @@ export async function randPlayerBtn() {
         event.preventDefault();
         const season = await handleSeasonBoxes();
         console.log(season);
-        await getP(base, 'random', season, 0);
+        await makePlayerDash(base, 'random', season, 0);
     })
     await showHideHvr(
         hlp, 
@@ -77,6 +98,7 @@ export async function randPlayerBtn() {
     )
 }
 
+//
 export async function handleSeasonBoxes() {
     const p = await checkBoxes('post', 'ps_slct')
     const r = await checkBoxes('reg', 'rs_slct')

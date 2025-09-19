@@ -29,7 +29,7 @@ set a slice of strings with both leagues to loop through. NBA is first in the sl
 this must be maintained for the logic to work. at the end of the for loop the sId
 variable is set to the WNBA season - it's declared as the NBA season before the loop begins
 */
-func QueryTopLgPlayers(db *sql.DB) (LgTop5, error) {
+func QueryTopLgPlayers(db *sql.DB, numPl string) (LgTop5, error) {
 	e := errd.InitErr()
 
 	var lt LgTop5
@@ -42,7 +42,7 @@ func QueryTopLgPlayers(db *sql.DB) (LgTop5, error) {
 	var sId string = strconv.FormatUint(sl.SznId, 10)
 	for _, lg := range lgs {
 		// query database
-		r, err := db.Query(pgdb.LgTop5.Q, sId, lg)
+		r, err := db.Query(pgdb.TstLgTop5, sId, lg, numPl)
 		if err != nil {
 			e.Msg = fmt.Sprintf(
 				"failed to query database for top 5 lg players: sznId: %s | lg: %s\n",
