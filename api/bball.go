@@ -9,6 +9,23 @@ import (
 	"github.com/jdetok/golib/errd"
 )
 
+func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
+	e := errd.InitErr()
+	LogHTTP(r)
+
+	lt, err := QueryTopLgPlayers(app.Database)
+	if err != nil {
+		msg := "failed to query top 5 league players"
+		e.HTTPErr(w, msg, err)
+	}
+	js, err := MarshalTop5(&lt)
+	if err != nil {
+		msg := "failed to marshal top 5 league players struct to JSON"
+		e.HTTPErr(w, msg, err)
+	}
+	app.JSONWriter(w, js)
+}
+
 // /player handler
 func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()

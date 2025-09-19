@@ -15,11 +15,11 @@
 
 <header>
   <div class="hdr">
-    <div><a href="https://jdeko.me">go to jdeko.me</a></div>
+    <div><a href="http://localhost:8080">go to jdeko.me</a></div>
     <div><a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">
       jdeko.me source code</a></div>
-    <div><a href="https://jdeko.me/bball/about">about jdeko.me/bball</a></div>
-    <div class="hidesmall"><a target="_blank" href="https://jdeko.me/about">
+    <div><a href="http://localhost:8080/bball/about">about jdeko.me/bball</a></div>
+    <div class="hidesmall"><a target="_blank" href="http://localhost:8080/about">
       about jdeko.me</a></div>
     <div><a target="_blank" href="https://www.nba.com/stats">
         all data owned by the nba/wnba</a></div>
@@ -28,13 +28,11 @@
 <body>
 
   <div id="titlesect">
-      <div id="top_players">
-        <table id="tstbl"></table>
-      </div>
-      <div>
-    
-  <h1>jdeko.me/bball<br>nba/wnba statistics</h1>
-
+    <div class="top_players" id="top_players">
+      <table class="tstbl" id="tstbl"></table>
+    </div>
+    <div>
+    <h1>jdeko.me/bball<br>nba/wnba statistics</h1>
   <!-- SELECTS ========================================= -->
     <form id="ui">
       <div class="uirowouter"> 
@@ -77,18 +75,17 @@
       <div class="hvr" id="hvrmsg"></div>
     </form>
     </div>
-    <div></div>
+      <!-- top 5 players in each league table -->
+    <div class="top_players" id="top_lg_players">
+      <!-- <h1 id="lgts_title"></h1> -->
+      <div class="lg_tbls">
+      <table class="tstbl" id="nba_tstbl"></table>
+      </div>
+    </div>
     </div>
 
   <!-- RESPONSE -->
   <div class="respouter">
-    <!-- <div id="titlesect">
-      <div id="top_players">
-        <table id="tstbl"></table>
-      </div>
-      <div class="resptitle" id="player_title"></div>
-      <div></div>
-    </div> -->
       <div class="resptitle" id="player_title"></div>
     <div class="resprow">
       <div class="respsect">

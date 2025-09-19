@@ -7,6 +7,8 @@ export async function tblCaption(tbl, caption) {
     tbl.appendChild(capt);
 } 
 
+
+
 // FIRST ROW CONTAINS HEADERS. ALL COLUMNS CONTAIN A HEADER AND DATA
 export async function basicTable(data, caption, pElName) {
     // parent element

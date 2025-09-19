@@ -125,7 +125,9 @@ export async function clearSearch() {
     const btn = document.getElementById('clearS');
     btn.addEventListener('click', async (event) => {
         event.preventDefault();
-        document.getElementById('pSearch').value = '';
+        let pSearch = document.getElementById('pSearch');
+        pSearch.value = '';
+        pSearch.focus();
     })
 }
 

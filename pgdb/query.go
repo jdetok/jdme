@@ -133,3 +133,26 @@ var Teams = Query{
 	where team_id > 0
 	`,
 }
+
+// top five players by points, season id and lg_cde (nba or wnba) as arguments
+var LgTop5 = Query{
+	Args: []string{},
+	Q: `
+	select 
+		a.player_id,
+		b.player,
+		e.szn,
+		max(c.team) as team,
+		sum(a.pts) as points
+	from stats.pbox a
+	inner join lg.plr b on b.player_id = a.player_id
+	inner join lg.team c on c.team_id = a.team_id
+	inner join lg.league d on d.lg_id = b.lg_id
+	inner join lg.szn e on e.szn_id = a.szn_id
+	where a.szn_id = $1
+	and d.lg_cde = $2
+	group by a.player_id, b.player, b.lg_id, e.szn
+	order by points desc
+	limit 5
+	`,
+}
