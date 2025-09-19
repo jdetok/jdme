@@ -1,7 +1,7 @@
 #titlesect {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: fit-content fit-content;
     grid-template-areas:
     "left middle-top right"
     "left middle-bottom right";

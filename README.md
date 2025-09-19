@@ -23,13 +23,6 @@ the site's frontend is written using only pure HTML/CSS/Javascript. all static f
     - etl (extract-transform-load) package written in go to fetch NBA/WNBA data & load it into  postgres database
 - ### [golib](https://github.com/jdetok/golib)
     - go packages i wrote to standardize logging/error handling/etc in all my projects
-<!-- - ### [bball-etl-go](https://github.com/jdetok/bball-etl-go) 
-    - etl (extract-transform-load) package written in go to fetch NBA/WNBA data & load it into postgres database
-    - ### [bball-postgres-bld-etl](https://github.com/jdetok/bball-postgres-bld-etl)
-        - uses etl package to build postgres database | fetch & insert with NBA/WNBA data from 1970-current
-    - ### [nightly-bball-etl](https://github.com/jdetok/nightly-bball-etl)
-        - uses etl package to fetch NBA/WNBA data from previous day, insert into existing postgres database
--->
 - ### [docker-jdeko.me](https://github.com/jdetok/docker-jdeko.me)
 
     - docker compose, Dockerfile, & apache files for environment setup 
