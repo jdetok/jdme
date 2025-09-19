@@ -53,7 +53,7 @@ export async function playerBtnListener(player) {
     let searchB = document.getElementById('pSearch');
     if (searchB) {
         searchB.value = player;
-        searchB.focus();
+        // searchB.focus();
         await makePlayerDash(base, player, 88888, 0, 0);
         searchB.value = '';
     }
