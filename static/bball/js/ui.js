@@ -9,7 +9,10 @@ export async function searchPlayer() {
         event.preventDefault();
 
         const input = document.getElementById('pSearch');
-        const player = input.value.trim();
+        let player = input.value.trim();
+        if (player === '') {
+            player = document.getElementById('pHold').value;
+        }
         const season = await handleSeasonBoxes();
         console.log(`searching for season ${season}`)
         await makePlayerDash(base, player, season, '0');
