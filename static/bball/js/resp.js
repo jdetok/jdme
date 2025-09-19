@@ -1,6 +1,6 @@
 import * as table from "./table.js"
 
-export async function buildPDash(data, ts) {
+export async function buildPlayerDash(data, ts) {
     await appendImg(data.player_meta.headshot_url, 'pl_img');
     await appendImg(data.player_meta.team_logo_url, 'tm_img');
     await respPlayerTitle(data.player_meta, 'player_title', ts);
@@ -18,22 +18,27 @@ export async function buildPDash(data, ts) {
 }
 
 // ts indicates 'top scorer' - used when called on page refresh to get recent game
-export async function getP(base, player, season, team, ts) { // add season & team
+export async function makePlayerDash(base, player, season, team, ts) { // add season & team
     const err = document.getElementById('sErr');
     if (err.style.display === "block") {
         err.style.display = 'none';
     }
 
+    // encode passed args to be ready for query string
     const s = encodeURIComponent(season)
     const p = encodeURIComponent(player).toLowerCase();
+
+    // attempt to fetch from /player endpoint with encoded params
     const r = await fetch(base + `/player?player=${p}&season=${s}&team=${team}`);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
     }
     
+    // get json, set first object in player array as data var
     const js = await r.json();
     const data = js.player[0];
 
+    // handle empty player response
     if (data.player_meta.player_id === 0) {
         if (player != '') {
             err.textContent = `'${player}' not found...`
@@ -41,13 +46,19 @@ export async function getP(base, player, season, team, ts) { // add season & tea
         }
         throw new Error(`Player not found error`);
     } 
-    await buildPDash(data, ts);
+
+    // build and display player dash
+    await buildPlayerDash(data, ts);
+
+    // set invisible player hold value as current player
     document.getElementById('pHold').value = data.player_meta.player;
 }
 
+// set the player name/team name as result title
 // RESULT TITLE - LIKE `LeBron James - Los Angeles Lakers`
 async function respPlayerTitle(data, elName, ts) {
     const rTitle = document.getElementById(elName);
+    // special title if caller specifies it's a top scorer
     if (ts) {
         rTitle.innerHTML = `
         Top Scorer from ${ts.recent_games[0].game_date}<br>${data.caption}
