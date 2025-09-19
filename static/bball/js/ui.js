@@ -1,7 +1,9 @@
 import { makePlayerDash } from "./resp.js";
+import { showHideHvr } from "./hover.js";
 import { base } from "./listen.js";
 
-export async function search() {
+// get player from search bar and make player dash
+export async function searchPlayer() {
     const frm = document.getElementById('ui');
     frm.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -15,32 +17,6 @@ export async function search() {
     }) 
 }
 
-export async function showHideHvr(el, hvrName, msg) {
-    const hvr = document.getElementById(hvrName);
-    el.addEventListener('mouseover', async (event) => {
-        event.preventDefault();
-        hvr.textContent = msg;
-        hvr.style.display = 'block'; 
-    })
-    el.addEventListener('mouseleave', async (event) => {
-        event.preventDefault();
-        hvr.textContent = '';
-        hvr.style.display = 'none'; 
-    })
-}
-
-export async function selHvr() {
-    const rs = document.getElementById('hlpRs');
-    const ps = document.getElementById('hlpPs');
-    await showHideHvr(rs, 'selhvr',
-        `search for a specific regular-season. if the player being searched didn't
-        play in the selected season, their first or most recent season, whichever
-        is closer to the selected, will be used`);
-    await showHideHvr(ps, 'selhvr',
-        `search for a specific post-season. if the player being searched didn't
-        play in the selected season, their first or most recent season, whichever
-        is closer to the selected, will be used`);
-}
 
 
 /* 
@@ -56,6 +32,10 @@ export async function playerBtnListener(player) {
         // searchB.focus();
         await makePlayerDash(base, player, 88888, 0, 0);
         searchB.value = '';
+        let res = document.getElementById("ui");
+        if (res) {
+            res.scrollIntoView({behavior: "smooth", block: "start"});
+        }
     }
 }
 
@@ -98,7 +78,21 @@ export async function randPlayerBtn() {
     )
 }
 
-//
+// season select hover messages
+export async function selHvr() {
+    const rs = document.getElementById('hlpRs');
+    const ps = document.getElementById('hlpPs');
+    await showHideHvr(rs, 'selhvr',
+        `search for a specific regular-season. if the player being searched didn't
+        play in the selected season, their first or most recent season, whichever
+        is closer to the selected, will be used`);
+    await showHideHvr(ps, 'selhvr',
+        `search for a specific post-season. if the player being searched didn't
+        play in the selected season, their first or most recent season, whichever
+        is closer to the selected, will be used`);
+}
+
+// return season or 88888 if no sseason box checked
 export async function handleSeasonBoxes() {
     const p = await checkBoxes('post', 'ps_slct')
     const r = await checkBoxes('reg', 'rs_slct')
@@ -131,6 +125,7 @@ export async function loadSznOptions() {
     await buildSznSelects(data);
 }
 
+// accept seasons in data object and make an option for each
 async function buildSznSelects(data) {
     const rs = document.getElementById('rs_slct');
     const ps = document.getElementById('ps_slct');
@@ -143,6 +138,7 @@ async function buildSznSelects(data) {
     }
 }
 
+// clear search box
 export async function clearSearch() {
     const btn = document.getElementById('clearS');
     btn.addEventListener('click', async (event) => {
@@ -153,6 +149,7 @@ export async function clearSearch() {
     })
 }
 
+// if checkbox is checked, return the value
 export async function checkBoxes(box, sel) {
     const b = document.getElementById(box);
     const s = document.getElementById(sel);
