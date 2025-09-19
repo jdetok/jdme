@@ -19,7 +19,10 @@ respective seasons
 */
 export async function buildLeadingScorersTbl(data, elName, numPl) {
     const tblcont = document.getElementById(elName);
+
     const tbl = document.getElementById('nba_tstbl');
+    tbl.textContent = '';
+
     const thead = document.createElement('thead');
     const rankH = document.createElement('td');
     const nbaH = document.createElement('td');

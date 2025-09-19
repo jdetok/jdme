@@ -1,20 +1,27 @@
 @media (max-width: 600px) {
-    /* #top_players {
-        display: none;
-    } */
+
     #titlesect {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+        grid-template-areas:
+            "middle-top"
+            "left"
+            "right"
+            "middle-bottom";
     }
 
-    #titlesect > div {
+    /* Optional: remove forced widths/borders if things look squished */
+    #titlesect > div, #titlesect h1, #titlesect form {
         width: 100%;
-        /* border: 1px solid black; */
+        /* border: none; */
     }
     .uisect {
         flex-direction: column;
     }
-
+    /* .lg_tbls {
+        display: flex;
+        flex-direction: column;
+    } */
     .resptitle {
         font-size: 30px;
     }
