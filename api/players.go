@@ -73,7 +73,7 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 		rp.HndlRespRow(&p, &s)
 	}
 	// handle aggregate season ids (all, regular season, playoffs)
-	HndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
+	// HndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
 
 	// assign nba or wnba season only based on league
 	t.HndlSeason(&rp.Meta.League, &rp.Meta.Season)

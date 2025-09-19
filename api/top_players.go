@@ -42,7 +42,7 @@ func QueryTopLgPlayers(db *sql.DB, numPl string) (LgTop5, error) {
 	var sId string = strconv.FormatUint(sl.SznId, 10)
 	for _, lg := range lgs {
 		// query database
-		r, err := db.Query(pgdb.TstLgTop5, sId, lg, numPl)
+		r, err := db.Query(pgdb.LeagueTopScorers, sId, lg, numPl)
 		if err != nil {
 			e.Msg = fmt.Sprintf(
 				"failed to query database for top 5 lg players: sznId: %s | lg: %s\n",
