@@ -1,7 +1,7 @@
 @media (max-width: 600px) {
-    #top_players {
-        display: none;;
-    }
+    /* #top_players {
+        display: none;
+    } */
     #titlesect {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
