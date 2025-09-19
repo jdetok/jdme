@@ -1,6 +1,4 @@
 import * as table from "./table.js"
-import { base } from "./listen.js"
-import { search } from "./ui.js";
 
 export async function buildPDash(data, ts) {
     await appendImg(data.player_meta.headshot_url, 'pl_img');

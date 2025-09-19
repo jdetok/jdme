@@ -19,7 +19,7 @@ func TestQueryTopLgPlayers(t *testing.T) {
 	if err != nil {
 		t.Error(e.BuildErr(err).Error())
 	}
-	lt, err := QueryTopLgPlayers(db)
+	lt, err := QueryTopLgPlayers(db, "10")
 	if err != nil {
 		t.Error(e.BuildErr(err).Error())
 	}

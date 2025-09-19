@@ -13,7 +13,9 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 
-	lt, err := QueryTopLgPlayers(app.Database)
+	numPl := r.URL.Query().Get("num")
+
+	lt, err := QueryTopLgPlayers(app.Database, numPl)
 	if err != nil {
 		msg := "failed to query top 5 league players"
 		e.HTTPErr(w, msg, err)

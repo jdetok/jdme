@@ -12,6 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await ui.search();
     await ui.clearSearch();
     await ui.holdPlayerBtn();
-    await ts.getRecentTopScorer();
-    await ts.getLeagueTop5();
+    await ts.getRecentTopScorers();
+    await ts.getScoringLeaders();
 });
