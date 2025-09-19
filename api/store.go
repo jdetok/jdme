@@ -72,7 +72,7 @@ query also gets player's min and max seasons (reg season and playoffs)
 */
 func UpdatePlayers(db *sql.DB) ([]Player, error) {
 	e := errd.InitErr()
-	rows, err := db.Query(pgdb.PlayersSeason.Q)
+	rows, err := db.Query(pgdb.PlayersSeason)
 	if err != nil {
 		e.Msg = "query failed"
 		return nil, e.BuildErr(err)
@@ -96,7 +96,7 @@ example: seasonId: 22025 | season: 2024-25 | WSeason: 2025-26
 */
 func UpdateSeasons(db *sql.DB) ([]Season, error) {
 	e := errd.InitErr()
-	rows, err := db.Query(pgdb.AllSeasons.Q)
+	rows, err := db.Query(pgdb.AllSeasons)
 	if err != nil {
 		e.Msg = "error querying db"
 		e.BuildErr(err)
@@ -114,7 +114,7 @@ func UpdateSeasons(db *sql.DB) ([]Season, error) {
 // query database for global teams store
 func UpdateTeams(db *sql.DB) ([]Team, error) {
 	e := errd.InitErr()
-	rows, err := db.Query(pgdb.Teams.Q)
+	rows, err := db.Query(pgdb.Teams)
 	if err != nil {
 		e.Msg = "error querying db"
 		e.BuildErr(err)

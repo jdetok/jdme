@@ -5,7 +5,6 @@
 
 #titlesect > div {
     width: 100%;
-    /* border: 1px solid black; */
 }
 
 .lg_tbls {
@@ -26,7 +25,8 @@
     background-color: inherit;
     width: 100%;
     height: 100%;
-    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.449);}
+    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.449);
+}
 
 .tstbl {
     width: 95%;

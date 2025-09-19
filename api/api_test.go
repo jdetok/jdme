@@ -55,7 +55,7 @@ func TestPlayerStore(t *testing.T) {
 	e := errd.InitErr()
 	db := StartupTest(t)
 	var ps []Player
-	rows, err := db.Query(pgdb.PlayersSeason.Q)
+	rows, err := db.Query(pgdb.PlayersSeason)
 	if err != nil {
 		e.Msg = "failed getting players"
 		t.Error(e.BuildErr(err))
@@ -74,7 +74,7 @@ func TestTeamStore(t *testing.T) {
 	e := errd.InitErr()
 	db := StartupTest(t)
 	var ts []Team
-	rows, err := db.Query(pgdb.Teams.Q)
+	rows, err := db.Query(pgdb.Teams)
 	if err != nil {
 		e.Msg = "failed getting teams"
 		t.Error(e.BuildErr(err))
@@ -93,7 +93,7 @@ func TestSeasonStore(t *testing.T) {
 	e := errd.InitErr()
 	db := StartupTest(t)
 	var sz []Season
-	rows, err := db.Query(pgdb.AllSeasons.Q)
+	rows, err := db.Query(pgdb.AllSeasons)
 	if err != nil {
 		e.Msg = "failed getting seasons"
 		t.Error(e.BuildErr(err))
