@@ -11,6 +11,53 @@ order by right(cast(szn_id as varchar(5)), 4) desc,
 left(cast(szn_id as varchar(5)), 1)	
 `
 
+/*
+select each player and the min max reg/post season stats. used to populate global
+player store
+*/
+var PlayersSeason = `
+select 
+	a.player_id,
+	lower(a.player) as plr,
+	case 
+		when a.lg_id = 0 then 'nba'
+		when a.lg_id = 1 then 'wnba'
+	end,
+	b.rs_max, 
+	b.rs_min,
+	coalesce(c.po_max, b.rs_max),
+	coalesce(c.po_min, b.rs_min)
+from lg.plr a
+inner join (
+	select player_id, min(season_id) as rs_min, max(season_id) as rs_max
+	from api.plr_agg
+	where left(cast(season_id as varchar(5)), 1) = '2'
+	and right(cast(season_id as varchar(5)), 4) != '9999'
+	group by player_id
+) b on b.player_id = a.player_id
+left join (
+	select player_id, min(season_id) as po_min, max(season_id) as po_max
+	from api.plr_agg
+	where left(cast(season_id as varchar(5)), 1) = '4'
+	and right(cast(season_id as varchar(5)), 4) != '9999'
+	group by player_id
+) c on c.player_id = a.player_id
+`
+
+/*
+query database for all teams, used to populate global teams store
+*/
+var Teams = `
+select
+	case
+		when lg_id = 0 then 'NBA'
+		when lg_id = 1 then 'WNBA'
+	end,
+	team_id, team, team_long
+from lg.team
+where team_id > 0
+`
+
 // player dash from api table from passed player and season
 var PlayerDash = `select * from api.plr_agg where player_id = $1 and season_id = $2`
 
@@ -68,73 +115,8 @@ select * from (
 order by plr_pts desc
 `
 
-/*
-select each player and the min max reg/post season stats. used to populate global
-player store
-*/
-var PlayersSeason = `
-select 
-	a.player_id,
-	lower(a.player) as plr,
-	case 
-		when a.lg_id = 0 then 'nba'
-		when a.lg_id = 1 then 'wnba'
-	end,
-	b.rs_max, 
-	b.rs_min,
-	coalesce(c.po_max, b.rs_max),
-	coalesce(c.po_min, b.rs_min)
-from lg.plr a
-inner join (
-	select player_id, min(season_id) as rs_min, max(season_id) as rs_max
-	from api.plr_agg
-	where left(cast(season_id as varchar(5)), 1) = '2'
-	and right(cast(season_id as varchar(5)), 4) != '9999'
-	group by player_id
-) b on b.player_id = a.player_id
-left join (
-	select player_id, min(season_id) as po_min, max(season_id) as po_max
-	from api.plr_agg
-	where left(cast(season_id as varchar(5)), 1) = '4'
-	and right(cast(season_id as varchar(5)), 4) != '9999'
-	group by player_id
-) c on c.player_id = a.player_id
-`
-
-/*
-query database for all teams, used to populate global teams store
-*/
-var Teams = `
-select
-	case
-		when lg_id = 0 then 'NBA'
-		when lg_id = 1 then 'WNBA'
-	end,
-	team_id, team, team_long
-from lg.team
-where team_id > 0
-`
-
-// top five players by points, season id and lg_cde (nba or wnba) as arguments
-var LgTop5 = `
-select 
-	a.player_id,
-	b.player,
-	e.szn,
-	max(c.team) as team,
-	sum(a.pts) as points
-from stats.pbox a
-inner join lg.plr b on b.player_id = a.player_id
-inner join lg.team c on c.team_id = a.team_id
-inner join lg.league d on d.lg_id = b.lg_id
-inner join lg.szn e on e.szn_id = a.szn_id
-where a.szn_id = $1
-and d.lg_cde = $2
-group by a.player_id, b.player, b.lg_id, e.szn
-order by points desc
-limit 5
-`
-var TstLgTop5 = `
+// top $3 players by points, season id, lg_cde (nba or wnba), limit # as arguments
+var LeagueTopScorers = `
 select 
 	a.player_id,
 	b.player,
