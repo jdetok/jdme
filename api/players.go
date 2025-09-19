@@ -138,10 +138,11 @@ func HndlAggsIds(sId *uint64, sType *string) {
 }
 
 func (m *RespPlayerMeta) MakeCaptions() {
-	m.Caption = fmt.Sprintf("%s - %s", m.Player, m.TeamName)
-	m.CaptionShort = fmt.Sprintf("%s - %s", m.Player, m.Team)
-	m.BoxCapTot = fmt.Sprintf("Box Totals - %s", m.Season)
-	m.BoxCapAvg = fmt.Sprintf("Box Averages - %s", m.Season)
-	m.ShtgCapTot = fmt.Sprintf("Shooting Totals - %s", m.Season)
-	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages - %s", m.Season)
+	var delim string = "|"
+	m.Caption = fmt.Sprintf("%s %s %s", m.Player, delim, m.TeamName)
+	m.CaptionShort = fmt.Sprintf("%s %s %s", m.Player, delim, m.Team)
+	m.BoxCapTot = fmt.Sprintf("Box Totals %s %s", delim, m.Season)
+	m.BoxCapAvg = fmt.Sprintf("Box Averages %s %s", delim, m.Season)
+	m.ShtgCapTot = fmt.Sprintf("Shooting Totals %s %s", delim, m.Season)
+	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages %s %s", delim, m.Season)
 }

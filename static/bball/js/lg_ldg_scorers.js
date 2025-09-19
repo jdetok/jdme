@@ -42,7 +42,7 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     tbl.appendChild(thead);
     
     for (let i = 0; i < numPl; i++) {
-        await lgTopScorerRow(tbl, data.nba[i], data.wnba[i]);
+        await lgTopScorerRow(tbl, data, i);
     }
 
     tblcont.appendChild(tbl);
@@ -52,7 +52,7 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
 add a row to the league top scorers table. called within a loop
 adds nba player with button, their points, wnba player with button, their points
 */
-export async function lgTopScorerRow(tbl, nba, wnba) {
+export async function lgTopScorerRow(tbl, data, i) {
     let r = document.createElement('tr');
 
     let pName = document.createElement('td');
@@ -61,25 +61,25 @@ export async function lgTopScorerRow(tbl, nba, wnba) {
     let wpts = document.createElement('td');
 
     let btn = document.createElement('button');
-    btn.textContent = `${nba.player} | ${nba.team}`;
+    btn.textContent = `${i+1}. ${data.nba[i].player} | ${data.nba[i].team}`;
     btn.type = 'button';
     btn.addEventListener('click', async () => {
-        await playerBtnListener(nba.player);
+        await playerBtnListener(data.nba[i].player);
     }); 
 
     let wbtn = document.createElement('button');
-    wbtn.textContent = `${wnba.player} | ${wnba.team}`;
+    wbtn.textContent = `${i+1}. ${data.wnba[i].player} | ${data.wnba[i].team}`;
     wbtn.type = 'button';
 
     wbtn.addEventListener('click', async () => {
-        await playerBtnListener(wnba.player);
+        await playerBtnListener(data.wnba[i].player);
     }); 
 
     pName.appendChild(btn);
     wpName.appendChild(wbtn);
 
-    pts.textContent = nba.points;
-    wpts.textContent = wnba.points;
+    pts.textContent = data.nba[i].points;
+    wpts.textContent = data.wnba[i].points;
     r.appendChild(pName);
     r.appendChild(pts);
     r.appendChild(wpName);
