@@ -21,6 +21,7 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     const tblcont = document.getElementById(elName);
     const tbl = document.getElementById('nba_tstbl');
     const thead = document.createElement('thead');
+    const rankH = document.createElement('td');
     const nbaH = document.createElement('td');
     const ptsH = document.createElement('td');
     const wnbaH = document.createElement('td');
@@ -29,11 +30,13 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     const caption = `Scoring Leaders | Current NBA/WNBA Top ${numPl}`
     tblCaption(tbl, caption);
     
+    rankH.textContent = 'rank';
     nbaH.textContent = `nba | ${data.nba[0].season}`;
     ptsH.textContent = 'points';
     wnbaH.textContent = `wnba | ${data.wnba[0].season}`;
     wptsH.textContent = 'points';
 
+    thead.appendChild(rankH);
     thead.appendChild(nbaH);
     thead.appendChild(ptsH);
     thead.appendChild(wnbaH);
@@ -55,31 +58,33 @@ adds nba player with button, their points, wnba player with button, their points
 export async function lgTopScorerRow(tbl, data, i) {
     let r = document.createElement('tr');
 
+    let rank = document.createElement('td');
     let pName = document.createElement('td');
     let pts = document.createElement('td');
     let wpName = document.createElement('td');
     let wpts = document.createElement('td');
-
     let btn = document.createElement('button');
-    btn.textContent = `${i+1}. ${data.nba[i].player} | ${data.nba[i].team}`;
+    let wbtn = document.createElement('button');
+
+    rank.textContent = i + 1;
+    btn.textContent = `${data.nba[i].player} | ${data.nba[i].team}`;
     btn.type = 'button';
     btn.addEventListener('click', async () => {
         await playerBtnListener(data.nba[i].player);
     }); 
+    pName.appendChild(btn);
 
-    let wbtn = document.createElement('button');
-    wbtn.textContent = `${i+1}. ${data.wnba[i].player} | ${data.wnba[i].team}`;
+    wbtn.textContent = `${data.wnba[i].player} | ${data.wnba[i].team}`;
     wbtn.type = 'button';
-
     wbtn.addEventListener('click', async () => {
         await playerBtnListener(data.wnba[i].player);
     }); 
-
-    pName.appendChild(btn);
     wpName.appendChild(wbtn);
 
     pts.textContent = data.nba[i].points;
     wpts.textContent = data.wnba[i].points;
+
+    r.appendChild(rank);
     r.appendChild(pName);
     r.appendChild(pts);
     r.appendChild(wpName);
