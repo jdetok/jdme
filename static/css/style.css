@@ -15,19 +15,16 @@ body {
     margin-bottom: 5px;
     padding: 5px;
     width: fit-content;
+    min-height: 20px;
 }
 
 .hlp {
+    display: none;
     padding: 2px;
     font-size: 18px;
     margin-left: 10px;
     margin-right: 10px;
 }
-
-/* .hvrmsg {
-    display: none;
-    background-color: aliceblue;
-} */
 
 .hidesmall {
     display: block;
