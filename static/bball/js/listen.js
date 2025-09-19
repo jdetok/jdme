@@ -14,5 +14,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     await clearSearch();
     await holdPlayerBtn();
     await makeRGTopScorers();
-    await makeScoringLeaders(10);
+
+    let numPl;
+    if (window.innerWidth <= 700) {
+        numPl = 3;
+    } else {
+        numPl = 10;
+    }
+    await makeScoringLeaders(numPl);
+
+    const seeMoreBtn = document.getElementById("seemore");
+    if (seeMoreBtn) {
+        seeMoreBtn.addEventListener("click", seeMoreLeaders);
+    }
 });
+
+export async function seeMoreLeaders() {
+    await makeScoringLeaders(10);
+}
