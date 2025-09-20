@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math/rand/v2"
+	"strconv"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/errd"
@@ -110,31 +112,58 @@ func (rp *RespObj) HndlRespRow(p *RespPlayerSznOvw, s *RespPlayerStats) {
 	}
 }
 
-// accept pointers of league and season, switch season/wseason on league
-func (t *RespSeasonTmp) HndlSeason(league *string, season *string) {
-	switch *league {
-	case "NBA":
-		*season = t.Season
-	case "WNBA":
-		*season = t.WSeason
-	}
+/*
+accept slice of Player structs and a season id, call slicePlayerSzn to create
+a new slice with only players from the specified season. then, generate a
+random number and return the player at that index in the slice
+*/
+func RandPlayer(pl []Player, sId uint64) uint64 {
+	players, _ := SlicePlayersSzn(pl, sId)
+	numPlayers := len(players)
+	randNum := rand.IntN(numPlayers)
+	return players[randNum].PlayerId
 }
 
 /*
-accept pointers of season_id and stat type, switch season to handle stat type
-used for aggregate seasons, deprecated
+player name and season ID from get request passed here, returns the player's
+ID and the season ID. if 'player' variable == "random", the randPlayer function
+is called. a player ID also can be passed as the player parameter, it will just
+be converted to an int and returned
 */
-func HndlAggsIds(sId *uint64, sType *string) {
-	switch *sId {
-	case 99999:
-		*sType = "career regular season + playoffs"
-	case 99998:
-		*sType = "career regular season"
-	case 99997:
-		*sType = "career playoffs"
-	default:
-		*sType = "regular season"
+func GetpIdsId(players []Player, player string, seasonId string, errStr *string) (uint64, uint64) {
+	sId, _ := strconv.ParseUint(seasonId, 10, 32)
+	var pId uint64
+
+	if player == "random" { // call randplayer function
+		pId = RandPlayer(players, sId)
+	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
+		// if it's numeric keep it and convert to uint64
+		pId, _ = strconv.ParseUint(player, 10, 64)
+	} else { // search name through players list
+		for _, p := range players {
+			if p.Name == player { // return match playerid (uint32) as string
+				pId = p.PlayerId
+			}
+		}
 	}
+
+	// loop through players to check that queried season is within min-max seasons
+	for _, p := range players {
+		if p.PlayerId == pId {
+			return pId, HandleSeasonId(sId, &p, errStr)
+		}
+	}
+	return pId, sId
+}
+
+// search player by name, return player id int if found
+func SearchPlayers(players []Player, pSearch string) string {
+	for _, p := range players {
+		if p.Name == pSearch { // return match playerid (uint32) as string
+			return strconv.FormatUint(p.PlayerId, 10)
+		}
+	}
+	return ""
 }
 
 func (m *RespPlayerMeta) MakeCaptions() {

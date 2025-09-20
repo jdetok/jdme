@@ -41,7 +41,7 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 
 	season := r.URL.Query().Get("season")
 	player := RemoveDiacritics(r.URL.Query().Get("player"))
-	pId, sId := GetpIdsId(app.Players, player, season)
+	pId, sId := GetpIdsId(app.Players, player, season, &rp.ErrorMsg)
 
 	js, err := rp.GetPlayerDash(app.Database, pId, sId, tId)
 	if err != nil {

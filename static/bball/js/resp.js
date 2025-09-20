@@ -38,6 +38,15 @@ export async function makePlayerDash(base, player, season, team, ts) { // add se
     const js = await r.json();
     const data = js.player[0];
 
+    if (js.error_string) {
+        console.log("error exists:");
+        console.log(js.error_string);
+        err.textContent = js.error_string;
+        err.style.display = "block"    
+
+    } else {
+        console.log("no error string from server");
+    }
     // handle empty player response
     if (data.player_meta.player_id === 0) {
         if (player != '') {
@@ -47,6 +56,7 @@ export async function makePlayerDash(base, player, season, team, ts) { // add se
         throw new Error(`Player not found error`);
     } 
 
+    console.log(data.player_meta.season_id);
     // build and display player dash
     await buildPlayerDash(data, ts);
 
