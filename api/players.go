@@ -130,7 +130,7 @@ ID and the season ID. if 'player' variable == "random", the randPlayer function
 is called. a player ID also can be passed as the player parameter, it will just
 be converted to an int and returned
 */
-func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64) {
+func GetpIdsId(players []Player, player string, seasonId string, errStr *string) (uint64, uint64) {
 	sId, _ := strconv.ParseUint(seasonId, 10, 32)
 	var pId uint64
 
@@ -150,7 +150,7 @@ func GetpIdsId(players []Player, player string, seasonId string) (uint64, uint64
 	// loop through players to check that queried season is within min-max seasons
 	for _, p := range players {
 		if p.PlayerId == pId {
-			return pId, HandleSeasonId(sId, &p)
+			return pId, HandleSeasonId(sId, &p, errStr)
 		}
 	}
 	return pId, sId

@@ -8,7 +8,8 @@ import (
 
 // outer response struct
 type Resp struct {
-	Results []RespObj `json:"player"`
+	Results  []RespObj `json:"player"`
+	ErrorMsg string    `json:"error_string,omitempty"`
 }
 
 type RespObj struct {

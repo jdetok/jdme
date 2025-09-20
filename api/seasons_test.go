@@ -15,9 +15,9 @@ func TestHandleSeasonId(t *testing.T) {
 	p.SeasonIdMax = 22024
 	p.PSeasonIdMin = 42005
 	p.SeasonIdMin = 22003
-
+	var errStr string
 	testSzn := uint64(22025)
-	resSzn := HandleSeasonId(testSzn, &p)
+	resSzn := HandleSeasonId(testSzn, &p, &errStr)
 
 	if resSzn != testSzn {
 		fmt.Printf("season was manipulated: test season: %d result season %d\n",

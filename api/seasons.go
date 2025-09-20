@@ -15,8 +15,8 @@ regular season and playoffs, the function will verify the player played in said
 season, and return either their max or min (whichever is closer) season  if they
 did not
 */
-func HandleSeasonId(sId uint64, p *Player) uint64 {
-	if sId == 99999 || sId == 49999 || sId == 29999 { // agg seasons
+func HandleSeasonId(sId uint64, p *Player, errStr *string) uint64 {
+	if sId == 99999 || sId == 29999 { // agg seasons
 		msg := fmt.Sprintf("aggregate season requested%d | %d\n", sId, sId)
 		fmt.Println(msg)
 		return sId
@@ -28,37 +28,52 @@ func HandleSeasonId(sId uint64, p *Player) uint64 {
 	} else if sId >= 40000 && sId < 50000 {
 		if p.PSeasonIdMax < 40000 { // player has no playeroff, return max reg season
 			msg := fmt.Sprintf(
-				"requested playoff szn for player without playoffs, returning max reg season%d | %d\n",
-				sId, p.SeasonIdMax)
+				"%s has not played in the post-season | displaying latest regular season stats",
+				p.Name)
+			*errStr = msg
 			fmt.Println(msg)
 			return p.SeasonIdMax // return reg season if player has no playoffs
 		}
+		if sId == 49999 {
+			msg := fmt.Sprintf(
+				"requested career playoff stats %d | %d\n",
+				sId, sId)
+			// *errStr = msg
+			fmt.Println(msg)
+			return sId
+		}
 		if sId > p.PSeasonIdMax {
 			msg := fmt.Sprintf(
-				"szn > playoff max, returning playoff max%d | %d\n",
-				sId, p.PSeasonIdMax)
+				// "szn > playoff max, returning playoff max%d | %d\n",
+				// sId, p.PSeasonIdMax)
+				"%d was after %s's last playoff season | displaying the %d playoffs",
+				sId, p.Name, p.PSeasonIdMax)
+			*errStr = msg
 			fmt.Println(msg)
 			return p.PSeasonIdMax
 		}
 		if sId < p.PSeasonIdMin {
 			msg := fmt.Sprintf(
-				"szn < playoff min, returning playoff min%d | %d\n",
-				sId, p.PSeasonIdMin)
+				"the first playoffs for %s was the %d season",
+				p.Name, p.PSeasonIdMin)
+			*errStr = msg
 			fmt.Println(msg)
 			return p.PSeasonIdMin
 		}
 	} else if sId >= 20000 && sId < 30000 {
 		if sId > p.SeasonIdMax {
 			msg := fmt.Sprintf(
-				"szn > max season, returning max season\n%d | %d\n",
-				sId, p.SeasonIdMax)
+				"%s has not played games in the %d season | displaying %d stats instead\n",
+				p.Name, sId, p.SeasonIdMax)
+			*errStr = msg
 			fmt.Println(msg)
 			return p.SeasonIdMax
 		}
 		if sId < p.SeasonIdMin {
 			msg := fmt.Sprintf(
-				"szn < min season, returning rookie season\n%d | %d\n",
-				sId, p.SeasonIdMin)
+				"%s was not in the league yet for the %d season | displaying their rookie season %d stats instead\n",
+				p.Name, sId, p.SeasonIdMin)
+			*errStr = msg
 			fmt.Println(msg)
 			return p.SeasonIdMin
 		}
