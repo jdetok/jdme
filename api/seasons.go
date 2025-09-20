@@ -1,6 +1,8 @@
 package api
 
-import "strconv"
+import (
+	"fmt"
+)
 
 /*
 accept a season id and a pointer to a Player struct, validate the player was active
@@ -14,37 +16,55 @@ season, and return either their max or min (whichever is closer) season  if they
 did not
 */
 func HandleSeasonId(sId uint64, p *Player) uint64 {
-	if strconv.FormatUint(sId, 10)[1:] == "9999" { // agg seasons
+	if sId == 99999 || sId == 49999 || sId == 29999 { // agg seasons
+		msg := fmt.Sprintf("aggregate season requested%d | %d\n", sId, sId)
+		fmt.Println(msg)
 		return sId
-	} else if sId >= 80000 && sId < 90000 {
+	} else if sId == 88888 {
+		msg := fmt.Sprintf("returning latest regular season for player%d | %d\n",
+			sId, p.SeasonIdMax)
+		fmt.Println(msg)
 		return p.SeasonIdMax // return most recent season
-	} else if sId >= 70000 && sId < 80000 {
-		return p.PSeasonIdMax // return most recent season
 	} else if sId >= 40000 && sId < 50000 {
 		if p.PSeasonIdMax < 40000 { // player has no playeroff, return max reg season
+			msg := fmt.Sprintf(
+				"requested playoff szn for player without playoffs, returning max reg season%d | %d\n",
+				sId, p.SeasonIdMax)
+			fmt.Println(msg)
 			return p.SeasonIdMax // return reg season if player has no playoffs
 		}
-		if sId == 49999 { // playoff career
-			return sId
-		}
-
 		if sId > p.PSeasonIdMax {
+			msg := fmt.Sprintf(
+				"szn > playoff max, returning playoff max%d | %d\n",
+				sId, p.PSeasonIdMax)
+			fmt.Println(msg)
 			return p.PSeasonIdMax
 		}
 		if sId < p.PSeasonIdMin {
+			msg := fmt.Sprintf(
+				"szn < playoff min, returning playoff min%d | %d\n",
+				sId, p.PSeasonIdMin)
+			fmt.Println(msg)
 			return p.PSeasonIdMin
 		}
 	} else if sId >= 20000 && sId < 30000 {
 		if sId > p.SeasonIdMax {
-			if sId == 29999 { // reg season career
-				return sId
-			}
+			msg := fmt.Sprintf(
+				"szn > max season, returning max season\n%d | %d\n",
+				sId, p.SeasonIdMax)
+			fmt.Println(msg)
 			return p.SeasonIdMax
 		}
 		if sId < p.SeasonIdMin {
+			msg := fmt.Sprintf(
+				"szn < min season, returning rookie season\n%d | %d\n",
+				sId, p.SeasonIdMin)
+			fmt.Println(msg)
 			return p.SeasonIdMin
 		}
 	}
+	msg := fmt.Sprintf("validated: %d | %d\n", sId, sId)
+	fmt.Println(msg)
 	return sId
 }
 
@@ -69,6 +89,17 @@ func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
 				seasonId = sl.WSznId
 			}
 		}
+
+		if seasonId == 49999 {
+			if p.PSeasonIdMin > 0 {
+				plslice = append(plslice, p)
+			}
+		}
+
+		if seasonId == 29999 {
+			plslice = append(plslice, p)
+		}
+
 		// append players to the random slice if the passed season id between player min and max season
 		if (seasonId >= 20000 && seasonId < 30000) &&
 			(seasonId <= p.SeasonIdMax && seasonId >= p.SeasonIdMin) ||
