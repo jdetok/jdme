@@ -15,6 +15,12 @@ export async function handleSeasonBoxes() {
     return 88888;
     // return `2${new Date().getFullYear()}`;
 }
+
+export async function clearCheckBoxes(box) {
+    const b = document.getElementById(box);
+    b.checked = 0;
+}
+
 // if checkbox is checked, return the value
 export async function checkBoxes(box, sel) {
     const b = document.getElementById(box);
