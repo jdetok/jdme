@@ -1,8 +1,8 @@
 // script to load in HTML -- all listener functions are called here 
-import { loadSznOptions, selHvr, randPlayerBtn, searchPlayer,
-    clearSearch, holdPlayerBtn, setupExclusiveCheckboxes } from "./ui.js"
+import { loadSznOptions, selHvr, setupExclusiveCheckboxes } from "./ui.js"
 import { makeScoringLeaders } from "./lg_ldg_scorers.js"
-import { makeRGTopScorers } from "./rg_ldg_scorers.js";
+import { makeRGTopScorers } from "./rg_ldg_scorers.js"
+import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch} from "./player_search.js"
 
 export const base = "http://localhost:8080/bball";
 
