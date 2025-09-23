@@ -45,8 +45,9 @@ type CurrentSeasons struct {
 returns slice of two season strings for date (generally pass time.Now())
 calling in 2025 will return 2024-25 and 2025-26 and so on
 */
-func (cs *CurrentSeasons) CurrentSzns(e *errd.Err) {
-	dt := time.Now()
+func (cs *CurrentSeasons) CurrentSzns(now time.Time, e *errd.Err) {
+	// dt := time.Now()
+	dt := now
 	// current year | year + 1 || e.g. 2025: cyyy=2025, cy=26
 	var cyyy string = dt.Format("2006")
 	var cy string = dt.AddDate(1, 0, 0).Format("06")
@@ -88,7 +89,7 @@ NBA season.
 func LgSznsByMonth(now time.Time) SeasonLeague {
 	e := errd.InitErr()
 	var cs CurrentSeasons
-	cs.CurrentSzns(&e)
+	cs.CurrentSzns(now, &e)
 
 	// convert current month to int
 	m, err := strconv.Atoi(now.Format("1"))

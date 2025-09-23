@@ -7,7 +7,7 @@ import (
 )
 
 func TestLgSznsByMonth(t *testing.T) {
-	tstDate := "2025-10-21"
+	tstDate := "2026-06-21"
 
 	dt, err := time.Parse("2006-01-02", tstDate)
 	if err != nil {
@@ -15,8 +15,8 @@ func TestLgSznsByMonth(t *testing.T) {
 		return
 	}
 	fmt.Println("test date: ", dt)
-	// sl := LgSznsByMonth(dt)
-	sl := LgSznsByMonth(time.Now())
+	sl := LgSznsByMonth(dt)
+	// sl := LgSznsByMonth(time.Now())
 	fmt.Println("NBA SeasonID | Season:", sl.SznId, "|", sl.Szn)
 	fmt.Println("WNBA SeasonID | Season:", sl.WSznId, "|", sl.WSzn)
 }
