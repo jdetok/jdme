@@ -1,6 +1,6 @@
 import { tblCaption } from "./table.js"
 import { base } from "./listen.js"
-import { playerBtnListener } from "./ui.js"
+import { playerBtnListener } from "./player_search.js"
 
 // build top x players table
 export async function makeScoringLeaders(numPl) {

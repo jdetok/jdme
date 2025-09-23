@@ -1,7 +1,7 @@
 import { tblCaption } from "./table.js"
 import { base } from "./listen.js"
-import {makePlayerDash} from "./resp.js"
-import { playerBtnListener } from "./ui.js"
+import {makePlayerDash} from "./player_dash.js"
+import { playerBtnListener } from "./player_search.js"
 
 /*
 get the top scorer from each game from the most recent night where games occured
