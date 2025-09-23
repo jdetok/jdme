@@ -160,3 +160,18 @@ export async function checkBoxes(box, sel) {
         return s.value
     }
 }
+// make post + reg checkboxes exclusive (but allow neither checked)
+export async function setupExclusiveCheckboxes() {
+    const post = document.getElementById("post");
+    const reg = document.getElementById("reg");
+
+    function handleCheck(e) {
+        if (e.target.checked) {
+            if (e.target === post) reg.checked = false;
+            if (e.target === reg) post.checked = false;
+        }
+    }
+
+    post.addEventListener("change", handleCheck);
+    reg.addEventListener("change", handleCheck);
+}
