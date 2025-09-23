@@ -12,9 +12,9 @@ export async function buildPlayerDash(data, ts) {
 
     // shooting stats tables
     await table.rowHdrTable(data.totals.shooting, data.player_meta.cap_shtg_tot, 
-        'shot_type', 'shooting');
+        'shot type', 'shooting');
     await table.rowHdrTable(data.per_game.shooting, data.player_meta.cap_shtg_avg, 
-        'shot_type', 'avg-shooting');
+        'shot type', 'avg-shooting');
 }
 
 // ts indicates 'top scorer' - used when called on page refresh to get recent game

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/errd"
@@ -35,7 +36,7 @@ func QueryTopLgPlayers(db *sql.DB, numPl string) (LgTop5, error) {
 	var lt LgTop5
 
 	// current seasons by league
-	sl := LgSznsByMonth()
+	sl := LgSznsByMonth(time.Now())
 
 	// query appropriate season for each league
 	var lgs = [2]string{"nba", "wnba"}
