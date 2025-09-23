@@ -7,6 +7,9 @@
     "left middle-bottom right";
     /* gap: 10px; */
 }
+#titlesect h1 {
+    font-size: 50px;
+}
 #seemore {
     border: none;
     color: rgba(212, 128, 177, 0.779);
