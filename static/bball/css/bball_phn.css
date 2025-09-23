@@ -1,6 +1,6 @@
 @media (max-width: 600px) {
 
-    #titlesect {
+    #topsect {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto auto auto;
         grid-template-areas:
@@ -10,8 +10,12 @@
             "middle-bottom";
     }
 
+    /* #topsect > div {
+        border: 1px solid black;
+    } */
+
     /* Optional: remove forced widths/borders if things look squished */
-    #titlesect > div, #titlesect h1, #titlesect form {
+    #topsect > div, #topsect h1, #topsect form {
         width: 100%;
         /* border: none; */
     }
