@@ -36,7 +36,7 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     rankH.textContent = 'rank';
     nbaH.textContent = `nba | ${data.nba[0].season}`;
     ptsH.textContent = 'points';
-    wnbaH.textContent = `wnba | ${data.wnba[0].season}`;
+    wnbaH.textContent = `wnba | ${(data.wnba[0].season).substring(0, 4)}`;
     wptsH.textContent = 'points';
 
     thead.appendChild(rankH);
@@ -44,7 +44,6 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     thead.appendChild(ptsH);
     thead.appendChild(wnbaH);
     thead.appendChild(wptsH);
-
     tbl.appendChild(thead);
     
     for (let i = 0; i < numPl; i++) {

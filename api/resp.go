@@ -39,48 +39,6 @@ type RespPlayerMeta struct {
 	TeamLogoUrl  string `json:"team_logo_url"`
 }
 
-// all player statistics (strings)
-type Stats struct {
-	Minutes  string `json:"minutes"`
-	Points   string `json:"points"`
-	Assists  string `json:"assists"`
-	Rebounds string `json:"rebounds"`
-	Steals   string `json:"steals"`
-	Blocks   string `json:"blocks"`
-	FgMade   string `json:"fg_made"`
-	FgAtpt   string `json:"fg_atpt"`
-	FgPct    string `json:"fg_pct"`
-	Fg3Made  string `json:"fg3_made"`
-	Fg3Atpt  string `json:"fg3_atpt"`
-	Fg3Pct   string `json:"fg3_pct"`
-	FtMade   string `json:"ft_made"`
-	FtAtpt   string `json:"ft_atpt"`
-	FtPct    string `json:"ft_pct"`
-}
-
-// only box stats (strings)
-type BoxStats struct {
-	Minutes  string `json:"minutes"`
-	Points   string `json:"points"`
-	Assists  string `json:"assists"`
-	Rebounds string `json:"rebounds"`
-	Steals   string `json:"steals"`
-	Blocks   string `json:"blocks"`
-}
-
-// only shooting stats (strings)
-type ShootingStats struct {
-	FgMade  string `json:"fg_made"`
-	FgAtpt  string `json:"fg_atpt"`
-	FgPct   string `json:"fg_pct"`
-	Fg3Made string `json:"fg3_made"`
-	Fg3Atpt string `json:"fg3_atpt"`
-	Fg3Pct  string `json:"fg3_pct"`
-	FtMade  string `json:"ft_made"`
-	FtAtpt  string `json:"ft_atpt"`
-	FtPct   string `json:"ft_pct"`
-}
-
 // outermost struct, returned to http handler as json string
 type RespPlayerSznOvw struct {
 	GamesPlayed   uint16  `json:"games_played"`
@@ -104,10 +62,11 @@ type RespPlayerStatsBox struct {
 }
 
 // shooting stats wrapper struct - holds shtg type structs for twos, three, free throws
+// changed underscores in json tags to spaces
 type RespPlayerStatsShtg struct {
-	Fg  RespPlayerStatsShtgType `json:"field_goals"`
-	Fg3 RespPlayerStatsShtgType `json:"three_pointers"`
-	Ft  RespPlayerStatsShtgType `json:"free_throws"`
+	Fg  RespPlayerStatsShtgType `json:"field goals"`
+	Fg3 RespPlayerStatsShtgType `json:"three pointers"`
+	Ft  RespPlayerStatsShtgType `json:"free throws"`
 }
 
 // struct to hold a category of shooting stats - should be stored in wrapper struct

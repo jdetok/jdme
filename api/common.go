@@ -45,8 +45,9 @@ type CurrentSeasons struct {
 returns slice of two season strings for date (generally pass time.Now())
 calling in 2025 will return 2024-25 and 2025-26 and so on
 */
-func (cs *CurrentSeasons) CurrentSzns(e *errd.Err) {
-	dt := time.Now()
+func (cs *CurrentSeasons) CurrentSzns(now time.Time, e *errd.Err) {
+	// dt := time.Now()
+	dt := now
 	// current year | year + 1 || e.g. 2025: cyyy=2025, cy=26
 	var cyyy string = dt.Format("2006")
 	var cy string = dt.AddDate(1, 0, 0).Format("06")
@@ -57,8 +58,9 @@ func (cs *CurrentSeasons) CurrentSzns(e *errd.Err) {
 
 	// in 2025: "2024-25", "2025-26"
 	cs.PrevSzn = fmt.Sprint(pyyy, "-", py)
-	cs.CurSzn = fmt.Sprint(cyyy, "-s", cy)
+	cs.CurSzn = fmt.Sprint(cyyy, "-", cy)
 
+	// append a 2 to front of current year, return as uint64
 	cint, err := strconv.ParseUint("2"+cyyy, 10, 64)
 	if err != nil {
 		e.Msg = "error converting month to int"
@@ -66,6 +68,7 @@ func (cs *CurrentSeasons) CurrentSzns(e *errd.Err) {
 	}
 	cs.CurSznId = cint
 
+	// append a 2 to front of prev year, return as uint64
 	pint, err := strconv.ParseUint("2"+pyyy, 10, 64)
 	if err != nil {
 		e.Msg = "error converting month to int"
@@ -82,20 +85,27 @@ created using only the year as an int. for example, in 2025, both "2024-25" and
 in the same calendar year and the NBA season spans two calendar years, there are
 times of year in which the "current" WNBA season is different than the current
 NBA season.
-
-9/14/25 NOT BEING USED
 */
-func LgSznsByMonth() SeasonLeague {
+func LgSznsByMonth(now time.Time) SeasonLeague {
 	e := errd.InitErr()
 	var cs CurrentSeasons
-	cs.CurrentSzns(&e)
+	cs.CurrentSzns(now, &e)
 
 	// convert current month to int
-	m, err := strconv.Atoi(time.Now().Format("1"))
+	m, err := strconv.Atoi(now.Format("1"))
 	if err != nil {
 		e.Msg = "error converting month to int"
 		fmt.Println(e.BuildErr(err))
 	}
+	fmt.Println("month: ", m)
+
+	// convert current day to int
+	d, err := strconv.Atoi(now.Format("2"))
+	if err != nil {
+		e.Msg = "error converting month to int"
+		fmt.Println(e.BuildErr(err))
+	}
+	fmt.Println("day: ", d)
 
 	// set prev year at first (jan - april)
 	var sl = SeasonLeague{
@@ -106,13 +116,14 @@ func LgSznsByMonth() SeasonLeague {
 	}
 
 	// may through september - WNBA gets current szn, NBA gets previous
-	if m > 5 && m < 10 {
+	if m > 5 {
 		sl.WSznId = cs.CurSznId
 		sl.WSzn = cs.CurSzn
 	}
 
-	// october through end of year - both leagues get current szn
-	if m > 10 {
+	// october 21 through end of year - both leagues get current szn
+	// this is based on the 2025-26 NBA season starting on 10/21 - update day each year
+	if m >= 10 && d >= 21 {
 		sl.SznId = cs.CurSznId
 		sl.Szn = cs.CurSzn
 		sl.WSznId = cs.CurSznId

@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"time"
 )
 
 /*
@@ -91,7 +92,7 @@ active players from the passed season id
 func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
 	var plslice []Player
 
-	sl := LgSznsByMonth()
+	sl := LgSznsByMonth(time.Now())
 
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
 
