@@ -1,5 +1,4 @@
 #topsect {
-    /* border: 1px solid black; */
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: fit-content fit-content fit-content;
@@ -44,7 +43,6 @@
     grid-area: middle-top;
 }
 .top_sect_tbls button {
-    /* border: 1px solid black; */
     border: none;
     color: rgba(211, 224, 241, 0.779);
     /* color: rgba(212, 128, 177, 0.779); */
@@ -78,46 +76,41 @@ table thead {
 }
 
 #ui {
-    border: 2px solid black;
+    border: 3px solid black;
     border-radius: 7px;
     grid-area: middle-bottom;
     display: grid;
     margin: 0 auto;
-    /* margin-top: 10px; */
     height: fit-content;
     width: fit-content;
-    padding: 5px;
+    padding: 10px;
     max-width: fit-content;
     align-self: start;
-
+    gap: 10px;
 }
+
 /* 
 #ui > * {
     border: 1px solid white;
 } */
 
 .uirowouter {
-    /* border: 3px solid red; */
     display: flex;
     flex-direction: row;
     justify-content: center;
     max-width: 100%;
-    /* height: fit-content; */
 }
 
 .uirow {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    /* height: fit-content; */
     max-width: 100%;
 }
 
 .uisect {
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
-    /* border: 1px solid black; */
     max-width: 100%;
 }
 
@@ -125,9 +118,6 @@ table thead {
     display: flex;
     flex-direction: column;
     height: fit-content;
-    /* border: 1px solid black; */
-    /* justify-content: center; */
-    /* align-items: center; */
 }
 
 #pSearchBtns {
@@ -145,7 +135,7 @@ table thead {
 
 /* meant to be outermost of response */
 .respouter {
-    /* border: 5px solid black; */
+    /* border: 2px solid black; */
     margin: 0 auto;
     margin-bottom: 10px;
 } 
@@ -170,10 +160,15 @@ table thead {
 }
 
 .respsect {
+    border: 3px solid black;
+    border-radius: 7px;
     /* border: 3px solid white; */
     display: flex;
     flex-direction: column;
     width: 100%;
+    padding: 10px;
+    gap: 10px;
+    /* max-width: fit-content; */
 }
 
 .respsect h2 {
@@ -217,7 +212,7 @@ table thead {
     flex-direction: column;
     justify-content: space-between;
     gap: 10px;
-    width: 90%;
+    /* width: 90%; */
     max-width: 100%;
 }
 
