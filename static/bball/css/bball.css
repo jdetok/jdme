@@ -2,9 +2,10 @@
     /* border: 1px solid black; */
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: fit-content fit-content;
+    grid-template-rows: fit-content fit-content fit-content;
     grid-template-areas:
     "left middle-top right"
+    "left middle-middle right"
     "left middle-bottom right";
     gap: 10px;
     padding: 5px;
@@ -74,6 +75,12 @@ table thead {
     font-size: 24px;
     color: white;
 }
+
+#under_ttl {
+    grid-area: "left middle-middle right";
+    align-self: end;
+}
+
 #ui {
     border: 2px solid black;
     border-radius: 7px;
@@ -85,7 +92,7 @@ table thead {
     width: fit-content;
     padding: 5px;
     max-width: fit-content;
-    align-self: end;
+    align-self: start;
 
 }
 /* 
