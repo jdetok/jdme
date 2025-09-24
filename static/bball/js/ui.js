@@ -1,6 +1,13 @@
 import { showHideHvr } from "./hover.js";
 import { base } from "./listen.js";
 
+export async function lgRadioBtns() {
+    const selected = document.querySelector('input[name="leagues"]:checked');
+    if (selected) {
+        console.log(selected.value); // "all", "nba", or "wnba"
+    }
+}
+
 // return season or 88888 if no sseason box checked
 export async function handleSeasonBoxes() {
     const p = await checkBoxes('post', 'ps_slct')

@@ -92,6 +92,7 @@ active players from the passed season id
 func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
 	var plslice []Player
 
+	// get struct with current seasons
 	sl := LgSznsByMonth(time.Now())
 
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
@@ -107,13 +108,15 @@ func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
 		}
 
 		if seasonId == 49999 {
-			if p.PSeasonIdMin > 0 {
+			if p.PSeasonIdMin > 0 && p.SeasonIdMax >= (sl.WSznId-3) {
 				plslice = append(plslice, p)
 			}
 		}
 
 		if seasonId == 29999 {
-			plslice = append(plslice, p)
+			if p.SeasonIdMax >= (sl.WSznId - 3) {
+				plslice = append(plslice, p)
+			}
 		}
 
 		// append players to the random slice if the passed season id between player min and max season

@@ -22,7 +22,8 @@
     width: fit-content;
     height: fit-content;
     max-width: fit-content;
-    align-self: end;
+    margin-top: 10px;
+    align-self: start;
 }
 
 /* #ttl h1 {
@@ -79,42 +80,51 @@ table thead {
     grid-area: middle-bottom;
     display: grid;
     margin: 0 auto;
-    margin-top: 10px;
+    /* margin-top: 10px; */
+    height: fit-content;
     width: fit-content;
     padding: 5px;
     max-width: fit-content;
-}
+    align-self: end;
 
-/* #ui > * {
-    border: 1px solid gray;
+}
+/* 
+#ui > * {
+    border: 1px solid white;
 } */
 
 .uirowouter {
+    /* border: 3px solid red; */
     display: flex;
     flex-direction: row;
     justify-content: center;
     max-width: 100%;
+    /* height: fit-content; */
 }
 
 .uirow {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    /* height: fit-content; */
     max-width: 100%;
 }
 
 .uisect {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /* justify-content: center; */
+    /* border: 1px solid black; */
     max-width: 100%;
 }
 
 .uiopt {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    height: fit-content;
+    /* border: 1px solid black; */
+    /* justify-content: center; */
+    /* align-items: center; */
 }
 
 #pSearchBtns {

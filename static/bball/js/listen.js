@@ -1,5 +1,6 @@
 // script to load in HTML -- all listener functions are called here 
-import { loadSznOptions, selHvr, setupExclusiveCheckboxes, clearCheckBoxes } from "./ui.js"
+// import { loadSznOptions, selHvr, setupExclusiveCheckboxes, clearCheckBoxes } from "./ui.js"
+import * as ui from "./ui.js"
 import { makeScoringLeaders } from "./lg_ldg_scorers.js"
 import { makeRGTopScorers } from "./rg_ldg_scorers.js"
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch} from "./player_search.js"
@@ -7,17 +8,17 @@ import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch} from "./player
 export const base = "https://jdeko.me/bball";
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadSznOptions();
-    await selHvr();
+    await ui.loadSznOptions();
+    await ui.selHvr();
     await randPlayerBtn();
     await searchPlayer();
     await clearSearch();
     await holdPlayerBtn();
     await makeRGTopScorers();
-    await setupExclusiveCheckboxes();
-    await clearCheckBoxes('post');
-    await clearCheckBoxes('reg');
-
+    await ui.setupExclusiveCheckboxes();
+    await ui.clearCheckBoxes('post');
+    await ui.clearCheckBoxes('reg');
+    await ui.lgRadioBtns();
     let numPl;
     if (window.innerWidth <= 700) {
         numPl = 3;
