@@ -20,7 +20,7 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 		msg := "failed to query top 5 league players"
 		e.HTTPErr(w, msg, err)
 	}
-	js, err := MarshalTop5(&lt)
+	js, err := MarshalTopPlayers(&lt)
 	if err != nil {
 		msg := "failed to marshal top 5 league players struct to JSON"
 		e.HTTPErr(w, msg, err)
@@ -112,7 +112,8 @@ func (app *App) HndlTeams(w http.ResponseWriter, r *http.Request) {
 	} else { // read & valid team from q string, not yet used 8/6
 		for _, tm := range app.Teams {
 			if team == tm.TeamAbbr {
-				tm.LogoUrl = tm.MakeTeamLogoUrl()
+
+				tm.LogoUrl = MakeTeamLogoUrl(tm.League, tm.TeamId)
 				json.NewEncoder(w).Encode(tm)
 			}
 		}

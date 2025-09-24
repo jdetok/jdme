@@ -6,27 +6,17 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"strconv"
+	"strings"
+	"time"
+	"unicode"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/errd"
 	"github.com/jdetok/golib/logd"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
-
-/*
-Player struct meant to store basic global data for each player
-SeasonIdMax/Min are the player's first and last REGULAR season in their league
-PSeasonIdMax/Min are the player's first and last POST SEASON in their league.
-these values will default to 0 for players without any recorded games in a past season
-*/
-type Player struct {
-	PlayerId     uint64
-	Name         string
-	League       string
-	SeasonIdMax  uint64
-	SeasonIdMin  uint64
-	PSeasonIdMax uint64
-	PSeasonIdMin uint64
-}
 
 /*
 primary database query function for the /players endpoint. queries the api
@@ -109,7 +99,8 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, q string, p, sId uint64) error
 	// build table captions & image urls
 	rp.Meta.MakePlayerDashCaptions()
 	rp.Meta.MakeHeadshotUrl()
-	rp.Meta.MakeTeamLogoUrl()
+	// rp.Meta.
+	rp.Meta.TeamLogoUrl = MakeTeamLogoUrl(rp.Meta.League, strconv.FormatUint(rp.Meta.TeamId, 10))
 
 	// append built respObj to Resp, return
 	r.Results = append(r.Results, rp)
@@ -177,6 +168,8 @@ func ValidatePlayerSzn(players []Player, cs *CurrentSeasons, player string, seas
 	return pId, sId
 }
 
+// fill RespPlayerMeta captions fields with formatted strings for each playerdash
+// table's caption
 func (m *RespPlayerMeta) MakePlayerDashCaptions() {
 	var delim string = "|"
 	m.Caption = fmt.Sprintf("%s %s %s", m.Player, delim, m.TeamName)
@@ -185,4 +178,185 @@ func (m *RespPlayerMeta) MakePlayerDashCaptions() {
 	m.BoxCapAvg = fmt.Sprintf("Box Averages %s %s", delim, m.Season)
 	m.ShtgCapTot = fmt.Sprintf("Shooting Totals %s %s", delim, m.Season)
 	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages %s %s", delim, m.Season)
+}
+
+/*
+use the transform package to remove accidentals
+e.g. Dončić becomes doncic
+*/
+func RemoveDiacritics(input string) string {
+	t := transform.Chain(
+		norm.NFD,
+		runes.Remove(runes.In(unicode.Mn)),
+		norm.NFC,
+	)
+	output, _, _ := transform.String(t, input)
+	return output
+}
+
+// use league and player id to build the URL containing a player's headshot
+func (m *RespPlayerMeta) MakeHeadshotUrl() {
+	lg := strings.ToLower(m.League)
+	pId := strconv.Itoa(int(m.PlayerId))
+	m.HeadshotUrl = fmt.Sprintf(
+		`https://cdn.%s.com/headshots/%s/latest/1040x760/%s.png`,
+		lg, lg, pId)
+}
+
+// use league and team id to build team logo URLs
+func MakeTeamLogoUrl(league, teamId string) string {
+	lg := strings.ToLower(league)
+	// tId := strconv.Itoa(int(teamId))
+	return fmt.Sprintf(
+		`https://cdn.%s.com/logos/%s/%s/primary/L/logo.svg`,
+		lg, lg, teamId)
+}
+
+/*
+accept a season id and a pointer to a Player struct, validate the player was active
+in the passed season, return a valid season ID if not. if season id starts with an
+8 the player's max regular season will be returned. if it starts with a 7, their
+max playoff season will be returned. if it starts with a 4, it will first verify
+player has played in a playoff game, and will return their max regular season if
+they haven't. a season id starting with 2 will return a regular season. for both
+regular season and playoffs, the function will verify the player played in said
+season, and return either their max or min (whichever is closer) season  if they
+did not
+*/
+func HandleSeasonId(sId uint64, p *Player, errStr *string) uint64 {
+	if sId == 99999 || sId == 29999 { // agg seasons
+		msg := fmt.Sprintf("aggregate season requested%d | %d\n", sId, sId)
+		fmt.Println(msg)
+		return sId
+	} else if sId == 88888 {
+		msg := fmt.Sprintf("returning latest regular season for player%d | %d\n",
+			sId, p.SeasonIdMax)
+		fmt.Println(msg)
+		return p.SeasonIdMax // return most recent season
+	} else if sId >= 40000 && sId < 50000 {
+		if p.PSeasonIdMax < 40000 { // player has no playeroff, return max reg season
+			msg := fmt.Sprintf(
+				"%s has not played in the post-season | displaying latest regular season stats",
+				p.Name)
+			*errStr = msg
+			fmt.Println(msg)
+			return p.SeasonIdMax // return reg season if player has no playoffs
+		}
+		if sId == 49999 {
+			msg := fmt.Sprintf(
+				"requested career playoff stats %d | %d\n",
+				sId, sId)
+			// *errStr = msg
+			fmt.Println(msg)
+			return sId
+		}
+		if sId > p.PSeasonIdMax {
+			msg := fmt.Sprintf(
+				// "szn > playoff max, returning playoff max%d | %d\n",
+				// sId, p.PSeasonIdMax)
+				"%d was after %s's last playoff season | displaying the %d playoffs",
+				sId, p.Name, p.PSeasonIdMax)
+			*errStr = msg
+			fmt.Println(msg)
+			return p.PSeasonIdMax
+		}
+		if sId < p.PSeasonIdMin {
+			msg := fmt.Sprintf(
+				"the first playoffs for %s was the %d season",
+				p.Name, p.PSeasonIdMin)
+			*errStr = msg
+			fmt.Println(msg)
+			return p.PSeasonIdMin
+		}
+	} else if sId >= 20000 && sId < 30000 {
+		if sId > p.SeasonIdMax {
+			msg := fmt.Sprintf(
+				"%s has not played games in the %d season | displaying %d stats instead\n",
+				p.Name, sId, p.SeasonIdMax)
+			*errStr = msg
+			fmt.Println(msg)
+			return p.SeasonIdMax
+		}
+		if sId < p.SeasonIdMin {
+			msg := fmt.Sprintf(
+				"%s was not in the league yet for the %d season | displaying their rookie season %d stats instead\n",
+				p.Name, sId, p.SeasonIdMin)
+			*errStr = msg
+			fmt.Println(msg)
+			return p.SeasonIdMin
+		}
+	}
+	msg := fmt.Sprintf("validated: %d | %d\n", sId, sId)
+	fmt.Println(msg)
+	return sId
+}
+
+/*
+accept the slice of all players and a seasonId, return a slice with just the
+active players from the passed season id
+*/
+// func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
+func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg string) ([]Player, error) {
+	var plslice []Player
+
+	// get struct with current seasons
+	sl := cs.LgSznsByMonth(time.Now())
+
+	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
+
+		// handle random season id
+		if seasonId == 88888 {
+			switch p.League {
+			case "nba":
+				seasonId = sl.SznId
+			case "wnba":
+				seasonId = sl.WSznId
+			}
+		}
+
+		if seasonId == 49999 {
+			if p.PSeasonIdMin > 0 && p.SeasonIdMax >= (sl.WSznId-3) {
+				if lg == "all" || lg == p.League {
+					plslice = append(plslice, p)
+				}
+			}
+		}
+
+		if seasonId == 29999 {
+			if p.SeasonIdMax >= (sl.WSznId - 3) {
+				if lg == "all" || lg == p.League {
+					plslice = append(plslice, p)
+				}
+			}
+		}
+
+		// append players to the random slice if the passed season id between player min and max season
+		if seasonId >= 20000 && seasonId < 30000 {
+			if seasonId <= p.SeasonIdMax && seasonId >= p.SeasonIdMin {
+				if lg == "all" || lg == p.League {
+					plslice = append(plslice, p)
+				}
+			}
+		}
+
+		if seasonId >= 40000 && seasonId < 50000 {
+			if seasonId <= p.PSeasonIdMax && seasonId >= p.PSeasonIdMin {
+				if lg == "all" || lg == p.League {
+					plslice = append(plslice, p)
+				}
+			}
+		}
+
+	}
+	return plslice, nil
+}
+
+// accept pointers of league and season, switch season/wseason on league
+func (t *RespSeasonTmp) SwitchSznByLeague(league *string, season *string) {
+	switch *league {
+	case "NBA":
+		*season = t.Season
+	case "WNBA":
+		*season = t.WSeason
+	}
 }
