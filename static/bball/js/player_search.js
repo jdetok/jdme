@@ -1,6 +1,6 @@
 import { base } from "./listen.js"
 import { showHideHvr } from "./hover.js";
-import { handleSeasonBoxes } from "./ui.js";
+import { handleSeasonBoxes, lgRadioBtns } from "./ui.js";
 import { makePlayerDash } from "./player_dash.js";
 
 // get player from search bar and make player dash
@@ -14,6 +14,9 @@ export async function searchPlayer() {
         const input = document.getElementById('pSearch');
         let player = input.value.trim();
 
+        const lg = await lgRadioBtns();
+        console.log(`league in searchPlayer: ${lg}`);
+        
         // if search pressed without anything in search box, searches current player
         if (player === '') {
             player = document.getElementById('pHold').value;
@@ -25,7 +28,7 @@ export async function searchPlayer() {
         console.log(`searching for season ${season}`)
 
         // build response player dash section
-        await makePlayerDash(base, player, season, 0, 0);
+        await makePlayerDash(base, player, season, 0, 0, lg);
 
         // clear player search box
         input.value = ''; // clear input box after searching
@@ -39,10 +42,12 @@ export async function randPlayerBtn() {
     btn.addEventListener('click', async (event) => {        
         event.preventDefault();
 
+        const lg = await lgRadioBtns();
+        console.log(`league in randPlayerBtn: ${lg}`);
         // check season boxes & get appropriate season id, search with random as player
         const season = await handleSeasonBoxes();
         console.log(`searching random player for season ${season}`);
-        await makePlayerDash(base, 'random', season, 0, 0);
+        await makePlayerDash(base, 'random', season, 0, 0, lg);
     })
 
     // hover message for help ?
@@ -69,8 +74,10 @@ export async function playerBtnListener(player) {
         searchB.value = player;
         const season = await handleSeasonBoxes();
 
+        const lg = await lgRadioBtns();
+
         // search & clear player search bar
-        await makePlayerDash(base, player, season, 0, 0);
+        await makePlayerDash(base, player, season, 0, 0, lg);
         searchB.value = '';
 
         // if screen is small scroll into it

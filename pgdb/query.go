@@ -16,7 +16,7 @@ select each player and the min max reg/post season stats. used to populate globa
 player store
 9/23/2025: updated playoff min/max coalesce calls to replace null with 0 rather
 than reg season min/max. this fixes issue where pressing random player with
-playoff season checkbox checked would get players without a playoff record
+playoff season checkbox checked would get players without a playoff game
 */
 var PlayersSeason = `
 select 
