@@ -30,7 +30,7 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 			fmt.Printf("refreshing store at %v\n", time.Now().Format(
 				"2006-01-02 15:04:05"),
 			)
-
+			app.CurrentSzns.GetCurrentSzns(time.Now(), &e)
 			UpdateStructs(app, &e)
 		}
 	}

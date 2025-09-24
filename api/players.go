@@ -12,6 +12,12 @@ import (
 	"github.com/jdetok/golib/logd"
 )
 
+/*
+Player struct meant to store basic global data for each player
+SeasonIdMax/Min are the player's first and last REGULAR season in their league
+PSeasonIdMax/Min are the player's first and last POST SEASON in their league.
+these values will default to 0 for players without any recorded games in a past season
+*/
 type Player struct {
 	PlayerId     uint64
 	Name         string
@@ -30,7 +36,7 @@ the top scorer of the most recent night's games. this is called when the site
 loads. the response is scanned into the structs defined in resp.go, before being
 marshalled into json and returned to write as the http response
 */
-func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]byte, error) {
+func (r *Resp) GetPlayerDash(db *sql.DB, pId, sId, tId uint64) ([]byte, error) {
 	e := errd.InitErr()
 	var q string
 	var p uint64
@@ -47,11 +53,33 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 		p = tId
 	}
 
+	// query player, scan to structs, call struct functions
+	// appends RespObj to r.Results
+	if err := r.BuildPlayerRespStructs(db, q, p, sId); err != nil {
+		e.Msg = fmt.Sprintf("failed to query playerId %d seasonId %d", p, sId)
+		return nil, e.BuildErr(err)
+	}
+
+	// marshall Resp struct to JSON, return as []byte
+	js, err := json.Marshal(r)
+	if err != nil {
+		e.Msg = "failed to marshal structs to json"
+		return nil, e.BuildErr(err)
+	}
+	return js, nil
+}
+
+// query player, scan to structs, call struct functions
+// appends RespObj to r.Results
+// separated from GetPlayerDash 09/24/2025
+func (r *Resp) BuildPlayerRespStructs(db *sql.DB, q string, p, sId uint64) error {
+	e := errd.InitErr()
+
 	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
 	rows, err := db.Query(q, p, sId)
 	if err != nil {
 		e.Msg = "error during player dash query"
-		return nil, e.BuildErr(err)
+		return e.BuildErr(err)
 	}
 
 	var t RespSeasonTmp // temp seasons for NBA/WNBA, handled after loop
@@ -72,34 +100,27 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId uint64, sId uint64, tId uint64) ([]
 			&s.Shtg.Fg3.Makes, &s.Shtg.Fg3.Attempts, &s.Shtg.Fg3.Percent,
 			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent)
 		// switch on stat type to assign stats to appropriate struct
-		rp.HndlRespRow(&p, &s)
+		rp.HandleStatTypeSznOvw(&p, &s)
 	}
-	// handle aggregate season ids (all, regular season, playoffs)
-	// HndlAggsIds(&rp.Meta.SeasonId, &rp.Meta.StatType)
 
 	// assign nba or wnba season only based on league
-	t.HndlSeason(&rp.Meta.League, &rp.Meta.Season)
+	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season)
 
 	// build table captions & image urls
-	rp.Meta.MakeCaptions()
+	rp.Meta.MakePlayerDashCaptions()
 	rp.Meta.MakeHeadshotUrl()
 	rp.Meta.MakeTeamLogoUrl()
-	r.Results = append(r.Results, rp)
 
-	// marshal response & return json []byte
-	js, err := json.Marshal(r)
-	if err != nil {
-		e.Msg = "failed to marshal structs to json"
-		return nil, e.BuildErr(err)
-	}
-	return js, nil
+	// append built respObj to Resp, return
+	r.Results = append(r.Results, rp)
+	return nil
 }
 
 /*
 switch between totals (sums) and pergame (averages) stats based on the
 Meta.StatType field
 */
-func (rp *RespObj) HndlRespRow(p *RespPlayerSznOvw, s *RespPlayerStats) {
+func (rp *RespObj) HandleStatTypeSznOvw(p *RespPlayerSznOvw, s *RespPlayerStats) {
 	switch rp.Meta.StatType {
 	case "avg":
 		rp.SeasonOvw.MinutsPerGame = p.Minutes
@@ -117,8 +138,8 @@ accept slice of Player structs and a season id, call slicePlayerSzn to create
 a new slice with only players from the specified season. then, generate a
 random number and return the player at that index in the slice
 */
-func RandPlayer(pl []Player, sId uint64, lg string) uint64 {
-	players, _ := SlicePlayersSzn(pl, sId, lg)
+func RandomPlayerId(pl []Player, cs *CurrentSeasons, sId uint64, lg string) uint64 {
+	players, _ := SlicePlayersSzn(pl, cs, sId, lg)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
 	return players[randNum].PlayerId
@@ -130,12 +151,12 @@ ID and the season ID. if 'player' variable == "random", the randPlayer function
 is called. a player ID also can be passed as the player parameter, it will just
 be converted to an int and returned
 */
-func GetpIdsId(players []Player, player string, seasonId string, lg string, errStr *string) (uint64, uint64) {
+func ValidatePlayerSzn(players []Player, cs *CurrentSeasons, player string, seasonId string, lg string, errStr *string) (uint64, uint64) {
 	sId, _ := strconv.ParseUint(seasonId, 10, 32)
 	var pId uint64
 
 	if player == "random" { // call randplayer function
-		pId = RandPlayer(players, sId, lg)
+		pId = RandomPlayerId(players, cs, sId, lg)
 	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
 		// if it's numeric keep it and convert to uint64
 		pId, _ = strconv.ParseUint(player, 10, 64)
@@ -156,17 +177,7 @@ func GetpIdsId(players []Player, player string, seasonId string, lg string, errS
 	return pId, sId
 }
 
-// search player by name, return player id int if found
-func SearchPlayers(players []Player, pSearch string) string {
-	for _, p := range players {
-		if p.Name == pSearch { // return match playerid (uint32) as string
-			return strconv.FormatUint(p.PlayerId, 10)
-		}
-	}
-	return ""
-}
-
-func (m *RespPlayerMeta) MakeCaptions() {
+func (m *RespPlayerMeta) MakePlayerDashCaptions() {
 	var delim string = "|"
 	m.Caption = fmt.Sprintf("%s %s %s", m.Player, delim, m.TeamName)
 	m.CaptionShort = fmt.Sprintf("%s %s %s", m.Player, delim, m.Team)

@@ -30,13 +30,13 @@ set a slice of strings with both leagues to loop through. NBA is first in the sl
 this must be maintained for the logic to work. at the end of the for loop the sId
 variable is set to the WNBA season - it's declared as the NBA season before the loop begins
 */
-func QueryTopLgPlayers(db *sql.DB, numPl string) (LgTop5, error) {
+func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTop5, error) {
 	e := errd.InitErr()
 
 	var lt LgTop5
 
 	// current seasons by league
-	sl := LgSznsByMonth(time.Now())
+	sl := cs.LgSznsByMonth(time.Now())
 
 	// query appropriate season for each league
 	var lgs = [2]string{"nba", "wnba"}

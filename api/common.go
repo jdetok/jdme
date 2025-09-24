@@ -45,7 +45,7 @@ type CurrentSeasons struct {
 returns slice of two season strings for date (generally pass time.Now())
 calling in 2025 will return 2024-25 and 2025-26 and so on
 */
-func (cs *CurrentSeasons) CurrentSzns(now time.Time, e *errd.Err) {
+func (cs *CurrentSeasons) GetCurrentSzns(now time.Time, e *errd.Err) {
 	// dt := time.Now()
 	dt := now
 	// current year | year + 1 || e.g. 2025: cyyy=2025, cy=26
@@ -86,10 +86,10 @@ in the same calendar year and the NBA season spans two calendar years, there are
 times of year in which the "current" WNBA season is different than the current
 NBA season.
 */
-func LgSznsByMonth(now time.Time) SeasonLeague {
+func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
 	e := errd.InitErr()
-	var cs CurrentSeasons
-	cs.CurrentSzns(now, &e)
+	// var cs CurrentSeasons
+	cs.GetCurrentSzns(now, &e)
 
 	// convert current month to int
 	m, err := strconv.Atoi(now.Format("1"))
@@ -150,7 +150,7 @@ func RemoveDiacritics(input string) string {
 /*
 use league and team id to generate URL with team's logo
 */
-func (t Team) MakeLogoUrl() string {
+func (t Team) MakeTeamLogoUrl() string {
 	lg := strings.ToLower(t.League)
 	return ("https://cdn." + lg + ".com/logos/" +
 		lg + "/" + t.TeamId + "/primary/L/logo.svg")

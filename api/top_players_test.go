@@ -19,7 +19,8 @@ func TestQueryTopLgPlayers(t *testing.T) {
 	if err != nil {
 		t.Error(e.BuildErr(err).Error())
 	}
-	lt, err := QueryTopLgPlayers(db, "10")
+	var cs CurrentSeasons
+	lt, err := QueryTopLgPlayers(db, &cs, "10")
 	if err != nil {
 		t.Error(e.BuildErr(err).Error())
 	}
