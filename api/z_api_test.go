@@ -4,11 +4,77 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/envd"
 	"github.com/jdetok/golib/errd"
 )
+
+func TestHandleSeasonId(t *testing.T) {
+
+	var p = Player{}
+	p.League = "NBA"
+	p.Name = "LeBron James"
+	p.PlayerId = 2544
+	p.PSeasonIdMax = 42024
+	p.SeasonIdMax = 22024
+	p.PSeasonIdMin = 42005
+	p.SeasonIdMin = 22003
+	var errStr string
+	testSzn := uint64(22025)
+	resSzn := HandleSeasonId(testSzn, &p, &errStr)
+
+	if resSzn != testSzn {
+		fmt.Printf("season was manipulated: test season: %d result season %d\n",
+			testSzn, resSzn)
+	} else {
+		fmt.Printf("season validated: test %d | result %d\n", testSzn, resSzn)
+	}
+
+	if resSzn < p.SeasonIdMin || resSzn > p.PSeasonIdMax {
+		t.Errorf(`resulting season out of range:
+			%d resulting season
+			%d min season
+			%d max season
+			`, resSzn, p.SeasonIdMax, p.SeasonIdMin)
+	}
+}
+func TestLgSznsByMonth(t *testing.T) {
+	tstDate := "2026-06-21"
+
+	dt, err := time.Parse("2006-01-02", tstDate)
+	if err != nil {
+		fmt.Println("error making test date")
+		return
+	}
+	fmt.Println("test date: ", dt)
+	var cs CurrentSeasons
+	sl := cs.LgSznsByMonth(dt)
+	fmt.Println("NBA SeasonID | Season:", sl.SznId, "|", sl.Szn)
+	fmt.Println("WNBA SeasonID | Season:", sl.WSznId, "|", sl.WSzn)
+}
+func TestQueryTopLgPlayers(t *testing.T) {
+	e := errd.InitErr()
+	err := envd.LoadDotEnvFile("../.env")
+	if err != nil {
+		t.Error(e.BuildErr(err).Error())
+	}
+	db, err := pgdb.PostgresConn()
+	if err != nil {
+		t.Error(e.BuildErr(err).Error())
+	}
+	var cs CurrentSeasons
+	lt, err := QueryTopLgPlayers(db, &cs, "10")
+	if err != nil {
+		t.Error(e.BuildErr(err).Error())
+	}
+	js, err := MarshalTopPlayers(&lt)
+	if err != nil {
+		t.Error(e.BuildErr(err).Error())
+	}
+	fmt.Println(string(js))
+}
 
 // RETURN DATABASE FOR TESTING
 func StartupTest(t *testing.T) *sql.DB {

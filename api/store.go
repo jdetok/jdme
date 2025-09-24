@@ -10,6 +10,36 @@ import (
 )
 
 /*
+Player struct meant to store basic global data for each player
+SeasonIdMax/Min are the player's first and last REGULAR season in their league
+PSeasonIdMax/Min are the player's first and last POST SEASON in their league.
+these values will default to 0 for players without any recorded games in a past season
+*/
+type Player struct {
+	PlayerId     uint64
+	Name         string
+	League       string
+	SeasonIdMax  uint64
+	SeasonIdMin  uint64
+	PSeasonIdMax uint64
+	PSeasonIdMin uint64
+}
+
+type Season struct {
+	SeasonId string `json:"season_id"`
+	Season   string `json:"season"`
+	WSeason  string `json:"wseason"`
+}
+
+type Team struct {
+	League   string `json:"league"`
+	TeamId   string `json:"team_id"`
+	TeamAbbr string `json:"team"`
+	CityTeam string `json:"team_long"`
+	LogoUrl  string `json:"-"`
+}
+
+/*
 launch goroutines to update the global players, seasons, and team stores
 updates at every interval
 */

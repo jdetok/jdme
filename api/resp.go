@@ -1,17 +1,12 @@
 package api
 
-import (
-	"fmt"
-	"strconv"
-	"strings"
-)
-
 // outer response struct
 type Resp struct {
 	Results  []RespObj `json:"player"`
 	ErrorMsg string    `json:"error_string,omitempty"`
 }
 
+// each player's outermost struct, members of Resp.Results slice
 type RespObj struct {
 	Meta      RespPlayerMeta   `json:"player_meta"`
 	SeasonOvw RespPlayerSznOvw `json:"playtime"`
@@ -81,22 +76,4 @@ type RespPlayerStatsShtgType struct {
 type RespSeasonTmp struct {
 	Season  string
 	WSeason string
-}
-
-// use league and player id to build the URL containing a player's headshot
-func (m *RespPlayerMeta) MakeHeadshotUrl() {
-	lg := strings.ToLower(m.League)
-	pId := strconv.Itoa(int(m.PlayerId))
-	m.HeadshotUrl = fmt.Sprintf(
-		`https://cdn.%s.com/headshots/%s/latest/1040x760/%s.png`,
-		lg, lg, pId)
-}
-
-// use league and team id to build team logo URLs
-func (m *RespPlayerMeta) MakeTeamLogoUrl() {
-	lg := strings.ToLower(m.League)
-	tId := strconv.Itoa(int(m.TeamId))
-	m.TeamLogoUrl = fmt.Sprintf(
-		`https://cdn.%s.com/logos/%s/%s/primary/L/logo.svg`,
-		lg, lg, tId)
 }
