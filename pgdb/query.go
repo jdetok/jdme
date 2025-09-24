@@ -14,6 +14,9 @@ left(cast(szn_id as varchar(5)), 1)
 /*
 select each player and the min max reg/post season stats. used to populate global
 player store
+9/23/2025: updated playoff min/max coalesce calls to replace null with 0 rather
+than reg season min/max. this fixes issue where pressing random player with
+playoff season checkbox checked would get players without a playoff record
 */
 var PlayersSeason = `
 select 
@@ -25,8 +28,8 @@ select
 	end,
 	b.rs_max, 
 	b.rs_min,
-	coalesce(c.po_max, b.rs_max),
-	coalesce(c.po_min, b.rs_min)
+	coalesce(c.po_max, 0),
+	coalesce(c.po_min, 0)
 from lg.plr a
 inner join (
 	select player_id, min(season_id) as rs_min, max(season_id) as rs_max
