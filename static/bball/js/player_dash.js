@@ -18,7 +18,7 @@ export async function buildPlayerDash(data, ts) {
 }
 
 // ts indicates 'top scorer' - used when called on page refresh to get recent game
-export async function makePlayerDash(base, player, season, team, ts) { // add season & team
+export async function makePlayerDash(base, player, season, team, ts, lg) { // add season & team
     const err = document.getElementById('sErr');
     if (err.style.display === "block") {
         err.style.display = 'none';
@@ -29,7 +29,7 @@ export async function makePlayerDash(base, player, season, team, ts) { // add se
     const p = encodeURIComponent(player).toLowerCase();
 
     // attempt to fetch from /player endpoint with encoded params
-    const r = await fetch(base + `/player?player=${p}&season=${s}&team=${team}`);
+    const r = await fetch(base + `/player?player=${p}&season=${s}&team=${team}&league=${lg}`);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
     }

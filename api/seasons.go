@@ -89,7 +89,7 @@ accept the slice of all players and a seasonId, return a slice with just the
 active players from the passed season id
 */
 // func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
-func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
+func SlicePlayersSzn(players []Player, seasonId uint64, lg string) ([]Player, error) {
 	var plslice []Player
 
 	// get struct with current seasons
@@ -109,23 +109,37 @@ func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
 
 		if seasonId == 49999 {
 			if p.PSeasonIdMin > 0 && p.SeasonIdMax >= (sl.WSznId-3) {
-				plslice = append(plslice, p)
+				if lg == "all" || lg == p.League {
+					plslice = append(plslice, p)
+				}
 			}
 		}
 
 		if seasonId == 29999 {
 			if p.SeasonIdMax >= (sl.WSznId - 3) {
-				plslice = append(plslice, p)
+				if lg == "all" || lg == p.League {
+					plslice = append(plslice, p)
+				}
 			}
 		}
 
 		// append players to the random slice if the passed season id between player min and max season
-		if (seasonId >= 20000 && seasonId < 30000) &&
-			(seasonId <= p.SeasonIdMax && seasonId >= p.SeasonIdMin) ||
-			(seasonId >= 40000 && seasonId < 50000) &&
-				(seasonId <= p.PSeasonIdMax && seasonId >= p.PSeasonIdMin) {
-			plslice = append(plslice, p)
+		if seasonId >= 20000 && seasonId < 30000 {
+			if seasonId <= p.SeasonIdMax && seasonId >= p.SeasonIdMin {
+				if lg == "all" || lg == p.League {
+					plslice = append(plslice, p)
+				}
+			}
 		}
+
+		if seasonId >= 40000 && seasonId < 50000 {
+			if seasonId <= p.PSeasonIdMax && seasonId >= p.PSeasonIdMin {
+				if lg == "all" || lg == p.League {
+					plslice = append(plslice, p)
+				}
+			}
+		}
+
 	}
 	return plslice, nil
 }

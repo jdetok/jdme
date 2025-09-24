@@ -17,7 +17,7 @@ export async function basicTable(data, caption, pElName) {
 
     // get keys of json object and set as cols
     const cols = Object.keys(data);
-    console.log(`cols: ${cols}`);
+    // console.log(`cols: ${cols}`);
     pEl.textContent = '' // clear parent element
     await tblCaption(tbl, caption); // create & append caption
 
@@ -48,8 +48,8 @@ export async function rowHdrTable(data, caption, rowHdrLabel, pElName) {
     // use keys from the first data[keys] as column headers - made, attempt, pct 
     const cHdrs = Object.keys(data[rHdrs[0]]);
     
-    console.log(`ROW HEADERS: ${rHdrs}`);
-    console.log(`COLUMN HEADERS: ${cHdrs}`);
+    // console.log(`ROW HEADERS: ${rHdrs}`);
+    // console.log(`COLUMN HEADERS: ${cHdrs}`);
 
     // use cols, create & append caption
     pEl.textContent = ''; 

@@ -117,8 +117,8 @@ accept slice of Player structs and a season id, call slicePlayerSzn to create
 a new slice with only players from the specified season. then, generate a
 random number and return the player at that index in the slice
 */
-func RandPlayer(pl []Player, sId uint64) uint64 {
-	players, _ := SlicePlayersSzn(pl, sId)
+func RandPlayer(pl []Player, sId uint64, lg string) uint64 {
+	players, _ := SlicePlayersSzn(pl, sId, lg)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
 	return players[randNum].PlayerId
@@ -130,12 +130,12 @@ ID and the season ID. if 'player' variable == "random", the randPlayer function
 is called. a player ID also can be passed as the player parameter, it will just
 be converted to an int and returned
 */
-func GetpIdsId(players []Player, player string, seasonId string, errStr *string) (uint64, uint64) {
+func GetpIdsId(players []Player, player string, seasonId string, lg string, errStr *string) (uint64, uint64) {
 	sId, _ := strconv.ParseUint(seasonId, 10, 32)
 	var pId uint64
 
 	if player == "random" { // call randplayer function
-		pId = RandPlayer(players, sId)
+		pId = RandPlayer(players, sId, lg)
 	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
 		// if it's numeric keep it and convert to uint64
 		pId, _ = strconv.ParseUint(player, 10, 64)

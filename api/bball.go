@@ -36,12 +36,23 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	var rp Resp
 	var tId uint64
 
+	// get and convert team from query string
 	team := r.URL.Query().Get("team")
-	tId, _ = strconv.ParseUint(team, 10, 64)
+	tId, err := strconv.ParseUint(team, 10, 64)
+	if err != nil {
+		msg := fmt.Sprintf("error converting %v to int", team)
+		e.HTTPErr(w, msg, err)
+	}
 
+	// get season from query string
 	season := r.URL.Query().Get("season")
+
+	//get league from query string
+	lg := r.URL.Query().Get("league")
+
+	// get player from query string
 	player := RemoveDiacritics(r.URL.Query().Get("player"))
-	pId, sId := GetpIdsId(app.Players, player, season, &rp.ErrorMsg)
+	pId, sId := GetpIdsId(app.Players, player, season, lg, &rp.ErrorMsg)
 
 	js, err := rp.GetPlayerDash(app.Database, pId, sId, tId)
 	if err != nil {
