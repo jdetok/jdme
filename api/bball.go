@@ -15,7 +15,7 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 
 	numPl := r.URL.Query().Get("num")
 
-	lt, err := QueryTopLgPlayers(app.Database, numPl)
+	lt, err := QueryTopLgPlayers(app.Database, &app.CurrentSzns, numPl)
 	if err != nil {
 		msg := "failed to query top 5 league players"
 		e.HTTPErr(w, msg, err)
@@ -52,13 +52,18 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 
 	// get player from query string
 	player := RemoveDiacritics(r.URL.Query().Get("player"))
-	pId, sId := GetpIdsId(app.Players, player, season, lg, &rp.ErrorMsg)
 
+	// validate player & get playerid/season id
+	pId, sId := ValidatePlayerSzn(app.Players, &app.CurrentSzns, player, season, lg, &rp.ErrorMsg)
+
+	// query the player & build JSON response, returned as []byte to write
 	js, err := rp.GetPlayerDash(app.Database, pId, sId, tId)
 	if err != nil {
 		msg := fmt.Sprintf("server failed to return player dash for %s", player)
 		e.HTTPErr(w, msg, err)
 	}
+
+	// write JSON response
 	app.JSONWriter(w, js)
 }
 
@@ -66,7 +71,8 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 func (app *App) HndlRecentGames(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
-	rgs := RecentGames{}
+	// rgs := RecentGames{}
+	var rgs RecentGames
 	js, err := rgs.GetRecentGames(app.Database)
 	if err != nil {
 		e.Msg = "failed to get recent games"
@@ -106,7 +112,7 @@ func (app *App) HndlTeams(w http.ResponseWriter, r *http.Request) {
 	} else { // read & valid team from q string, not yet used 8/6
 		for _, tm := range app.Teams {
 			if team == tm.TeamAbbr {
-				tm.LogoUrl = tm.MakeLogoUrl()
+				tm.LogoUrl = tm.MakeTeamLogoUrl()
 				json.NewEncoder(w).Encode(tm)
 			}
 		}

@@ -89,11 +89,11 @@ accept the slice of all players and a seasonId, return a slice with just the
 active players from the passed season id
 */
 // func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
-func SlicePlayersSzn(players []Player, seasonId uint64, lg string) ([]Player, error) {
+func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg string) ([]Player, error) {
 	var plslice []Player
 
 	// get struct with current seasons
-	sl := LgSznsByMonth(time.Now())
+	sl := cs.LgSznsByMonth(time.Now())
 
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
 
@@ -145,7 +145,7 @@ func SlicePlayersSzn(players []Player, seasonId uint64, lg string) ([]Player, er
 }
 
 // accept pointers of league and season, switch season/wseason on league
-func (t *RespSeasonTmp) HndlSeason(league *string, season *string) {
+func (t *RespSeasonTmp) SwitchSznByLeague(league *string, season *string) {
 	switch *league {
 	case "NBA":
 		*season = t.Season

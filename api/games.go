@@ -36,8 +36,7 @@ type RecentGame struct {
 }
 
 // accepts a sql.Rows pointer and scans it to a RecentGames struct
-func MakeRgs(rows *sql.Rows) RecentGames {
-	var rgs RecentGames
+func (rgs *RecentGames) ScanRecentGamesRows(rows *sql.Rows) {
 	for rows.Next() {
 		var rg RecentGame
 		var ps PlayerBasic
@@ -53,7 +52,6 @@ func MakeRgs(rows *sql.Rows) RecentGames {
 		rgs.TopScorers = append(rgs.TopScorers, ps)
 		rgs.Games = append(rgs.Games, rg)
 	}
-	return rgs
 }
 
 /*
@@ -67,8 +65,9 @@ func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
 		e.Msg = "query failed"
 		return nil, e.BuildErr(err)
 	}
-	recentGames := MakeRgs(rows)
-	js, err := json.Marshal(recentGames)
+
+	rgs.ScanRecentGamesRows(rows)
+	js, err := json.Marshal(rgs)
 	if err != nil {
 		e.Msg = "json marshal failed"
 		return nil, e.BuildErr(err)
