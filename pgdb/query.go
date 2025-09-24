@@ -87,7 +87,7 @@ team and top player stats from most recent night's games
 */
 var RecGameTopScorers = `
 select * from (
-	select distinct on (a.game_id)
+	select distinct on (a.game_id, a.team_id)
 	a.game_id,  
 	a.team_id, 
 	d.player_id, 
@@ -111,7 +111,7 @@ select * from (
 	inner join lg.team c on c.team_id = a.team_id
 	inner join stats.pbox d on d.game_id = a.game_id and d.team_id = a.team_id
 	inner join lg.plr e on e.player_id = d.player_id
-	order by a.game_id, d.pts desc, (d.ast + d.reb + d.stl + d.blk) desc)
+	order by a.game_id, a.team_id, d.pts desc, (d.ast + d.reb + d.stl + d.blk) desc)
 order by plr_pts desc
 `
 
