@@ -26,27 +26,27 @@ the top scorer of the most recent night's games. this is called when the site
 loads. the response is scanned into the structs defined in resp.go, before being
 marshalled into json and returned to write as the http response
 */
-func (r *Resp) GetPlayerDash(db *sql.DB, pId, sId, tId uint64) ([]byte, error) {
+func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
 	e := errd.InitErr()
 	var q string
 	var p uint64
 
 	// if 0 is passed as tId, query by player_id. otherwise, query by team_id
-	switch tId {
+	switch iq.TId {
 	case 0:
-		logd.Logc(fmt.Sprintf("querying player_id: %d | season_id: %d", pId, sId))
+		logd.Logc(fmt.Sprintf("querying player_id: %d | season_id: %d", iq.PId, iq.SId))
 		q = pgdb.PlayerDash
-		p = pId
+		p = iq.PId
 	default:
-		logd.Logc(fmt.Sprintf("querying team_id: %d | season_id: %d", tId, sId))
+		logd.Logc(fmt.Sprintf("querying team_id: %d | season_id: %d", iq.TId, iq.SId))
 		q = pgdb.TeamTopScorerDash
-		p = tId
+		p = iq.TId
 	}
 
 	// query player, scan to structs, call struct functions
 	// appends RespObj to r.Results
-	if err := r.BuildPlayerRespStructs(db, q, p, sId); err != nil {
-		e.Msg = fmt.Sprintf("failed to query playerId %d seasonId %d", p, sId)
+	if err := r.BuildPlayerRespStructs(db, q, p, iq.SId); err != nil {
+		e.Msg = fmt.Sprintf("failed to query playerId %d seasonId %d", p, iq.SId)
 		return nil, e.BuildErr(err)
 	}
 
@@ -129,8 +129,8 @@ accept slice of Player structs and a season id, call slicePlayerSzn to create
 a new slice with only players from the specified season. then, generate a
 random number and return the player at that index in the slice
 */
-func RandomPlayerId(pl []Player, cs *CurrentSeasons, sId uint64, lg string) uint64 {
-	players, _ := SlicePlayersSzn(pl, cs, sId, lg)
+func RandomPlayerId(pl []Player, cs *CurrentSeasons, pq *PlayerQuery) uint64 {
+	players, _ := SlicePlayersSzn(pl, cs, pq)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
 	return players[randNum].PlayerId
@@ -142,30 +142,39 @@ ID and the season ID. if 'player' variable == "random", the randPlayer function
 is called. a player ID also can be passed as the player parameter, it will just
 be converted to an int and returned
 */
-func ValidatePlayerSzn(players []Player, cs *CurrentSeasons, player string, seasonId string, lg string, errStr *string) (uint64, uint64) {
-	sId, _ := strconv.ParseUint(seasonId, 10, 32)
-	var pId uint64
+func ValidatePlayerSzn(
+	players []Player,
+	cs *CurrentSeasons,
+	pq *PlayerQuery,
+	errStr *string) (PQueryIds, error) {
+	//
+	e := errd.InitErr()
+	sId, _ := strconv.ParseUint(pq.Season, 10, 32)
+	var iq PQueryIds
+	// var pId uint64
 
-	if player == "random" { // call randplayer function
-		pId = RandomPlayerId(players, cs, sId, lg)
-	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
+	if pq.Player == "random" { // call randplayer function
+		iq.PId = RandomPlayerId(players, cs, pq)
+	} else if _, err := strconv.ParseUint(pq.Player, 10, 64); err == nil {
 		// if it's numeric keep it and convert to uint64
-		pId, _ = strconv.ParseUint(player, 10, 64)
+		iq.PId, _ = strconv.ParseUint(pq.Player, 10, 64)
 	} else { // search name through players list
 		for _, p := range players {
-			if p.Name == player { // return match playerid (uint32) as string
-				pId = p.PlayerId
+			if p.Name == pq.Player { // return match playerid (uint32) as string
+				iq.PId = p.PlayerId
 			}
 		}
 	}
 
 	// loop through players to check that queried season is within min-max seasons
 	for _, p := range players {
-		if p.PlayerId == pId {
-			return pId, HandleSeasonId(sId, &p, errStr)
+		if p.PlayerId == iq.PId {
+			iq.SId = HandleSeasonId(sId, &p, errStr)
+			return iq, nil
 		}
 	}
-	return pId, sId
+	e.Msg = "player not in memory"
+	return iq, e.NewErr()
 }
 
 // fill RespPlayerMeta captions fields with formatted strings for each playerdash
@@ -291,14 +300,31 @@ func HandleSeasonId(sId uint64, p *Player, errStr *string) uint64 {
 	return sId
 }
 
+// tId, err := strconv.ParseUint(pq.Team, 10, 64)
+// iq.TId = tId
+// if err != nil {
+// 	msg := fmt.Sprintf("error converting %v to int", pq.Team)
+// 	e.HTTPErr(w, msg, err)
+// }
+
 /*
 accept the slice of all players and a seasonId, return a slice with just the
 active players from the passed season id
 */
 // func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
-func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg string) ([]Player, error) {
+func SlicePlayersSzn(players []Player, cs *CurrentSeasons, pq *PlayerQuery) ([]Player, error) {
+	e := errd.InitErr()
 	var plslice []Player
 
+	if pq.Team != "0" {
+		fmt.Println("team not 0")
+	}
+
+	seasonId, err := strconv.ParseUint(pq.Season, 10, 64)
+	if err != nil {
+		e.Msg = fmt.Sprintf("failed to convert %s to int", pq.Season)
+	}
+	//
 	// get struct with current seasons
 	sl := cs.LgSznsByMonth(time.Now())
 
@@ -316,7 +342,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 
 		if seasonId == 49999 {
 			if p.PSeasonIdMin > 0 && p.SeasonIdMax >= (sl.WSznId-3) {
-				if lg == "all" || lg == p.League {
+				if pq.League == "all" || pq.League == p.League {
 					plslice = append(plslice, p)
 				}
 			}
@@ -324,7 +350,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 
 		if seasonId == 29999 {
 			if p.SeasonIdMax >= (sl.WSznId - 3) {
-				if lg == "all" || lg == p.League {
+				if pq.League == "all" || pq.League == p.League {
 					plslice = append(plslice, p)
 				}
 			}
@@ -333,7 +359,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 		// append players to the random slice if the passed season id between player min and max season
 		if seasonId >= 20000 && seasonId < 30000 {
 			if seasonId <= p.SeasonIdMax && seasonId >= p.SeasonIdMin {
-				if lg == "all" || lg == p.League {
+				if pq.League == "all" || pq.League == p.League {
 					plslice = append(plslice, p)
 				}
 			}
@@ -341,7 +367,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 
 		if seasonId >= 40000 && seasonId < 50000 {
 			if seasonId <= p.PSeasonIdMax && seasonId >= p.PSeasonIdMin {
-				if lg == "all" || lg == p.League {
+				if pq.League == "all" || pq.League == p.League {
 					plslice = append(plslice, p)
 				}
 			}

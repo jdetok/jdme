@@ -4,10 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/jdetok/golib/errd"
 )
+
+type PlayerQuery struct {
+	Player string
+	Team   string
+	Season string
+	League string
+}
+
+type PQueryIds struct {
+	PId uint64
+	TId uint64
+	SId uint64
+}
 
 func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
@@ -33,36 +45,37 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 
+	var pq PlayerQuery
+	// var iq PQueryIds
 	var rp Resp
-	var tId uint64
+	// var tId uint64
 
 	// get and convert team from query string
-	team := r.URL.Query().Get("team")
-	tId, err := strconv.ParseUint(team, 10, 64)
-	if err != nil {
-		msg := fmt.Sprintf("error converting %v to int", team)
-		e.HTTPErr(w, msg, err)
-	}
+	pq.Team = r.URL.Query().Get("team")
 
 	// get season from query string
-	season := r.URL.Query().Get("season")
+	pq.Season = r.URL.Query().Get("season")
 
 	//get league from query string
-	lg := r.URL.Query().Get("league")
+	pq.League = r.URL.Query().Get("league")
 
 	// get player from query string
-	player := RemoveDiacritics(r.URL.Query().Get("player"))
+	pq.Player = RemoveDiacritics(r.URL.Query().Get("player"))
 
 	// validate player & get playerid/season id
-	pId, sId := ValidatePlayerSzn(app.Players, &app.CurrentSzns, player, season, lg, &rp.ErrorMsg)
-
-	// query the player & build JSON response, returned as []byte to write
-	js, err := rp.GetPlayerDash(app.Database, pId, sId, tId)
+	iq, err := ValidatePlayerSzn(app.Players, &app.CurrentSzns, &pq, &rp.ErrorMsg)
 	if err != nil {
-		msg := fmt.Sprintf("server failed to return player dash for %s", player)
+		msg := fmt.Sprintf("validate player %s", pq.Player)
 		e.HTTPErr(w, msg, err)
 	}
 
+	// query the player & build JSON response, returned as []byte to write
+	js, err := rp.GetPlayerDash(app.Database, &iq)
+	if err != nil {
+		msg := fmt.Sprintf("server failed to return player dash for %s", pq.Player)
+		e.HTTPErr(w, msg, err)
+	}
+	fmt.Println("test")
 	// write JSON response
 	app.JSONWriter(w, js)
 }
