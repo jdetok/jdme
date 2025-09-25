@@ -1,3 +1,21 @@
+#seeMoreFrm {
+    display: flex;
+    flex-direction: row;
+}
+
+#seeMoreBtn {
+    width: 20%;
+    /* max-width: fit-content; */
+}
+
+#seeMoreLbl {
+    width: fit-content;
+}
+
+#seeMoreIn {
+    width: min-content;
+}
+
 #topsect {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;

@@ -30,9 +30,9 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     const wnbaH = document.createElement('td');
     const wptsH = document.createElement('td');
 
-    const caption = `Scoring Leaders | Current NBA/WNBA Top ${numPl}`
-    tblCaption(tbl, caption);
-    
+    const capMsg = `Scoring Leaders | Current NBA/WNBA Top ${numPl}`;
+    tblCaption(tbl, capMsg);
+
     rankH.textContent = 'rank';
     nbaH.textContent = `nba | ${data.nba[0].season}`;
     ptsH.textContent = 'points';
@@ -49,8 +49,29 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     for (let i = 0; i < numPl; i++) {
         await lgTopScorerRow(tbl, data, i);
     }
-
     tblcont.appendChild(tbl);
+
+    const seeMoreFrm = document.createElement('form');
+    const seeMoreIn = document.createElement('input');
+    const seeMoreLbl = document.createElement('label');
+    const seeMoreBtn = document.createElement('button');
+
+    seeMoreFrm.id = 'seeMoreFrm';
+
+    seeMoreIn.id = 'seeMoreIn';
+    seeMoreIn.type = 'number';
+
+    seeMoreLbl.for = 'seeMoreIn';
+    seeMoreLbl.textContent = 'see more/less leading scorers...';
+
+    seeMoreBtn.type = 'submit';
+    seeMoreBtn.textContent = 'go';
+
+    seeMoreFrm.appendChild(seeMoreLbl);
+    seeMoreFrm.appendChild(seeMoreIn);
+    seeMoreFrm.appendChild(seeMoreBtn);
+
+    tblcont.appendChild(seeMoreFrm);
 }
 
 /* 
