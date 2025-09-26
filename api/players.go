@@ -12,11 +12,23 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/errd"
-	"github.com/jdetok/golib/logd"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
+
+func VerifyPlayerTeam(db *sql.DB, iq *PQueryIds) (bool, error) {
+	e := errd.InitErr()
+	fmt.Println("VerifyPlayerTeam func called")
+	rows, err := db.Query(pgdb.VerifyTeamSzn, iq.SId, iq.TId, iq.PId)
+	if err != nil {
+		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+			iq.SId, iq.TId, iq.PId)
+		return false, e.BuildErr(err)
+	}
+	// just need to know if a row exists -
+	return rows.Next(), nil
+}
 
 /*
 primary database query function for the /players endpoint. queries the api
@@ -28,25 +40,40 @@ marshalled into json and returned to write as the http response
 */
 func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
 	e := errd.InitErr()
-	var q string
-	var p uint64
+	// var q string
+	// var p uint64
 
 	// if 0 is passed as tId, query by player_id. otherwise, query by team_id
-	switch iq.TId {
-	case 0:
-		logd.Logc(fmt.Sprintf("querying player_id: %d | season_id: %d", iq.PId, iq.SId))
-		q = pgdb.PlayerDash
-		p = iq.PId
-	default:
-		logd.Logc(fmt.Sprintf("querying team_id: %d | season_id: %d", iq.TId, iq.SId))
-		q = pgdb.TeamTopScorerDash
-		p = iq.TId
+	if iq.TId > 0 {
+		ptValid, err := VerifyPlayerTeam(db, iq)
+		if err != nil {
+			e.Msg = "error executing team player validation query"
+			return nil, e.BuildErr(err)
+		}
+		if !(ptValid) {
+			r.ErrorMsg = fmt.Sprintf(
+				"error validating playerId %d | teamId %d | seasonId %d",
+				iq.PId, iq.TId, iq.SId)
+			// handle team not valid
+		}
 	}
+
+	// switch iq.TId {
+	// case 0:
+	// 	logd.Logc(fmt.Sprintf("querying player_id: %d | season_id: %d", iq.PId, iq.SId))
+	// 	q = pgdb.PlayerDash
+	// 	p = iq.PId
+	// default:
+	// 	// TODO: VALIDATE TEAMID WITH PLAYER ID AND SEASONID
+	// 	logd.Logc(fmt.Sprintf("querying team_id: %d | season_id: %d", iq.TId, iq.SId))
+	// 	q = pgdb.TeamTopScorerDash
+	// 	p = iq.TId
+	// }
 
 	// query player, scan to structs, call struct functions
 	// appends RespObj to r.Results
-	if err := r.BuildPlayerRespStructs(db, q, p, iq.SId); err != nil {
-		e.Msg = fmt.Sprintf("failed to query playerId %d seasonId %d", p, iq.SId)
+	if err := r.BuildPlayerRespStructs(db, iq); err != nil {
+		e.Msg = fmt.Sprintf("failed to query playerId %d seasonId %d", iq.PId, iq.SId)
 		return nil, e.BuildErr(err)
 	}
 
@@ -62,11 +89,20 @@ func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
 // query player, scan to structs, call struct functions
 // appends RespObj to r.Results
 // separated from GetPlayerDash 09/24/2025
-func (r *Resp) BuildPlayerRespStructs(db *sql.DB, q string, p, sId uint64) error {
+func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	e := errd.InitErr()
-
+	var args = []uint64{}
+	var q string
 	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
-	rows, err := db.Query(q, p, sId)
+	if iq.TId > 0 {
+		args = []uint64{iq.PId, iq.TId}
+		q = pgdb.TstTeamPlayer
+	} else {
+		args = []uint64{iq.PId, iq.SId}
+		q = pgdb.PlayerDash
+	}
+	// rows , err := db.Query(q, iq.PId, iq.SId)
+	rows, err := db.Query(q, args[0], args[1])
 	if err != nil {
 		e.Msg = "error during player dash query"
 		return e.BuildErr(err)
@@ -79,6 +115,7 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, q string, p, sId uint64) error
 		var s RespPlayerStats
 		var p RespPlayerSznOvw
 		// 8/6 2PM - MOVED Season/WSeason FROM END TO AFTER SeasonId
+		// two rows are returned, one for each stattype
 		rows.Scan( // MUST BE IN ORDER OF QUERY
 			&rp.Meta.PlayerId, &rp.Meta.TeamId, &rp.Meta.League,
 			&rp.Meta.SeasonId, &t.Season, &t.WSeason, &rp.Meta.StatType,
@@ -149,19 +186,35 @@ func ValidatePlayerSzn(
 	errStr *string) (PQueryIds, error) {
 	//
 	e := errd.InitErr()
-	sId, _ := strconv.ParseUint(pq.Season, 10, 32)
 	var iq PQueryIds
+
+	sId, err := strconv.ParseUint(pq.Season, 10, 32)
+	if err != nil {
+		e.Msg = fmt.Sprintf("failed to convert season %s to int", pq.Season)
+		return iq, e.BuildErr(err)
+	}
+
+	tId, err := strconv.ParseUint(pq.Team, 10, 64)
+	if err != nil {
+		e.Msg = fmt.Sprintf("failed to convert team %s to int", pq.Team)
+		return iq, e.BuildErr(err)
+	}
+	iq.TId = tId
 	// var pId uint64
 
 	if pq.Player == "random" { // call randplayer function
 		iq.PId = RandomPlayerId(players, cs, pq)
-	} else if _, err := strconv.ParseUint(pq.Player, 10, 64); err == nil {
-		// if it's numeric keep it and convert to uint64
-		iq.PId, _ = strconv.ParseUint(pq.Player, 10, 64)
-	} else { // search name through players list
-		for _, p := range players {
-			if p.Name == pq.Player { // return match playerid (uint32) as string
-				iq.PId = p.PlayerId
+	} else {
+		// check if it can be converted to number
+		pId, err := strconv.ParseUint(pq.Player, 10, 64)
+		if err == nil {
+			// if it's numeric keep it and convert to uint64
+			iq.PId = pId
+		} else { // search name through players list
+			for _, p := range players {
+				if p.Name == pq.Player { // return match playerid (uint32) as string
+					iq.PId = p.PlayerId
+				}
 			}
 		}
 	}
@@ -307,6 +360,20 @@ func HandleSeasonId(sId uint64, p *Player, errStr *string) uint64 {
 // 	e.HTTPErr(w, msg, err)
 // }
 
+// func SlicePlayerTeam(players *[]Player, teamId string) ([]Player, error) {
+// 	e := errd.InitErr()
+// 	tId, err := strconv.ParseUint(teamId, 10, 64)
+// 	if err != nil {
+// 		e.Msg = fmt.Sprintf("error converting %s to uint64")
+// 		return nil, e.BuildErr(err)
+// 	}
+
+// 	for _, p := range *players {
+// 		if p.
+// 	}
+
+// }
+
 /*
 accept the slice of all players and a seasonId, return a slice with just the
 active players from the passed season id
@@ -323,6 +390,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, pq *PlayerQuery) ([]P
 	seasonId, err := strconv.ParseUint(pq.Season, 10, 64)
 	if err != nil {
 		e.Msg = fmt.Sprintf("failed to convert %s to int", pq.Season)
+		return nil, e.BuildErr(err)
 	}
 	//
 	// get struct with current seasons

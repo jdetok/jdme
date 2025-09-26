@@ -75,7 +75,6 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 		msg := fmt.Sprintf("server failed to return player dash for %s", pq.Player)
 		e.HTTPErr(w, msg, err)
 	}
-	fmt.Println("test")
 	// write JSON response
 	app.JSONWriter(w, js)
 }

@@ -103,11 +103,13 @@ func TestGetPlayerDash(t *testing.T) {
 
 	for i := range pIds {
 		var rp Resp
-		plr := pIds[i]
-		szn := sIds[i]
-		tm := tIds[i]
-		msg := fmt.Sprintf("pId: %d | sId: %d | tId: %d", plr, szn, tm)
-		js, err := rp.GetPlayerDash(db, plr, szn, tm)
+		iq := PQueryIds{
+			PId: pIds[i],
+			TId: tIds[i],
+			SId: sIds[i],
+		}
+		msg := fmt.Sprintf("pId: %d | sId: %d | tId: %d", iq.PId, iq.SId, iq.TId)
+		js, err := rp.GetPlayerDash(db, &iq)
 		if err != nil {
 			e.Msg = fmt.Sprintf("failed getting player dash\n%s", msg)
 			t.Error(e.BuildErr(err))
@@ -171,4 +173,76 @@ func TestSeasonStore(t *testing.T) {
 		sz = append(sz, s)
 	}
 	// fmt.Println(sz)
+}
+
+// func TestVerifyTeamQuery(t *testing.T) {
+// 	// db := StartupTest(t)
+
+// 	err := envd.LoadDotEnvFile("../.env")
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	db, err := pgdb.PostgresConn()
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+
+// 	rows, err := db.Query(pgdb.VerifyTeamSzn, 22024, 1610612747, 2544)
+// 	// rows.
+// 	if err != nil {
+// 		t.Error("failed getting seasons")
+// 	}
+// 	if rows.Next() {
+// 		fmt.Println("player verified")
+// 	} else {
+// 		fmt.Println("player not verified")
+// 	}
+// 	// for rows.Next() {
+// 	// 	fmt.Println("verif")
+// 	// }
+// }
+
+func TestVerifyPlayerTeam(t *testing.T) {
+	db := StartupTest(t)
+
+	iq := PQueryIds{
+		PId: 2544,
+		SId: 22024,
+		TId: 1610612747,
+	}
+
+	ptVerif, err := VerifyPlayerTeam(db, &iq)
+	if err != nil {
+		t.Error(err)
+	}
+	if ptVerif {
+		fmt.Printf("Player %d | Team %d | Season %d ||| verified",
+			iq.PId, iq.TId, iq.SId)
+	} else {
+		fmt.Printf("Player %d | Team %d | Season %d ||| NOT verified",
+			iq.PId, iq.TId, iq.SId)
+	}
+}
+
+func TestQueryPlayerTeam(t *testing.T) {
+	db := StartupTest(t)
+
+	iq := PQueryIds{
+		PId: 2544,
+		SId: 22024,
+		TId: 1610612747,
+	}
+
+	ptVerif, err := VerifyPlayerTeam(db, &iq)
+	if err != nil {
+		t.Error(err)
+	}
+	if ptVerif {
+		fmt.Printf("Player %d | Team %d | Season %d ||| verified",
+			iq.PId, iq.TId, iq.SId)
+
+	} else {
+		fmt.Printf("Player %d | Team %d | Season %d ||| NOT verified",
+			iq.PId, iq.TId, iq.SId)
+	}
 }
