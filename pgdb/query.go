@@ -155,11 +155,11 @@ select
 	sum(gp) as gp, sum(minutes) as minutes, sum(points) as points, sum(assists) as assists, 
 	sum(rebounds) as rebounds, sum(steals) as steals, sum(blocks) as blocks, 
 	sum(fgm) as fgm, sum(fga) as fga, 
-	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) || '%' as fgp, 
+	round(avg(to_number(substring(fgp, 0, 5), '999.99')), 2) || '%' as fgp, 
 	sum(f3m) as f3m, sum(f3a) as f3a, 
-	round(avg(to_number(substring(f3p, 0, 5), '99.99')), 2) || '%' as f3p,
+	round(avg(to_number(substring(f3p, 0, 5), '999.99')), 2) || '%' as f3p,
 	sum(ftm) as ftm, sum(fta) as fta, 
-	round(avg(to_number(substring(ftp, 0, 5), '99.99')), 2) || '%' as ftp
+	round(avg(to_number(substring(ftp, 0, 5), '999.99')), 2) || '%' as ftp
 from api.v_plr_szn_tot
 where player_id = $1 
 and team_id = $2
@@ -172,11 +172,11 @@ select
 	sum(gp) as gp, round(avg(minutes), 2) as minutes, round(avg(points), 2) as points, round(avg(assists), 2) as assists, 
 	round(avg(rebounds), 2) as rebounds, round(avg(steals), 2) as steals, round(avg(blocks), 2) as blocks, 
 	round(avg(fgm), 2) as fgm, round(avg(fga), 2) as fga, 
-	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) || '%' as fgp, 
+	round(avg(to_number(substring(fgp, 0, 5), '999.99')), 2) || '%' as fgp, 
 	round(avg(f3m), 2) as f3m, round(avg(f3a), 2) as f3a, 
-	round(avg(to_number(substring(f3p, 0, 5), '99.99')), 2) || '%' as f3p,
+	round(avg(to_number(substring(f3p, 0, 5), '999.99')), 2) || '%' as f3p,
 	round(avg(ftm), 2) as ftm, round(avg(fta), 2) as fta, 
-	round(avg(to_number(substring(ftp, 0, 5), '99.99')), 2) || '%' as ftp
+	round(avg(to_number(substring(ftp, 0, 5), '999.99')), 2) || '%' as ftp
 from api.v_plr_szn_avg
 where player_id = $1
 and team_id = $2

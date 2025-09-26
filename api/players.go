@@ -40,36 +40,6 @@ marshalled into json and returned to write as the http response
 */
 func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
 	e := errd.InitErr()
-	// var q string
-	// var p uint64
-
-	// if 0 is passed as tId, query by player_id. otherwise, query by team_id
-	if iq.TId > 0 {
-		ptValid, err := VerifyPlayerTeam(db, iq)
-		if err != nil {
-			e.Msg = "error executing team player validation query"
-			return nil, e.BuildErr(err)
-		}
-		if !(ptValid) {
-			r.ErrorMsg = fmt.Sprintf(
-				"error validating playerId %d | teamId %d | seasonId %d",
-				iq.PId, iq.TId, iq.SId)
-			// handle team not valid
-		}
-	}
-
-	// switch iq.TId {
-	// case 0:
-	// 	logd.Logc(fmt.Sprintf("querying player_id: %d | season_id: %d", iq.PId, iq.SId))
-	// 	q = pgdb.PlayerDash
-	// 	p = iq.PId
-	// default:
-	// 	// TODO: VALIDATE TEAMID WITH PLAYER ID AND SEASONID
-	// 	logd.Logc(fmt.Sprintf("querying team_id: %d | season_id: %d", iq.TId, iq.SId))
-	// 	q = pgdb.TeamTopScorerDash
-	// 	p = iq.TId
-	// }
-
 	// query player, scan to structs, call struct functions
 	// appends RespObj to r.Results
 	if err := r.BuildPlayerRespStructs(db, iq); err != nil {
@@ -89,12 +59,31 @@ func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
 // query player, scan to structs, call struct functions
 // appends RespObj to r.Results
 // separated from GetPlayerDash 09/24/2025
+/*
+swtiches query and arguments based on whether teamId = 0
+*/
 func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	e := errd.InitErr()
 	var args = []uint64{}
 	var q string
 	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
 	if iq.TId > 0 {
+		ptValid, err := VerifyPlayerTeam(db, iq)
+		if err != nil {
+			e.Msg = "error executing team player validation query"
+			return e.BuildErr(err)
+		}
+		if !(ptValid) {
+			errmsg := fmt.Sprintf(
+				"error validating playerId %d | teamId %d | seasonId %d",
+				iq.PId, iq.TId, iq.SId)
+			r.ErrorMsg = errmsg
+			e.Msg = errmsg
+			return e.NewErr()
+		}
+		fmt.Printf(
+			"Player %d Team %d Season %d validated in BuildPlayerRespStructs func\n",
+			iq.PId, iq.TId, iq.SId)
 		args = []uint64{iq.PId, iq.TId}
 		q = pgdb.TstTeamPlayer
 	} else {
