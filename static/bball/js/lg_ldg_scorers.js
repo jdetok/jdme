@@ -51,27 +51,27 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     }
     tblcont.appendChild(tbl);
 
-    const seeMoreFrm = document.createElement('form');
-    const seeMoreIn = document.createElement('input');
-    const seeMoreLbl = document.createElement('label');
-    const seeMoreBtn = document.createElement('button');
+    // const seeMoreFrm = document.createElement('form');
+    // const seeMoreIn = document.createElement('input');
+    // const seeMoreLbl = document.createElement('label');
+    // const seeMoreBtn = document.createElement('button');
 
-    seeMoreFrm.id = 'seeMoreFrm';
+    // seeMoreFrm.id = 'seeMoreFrm';
 
-    seeMoreIn.id = 'seeMoreIn';
-    seeMoreIn.type = 'number';
+    // seeMoreIn.id = 'seeMoreIn';
+    // seeMoreIn.type = 'number';
 
-    seeMoreLbl.for = 'seeMoreIn';
-    seeMoreLbl.textContent = 'see more/less leading scorers...';
+    // seeMoreLbl.for = 'seeMoreIn';
+    // seeMoreLbl.textContent = 'see more/less leading scorers...';
 
-    seeMoreBtn.type = 'submit';
-    seeMoreBtn.textContent = 'go';
+    // seeMoreBtn.type = 'submit';
+    // seeMoreBtn.textContent = 'go';
 
-    seeMoreFrm.appendChild(seeMoreLbl);
-    seeMoreFrm.appendChild(seeMoreIn);
-    seeMoreFrm.appendChild(seeMoreBtn);
+    // seeMoreFrm.appendChild(seeMoreLbl);
+    // seeMoreFrm.appendChild(seeMoreIn);
+    // seeMoreFrm.appendChild(seeMoreBtn);
 
-    tblcont.appendChild(seeMoreFrm);
+    // tblcont.appendChild(seeMoreFrm);
 }
 
 /* 

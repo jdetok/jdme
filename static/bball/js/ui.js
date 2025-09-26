@@ -26,9 +26,11 @@ export async function handleSeasonBoxes() {
     // return `2${new Date().getFullYear()}`;
 }
 
-export async function clearCheckBoxes(box) {
-    const b = document.getElementById(box);
-    b.checked = 0;
+export async function clearCheckBoxes(boxes) {
+    for (let i = 0; i < boxes.length; i++) {
+        let b = document.getElementById(boxes[i]);
+        b.checked = 0;
+    }
 }
 
 // if checkbox is checked, return the value
@@ -40,19 +42,17 @@ export async function checkBoxes(box, sel) {
     }
 }
 // make post + reg checkboxes exclusive (but allow neither checked)
-export async function setupExclusiveCheckboxes() {
-    const post = document.getElementById("post");
-    const reg = document.getElementById("reg");
-
+export async function setupExclusiveCheckboxes(leftbox, rightbox) {
+    let lbox = document.getElementById(leftbox);
+    let rbox = document.getElementById(rightbox);
     function handleCheck(e) {
         if (e.target.checked) {
-            if (e.target === post) reg.checked = false;
-            if (e.target === reg) post.checked = false;
+            if (e.target === lbox) rbox.checked = false;
+            if (e.target === rbox) lbox.checked = false;
         }
     }
-
-    post.addEventListener("change", handleCheck);
-    reg.addEventListener("change", handleCheck);
+    lbox.addEventListener("change", handleCheck);
+    rbox.addEventListener("change", handleCheck);
 }
 
 
@@ -75,6 +75,7 @@ async function makeOption(slct, txt, val) {
     let opt = document.createElement('option');
     opt.textContent = txt;
     opt.value = val;
+    opt.style.width = '100%';
     slct.appendChild(opt);
 }
 
@@ -97,6 +98,30 @@ async function buildSznSelects(data) {
             await makeOption(ps, s.season, s.season_id);
         } else if (s.season_id.substring(0, 1) === '2') {
             await makeOption(rs, s.season, s.season_id);
+        }
+    }
+}
+
+// call seaons endpoint for the opts
+export async function loadTeamOptions() {
+    const r = await fetch(base + '/teams');
+    if (!r.ok) { 
+        throw new Error(`HTTP Error: ${s.status}`);
+    } 
+    const data = await r.json();
+    await buildTeamSelects(data);
+}
+
+// accept seasons in data object and make an option for each
+async function buildTeamSelects(data) {
+    const nba = document.getElementById('tm_slct');
+    const wnba = document.getElementById('wTm_slct');
+    for (let t of data) {
+        let txt = `${t.team} | ${t.team_long}`
+        if (t.league === 'NBA') {
+            await makeOption(nba, txt, t.team_id);
+        } else if (t.league === 'WNBA') {
+            await makeOption(wnba, txt, t.team_id);
         }
     }
 }

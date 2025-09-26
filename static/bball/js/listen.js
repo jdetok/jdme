@@ -8,19 +8,22 @@ import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch} from "./player
 export const base = "http://localhost:8080/bball";
 
 document.addEventListener('DOMContentLoaded', async () => {
+    await ui.setupExclusiveCheckboxes('post', 'reg');
+    await ui.setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
+    await ui.clearCheckBoxes(['post', 'reg', 'nbaTm', 'wnbaTm']);
     await ui.loadSznOptions();
+    await ui.loadTeamOptions();
+    await ui.lgRadioBtns();
     await ui.selHvr();
     await randPlayerBtn();
     await searchPlayer();
     await clearSearch();
     await holdPlayerBtn();
     await makeRGTopScorers();
-    await ui.setupExclusiveCheckboxes();
-    await ui.clearCheckBoxes('post');
-    await ui.clearCheckBoxes('reg');
-    await ui.lgRadioBtns();
+    
     await loadScoringLeaders();
     document.getElementById('all_lgs').checked = 1;
+    // await border('#topsect > div', '2px solid black');
 });
 
 export async function loadScoringLeaders() {
@@ -31,4 +34,14 @@ export async function loadScoringLeaders() {
         numPl = 10;
     }
     await makeScoringLeaders(numPl);
+}
+
+// place border around elements
+async function border(selector, border) {
+  const els = document.querySelectorAll(selector);
+  if (!els.length) return;
+
+  els.forEach(el => { 
+    el.style.border = border;
+  });
 }
