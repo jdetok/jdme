@@ -28,8 +28,9 @@ export async function makePlayerDash(base, player, season, team, ts, lg) { // ad
     const s = encodeURIComponent(season)
     const p = encodeURIComponent(player).toLowerCase();
 
+    const req = `${base}/player?player=${p}&season=${s}&team=${team}&league=${lg}`;
     // attempt to fetch from /player endpoint with encoded params
-    const r = await fetch(base + `/player?player=${p}&season=${s}&team=${team}&league=${lg}`);
+    const r = await fetch(req);
     if (!r.ok) {
         throw new Error(`HTTP Error: ${r.status}`);
     }

@@ -26,6 +26,20 @@ export async function handleSeasonBoxes() {
     // return `2${new Date().getFullYear()}`;
 }
 
+// return season or 88888 if no sseason box checked
+// needs to be like lgrp.box and lgrp.select
+export async function checkBoxGroupValue(lgrp, rgrp, dflt) {
+    const l = await checkBoxes(lgrp.box, lgrp.slct);
+    const r = await checkBoxes(rgrp.box, rgrp.slct);
+
+    if (l) return l;
+    if (r) return r;
+    
+    // 88888 for season, 0 for team
+    return dflt;
+    // return `2${new Date().getFullYear()}`;
+}
+
 export async function clearCheckBoxes(boxes) {
     for (let i = 0; i < boxes.length; i++) {
         let b = document.getElementById(boxes[i]);

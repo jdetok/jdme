@@ -10,6 +10,12 @@ and team_id = $2
 and player_id = $3
 and stat_type = 'tot'
 `
+var PlayerTeamBool = `
+select 1
+from api.plr_agg
+where player_id = $1
+and team_id = $2
+`
 
 // query all seasons in database, populates global seasons struct
 var AllSeasons = `

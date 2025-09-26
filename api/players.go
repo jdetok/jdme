@@ -17,9 +17,24 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+// TODO: if sId 88888 doesn't need to do season
 func VerifyPlayerTeam(db *sql.DB, iq *PQueryIds) (bool, error) {
 	e := errd.InitErr()
 	fmt.Println("VerifyPlayerTeam func called")
+	rows, err := db.Query(pgdb.PlayerTeamBool, iq.PId, iq.TId)
+	if err != nil {
+		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+			iq.SId, iq.TId, iq.PId)
+		return false, e.BuildErr(err)
+	}
+	// just need to know if a row exists -
+	return rows.Next(), nil
+}
+
+// TODO: if sId 88888 doesn't need to do season
+func VerifyPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (bool, error) {
+	e := errd.InitErr()
+	fmt.Println("VerifyPlayerTeamSeason func called")
 	rows, err := db.Query(pgdb.VerifyTeamSzn, iq.SId, iq.TId, iq.PId)
 	if err != nil {
 		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
@@ -64,22 +79,33 @@ swtiches query and arguments based on whether teamId = 0
 */
 func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	e := errd.InitErr()
-	var args = []uint64{}
+	var args []uint64
 	var q string
 	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
 	if iq.TId > 0 {
-		ptValid, err := VerifyPlayerTeam(db, iq)
-		if err != nil {
-			e.Msg = "error executing team player validation query"
-			return e.BuildErr(err)
+		var ptValid bool
+		var err error
+		if iq.SId == 88888 {
+			ptValid, err = VerifyPlayerTeam(db, iq)
+			if err != nil {
+				e.Msg = "error executing team player validation query"
+				return e.BuildErr(err)
+			}
+		} else {
+			ptValid, err = VerifyPlayerTeamSeason(db, iq)
+			if err != nil {
+				e.Msg = "error executing team player validation query"
+				return e.BuildErr(err)
+			}
 		}
+
 		if !(ptValid) {
 			errmsg := fmt.Sprintf(
-				"error validating playerId %d | teamId %d | seasonId %d",
+				"%d did not play for %d in %d",
 				iq.PId, iq.TId, iq.SId)
 			r.ErrorMsg = errmsg
 			e.Msg = errmsg
-			return e.NewErr()
+			// return e.NewErr()
 		}
 		fmt.Printf(
 			"Player %d Team %d Season %d validated in BuildPlayerRespStructs func\n",
@@ -211,7 +237,11 @@ func ValidatePlayerSzn(
 	// loop through players to check that queried season is within min-max seasons
 	for _, p := range players {
 		if p.PlayerId == iq.PId {
-			iq.SId = HandleSeasonId(sId, &p, errStr)
+			if iq.TId > 0 {
+				iq.SId = HandleSeasonId(sId, &p, true, errStr)
+			} else {
+				iq.SId = HandleSeasonId(sId, &p, false, errStr)
+			}
 			return iq, nil
 		}
 	}
@@ -274,12 +304,15 @@ regular season and playoffs, the function will verify the player played in said
 season, and return either their max or min (whichever is closer) season  if they
 did not
 */
-func HandleSeasonId(sId uint64, p *Player, errStr *string) uint64 {
+func HandleSeasonId(sId uint64, p *Player, team bool, errStr *string) uint64 {
 	if sId == 99999 || sId == 29999 { // agg seasons
 		msg := fmt.Sprintf("aggregate season requested%d | %d\n", sId, sId)
 		fmt.Println(msg)
 		return sId
 	} else if sId == 88888 {
+		if team {
+			return sId
+		}
 		msg := fmt.Sprintf("returning latest regular season for player%d | %d\n",
 			sId, p.SeasonIdMax)
 		fmt.Println(msg)

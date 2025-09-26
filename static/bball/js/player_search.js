@@ -1,6 +1,6 @@
 import { base } from "./listen.js"
 import { showHideHvr } from "./hover.js";
-import { handleSeasonBoxes, lgRadioBtns } from "./ui.js";
+import { checkBoxGroupValue, handleSeasonBoxes, lgRadioBtns } from "./ui.js";
 import { makePlayerDash } from "./player_dash.js";
 
 // get player from search bar and make player dash
@@ -24,11 +24,20 @@ export async function searchPlayer() {
 
         // check if season box is checked, return sel val if so, 88888 if not
         // 88888 gets the most recent season from the api
-        const season = await handleSeasonBoxes();
+        // const season = await handleSeasonBoxes();
+        const season = await checkBoxGroupValue(
+            {box: 'post', slct: 'ps_slct'}, 
+            {box: 'reg', slct: 'rs_slct'}, 
+            88888);
         console.log(`searching for season ${season}`)
 
+        const team = await checkBoxGroupValue(
+            {box: 'nbaTm', slct: 'tm_slct'}, 
+            {box: 'wnbaTm', slct: 'wTm_slct'}, 
+            0);
+        console.log(`TEAM QUERY: ${team}`);
         // build response player dash section
-        await makePlayerDash(base, player, season, 0, 0, lg);
+        await makePlayerDash(base, player, season, team, 0, lg);
 
         // clear player search box
         input.value = ''; // clear input box after searching
@@ -45,7 +54,10 @@ export async function randPlayerBtn() {
         const lg = await lgRadioBtns();
         console.log(`league in randPlayerBtn: ${lg}`);
         // check season boxes & get appropriate season id, search with random as player
-        const season = await handleSeasonBoxes();
+        const season = await checkBoxGroupValue(
+            {box: 'post', slct: 'ps_slct'}, 
+            {box: 'reg', slct: 'rs_slct'}, 
+            88888);
         console.log(`searching random player for season ${season}`);
         await makePlayerDash(base, 'random', season, 0, 0, lg);
     })
@@ -55,6 +67,7 @@ export async function randPlayerBtn() {
     await showHideHvr(
         hlp, 
         'hvrmsg',
+
         `get the stats for a random player in the selected season. if no season 
         is specified, the current/most recent season will be used. if the 
         random player did not play in the selected season, their most 
