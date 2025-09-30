@@ -15,6 +15,12 @@ type PlayerQuery struct {
 	League string
 }
 
+type PlayerTeamSeason struct {
+	Player string
+	Team   string
+	Season string
+}
+
 type PQueryIds struct {
 	PId uint64
 	TId uint64

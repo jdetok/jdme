@@ -17,6 +17,22 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+func GetPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (PlayerTeamSeason, error) {
+	e := errd.InitErr()
+	var pltmszn PlayerTeamSeason
+	rows, err := db.Query(pgdb.PlTmSzn, iq.PId, iq.TId, iq.SId)
+	if err != nil {
+		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+			iq.SId, iq.TId, iq.PId)
+		return pltmszn, e.BuildErr(err)
+	}
+
+	for rows.Next() {
+		rows.Scan(&pltmszn.Player, &pltmszn.Team, &pltmszn.Season)
+	}
+	return pltmszn, nil
+}
+
 // TODO: if sId 88888 doesn't need to do season
 func VerifyPlayerTeam(db *sql.DB, iq *PQueryIds) (bool, error) {
 	e := errd.InitErr()
@@ -102,11 +118,17 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 		}
 
 		if !(ptValid) {
+			pltmszn_str, err := GetPlayerTeamSeason(db, iq)
+			if err != nil {
+				e.Msg = "error getting strings from ids"
+				return e.BuildErr(err)
+			}
 			errmsg := fmt.Sprintf(
-				"%d did not play for %d in %d",
-				iq.PId, iq.TId, iq.SId)
+				"%s has not played for %s",
+				pltmszn_str.Player, pltmszn_str.Team)
 			r.ErrorMsg = errmsg
 			e.Msg = errmsg
+			// return nil
 			// return e.NewErr()
 		}
 		fmt.Printf(

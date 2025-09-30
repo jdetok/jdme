@@ -23,7 +23,7 @@ func TestHandleSeasonId(t *testing.T) {
 	p.SeasonIdMin = 22003
 	var errStr string
 	testSzn := uint64(22025)
-	resSzn := HandleSeasonId(testSzn, &p, &errStr)
+	resSzn := HandleSeasonId(testSzn, &p, false, &errStr)
 
 	if resSzn != testSzn {
 		fmt.Printf("season was manipulated: test season: %d result season %d\n",
@@ -245,4 +245,18 @@ func TestQueryPlayerTeam(t *testing.T) {
 		fmt.Printf("Player %d | Team %d | Season %d ||| NOT verified",
 			iq.PId, iq.TId, iq.SId)
 	}
+}
+
+func TestGetPlayerTeamSeason(t *testing.T) {
+	db := StartupTest(t)
+	iq := PQueryIds{
+		PId: 2544,
+		SId: 22024,
+		TId: 1610612747,
+	}
+	pltmszn, err := GetPlayerTeamSeason(db, &iq)
+	if err != nil {
+		t.Error("failed getting pltmszn")
+	}
+	fmt.Println(pltmszn)
 }
