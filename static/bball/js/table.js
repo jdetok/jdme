@@ -3,7 +3,7 @@
 // create caption and append to table
 export async function tblCaption(tbl, caption) {
     const capt = document.createElement('caption');
-    capt.textContent = caption;
+    capt.innerHTML = caption;
     tbl.appendChild(capt);
 } 
 

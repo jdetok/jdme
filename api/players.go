@@ -12,11 +12,54 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/errd"
-	"github.com/jdetok/golib/logd"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
+
+func GetPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (PlayerTeamSeason, error) {
+	e := errd.InitErr()
+	var pltmszn PlayerTeamSeason
+	rows, err := db.Query(pgdb.PlTmSzn, iq.PId, iq.TId, iq.SId)
+	if err != nil {
+		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+			iq.SId, iq.TId, iq.PId)
+		return pltmszn, e.BuildErr(err)
+	}
+
+	for rows.Next() {
+		rows.Scan(&pltmszn.Player, &pltmszn.Team, &pltmszn.Season)
+	}
+	return pltmszn, nil
+}
+
+// TODO: if sId 88888 doesn't need to do season
+func VerifyPlayerTeam(db *sql.DB, iq *PQueryIds) (bool, error) {
+	e := errd.InitErr()
+	fmt.Println("VerifyPlayerTeam func called")
+	rows, err := db.Query(pgdb.PlayerTeamBool, iq.PId, iq.TId)
+	if err != nil {
+		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+			iq.SId, iq.TId, iq.PId)
+		return false, e.BuildErr(err)
+	}
+	// just need to know if a row exists -
+	return rows.Next(), nil
+}
+
+// TODO: if sId 88888 doesn't need to do season
+func VerifyPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (bool, error) {
+	e := errd.InitErr()
+	fmt.Println("VerifyPlayerTeamSeason func called")
+	rows, err := db.Query(pgdb.VerifyTeamSzn, iq.SId, iq.TId, iq.PId)
+	if err != nil {
+		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+			iq.SId, iq.TId, iq.PId)
+		return false, e.BuildErr(err)
+	}
+	// just need to know if a row exists -
+	return rows.Next(), nil
+}
 
 /*
 primary database query function for the /players endpoint. queries the api
@@ -26,27 +69,12 @@ the top scorer of the most recent night's games. this is called when the site
 loads. the response is scanned into the structs defined in resp.go, before being
 marshalled into json and returned to write as the http response
 */
-func (r *Resp) GetPlayerDash(db *sql.DB, pId, sId, tId uint64) ([]byte, error) {
+func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
 	e := errd.InitErr()
-	var q string
-	var p uint64
-
-	// if 0 is passed as tId, query by player_id. otherwise, query by team_id
-	switch tId {
-	case 0:
-		logd.Logc(fmt.Sprintf("querying player_id: %d | season_id: %d", pId, sId))
-		q = pgdb.PlayerDash
-		p = pId
-	default:
-		logd.Logc(fmt.Sprintf("querying team_id: %d | season_id: %d", tId, sId))
-		q = pgdb.TeamTopScorerDash
-		p = tId
-	}
-
 	// query player, scan to structs, call struct functions
 	// appends RespObj to r.Results
-	if err := r.BuildPlayerRespStructs(db, q, p, sId); err != nil {
-		e.Msg = fmt.Sprintf("failed to query playerId %d seasonId %d", p, sId)
+	if err := r.BuildPlayerRespStructs(db, iq); err != nil {
+		e.Msg = fmt.Sprintf("failed to query playerId %d seasonId %d", iq.PId, iq.SId)
 		return nil, e.BuildErr(err)
 	}
 
@@ -62,11 +90,59 @@ func (r *Resp) GetPlayerDash(db *sql.DB, pId, sId, tId uint64) ([]byte, error) {
 // query player, scan to structs, call struct functions
 // appends RespObj to r.Results
 // separated from GetPlayerDash 09/24/2025
-func (r *Resp) BuildPlayerRespStructs(db *sql.DB, q string, p, sId uint64) error {
+/*
+swtiches query and arguments based on whether teamId = 0
+*/
+func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	e := errd.InitErr()
-
+	var args []uint64
+	var q string
+	var plr_or_tm string
 	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
-	rows, err := db.Query(q, p, sId)
+	if iq.TId > 0 {
+		var ptValid bool
+		var err error
+		plr_or_tm = "tm"
+		if iq.SId == 88888 {
+			ptValid, err = VerifyPlayerTeam(db, iq)
+			if err != nil {
+				e.Msg = "error executing team player validation query"
+				return e.BuildErr(err)
+			}
+		} else {
+			ptValid, err = VerifyPlayerTeamSeason(db, iq)
+			if err != nil {
+				e.Msg = "error executing team player validation query"
+				return e.BuildErr(err)
+			}
+		}
+
+		if !(ptValid) {
+			pltmszn_str, err := GetPlayerTeamSeason(db, iq)
+			if err != nil {
+				e.Msg = "error getting strings from ids"
+				return e.BuildErr(err)
+			}
+			errmsg := fmt.Sprintf(
+				"%s has not played for %s",
+				pltmszn_str.Player, pltmszn_str.Team)
+			r.ErrorMsg = errmsg
+			e.Msg = errmsg
+			// return nil
+			// return e.NewErr()
+		}
+		fmt.Printf(
+			"Player %d Team %d Season %d validated in BuildPlayerRespStructs func\n",
+			iq.PId, iq.TId, iq.SId)
+		args = []uint64{iq.PId, iq.TId}
+		q = pgdb.TstTeamPlayer
+	} else {
+		plr_or_tm = "plr"
+		args = []uint64{iq.PId, iq.SId}
+		q = pgdb.PlayerDash
+	}
+	// rows , err := db.Query(q, iq.PId, iq.SId)
+	rows, err := db.Query(q, args[0], args[1])
 	if err != nil {
 		e.Msg = "error during player dash query"
 		return e.BuildErr(err)
@@ -79,6 +155,7 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, q string, p, sId uint64) error
 		var s RespPlayerStats
 		var p RespPlayerSznOvw
 		// 8/6 2PM - MOVED Season/WSeason FROM END TO AFTER SeasonId
+		// two rows are returned, one for each stattype
 		rows.Scan( // MUST BE IN ORDER OF QUERY
 			&rp.Meta.PlayerId, &rp.Meta.TeamId, &rp.Meta.League,
 			&rp.Meta.SeasonId, &t.Season, &t.WSeason, &rp.Meta.StatType,
@@ -94,10 +171,10 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, q string, p, sId uint64) error
 	}
 
 	// assign nba or wnba season only based on league
-	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season)
+	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season, plr_or_tm)
 
 	// build table captions & image urls
-	rp.Meta.MakePlayerDashCaptions()
+	rp.Meta.MakePlayerDashCaptions(plr_or_tm)
 	rp.Meta.MakeHeadshotUrl()
 	// rp.Meta.
 	rp.Meta.TeamLogoUrl = MakeTeamLogoUrl(rp.Meta.League, strconv.FormatUint(rp.Meta.TeamId, 10))
@@ -129,8 +206,8 @@ accept slice of Player structs and a season id, call slicePlayerSzn to create
 a new slice with only players from the specified season. then, generate a
 random number and return the player at that index in the slice
 */
-func RandomPlayerId(pl []Player, cs *CurrentSeasons, sId uint64, lg string) uint64 {
-	players, _ := SlicePlayersSzn(pl, cs, sId, lg)
+func RandomPlayerId(pl []Player, cs *CurrentSeasons, pq *PlayerQuery) uint64 {
+	players, _ := SlicePlayersSzn(pl, cs, pq)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
 	return players[randNum].PlayerId
@@ -142,42 +219,77 @@ ID and the season ID. if 'player' variable == "random", the randPlayer function
 is called. a player ID also can be passed as the player parameter, it will just
 be converted to an int and returned
 */
-func ValidatePlayerSzn(players []Player, cs *CurrentSeasons, player string, seasonId string, lg string, errStr *string) (uint64, uint64) {
-	sId, _ := strconv.ParseUint(seasonId, 10, 32)
-	var pId uint64
+func ValidatePlayerSzn(
+	players []Player,
+	cs *CurrentSeasons,
+	pq *PlayerQuery,
+	errStr *string) (PQueryIds, error) {
+	//
+	e := errd.InitErr()
+	var iq PQueryIds
 
-	if player == "random" { // call randplayer function
-		pId = RandomPlayerId(players, cs, sId, lg)
-	} else if _, err := strconv.ParseUint(player, 10, 64); err == nil {
-		// if it's numeric keep it and convert to uint64
-		pId, _ = strconv.ParseUint(player, 10, 64)
-	} else { // search name through players list
-		for _, p := range players {
-			if p.Name == player { // return match playerid (uint32) as string
-				pId = p.PlayerId
+	sId, err := strconv.ParseUint(pq.Season, 10, 32)
+	if err != nil {
+		e.Msg = fmt.Sprintf("failed to convert season %s to int", pq.Season)
+		return iq, e.BuildErr(err)
+	}
+
+	tId, err := strconv.ParseUint(pq.Team, 10, 64)
+	if err != nil {
+		e.Msg = fmt.Sprintf("failed to convert team %s to int", pq.Team)
+		return iq, e.BuildErr(err)
+	}
+	iq.TId = tId
+	// var pId uint64
+
+	if pq.Player == "random" { // call randplayer function
+		iq.PId = RandomPlayerId(players, cs, pq)
+	} else {
+		// check if it can be converted to number
+		pId, err := strconv.ParseUint(pq.Player, 10, 64)
+		if err == nil {
+			// if it's numeric keep it and convert to uint64
+			iq.PId = pId
+		} else { // search name through players list
+			for _, p := range players {
+				if p.Name == pq.Player { // return match playerid (uint32) as string
+					iq.PId = p.PlayerId
+				}
 			}
 		}
 	}
 
 	// loop through players to check that queried season is within min-max seasons
 	for _, p := range players {
-		if p.PlayerId == pId {
-			return pId, HandleSeasonId(sId, &p, errStr)
+		if p.PlayerId == iq.PId {
+			if iq.TId > 0 {
+				iq.SId = HandleSeasonId(sId, &p, true, errStr)
+			} else {
+				iq.SId = HandleSeasonId(sId, &p, false, errStr)
+			}
+			return iq, nil
 		}
 	}
-	return pId, sId
+	e.Msg = "player not in memory"
+	return iq, e.NewErr()
 }
 
 // fill RespPlayerMeta captions fields with formatted strings for each playerdash
 // table's caption
-func (m *RespPlayerMeta) MakePlayerDashCaptions() {
+func (m *RespPlayerMeta) MakePlayerDashCaptions(plr_or_tm string) {
 	var delim string = "|"
+	var stat_lbl_ender string
+	if plr_or_tm == "plr" {
+		stat_lbl_ender = m.Season
+	} else if plr_or_tm == "tm" {
+		stat_lbl_ender = "Career w/ " + m.Team
+	}
 	m.Caption = fmt.Sprintf("%s %s %s", m.Player, delim, m.TeamName)
 	m.CaptionShort = fmt.Sprintf("%s %s %s", m.Player, delim, m.Team)
-	m.BoxCapTot = fmt.Sprintf("Box Totals %s %s", delim, m.Season)
-	m.BoxCapAvg = fmt.Sprintf("Box Averages %s %s", delim, m.Season)
-	m.ShtgCapTot = fmt.Sprintf("Shooting Totals %s %s", delim, m.Season)
-	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages %s %s", delim, m.Season)
+	m.BoxCapTot = fmt.Sprintf("Box Totals %s %s", delim, stat_lbl_ender)
+	m.BoxCapAvg = fmt.Sprintf("Box Averages %s %s", delim, stat_lbl_ender)
+	m.ShtgCapTot = fmt.Sprintf("Shooting Totals %s %s", delim, stat_lbl_ender)
+	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages %s %s", delim, stat_lbl_ender)
 }
 
 /*
@@ -223,12 +335,15 @@ regular season and playoffs, the function will verify the player played in said
 season, and return either their max or min (whichever is closer) season  if they
 did not
 */
-func HandleSeasonId(sId uint64, p *Player, errStr *string) uint64 {
+func HandleSeasonId(sId uint64, p *Player, team bool, errStr *string) uint64 {
 	if sId == 99999 || sId == 29999 { // agg seasons
 		msg := fmt.Sprintf("aggregate season requested%d | %d\n", sId, sId)
 		fmt.Println(msg)
 		return sId
 	} else if sId == 88888 {
+		if team {
+			return sId
+		}
 		msg := fmt.Sprintf("returning latest regular season for player%d | %d\n",
 			sId, p.SeasonIdMax)
 		fmt.Println(msg)
@@ -296,9 +411,20 @@ accept the slice of all players and a seasonId, return a slice with just the
 active players from the passed season id
 */
 // func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
-func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg string) ([]Player, error) {
+func SlicePlayersSzn(players []Player, cs *CurrentSeasons, pq *PlayerQuery) ([]Player, error) {
+	e := errd.InitErr()
 	var plslice []Player
 
+	if pq.Team != "0" {
+		fmt.Println("team not 0")
+	}
+
+	seasonId, err := strconv.ParseUint(pq.Season, 10, 64)
+	if err != nil {
+		e.Msg = fmt.Sprintf("failed to convert %s to int", pq.Season)
+		return nil, e.BuildErr(err)
+	}
+	//
 	// get struct with current seasons
 	sl := cs.LgSznsByMonth(time.Now())
 
@@ -316,7 +442,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 
 		if seasonId == 49999 {
 			if p.PSeasonIdMin > 0 && p.SeasonIdMax >= (sl.WSznId-3) {
-				if lg == "all" || lg == p.League {
+				if pq.League == "all" || pq.League == p.League {
 					plslice = append(plslice, p)
 				}
 			}
@@ -324,7 +450,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 
 		if seasonId == 29999 {
 			if p.SeasonIdMax >= (sl.WSznId - 3) {
-				if lg == "all" || lg == p.League {
+				if pq.League == "all" || pq.League == p.League {
 					plslice = append(plslice, p)
 				}
 			}
@@ -333,7 +459,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 		// append players to the random slice if the passed season id between player min and max season
 		if seasonId >= 20000 && seasonId < 30000 {
 			if seasonId <= p.SeasonIdMax && seasonId >= p.SeasonIdMin {
-				if lg == "all" || lg == p.League {
+				if pq.League == "all" || pq.League == p.League {
 					plslice = append(plslice, p)
 				}
 			}
@@ -341,7 +467,7 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 
 		if seasonId >= 40000 && seasonId < 50000 {
 			if seasonId <= p.PSeasonIdMax && seasonId >= p.PSeasonIdMin {
-				if lg == "all" || lg == p.League {
+				if pq.League == "all" || pq.League == p.League {
 					plslice = append(plslice, p)
 				}
 			}
@@ -352,11 +478,15 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, seasonId uint64, lg s
 }
 
 // accept pointers of league and season, switch season/wseason on league
-func (t *RespSeasonTmp) SwitchSznByLeague(league *string, season *string) {
-	switch *league {
-	case "NBA":
-		*season = t.Season
-	case "WNBA":
-		*season = t.WSeason
+func (t *RespSeasonTmp) SwitchSznByLeague(league, season *string, plr_or_tm string) {
+	if plr_or_tm == "plr" {
+		switch *league {
+		case "NBA":
+			*season = t.Season
+		case "WNBA":
+			*season = t.WSeason
+		}
+	} else {
+		*season = "Career with Team"
 	}
 }

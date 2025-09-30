@@ -2,6 +2,21 @@
 
 package pgdb
 
+var VerifyTeamSzn = `
+select 1
+from api.plr_agg
+where season_id = $1
+and team_id = $2
+and player_id = $3
+and stat_type = 'tot'
+`
+var PlayerTeamBool = `
+select 1
+from api.plr_agg
+where player_id = $1
+and team_id = $2
+`
+
 // query all seasons in database, populates global seasons struct
 var AllSeasons = `
 select szn_id, szn_desc, wszn_desc
@@ -137,3 +152,66 @@ group by a.player_id, b.player, b.lg_id, e.szn
 order by points desc
 limit $3
 `
+
+var TstTeamPlayer = `
+select 
+	player_id, team_id, lg, 
+	max(szn_id) as szn_id, max(szn_desc) as szn_desc, max(wszn_desc) as wszn_desc,
+	max(stype) as stype, max(player) as player, max(team) as team, max(team_long) as team_long, 
+	sum(gp) as gp, sum(minutes) as minutes, sum(points) as points, sum(assists) as assists, 
+	sum(rebounds) as rebounds, sum(steals) as steals, sum(blocks) as blocks, 
+	sum(fgm) as fgm, sum(fga) as fga, 
+	round(avg(to_number(substring(fgp, 0, 5), '999.99')), 2) || '%' as fgp, 
+	sum(f3m) as f3m, sum(f3a) as f3a, 
+	round(avg(to_number(substring(f3p, 0, 5), '999.99')), 2) || '%' as f3p,
+	sum(ftm) as ftm, sum(fta) as fta, 
+	round(avg(to_number(substring(ftp, 0, 5), '999.99')), 2) || '%' as ftp
+from api.v_plr_szn_tot
+where player_id = $1 
+and team_id = $2
+group by player_id, team_id, lg
+union
+select 
+	player_id, team_id, lg, 
+	max(szn_id) as szn_id, max(szn_desc) as szn_desc, max(wszn_desc) as wszn_desc,
+	max(stype) as stype, max(player) as player, max(team) as team, max(team_long) as team_long, 
+	sum(gp) as gp, round(avg(minutes), 2) as minutes, round(avg(points), 2) as points, round(avg(assists), 2) as assists, 
+	round(avg(rebounds), 2) as rebounds, round(avg(steals), 2) as steals, round(avg(blocks), 2) as blocks, 
+	round(avg(fgm), 2) as fgm, round(avg(fga), 2) as fga, 
+	round(avg(to_number(substring(fgp, 0, 5), '999.99')), 2) || '%' as fgp, 
+	round(avg(f3m), 2) as f3m, round(avg(f3a), 2) as f3a, 
+	round(avg(to_number(substring(f3p, 0, 5), '999.99')), 2) || '%' as f3p,
+	round(avg(ftm), 2) as ftm, round(avg(fta), 2) as fta, 
+	round(avg(to_number(substring(ftp, 0, 5), '999.99')), 2) || '%' as ftp
+from api.v_plr_szn_avg
+where player_id = $1
+and team_id = $2
+group by player_id, team_id, lg
+`
+
+var PlTmSzn = `
+select 
+    (select player from lg.plr where player_id = $1) as player,
+    (select team from lg.team where team_id = $2) as team,
+    (select szn from lg.szn where szn_id = $3) as season
+`
+
+/*
+select
+	player_id, team_id, lg,
+	max(szn_id) as szn_id, max(szn_desc) as szn_desc, max(wszn_desc) as wszn_desc,
+	max(stype) as stype, max(player) as player, max(team) as team, max(team_long) as team_long,
+	sum(gp) as gp, sum(minutes) as minutes, sum(points) as point, sum(assists) as assists,
+	sum(rebounds) as rebounds, sum(steals) as steals, sum(blocks) as blocks,
+	round(avg(fgm), 2) as fgm, round(avg(fga), 2) as fga,
+	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as fgp,
+	round(avg(f3m), 2) as f3m, round(avg(f3a), 2) as f3a,
+	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as f3p,
+	round(avg(ftm), 2) as ftm, round(avg(fta), 2) as fta,
+	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as ftp
+from api.v_plr_szn_tot
+where player_id = 2544
+and team_id = 1610612747
+group by player_id, team_id, lg
+
+*/

@@ -1,3 +1,38 @@
+table {
+    color: rgb(236, 237, 255);
+    border: 3px solid black;
+    width: 100%;
+    border-radius: 5px;
+
+}
+
+table tr th,
+table tr td {
+    border: 1px solid black;
+}
+
+caption {
+    font-size: 24px;
+}
+
+#seeMoreFrm {
+    display: flex;
+    flex-direction: row;
+}
+
+#seeMoreBtn {
+    width: 20%;
+    /* max-width: fit-content; */
+}
+
+#seeMoreLbl {
+    width: fit-content;
+}
+
+#seeMoreIn {
+    width: min-content;
+}
+
 #topsect {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -95,22 +130,10 @@ table thead {
 } */
 
 .uirowouter {
+    /* border: 2px solid orange; */
     display: flex;
     flex-direction: row;
     justify-content: center;
-    max-width: 100%;
-}
-
-.uirow {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    max-width: 100%;
-}
-
-.uisect {
-    display: flex;
-    flex-direction: column;
     max-width: 100%;
 }
 
@@ -118,7 +141,25 @@ table thead {
     display: flex;
     flex-direction: column;
     height: fit-content;
+    max-width: 50%;
+    width: 50%;
 }
+
+.uiel {
+    /* border: 2px solid white; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+.uiel select {
+    width: 100%;
+    max-width: 100%;
+}
+
+
 
 #pSearchBtns {
     display: flex;
@@ -219,23 +260,6 @@ table thead {
 .resptbl {
     /* border: 2px solid yellow; */
     width: 100%;
-}
-
-table {
-    color: rgb(236, 237, 255);
-    border: 3px solid black;
-    width: 100%;
-    border-radius: 5px;
-
-}
-
-table tr th,
-table tr td {
-    border: 1px solid black;
-}
-
- caption {
-    font-size: 24px;
 }
 
 .btm {
