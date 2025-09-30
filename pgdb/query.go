@@ -189,6 +189,13 @@ and team_id = $2
 group by player_id, team_id, lg
 `
 
+var PlTmSzn = `
+select 
+    (select player from lg.plr where player_id = $1) as player,
+    (select team from lg.team where team_id = $2) as team,
+    (select szn from lg.szn where szn_id = $3) as season
+`
+
 /*
 select
 	player_id, team_id, lg,

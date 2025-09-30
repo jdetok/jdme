@@ -81,10 +81,12 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	e := errd.InitErr()
 	var args []uint64
 	var q string
+	var plr_or_tm string
 	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
 	if iq.TId > 0 {
 		var ptValid bool
 		var err error
+		plr_or_tm = "tm"
 		if iq.SId == 88888 {
 			ptValid, err = VerifyPlayerTeam(db, iq)
 			if err != nil {
@@ -113,6 +115,7 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 		args = []uint64{iq.PId, iq.TId}
 		q = pgdb.TstTeamPlayer
 	} else {
+		plr_or_tm = "plr"
 		args = []uint64{iq.PId, iq.SId}
 		q = pgdb.PlayerDash
 	}
@@ -146,10 +149,10 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	}
 
 	// assign nba or wnba season only based on league
-	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season)
+	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season, plr_or_tm)
 
 	// build table captions & image urls
-	rp.Meta.MakePlayerDashCaptions()
+	rp.Meta.MakePlayerDashCaptions(plr_or_tm)
 	rp.Meta.MakeHeadshotUrl()
 	// rp.Meta.
 	rp.Meta.TeamLogoUrl = MakeTeamLogoUrl(rp.Meta.League, strconv.FormatUint(rp.Meta.TeamId, 10))
@@ -251,14 +254,20 @@ func ValidatePlayerSzn(
 
 // fill RespPlayerMeta captions fields with formatted strings for each playerdash
 // table's caption
-func (m *RespPlayerMeta) MakePlayerDashCaptions() {
+func (m *RespPlayerMeta) MakePlayerDashCaptions(plr_or_tm string) {
 	var delim string = "|"
+	var stat_lbl_ender string
+	if plr_or_tm == "plr" {
+		stat_lbl_ender = m.Season
+	} else if plr_or_tm == "tm" {
+		stat_lbl_ender = "Career w/ " + m.Team
+	}
 	m.Caption = fmt.Sprintf("%s %s %s", m.Player, delim, m.TeamName)
 	m.CaptionShort = fmt.Sprintf("%s %s %s", m.Player, delim, m.Team)
-	m.BoxCapTot = fmt.Sprintf("Box Totals %s %s", delim, m.Season)
-	m.BoxCapAvg = fmt.Sprintf("Box Averages %s %s", delim, m.Season)
-	m.ShtgCapTot = fmt.Sprintf("Shooting Totals %s %s", delim, m.Season)
-	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages %s %s", delim, m.Season)
+	m.BoxCapTot = fmt.Sprintf("Box Totals %s %s", delim, stat_lbl_ender)
+	m.BoxCapAvg = fmt.Sprintf("Box Averages %s %s", delim, stat_lbl_ender)
+	m.ShtgCapTot = fmt.Sprintf("Shooting Totals %s %s", delim, stat_lbl_ender)
+	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages %s %s", delim, stat_lbl_ender)
 }
 
 /*
@@ -375,27 +384,6 @@ func HandleSeasonId(sId uint64, p *Player, team bool, errStr *string) uint64 {
 	return sId
 }
 
-// tId, err := strconv.ParseUint(pq.Team, 10, 64)
-// iq.TId = tId
-// if err != nil {
-// 	msg := fmt.Sprintf("error converting %v to int", pq.Team)
-// 	e.HTTPErr(w, msg, err)
-// }
-
-// func SlicePlayerTeam(players *[]Player, teamId string) ([]Player, error) {
-// 	e := errd.InitErr()
-// 	tId, err := strconv.ParseUint(teamId, 10, 64)
-// 	if err != nil {
-// 		e.Msg = fmt.Sprintf("error converting %s to uint64")
-// 		return nil, e.BuildErr(err)
-// 	}
-
-// 	for _, p := range *players {
-// 		if p.
-// 	}
-
-// }
-
 /*
 accept the slice of all players and a seasonId, return a slice with just the
 active players from the passed season id
@@ -468,11 +456,15 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, pq *PlayerQuery) ([]P
 }
 
 // accept pointers of league and season, switch season/wseason on league
-func (t *RespSeasonTmp) SwitchSznByLeague(league *string, season *string) {
-	switch *league {
-	case "NBA":
-		*season = t.Season
-	case "WNBA":
-		*season = t.WSeason
+func (t *RespSeasonTmp) SwitchSznByLeague(league, season *string, plr_or_tm string) {
+	if plr_or_tm == "plr" {
+		switch *league {
+		case "NBA":
+			*season = t.Season
+		case "WNBA":
+			*season = t.WSeason
+		}
+	} else {
+		*season = "Career with Team"
 	}
 }

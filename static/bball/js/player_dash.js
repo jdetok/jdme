@@ -44,18 +44,17 @@ export async function makePlayerDash(base, player, season, team, ts, lg) { // ad
         console.log(js.error_string);
         err.textContent = js.error_string;
         err.style.display = "block"    
-
-    } else {
-        console.log("no error string from server");
-    }
-    // handle empty player response
-    if (data.player_meta.player_id === 0) {
+// handle empty player response
+    } else if (data.player_meta.player_id === 0) {
         if (player != '') {
             err.textContent = `'${player}' not found...`
             err.style.display = "block"    
         }
         throw new Error(`Player not found error`);
-    } 
+    } else {
+        console.log("no error string from server");
+    }
+    
 
     console.log(data.player_meta.season_id);
     // build and display player dash
