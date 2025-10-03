@@ -14,43 +14,39 @@
   <script type="module" src="/bball/js/listen.js" defer></script>
 </head>
 
-<header>
-  <div class="bhdr">
-    <div class="left">
-      <a href="https://jdeko.me">go to jdeko.me</a>
-      <a class="hidesmall" target="_blank" href="https://jdeko.me/about">about jdeko.me</a>
-      <a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a>
-    </div>
 
-    <div class="center">
-      <div id="site_title">
-      jdeko.me/bball<br>nba/wnba statistics
-      </div>
-      <a href="https://jdeko.me/bball/about">about jdeko.me/bball</a>
-    </div>
-
-    <div class="right">
-      <a target="_blank" href="https://www.nba.com">all data owned by the nba/wnba</a>
-    </div>
-  </div>
-</header>
 
 <body>
 <!-- TOP HALF OF SITE (BEFORE RESPONSE SECTION) -->
-  <div id="topsect">
+  <div class="static_grid">
+    <!-- left header links -->
+    <div class="lhdr">
+      <a href="https://jdeko.me">go to jdeko.me</a> |
+      <a class="hidesmall" target="_blank" href="https://jdeko.me/about">about jdeko.me</a> |
+      <a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a> 
+    </div>
+    <!-- center header link(s) -->
+    <div class="chdr">
+      <a href="https://jdeko.me/bball/about">about jdeko.me/bball</a>  
+    </div>
+    <!-- right header link(s) -->
+    <div class="rhdr">
+      <a target="_blank" href="https://www.nba.com/stats">ALL DATA OWNED BY THE NBA/WNBA</a>
+    </div>
     <!-- TOP SCORERS FROM RECENTS GAMES TABLE -->
     <div class="top_sect_tbls" id="top_players">
       <table class="tstbl" id="tstbl"></table>
     </div>
     <!-- SITE TITLE -->
-    
-    <!-- SHORT INSTRUCTIONS FOR UI -->
-    
+    <div id="site_title">
+      jdeko.me/bball<br>nba/wnba statistics
+    </div>
+
     <!-- MAIN UI ELEMENTS -->
     <form id="ui">
-      <div id="site_helpbox">
-      <i>press the corresponding checkbox to filter players by season<br> 
-        defaults to current regular season if neither checkbox is checked</i>
+      <div class="helpbox">
+        press the corresponding season checkbox to filter by season 
+        defaults to current regular season if left unchecked
       </div>
       <!-- SEASON SELECTORS -->
       <div class="uirowouter"> 
@@ -72,6 +68,10 @@
             <div class="hlp" id="hlpRs">?</div>
           </div>
         </div>
+      </div>
+      <div class="helpbox">
+        team filter will return player's career stats with selected team 
+        if team checkbox is checked
       </div> 
       <!-- TEAM SELECTORS -->
       <div class="uirowouter"> 
@@ -109,11 +109,11 @@
         <input type="text" style="display:none;" id="pHold">
         <div class="uiel">
           <input type="text" id="pSearch" placeholder="Search for a player">
-          <button type="button" id="clearS">clear search</button>
+          <button type="submit" id="search">search player</button>
         </div>
         <!-- SEARCH PLAYER BUTTON | HOLD PLAYER BUTTON -->
         <div class="uiel">
-          <button type="submit" id="search">search player</button>
+          <button type="button" id="clearS">clear search</button>          
           <button type="button" id="holdP">hold current player</button>
           <div class="hlp" id="hlpHld">?</div>
         </div>
@@ -134,7 +134,7 @@
   </div>
 
   <!-- RESPONSE -->
-  <div class="respouter">
+  <div class="response">
     <!-- RESPONSE PLAYER/TEAM LABEL -->
     <div class="resptitle" id="player_title"></div>
     <!-- RESPONSE SECTION 1 (LEFT HALF) -->
@@ -146,14 +146,14 @@
       </div>
     </div>
     <!-- RESPONSE SECTION 2 (RIGHT HALF) -->
-    <div class="respsect" id="stats">
-      <div class="resptbls">
+    <!-- <div class="respsect" id="stats"> -->
+      <div class="resptbls" id="stats">
         <div class="resptbl" id="box"></div>
         <div class="resptbl" id="avg-box"></div>
         <div class="resptbl" id="shooting"></div>
         <div class="resptbl" id="avg-shooting"></div>
       </div>
-    </div>
+    <!-- </div> -->
   </div>
   <!-- DISCLAIMER AT BOTTOM -->
   <div class="btm">

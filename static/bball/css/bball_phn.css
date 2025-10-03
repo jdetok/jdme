@@ -1,50 +1,35 @@
 @media (max-width: 600px) {
-
-    .bhdr {
-        display: grid;
-        grid-template-columns: 1fr; /* left | center | right */
-        align-items: center;
-        margin: 0 auto;
-    }
-
-    .left {
-        display: none;
-    } 
-
-    .right {
-        display: none;
-    } 
-
-    .bhdr {
-        width: 100%;
-    }
-
-    #topsect {
+    .static_grid {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
+        grid-template-rows: repeat(5, auto);
         grid-template-areas:
-            "top"
-            "mid"
-            "btm";
+            "rhdr"
+            "ttl"
+            "chdr"
+            "l"
+            "r"
+            "m";
+        justify-items: center;
+
     }
     
-    #top_players {
-        grid-area: top;
-    } 
-
-    #top_lg_players {
-        grid-area: mid;
+    .lhdr {
+        display: none;
     }
 
-    #ui {
-        grid-area: btm;
+    .chdr {
+        grid-area: chdr;
     }
 
-    #topsect > div, #topsect h1, #topsect form {
-        width: 100%;
+    .rhdr {
+        grid-area: rhdr;
+        justify-self: center;
     }
-    .uisect {
-        flex-direction: column;
+
+    .response {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        max-width: 100%;
     }
     
     .resptitle {
@@ -58,15 +43,4 @@
     .resprow {
         flex-direction: column;
     }
-
-    .resptbls {
-        width: 100%;
-    }
-
-    .respouter {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-    }
-
-
 }
