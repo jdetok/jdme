@@ -1,3 +1,33 @@
+/* FULL SCREEN CROSSAIR POSITIONING */
+/* body::before,
+body::after {
+  content: "";
+  position: fixed;
+  background: rgba(0, 0, 0, 0.449);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+body::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+}
+
+body::after {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+} */
+
+/* BORDERS ON OFF */
+/* #topsect > * {
+    border: 1px solid black;
+} */
+
+/* GLOBAL TABLE */
 table {
     color: rgb(236, 237, 255);
     border: 3px solid black;
@@ -5,7 +35,9 @@ table {
     border-radius: 5px;
 
 }
-
+table thead {
+    border-right: 1px solid black;
+}
 table tr th,
 table tr td {
     border: 1px solid black;
@@ -15,41 +47,73 @@ caption {
     font-size: 24px;
 }
 
-#seeMoreFrm {
-    display: flex;
-    flex-direction: row;
+/* BUTTONS WITHIN A TABLE */
+table button {
+    border: none;
+    color: rgba(211, 224, 241, 0.779);
+    font-size: 16px;
+    text-decoration: underline;
+    background-color: inherit;
+    width: 100%;
+    height: 100%;
+    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.449);
 }
 
-#seeMoreBtn {
-    width: 20%;
-    /* max-width: fit-content; */
+/* MAKE SELECTS APPEAR CENTERED IN THE UI DIV */
+select {
+    width: 100%;
+    max-width: 100%;
 }
 
-#seeMoreLbl {
-    width: fit-content;
+/* BBALL HEADER */
+.bhdr {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* left | center | right */
+  align-items: center;
+  margin: 0 auto;
 }
 
-#seeMoreIn {
-    width: min-content;
+.bhdr > div {
+    align-self: start;
 }
 
+/* left side hugs left */
+.left {
+  justify-self: start;
+  display: flex;
+  gap: 1rem;
+}
+
+/* middle perfectly centered */
+.center {
+  justify-self: center;
+}
+
+/* right side hugs right */
+.right {
+  justify-self: end;
+  display: flex;
+  gap: 1rem;
+}
+
+/* ERROR MESSAGE */
+.err {
+    display: none;
+}
+
+/* OUTER GRID DIV FOR TOP SCORERS TABLE, TITLE, UI */
 #topsect {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: fit-content fit-content fit-content;
+    /* grid-template-rows: fit-content fit-content fit-content; */
     grid-template-areas:
-    "left middle-top right"
-    "left middle-middle right"
-    "left middle-bottom right";
+    "left middle right";
+    /* "left middle-bottom right"; */
     gap: 10px;
     padding: 5px;
 }
 
-/* #topsect > * {
-    border: 1px solid black;
-} */
-
-#ttl {
+#site_title {
     font-size: 54px;
     font-weight: bold;
     color:blanchedalmond;
@@ -58,7 +122,7 @@ caption {
     height: fit-content;
     max-width: fit-content;
     margin-top: 10px;
-    align-self: start;
+    align-self: end;
 }
 
 .lg_tbls {
@@ -68,25 +132,11 @@ caption {
 
 #top_players {
     grid-area: left;
+    align-self: start;
 }
 
 #top_lg_players {
     grid-area: right;
-}
-
-#titlesect h1 {
-    grid-area: middle-top;
-}
-.top_sect_tbls button {
-    border: none;
-    color: rgba(211, 224, 241, 0.779);
-    /* color: rgba(212, 128, 177, 0.779); */
-    font-size: 16px;
-    text-decoration: underline;
-    background-color: inherit;
-    width: 100%;
-    height: 100%;
-    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.449);
 }
 
 .tstbl {
@@ -95,9 +145,6 @@ caption {
     margin-top: 20px;
     border-radius: 5px;
 }
-table thead {
-    border-right: 1px solid black;
-}
 
 #lgts_title {
     margin: 0 auto;
@@ -105,32 +152,22 @@ table thead {
     color: white;
 }
 
-#under_ttl {
-    grid-area: "left middle-middle right";
-    align-self: end;
-}
-
+/* UI SECTION - MAIN SELECTORS, CHECKBOXES, BUTTONS, SEARCH BOX, ETC */
 #ui {
     border: 3px solid black;
     border-radius: 7px;
-    grid-area: middle-bottom;
+    grid-area: middle;
     display: grid;
     margin: 0 auto;
     height: fit-content;
     width: fit-content;
     padding: 10px;
     max-width: fit-content;
-    align-self: start;
+    align-self: end;
     gap: 10px;
 }
 
-/* 
-#ui > * {
-    border: 1px solid white;
-} */
-
 .uirowouter {
-    /* border: 2px solid orange; */
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -146,7 +183,6 @@ table thead {
 }
 
 .uiel {
-    /* border: 2px solid white; */
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -154,14 +190,7 @@ table thead {
     max-width: 100%;
 }
 
-.uiel select {
-    width: 100%;
-    max-width: 100%;
-}
-
-
-
-#pSearchBtns {
+#search_group {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -169,47 +198,36 @@ table thead {
     width: fit-content;
     max-width: 100%;
 }
-
-.err {
-    display: none;
-}
-
+/* RESPONSE CLASSES */
 /* meant to be outermost of response */
 .respouter {
-    /* border: 2px solid black; */
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: 1fr 1fr;
     margin: 0 auto;
-    margin-bottom: 10px;
+    gap: 1%;
+    width: 100%;
 } 
 
 .resptitle {
+    grid-column: 1 / -1;
+    /* border: 3px solid black;
+    border-radius: 7px; */
     color: rgb(232, 225, 235);
     font-size: 40px;
     font-weight: bold;
-    margin-bottom: 1%;
-    margin-top: 1%;
-}
-
-/* for side by side divs */
-.resprow {
-    /* border: 2px solid pink; */
     margin: 0 auto;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 95%;
-    gap: 1%;
+    width: fit-content;
+    padding: 10px;
 }
 
+/*  response section, takes up half of screen */
 .respsect {
     border: 3px solid black;
     border-radius: 7px;
-    /* border: 3px solid white; */
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 10px;
-    gap: 10px;
-    /* max-width: fit-content; */
+    padding: 1%;
+    height: fit-content;
+    align-items: center;
 }
 
 .respsect h2 {
@@ -222,15 +240,8 @@ table thead {
     font-size: 26px;
 } 
 
-.respblk {
-    /* border: 3px solid magenta; */
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
+/* div and img both necessary for player/team images! */
 .respimgs {
-    /* border: 3px solid black; */
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -238,32 +249,15 @@ table thead {
 }
 
 .respimgs div {
-    /* border: 2px solid purple; */
     width: 50%;
 }
 
 .respimgs img {
     width: 100%;
-    max-width: 100%;
-}
-
-.resptbls {
-    /* border: 2px solid blue; */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 10px;
-    /* width: 90%; */
-    max-width: 100%;
-}
-
-.resptbl {
-    /* border: 2px solid yellow; */
-    width: 100%;
 }
 
 .btm {
-    margin-top: 2%;
+    margin-top:35px;
     font-size: 16px;
     color: rgb(236, 237, 255);
 }

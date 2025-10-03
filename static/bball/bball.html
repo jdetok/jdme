@@ -14,99 +14,117 @@
 </head>
 
 <header>
-  <div class="hdr">
-    <div><a href="http://localhost:8080">go to jdeko.me</a></div>
-    <div><a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">
-      jdeko.me source code</a></div>
-    <div><a href="http://localhost:8080/bball/about">about jdeko.me/bball</a></div>
-    <div class="hidesmall"><a target="_blank" href="http://localhost:8080/about">
-      about jdeko.me</a></div>
-    <div><a target="_blank" href="https://www.nba.com/stats">
-        all data owned by the nba/wnba</a></div>
+  <div class="bhdr">
+    <div class="left">
+      <a href="http://localhost:8080">go to jdeko.me</a>
+      <a class="hidesmall" target="_blank" href="http://localhost:8080/about">about jdeko.me</a>
+      <a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a>
+    </div>
+
+    <div class="center">
+      <div id="site_title">
+      jdeko.me/bball<br>nba/wnba statistics
+      </div>
+      <a href="http://localhost:8080/bball/about">about jdeko.me/bball</a>
+    </div>
+
+    <div class="right">
+      <a target="_blank" href="https://www.nba.com/stats">all data owned by the nba/wnba</a>
+    </div>
   </div>
 </header>
-<body>
 
-<div id="topsect">
-  <div class="top_sect_tbls" id="top_players">
-    <table class="tstbl" id="tstbl"></table>
-  </div>
-  <div id="ttl">
-    jdeko.me/bball<br>nba/wnba statistics
-  </div>
-  <div id="under_ttl">
-    <i>press the corresponding checkbox to filter players by season 
-      - defaults to current regular season if neither checkbox is checked</i>
-  </div>
-  <!-- SELECTS ========================================= -->
-  <form id="ui">
-    <div class="uirowouter"> 
-      <div class="uiopt" id="psdiv">
-        <label for="post">post-seasons:</label>
-        <div class="uiel"> 
-          <div class="hlp" id="hlpPs">?</div>
-          <select id="ps_slct"></select>
-          <input type="checkbox" id="post">
-        </div>
-      </div>
-      <div class="uiopt" id="rsdiv">
-        <label for="reg">regular seasons:</label>
-        <div class="uiel">
-          <input type="checkbox" value="rs" id="reg">
-          <select id="rs_slct"></select>
-          <div class="hlp" id="hlpRs">?</div>
-        </div>
-      </div>
-    </div> 
-    <div class="uirowouter"> 
-      <div class="uiopt" id="teams">
-        <label for="nbaTm">nba teams:</label>
-        <div class="uiel"> 
-          <div class="hlp" id="hlpTm">?</div>
-          <select id="tm_slct"></select>
-          <input type="checkbox" id="nbaTm">
-        </div>
-      </div>
-      <div class="uiopt" id="wTeams">
-        <label for="wnbaTm">wnba teams:</label>
-        <div class="uiel">
-          <input type="checkbox" value="wt" id="wnbaTm">
-          <select id="wTm_slct"></select>
-          <div class="hlp" id="hlpWTm">?</div>
-        </div>
-      </div>
-    </div> 
-    <div id="lg_radio">
-      <input type="radio" id="nba" name="leagues" value="nba" />
-      <label for="nba">NBA</label>
-      <input type="radio" id="wnba" name="leagues" value="wnba" />
-      <label for="wnba">WNBA</label>
-      <input type="radio" id="all_lgs" name="leagues" value="all" />
-      <label for="all_lgs">Both</label>
+<body>
+<!-- TOP HALF OF SITE (BEFORE RESPONSE SECTION) -->
+  <div id="topsect">
+    <!-- TOP SCORERS FROM RECENTS GAMES TABLE -->
+    <div class="top_sect_tbls" id="top_players">
+      <table class="tstbl" id="tstbl"></table>
     </div>
-    <div class="hvr" id="selhvr"></div>
-    <div id="pSearchBtns">
-      <div class="err" id="sErr"></div>
-      <input type="text" style="display:none;" id="pHold">
-      <div class="uiel">
-        <input type="text" id="pSearch" placeholder="Search for a player">
-        <button type="button" id="clearS">clear search</button>
+    <!-- SITE TITLE -->
+    
+    <!-- SHORT INSTRUCTIONS FOR UI -->
+    
+    <!-- MAIN UI ELEMENTS -->
+    <form id="ui">
+      <div id="site_helpbox">
+      <i>press the corresponding checkbox to filter players by season<br> 
+        defaults to current regular season if neither checkbox is checked</i>
       </div>
-      <div class="uiel">
-        <button type="submit" id="search">search player</button>
-        <button type="button" id="holdP">hold current player</button>
-        <div class="hlp" id="hlpHld">?</div>
+      <!-- SEASON SELECTORS -->
+      <div class="uirowouter"> 
+        <!-- POST SEASONS -->
+        <div class="uiopt" id="psdiv">
+          <label for="post">post-seasons:</label>
+          <div class="uiel"> 
+            <div class="hlp" id="hlpPs">?</div>
+            <select id="ps_slct"></select>
+            <input type="checkbox" id="post">
+          </div>
+        </div>
+        <!-- REGULAR SEASONS -->
+        <div class="uiopt" id="rsdiv">
+          <label for="reg">regular seasons:</label>
+          <div class="uiel">
+            <input type="checkbox" value="rs" id="reg">
+            <select id="rs_slct"></select>
+            <div class="hlp" id="hlpRs">?</div>
+          </div>
+        </div>
+      </div> 
+      <!-- TEAM SELECTORS -->
+      <div class="uirowouter"> 
+        <!-- NBA TEAMS -->
+        <div class="uiopt" id="teams"> 
+          <label for="nbaTm">nba teams:</label>
+          <div class="uiel"> 
+            <div class="hlp" id="hlpTm">?</div>
+            <select id="tm_slct"></select>
+            <input type="checkbox" id="nbaTm">
+          </div>
+        </div>
+        <!-- WNBA TEAMS -->
+        <div class="uiopt" id="wTeams"> 
+          <label for="wnbaTm">wnba teams:</label>
+          <div class="uiel">
+            <input type="checkbox" value="wt" id="wnbaTm">
+            <select id="wTm_slct"></select>
+            <div class="hlp" id="hlpWTm">?</div>
+          </div>
+        </div>
+      </div> 
+      <!-- LEAGUE RADIO BUTTONS (NBA | WNBA | BOTH) -->
+      <div id="lg_radio"> 
+        <input type="radio" id="nba" name="leagues" value="nba" />
+        <label for="nba">NBA</label>
+        <input type="radio" id="wnba" name="leagues" value="wnba" />
+        <label for="wnba">WNBA</label>
+        <input type="radio" id="all_lgs" name="leagues" value="all" />
+        <label for="all_lgs">Both</label>
       </div>
-      
-      <div class="uiel">
-        <button type="button" id="randP">search for a random player</button>
-        <div class="hlp" id="hlpRnd">?</div>
+      <!-- CLUSTER OF PLAYER INPUT BOX, SEARCH BUTTONS -->
+      <div id="search_group">
+        <div class="err" id="sErr"></div>
+        <input type="text" style="display:none;" id="pHold">
+        <div class="uiel">
+          <input type="text" id="pSearch" placeholder="Search for a player">
+          <button type="button" id="clearS">clear search</button>
+        </div>
+        <!-- SEARCH PLAYER BUTTON | HOLD PLAYER BUTTON -->
+        <div class="uiel">
+          <button type="submit" id="search">search player</button>
+          <button type="button" id="holdP">hold current player</button>
+          <div class="hlp" id="hlpHld">?</div>
+        </div>
+        <!-- RANDOM PLAYER BUTTON -->
+        <div class="uiel">
+          <button type="button" id="randP">search for a random player</button>
+          <div class="hlp" id="hlpRnd">?</div>
+        </div>
       </div>
-    </div>
-    <div class="hvr" id="hvrmsg"></div>
-  </form>
-    <!-- </div> -->
-      <!-- top 5 players in each league table -->
+      <div class="hvr" id="hvrmsg"></div>
+    </form>
+    <!-- LEADING SCORERS TABLE -->
     <div class="top_sect_tbls" id="top_lg_players">
       <div class="lg_tbls">
         <table class="tstbl" id="nba_tstbl"></table>
@@ -116,25 +134,27 @@
 
   <!-- RESPONSE -->
   <div class="respouter">
-      <div class="resptitle" id="player_title"></div>
-    <div class="resprow">
-      <div class="respsect">
-        <div class="respblk" id="player_szn"></div>
-        <div class="respimgs" id="imgs">
-          <div id="tm_img"></div>
-          <div id="pl_img"></div>
-        </div>
+    <!-- RESPONSE PLAYER/TEAM LABEL -->
+    <div class="resptitle" id="player_title"></div>
+    <!-- RESPONSE SECTION 1 (LEFT HALF) -->
+    <div class="respsect">
+      <div id="player_szn"></div>
+      <div class="respimgs" id="imgs">
+        <div id="tm_img"></div>
+        <div id="pl_img"></div>
       </div>
-      <div class="respsect" id="stats">
-        <div class="resptbls">
-          <div class="resptbl" id="box"></div>
-          <div class="resptbl" id="avg-box"></div>
-          <div class="resptbl" id="shooting"></div>
-          <div class="resptbl" id="avg-shooting"></div>
-        </div>
+    </div>
+    <!-- RESPONSE SECTION 2 (RIGHT HALF) -->
+    <div class="respsect" id="stats">
+      <div class="resptbls">
+        <div class="resptbl" id="box"></div>
+        <div class="resptbl" id="avg-box"></div>
+        <div class="resptbl" id="shooting"></div>
+        <div class="resptbl" id="avg-shooting"></div>
       </div>
     </div>
   </div>
+  <!-- DISCLAIMER AT BOTTOM -->
   <div class="btm">
     <i>there may be small inconsitencies with statistics at nba.com -- 
       this is a personal passion project for learning more
