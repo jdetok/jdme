@@ -1,31 +1,52 @@
 @media (max-width: 600px) {
 
-    #topsect {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto auto;
-        grid-template-areas:
-            "middle-top"
-            "left"
-            "right"
-            "middle-bottom";
+    .bhdr {
+        display: grid;
+        grid-template-columns: 1fr; /* left | center | right */
+        align-items: center;
+        margin: 0 auto;
     }
 
-    /* #topsect > div {
-        border: 1px solid black;
-    } */
+    .left {
+        display: none;
+    } 
 
-    /* Optional: remove forced widths/borders if things look squished */
+    .right {
+        display: none;
+    } 
+
+    .bhdr {
+        width: 100%;
+    }
+
+    #topsect {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        grid-template-areas:
+            "top"
+            "mid"
+            "btm";
+    }
+    
+    #top_players {
+        grid-area: top;
+    } 
+
+    #top_lg_players {
+        grid-area: mid;
+    }
+
+    #ui {
+        grid-area: btm;
+    }
+
     #topsect > div, #topsect h1, #topsect form {
         width: 100%;
-        /* border: none; */
     }
     .uisect {
         flex-direction: column;
     }
-    /* .lg_tbls {
-        display: flex;
-        flex-direction: column;
-    } */
+    
     .resptitle {
         font-size: 30px;
     }
@@ -41,4 +62,11 @@
     .resptbls {
         width: 100%;
     }
+
+    .respouter {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+    }
+
+
 }
