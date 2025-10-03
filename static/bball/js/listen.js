@@ -5,7 +5,7 @@ import { makeScoringLeaders } from "./lg_ldg_scorers.js"
 import { makeRGTopScorers } from "./rg_ldg_scorers.js"
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch} from "./player_search.js"
 
-export const base = "https://jdeko.me/bball";
+export const base = "http://localhost:8080/bball";
 
 document.addEventListener('DOMContentLoaded', async () => {
     await ui.setupExclusiveCheckboxes('post', 'reg');
