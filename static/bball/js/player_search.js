@@ -1,7 +1,6 @@
 import { base } from "./listen.js"
 import { showHideHvr } from "./hover.js";
 import { checkBoxGroupValue, handleSeasonBoxes, lgRadioBtns } from "./ui.js";
-import { buildRGTopScorersTbl } from "./rg_ldg_scorers.js";
 import { getPlayerStats, buildPlayerDash } from "./player_dash.js";
 
 /*
@@ -25,12 +24,8 @@ export async function getRecentGamesData() {
 // called in listen.js
 export async function buildLoadDash(recent_game_data) {
     const top_scorer = recent_game_data.top_scorers[0].player_id;
-    // build the recent games top scorers 
-    await buildRGTopScorersTbl(recent_game_data, 'top_players');
-
     const lg = await lgRadioBtns();
     let js = await getPlayerStats(base, top_scorer, 88888, 0, lg);
-    
     await buildPlayerDash(js.player[0], recent_game_data);
 }
 
@@ -124,15 +119,27 @@ getP
 export async function playerBtnListener(player) {
     let searchB = document.getElementById('pSearch');
     if (searchB) {
-        searchB.value = player;
-        const season = await handleSeasonBoxes();
+        // searchB.value = player;
+        // searchB.value = '';
+        const season = await checkBoxGroupValue(
+            {box: 'post', slct: 'ps_slct'}, 
+            {box: 'reg', slct: 'rs_slct'}, 
+            88888);
+
+        const team = await checkBoxGroupValue(
+            {box: 'nbaTm', slct: 'tm_slct'}, 
+            {box: 'wnbaTm', slct: 'wTm_slct'}, 0);
 
         const lg = await lgRadioBtns();
 
-        // search & clear player search bar
-        await getPlayerStats(base, player, season, 0, 0, lg);
-        searchB.value = '';
+        console.log(`player: ${player} | tm: ${team} | szn: ${season}`);
 
+        // search & clear player search bar
+        let js = await getPlayerStats(base, player, season, team, lg);
+        if (js) {
+            console.log(js);
+            await buildPlayerDash(js.player[0], 0);
+        }
         // if screen is small scroll into it
         if (window.innerWidth <= 700) {
             let res = document.getElementById("ui");

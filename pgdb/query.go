@@ -113,13 +113,14 @@ select * from (
 	case 
 		when c.lg_id = 0 then 'NBA'
 		when c.lg_id = 1 then 'WNBA'
-		end as lg, 
+	end as lg, 
 	c.team,
 	c.team_long,
 	to_char(a.gdate, 'MM/DD/YYYY'),
 	a.matchup, 
 	a.wl, 
 	a.pts as tm_pts, 
+	f.pts as opp_pts,
 	d.pts as plr_pts
 	from stats.tbox a
 	inner join (
@@ -129,6 +130,10 @@ select * from (
 	inner join lg.team c on c.team_id = a.team_id
 	inner join stats.pbox d on d.game_id = a.game_id and d.team_id = a.team_id
 	inner join lg.plr e on e.player_id = d.player_id
+	inner join (
+		select game_id, team_id, pts
+		from stats.tbox
+	) f on f.game_id = a.game_id and f.team_id <> a.team_id
 	order by a.game_id, a.team_id, d.pts desc, (d.ast + d.reb + d.stl + d.blk) desc)
 order by plr_pts desc
 `

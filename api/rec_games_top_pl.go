@@ -38,17 +38,18 @@ type PlayerBasic struct {
 }
 
 type RecentGame struct {
-	GameId   uint64 `json:"game_id"`
-	TeamId   uint64 `json:"team_id"`
-	PlayerId uint64 `json:"player_id"`
-	Player   string `json:"player"`
-	League   string `json:"league"`
-	Team     string `json:"team"`
-	TeamName string `json:"team_name"`
-	GameDate string `json:"game_date"`
-	Matchup  string `json:"matchup"`
-	WinLoss  string `json:"wl"`
-	Points   uint16 `json:"points"`
+	GameId    uint64 `json:"game_id"`
+	TeamId    uint64 `json:"team_id"`
+	PlayerId  uint64 `json:"player_id"`
+	Player    string `json:"player"`
+	League    string `json:"league"`
+	Team      string `json:"team"`
+	TeamName  string `json:"team_name"`
+	GameDate  string `json:"game_date"`
+	Matchup   string `json:"matchup"`
+	WinLoss   string `json:"wl"`
+	Points    uint16 `json:"points"`
+	OppPoints uint16 `json:"opp_points"`
 }
 
 // use the LgTop5 query to get top 5 players per league
@@ -135,7 +136,7 @@ func (rgs *RecentGames) ScanRecentGamesRows(rows *sql.Rows) {
 		rows.Scan(&rg.GameId, &rg.TeamId, &rg.PlayerId,
 			&rg.Player, &rg.League, &rg.Team,
 			&rg.TeamName, &rg.GameDate, &rg.Matchup,
-			&rg.WinLoss, &rg.Points, &ps.Points)
+			&rg.WinLoss, &rg.Points, &rg.OppPoints, &ps.Points)
 
 		ps.PlayerId = rg.PlayerId
 		ps.TeamId = rg.TeamId

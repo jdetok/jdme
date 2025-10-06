@@ -4,7 +4,7 @@ import { base } from "./listen.js";
 export async function lgRadioBtns() {
     const selected = document.querySelector('input[name="leagues"]:checked');
     if (selected) {
-        console.log(selected.value); // "all", "nba", or "wnba"
+        // console.log(selected.value); // "all", "nba", or "wnba"
         return selected.value;
     } else {
         return 'all';

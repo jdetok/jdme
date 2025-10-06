@@ -2,7 +2,9 @@
 // import { loadSznOptions, selHvr, setupExclusiveCheckboxes, clearCheckBoxes } from "./ui.js"
 import * as ui from "./ui.js"
 import { makeScoringLeaders } from "./lg_ldg_scorers.js"
-import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash, getRecentGamesData} from "./player_search.js"
+import { buildRGTopScorersTbl } from "./rg_ldg_scorers.js";
+import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
+    getRecentGamesData} from "./player_search.js"
 
 export const base = "http://localhost:8080/bball";
 
@@ -21,6 +23,7 @@ export async function buildOnLoadElements() {
     // get recent games data, build player dash
     let js = await getRecentGamesData();
     await buildLoadDash(js);
+    await buildRGTopScorersTbl(js, 'top_players');
 
     // setup season/team checkboxes
     await ui.setupExclusiveCheckboxes('post', 'reg');

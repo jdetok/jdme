@@ -14,9 +14,9 @@ export async function buildRGTopScorersTbl(data, elName) {
     const teamH = document.createElement('td');
 
     // set table column headers
-    nameH.textContent = 'name';
+    nameH.textContent = 'name | team';
     ptsH.textContent = 'points';
-    teamH.textContent = 'team | matchup | win-loss';
+    teamH.textContent = 'matchup | win-loss';
     
     // set table caption
     const caption = `Scoring Leaders | ${data.recent_games[0].game_date} Games`
@@ -40,6 +40,7 @@ export async function buildRGTopScorersTbl(data, elName) {
 /*
 called within the loop in recGmsTopScorersTbl - creates the rows for the table
 with the data from each player
+run .find on recent_games.player_id & scorer.player_id to access team/game data
 */
 export async function rgTopScorerRow(tbl, scorer, data) {
     let game = data.recent_games.find(g => g.player_id === scorer.player_id);
@@ -50,15 +51,17 @@ export async function rgTopScorerRow(tbl, scorer, data) {
     let pts = document.createElement('td');
 
     let btn = document.createElement('button');
-    btn.textContent = scorer.player;
+    btn.textContent = `${scorer.player} | ${game.team}`;
+    console.log(scorer);
+    console.log(game);
     btn.type = 'button';
     btn.addEventListener('click', async () => {
         await playerBtnListener(scorer.player);
     }); 
     pName.appendChild(btn);
     
-    pTeam.textContent = `${game ? game.team_name : ""} | \
-    ${game ? game.matchup : ""} | ${game ? game.wl : ""}`;
+    pTeam.textContent = `${game.matchup} | ${game.wl} \
+    | ${game.points}-${game.opp_points}`;
     
     pts.textContent = scorer.points;
 
