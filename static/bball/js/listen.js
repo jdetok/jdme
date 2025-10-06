@@ -6,7 +6,7 @@ import { buildRGTopScorersTbl } from "./rg_ldg_scorers.js";
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
     getRecentGamesData} from "./player_search.js"
 
-export const base = "http://localhost:8080/bball";
+export const base = "https://jdeko.me/bball";
 
 document.addEventListener('DOMContentLoaded', async () => {
     await buildOnLoadElements();
