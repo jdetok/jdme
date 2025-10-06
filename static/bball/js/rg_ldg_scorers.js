@@ -1,31 +1,5 @@
 import { tblCaption } from "./table.js"
-import { base } from "./listen.js"
-import {makePlayerDash} from "./player_dash.js"
 import { playerBtnListener } from "./player_search.js"
-
-/*
-get the top scorer from each game from the most recent night where games occured
-(usually dated yesterday, but when no games occur it'll get the most recent day
-where games did occur). called on page load, it creates a table with all these
-scorers and immediately grabs and loads the player dash for the top overall 
-scorer. use season id 88888 in getP to get most recent season
-*/
-export async function makeRGTopScorers() {
-    const r = await fetch(`${base}/games/recent`);
-    if (!r.ok) {
-        throw new Error(`${r.status}: error calling /games/recent`);
-    }
-    const data = await r.json();
-
-    // capture overall leading scorer's ID, pass get the player and display 
-    const top_scorer = data.top_scorers[0].player_id;
-    
-    // build the recent games top scorers 
-    await buildRGTopScorersTbl(data, 'top_players');
-
-    await makePlayerDash(base, top_scorer, 88888, 0, data);
-}
-
 
 /* 
 creates a table with the top scorer from each game from the recent night. each 

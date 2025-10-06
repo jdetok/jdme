@@ -18,10 +18,10 @@ export async function buildPlayerDash(data, ts) {
 }
 
 // ts indicates 'top scorer' - used when called on page refresh to get recent game
-export async function makePlayerDash(base, player, season, team, ts, lg) { // add season & team
-    const err = document.getElementById('sErr');
-    if (err.style.display === "block") {
-        err.style.display = 'none';
+export async function getPlayerStats(base, player, season, team, lg) { // add season & team
+    const errmsg = document.getElementById('sErr');
+    if (errmsg.style.display === "block") {
+        errmsg.style.display = 'none';
     }
 
     // encode passed args to be ready for query string
@@ -30,39 +30,43 @@ export async function makePlayerDash(base, player, season, team, ts, lg) { // ad
 
     const req = `${base}/player?player=${p}&season=${s}&team=${team}&league=${lg}`;
     // attempt to fetch from /player endpoint with encoded params
-    const r = await fetch(req);
-    if (!r.ok) {
+    try {
+        const r = await fetch(req);
+        if (!r.ok) {
+            throw new Error(`HTTP Error: ${r.status}`);
+        }
+        
+        // get json, set first object in player array as data var
+        const js = await r.json()
+        if (js) {
+            if (js.error_string) {
+                errmsg.textContent = js.error_string;
+                errmsg.style.display = "block";
+                return;
+            } else {
+                return js;
+            }
+        }
+    } catch(err) {
+        errmsg.textContent = `can't find ${player}` 
+        console.log(`an error occured attempting to fetch ${player}\n${err}`);
+        errmsg.style.display = "block";
         throw new Error(`HTTP Error: ${r.status}`);
     }
-    
-    // get json, set first object in player array as data var
-    const js = await r.json();
-    const data = js.player[0];
 
-    if (js.error_string) {
-        console.log("error exists:");
-        console.log(js.error_string);
-        err.textContent = js.error_string;
-        err.style.display = "block"    
+    // const data = js.player[0];
+
+    
 // handle empty player response
-    } else if (data.player_meta.player_id === 0) {
-        if (player != '') {
-            err.textContent = `'${player}' not found...`
-            err.style.display = "block"    
-        }
-        throw new Error(`Player not found error`);
-    } else {
-        console.log("no error string from server");
-    }
-    
 
-    console.log(data.player_meta.season_id);
     // build and display player dash
-    await buildPlayerDash(data, ts);
+    // await buildPlayerDash(data, ts);
 
     // set invisible player hold value as current player
-    document.getElementById('pHold').value = data.player_meta.player;
+    // document.getElementById('pHold').value = data.player_meta.player;
 }
+
+
 
 // set the player name/team name as result title
 // RESULT TITLE - LIKE `LeBron James - Los Angeles Lakers`
