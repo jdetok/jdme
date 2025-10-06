@@ -55,18 +55,16 @@ export async function searchPlayer() {
             {box: 'post', slct: 'ps_slct'}, 
             {box: 'reg', slct: 'rs_slct'}, 
             88888);
-        console.log(`searching for season ${season}`)
 
         const team = await checkBoxGroupValue(
             {box: 'nbaTm', slct: 'tm_slct'}, 
             {box: 'wnbaTm', slct: 'wTm_slct'}, 
             0);
-        console.log(`TEAM QUERY: ${team}`);
 
         // build response player dash section
         let js = await getPlayerStats(base, player, season, team, lg);
         if (js) {
-            document.getElementById('pHold').value = js.player[0].player_meta.player;
+            await setPHold(js.player[0].player_meta.player);
             await buildPlayerDash(js.player[0], 0);
         }
 
@@ -74,6 +72,10 @@ export async function searchPlayer() {
         // clear player search box
         // input.value = ''; // clear input box after searching
     }) 
+}
+
+export async function setPHold(player) {
+    document.getElementById('pHold').value = player;
 }
 
 // get a random player from the API and getPlayerStats
@@ -138,6 +140,7 @@ export async function playerBtnListener(player) {
         let js = await getPlayerStats(base, player, season, team, lg);
         if (js) {
             console.log(js);
+            await setPHold(js.player[0].player_meta.player);
             await buildPlayerDash(js.player[0], 0);
         }
         // if screen is small scroll into it
