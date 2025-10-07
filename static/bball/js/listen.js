@@ -3,6 +3,7 @@
 import * as ui from "./ui.js"
 import { makeScoringLeaders } from "./lg_ldg_scorers.js"
 import { buildRGTopScorersTbl } from "./rg_ldg_scorers.js";
+import { getTeamRecords, buildTeamRecsTbl } from "./team_records.js";
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
     getRecentGamesData} from "./player_search.js"
 
@@ -15,8 +16,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await clearSearch();
     await holdPlayerBtn();
 });
-
+// TODO: separate UI setup and table builds
 export async function buildOnLoadElements() {
+    let trjs = await getTeamRecords();
+    await buildTeamRecsTbl(trjs);
+
     // scoring leaders (number of players table based on screen width)
     await makeScoringLeaders(numScoringLeaders());
 

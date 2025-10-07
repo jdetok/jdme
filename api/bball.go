@@ -52,13 +52,13 @@ func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 
-	team_recs, err := GetTeamRecords(app.Database, &app.CurrentSzns)
-	if err != nil {
-		msg := "failed to query team records"
-		e.HTTPErr(w, msg, err)
-	}
+	// team_recs, err := GetTeamRecords(app.Database, &app.CurrentSzns)
+	// if err != nil {
+	// 	msg := "failed to query team records"
+	// 	e.HTTPErr(w, msg, err)
+	// }
 
-	js, err := TeamRecordsJSON(&team_recs)
+	js, err := TeamRecordsJSON(&app.TeamRecs)
 	if err != nil {
 		msg := "failed to marshal team records struct to JSON"
 		e.HTTPErr(w, msg, err)

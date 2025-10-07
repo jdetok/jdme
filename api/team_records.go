@@ -52,6 +52,7 @@ func GetTeamRecords(db *sql.DB, cs *CurrentSeasons) (TeamRecords, error) {
 	return team_recs, nil
 }
 
+// get from memory
 func TeamRecordsJSON(team_recs *TeamRecords) ([]byte, error) {
 	e := errd.InitErr()
 	js, err := json.Marshal(team_recs)

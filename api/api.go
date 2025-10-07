@@ -21,6 +21,7 @@ type App struct {
 	Seasons     []Season
 	Teams       []Team
 	CurrentSzns CurrentSeasons
+	TeamRecs    TeamRecords
 }
 
 // configs, currently only contains server address

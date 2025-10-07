@@ -91,6 +91,14 @@ func UpdateStructs(app *App, e *errd.Err) {
 		fmt.Println(e.BuildErr(err))
 	}
 
+	// update team records
+	app.TeamRecs, err = UpdateTeamRecords(app.Database, &app.CurrentSzns)
+	if err != nil {
+		e.Msg = "failed to update team records"
+		fmt.Println(e.BuildErr(err))
+	}
+
+	// update last update time
 	updateTime := time.Now()
 	app.LastUpdate = updateTime
 	fmt.Printf("finished refreshing store at %v\n", app.LastUpdate)
@@ -157,4 +165,30 @@ func UpdateTeams(db *sql.DB) ([]Team, error) {
 		teams = append(teams, tm)
 	}
 	return teams, nil
+}
+
+// query db for team season records to populate records table
+func UpdateTeamRecords(db *sql.DB, cs *CurrentSeasons) (TeamRecords, error) {
+	e := errd.InitErr()
+	var team_recs TeamRecords
+
+	sl := cs.LgSznsByMonth(time.Now())
+	rows, err := db.Query(pgdb.TeamSznRecords, sl.SznId, sl.WSznId)
+	if err != nil {
+		e.Msg = "error getting team records"
+		return team_recs, e.BuildErr(err)
+	}
+	for rows.Next() {
+		var tr TeamRecord
+		rows.Scan(&tr.League, &tr.SeasonId, &tr.Season, &tr.SeasonDesc,
+			&tr.TeamId, &tr.Team, &tr.TeamLong, &tr.Wins, &tr.Losses)
+
+		// append appropriate records based on season
+		if tr.League == "NBA" && tr.SeasonId == sl.SznId {
+			team_recs.NBARecords = append(team_recs.NBARecords, tr)
+		} else if tr.League == "WNBA" && tr.SeasonId == sl.WSznId {
+			team_recs.WNBARecords = append(team_recs.WNBARecords, tr)
+		}
+	}
+	return team_recs, nil
 }

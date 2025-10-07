@@ -33,7 +33,7 @@ export async function getPlayerStats(base, player, season, team, lg) { // add se
     try {
         const r = await fetch(req);
         if (!r.ok) {
-            throw new Error(`HTTP Error: ${r.status}`);
+            throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
         }
         
         // get json, set first object in player array as data var
