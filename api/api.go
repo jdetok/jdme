@@ -12,11 +12,15 @@ main struct referenced through the app. contains configs, , pool,
 in-memory player, season, team slices
 */
 type App struct {
-	Config      Config
-	Database    *sql.DB
-	StartTime   time.Time
-	LastUpdate  time.Time
-	Started     uint8
+	Config     Config
+	Database   *sql.DB
+	StartTime  time.Time
+	LastUpdate time.Time
+	Started    uint8
+	Store      InMemStore
+}
+
+type InMemStore struct {
 	Players     []Player
 	Seasons     []Season
 	Teams       []Team

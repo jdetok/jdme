@@ -34,7 +34,7 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 
 	numPl := r.URL.Query().Get("num")
 
-	lt, err := QueryTopLgPlayers(app.Database, &app.CurrentSzns, numPl)
+	lt, err := QueryTopLgPlayers(app.Database, &app.Store.CurrentSzns, numPl)
 	if err != nil {
 		msg := "failed to query top 5 league players"
 		e.HTTPErr(w, msg, err)
@@ -58,7 +58,7 @@ func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
 	// 	e.HTTPErr(w, msg, err)
 	// }
 
-	js, err := TeamRecordsJSON(&app.TeamRecs)
+	js, err := TeamRecordsJSON(&app.Store.TeamRecs)
 	if err != nil {
 		msg := "failed to marshal team records struct to JSON"
 		e.HTTPErr(w, msg, err)
@@ -106,7 +106,7 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	pq.Player = RemoveDiacritics(r.URL.Query().Get("player"))
 
 	// validate player & get playerid/season id
-	iq, err := ValidatePlayerSzn(app.Players, &app.CurrentSzns, &pq, &rp.ErrorMsg)
+	iq, err := ValidatePlayerSzn(app.Store.Players, &app.Store.CurrentSzns, &pq, &rp.ErrorMsg)
 	if err != nil {
 		msg := fmt.Sprintf("validate player %s", pq.Player)
 		e.HTTPErr(w, msg, err)
@@ -144,9 +144,9 @@ func (app *App) HndlSeasons(w http.ResponseWriter, r *http.Request) {
 	season := r.URL.Query().Get("szn")
 	w.Header().Set("Content-Type", "application/json")
 	if season == "" { // send all szns when szn is not in q str, used most often
-		json.NewEncoder(w).Encode(app.Seasons)
+		json.NewEncoder(w).Encode(app.Store.Seasons)
 	} else {
-		for _, szn := range app.Seasons {
+		for _, szn := range app.Store.Seasons {
 			if season == szn.SeasonId { // validate szn from q string
 				json.NewEncoder(w).Encode(map[string]string{
 					"szn": season,
@@ -163,9 +163,9 @@ func (app *App) HndlTeams(w http.ResponseWriter, r *http.Request) {
 	team := r.URL.Query().Get("team")
 	w.Header().Set("Content-Type", "application/json")
 	if team == "" { // send all teams when team is not in q str, used most often
-		json.NewEncoder(w).Encode(app.Teams)
+		json.NewEncoder(w).Encode(app.Store.Teams)
 	} else { // read & valid team from q string, not yet used 8/6
-		for _, tm := range app.Teams {
+		for _, tm := range app.Store.Teams {
 			if team == tm.TeamAbbr {
 
 				tm.LogoUrl = MakeTeamLogoUrl(tm.League, tm.TeamId)

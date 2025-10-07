@@ -60,7 +60,10 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 			fmt.Printf("refreshing store at %v\n", time.Now().Format(
 				"2006-01-02 15:04:05"),
 			)
-			app.CurrentSzns.GetCurrentSzns(time.Now(), &e)
+			// calculate current NBA/WNBA seasons
+			app.Store.CurrentSzns.GetCurrentSzns(time.Now(), &e)
+
+			// update in memory structs
 			UpdateStructs(app, &e)
 		}
 	}
@@ -71,28 +74,28 @@ func UpdateStructs(app *App, e *errd.Err) {
 	var err error
 
 	// update in memory players slice
-	app.Players, err = UpdatePlayers(app.Database)
+	app.Store.Players, err = UpdatePlayers(app.Database)
 	if err != nil {
 		e.Msg = "failed to get players"
 		fmt.Println(e.BuildErr(err))
 	}
 
 	// update in memory seasons slice
-	app.Seasons, err = UpdateSeasons(app.Database)
+	app.Store.Seasons, err = UpdateSeasons(app.Database)
 	if err != nil {
 		e.Msg = "failed to get seasons"
 		fmt.Println(e.BuildErr(err))
 	}
 
 	// update in memory teams slice
-	app.Teams, err = UpdateTeams(app.Database)
+	app.Store.Teams, err = UpdateTeams(app.Database)
 	if err != nil {
 		e.Msg = "failed to get teams"
 		fmt.Println(e.BuildErr(err))
 	}
 
 	// update team records
-	app.TeamRecs, err = UpdateTeamRecords(app.Database, &app.CurrentSzns)
+	app.Store.TeamRecs, err = UpdateTeamRecords(app.Database, &app.Store.CurrentSzns)
 	if err != nil {
 		e.Msg = "failed to update team records"
 		fmt.Println(e.BuildErr(err))
@@ -168,6 +171,7 @@ func UpdateTeams(db *sql.DB) ([]Team, error) {
 }
 
 // query db for team season records to populate records table
+// moved to store rather than querying for every request
 func UpdateTeamRecords(db *sql.DB, cs *CurrentSeasons) (TeamRecords, error) {
 	e := errd.InitErr()
 	var team_recs TeamRecords
