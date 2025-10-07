@@ -162,5 +162,10 @@ export async function clearSearch() {
         let pSearch = document.getElementById('pSearch');
         pSearch.value = '';
         pSearch.focus();
-    })
+    });
+}
+
+export async function clearSearchBar() {
+    let pSearch = document.getElementById('pSearch');
+    pSearch.value = '';
 }

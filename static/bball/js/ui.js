@@ -69,21 +69,6 @@ export async function setupExclusiveCheckboxes(leftbox, rightbox) {
     rbox.addEventListener("change", handleCheck);
 }
 
-
-// season select hover messages
-export async function selHvr() {
-    const rs = document.getElementById('hlpRs');
-    const ps = document.getElementById('hlpPs');
-    await showHideHvr(rs, 'selhvr',
-        `search for a specific regular-season. if the player being searched didn't
-        play in the selected season, their first or most recent season, whichever
-        is closer to the selected, will be used`);
-    await showHideHvr(ps, 'selhvr',
-        `search for a specific post-season. if the player being searched didn't
-        play in the selected season, their first or most recent season, whichever
-        is closer to the selected, will be used`);
-}
-
 // append options to select
 async function makeOption(slct, txt, val) {
     let opt = document.createElement('option');
