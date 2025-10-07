@@ -41,11 +41,12 @@ func GetTeamRecords(db *sql.DB, cs *CurrentSeasons) (TeamRecords, error) {
 		var tr TeamRecord
 		rows.Scan(&tr.League, &tr.SeasonId, &tr.Season, &tr.SeasonDesc,
 			&tr.TeamId, &tr.Team, &tr.TeamLong, &tr.Wins, &tr.Losses)
-		switch tr.League {
-		case "NBA":
+
+		// append appropriate records based on season
+		if tr.League == "NBA" && tr.SeasonId == sl.SznId {
 			team_recs.NBARecords = append(team_recs.NBARecords, tr)
-		case "WNBA":
-			team_recs.WNBARecords = append(team_recs.NBARecords, tr)
+		} else if tr.League == "WNBA" && tr.SeasonId == sl.WSznId {
+			team_recs.WNBARecords = append(team_recs.WNBARecords, tr)
 		}
 	}
 	return team_recs, nil
