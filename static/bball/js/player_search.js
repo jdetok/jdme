@@ -1,6 +1,5 @@
 import { base } from "./listen.js"
-import { showHideHvr } from "./hover.js";
-import { checkBoxGroupValue, handleSeasonBoxes, lgRadioBtns } from "./ui.js";
+import { checkBoxGroupValue, lgRadioBtns } from "./ui.js";
 import { getPlayerStats, buildPlayerDash } from "./player_dash.js";
 
 /*
@@ -98,18 +97,6 @@ export async function randPlayerBtn() {
             await buildPlayerDash(js.player[0], 0);
         }
     });
-
-    // hover message for help ?
-    const hlp = document.getElementById('hlpRnd');
-    await showHideHvr(
-        hlp, 
-        'hvrmsg',
-
-        `get the stats for a random player in the selected season. if no season 
-        is specified, the current/most recent season will be used. if the 
-        random player did not play in the selected season, their most 
-        recent (or first, whichever is closer) season will be used`
-    )
 }
 
 /* 
@@ -164,14 +151,6 @@ export async function holdPlayerBtn() {
         let player = document.getElementById('pHold').value;
         document.getElementById('pSearch').value = player;
     })
-
-    // help button hover val
-    const hlp = document.getElementById('hlpHld');
-    await showHideHvr(
-        hlp, 
-        'hvrmsg',
-        `fill the input box with the current player's name`
-    )
 }
 
 // clear search box
