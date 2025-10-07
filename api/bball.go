@@ -27,6 +27,7 @@ type PQueryIds struct {
 	SId uint64
 }
 
+// top numPl players for each league
 func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
@@ -41,6 +42,25 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	js, err := MarshalTopPlayers(&lt)
 	if err != nil {
 		msg := "failed to marshal top 5 league players struct to JSON"
+		e.HTTPErr(w, msg, err)
+	}
+	app.JSONWriter(w, js)
+}
+
+// team records for current/most recent reg. seasons for each league
+func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
+	e := errd.InitErr()
+	LogHTTP(r)
+
+	team_recs, err := GetTeamRecords(app.Database, &app.CurrentSzns)
+	if err != nil {
+		msg := "failed to query team records"
+		e.HTTPErr(w, msg, err)
+	}
+
+	js, err := TeamRecordsJSON(&team_recs)
+	if err != nil {
+		msg := "failed to marshal team records struct to JSON"
 		e.HTTPErr(w, msg, err)
 	}
 	app.JSONWriter(w, js)

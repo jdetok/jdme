@@ -53,6 +53,7 @@ func (app *App) Mount() *http.ServeMux {
 	mux.HandleFunc("GET /bball/player", app.HndlPlayer)
 	mux.HandleFunc("GET /bball/games/recent", app.HndlRecentGames)
 	mux.HandleFunc("GET /bball/league/scoring-leaders", app.HndlTopLgPlayers)
+	mux.HandleFunc("GET /bball/teamrecs", app.HndlTeamRecords)
 
 	// serve static files
 	mux.Handle("/js/", http.HandlerFunc(app.JSNostore))
