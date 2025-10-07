@@ -200,23 +200,37 @@ select
     (select team from lg.team where team_id = $2) as team,
     (select szn from lg.szn where szn_id = $3) as season
 `
-
-/*
-select
-	player_id, team_id, lg,
-	max(szn_id) as szn_id, max(szn_desc) as szn_desc, max(wszn_desc) as wszn_desc,
-	max(stype) as stype, max(player) as player, max(team) as team, max(team_long) as team_long,
-	sum(gp) as gp, sum(minutes) as minutes, sum(points) as point, sum(assists) as assists,
-	sum(rebounds) as rebounds, sum(steals) as steals, sum(blocks) as blocks,
-	round(avg(fgm), 2) as fgm, round(avg(fga), 2) as fga,
-	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as fgp,
-	round(avg(f3m), 2) as f3m, round(avg(f3a), 2) as f3a,
-	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as f3p,
-	round(avg(ftm), 2) as ftm, round(avg(fta), 2) as fta,
-	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as ftp
-from api.v_plr_szn_tot
-where player_id = 2544
-and team_id = 1610612747
-group by player_id, team_id, lg
-
-*/
+var TeamSznRecords = `
+select distinct on (c.sznt_id, a.szn_id, d.lg, w.wins, a.team_id)
+	d.lg, 
+	a.szn_id,
+	case
+		when d.lg = 'NBA' then szn
+		when d.lg = 'WNBA' then wszn
+	end as season,
+	case
+		when d.lg = 'NBA' then szn_desc
+		when d.lg = 'WNBA' then wszn_desc
+	end as season_desc,
+	a.team_id,
+	b.team,
+	b.team_long,
+	w.wins,
+	l.losses
+from stats.tbox a
+inner join lg.team b on b.team_id = a.team_id
+inner join lg.szn c on c.szn_id = a.szn_id
+inner join lg.league d on d.lg_id = b.lg_id
+inner join (
+	select team_id, szn_id, count(distinct game_id) as wins
+	from stats.tbox where wl = 'W'
+	group by team_id, szn_id
+) w on w.team_id = a.team_id and w.szn_id = a.szn_id
+inner join (
+	select team_id, szn_id, count(distinct game_id) as losses
+	from stats.tbox where wl = 'L'
+	group by team_id, szn_id
+) l on l.team_id = a.team_id and l.szn_id = a.szn_id
+where a.szn_id in ($1, $2)
+order by c.sznt_id, a.szn_id desc, d.lg, w.wins desc, a.team_id desc
+`
