@@ -95,6 +95,7 @@ export async function randPlayerBtn() {
         let js = await getPlayerStats(base, 'random', season, 0, lg);
         if (js) {
             await buildPlayerDash(js.player[0], 0);
+            await setPHold(js.player[0].player_meta.player);
         }
     });
 }
