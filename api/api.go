@@ -12,15 +12,21 @@ main struct referenced through the app. contains configs, , pool,
 in-memory player, season, team slices
 */
 type App struct {
-	Config      Config
-	Database    *sql.DB
-	StartTime   time.Time
-	LastUpdate  time.Time
-	Started     uint8
-	Players     []Player
-	Seasons     []Season
-	Teams       []Team
-	CurrentSzns CurrentSeasons
+	Config     Config
+	Database   *sql.DB
+	StartTime  time.Time
+	LastUpdate time.Time
+	Started    uint8
+	Store      InMemStore
+}
+
+type InMemStore struct {
+	Players      []Player
+	Seasons      []Season
+	Teams        []Team
+	CurrentSzns  CurrentSeasons
+	TeamRecs     TeamRecords
+	TopLgPlayers LgTopPlayers
 }
 
 // configs, currently only contains server address
@@ -53,6 +59,7 @@ func (app *App) Mount() *http.ServeMux {
 	mux.HandleFunc("GET /bball/player", app.HndlPlayer)
 	mux.HandleFunc("GET /bball/games/recent", app.HndlRecentGames)
 	mux.HandleFunc("GET /bball/league/scoring-leaders", app.HndlTopLgPlayers)
+	mux.HandleFunc("GET /bball/teamrecs", app.HndlTeamRecords)
 
 	// serve static files
 	mux.Handle("/js/", http.HandlerFunc(app.JSNostore))

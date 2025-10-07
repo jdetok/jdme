@@ -20,8 +20,8 @@ type TopPlayers struct {
 }
 
 type LgTopPlayers struct {
-	NBATop5  []TopPlayers `json:"nba"`
-	WNBATop5 []TopPlayers `json:"wnba"`
+	NBATop  []TopPlayers `json:"nba"`
+	WNBATop []TopPlayers `json:"wnba"`
 }
 
 type RecentGames struct {
@@ -85,9 +85,9 @@ func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlaye
 			r.Scan(&t.PlayerId, &t.Player, &t.Season, &t.Team, &t.Points)
 			switch lg {
 			case "nba":
-				lt.NBATop5 = append(lt.NBATop5, t)
+				lt.NBATop = append(lt.NBATop, t)
 			case "wnba":
-				lt.WNBATop5 = append(lt.WNBATop5, t)
+				lt.WNBATop = append(lt.WNBATop, t)
 			}
 		}
 
