@@ -21,11 +21,12 @@ type App struct {
 }
 
 type InMemStore struct {
-	Players     []Player
-	Seasons     []Season
-	Teams       []Team
-	CurrentSzns CurrentSeasons
-	TeamRecs    TeamRecords
+	Players      []Player
+	Seasons      []Season
+	Teams        []Team
+	CurrentSzns  CurrentSeasons
+	TeamRecs     TeamRecords
+	TopLgPlayers LgTopPlayers
 }
 
 // configs, currently only contains server address

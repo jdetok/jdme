@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/jdetok/golib/errd"
 )
@@ -32,13 +33,24 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
 
-	numPl := r.URL.Query().Get("num")
+	// new LgTopPlayers to get from in memory store
+	var lt LgTopPlayers
 
-	lt, err := QueryTopLgPlayers(app.Database, &app.Store.CurrentSzns, numPl)
+	// get number of players from query string & convert to int
+	numPlStr := r.URL.Query().Get("num")
+	numPl, err := strconv.ParseUint(numPlStr, 10, 64)
 	if err != nil {
-		msg := "failed to query top 5 league players"
+		msg := "failed to convert numPlStr to int"
 		e.HTTPErr(w, msg, err)
 	}
+
+	// append numPl to NBA/WNBA LgTopPlayer from memory store
+	for i := range numPl {
+		lt.NBATop = append(lt.NBATop, app.Store.TopLgPlayers.NBATop[i])
+		lt.WNBATop = append(lt.WNBATop, app.Store.TopLgPlayers.WNBATop[i])
+	}
+
+	// marshal new LgTopPlayers to json
 	js, err := MarshalTopPlayers(&lt)
 	if err != nil {
 		msg := "failed to marshal top 5 league players struct to JSON"
@@ -51,12 +63,6 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()
 	LogHTTP(r)
-
-	// team_recs, err := GetTeamRecords(app.Database, &app.CurrentSzns)
-	// if err != nil {
-	// 	msg := "failed to query team records"
-	// 	e.HTTPErr(w, msg, err)
-	// }
 
 	js, err := TeamRecordsJSON(&app.Store.TeamRecs)
 	if err != nil {

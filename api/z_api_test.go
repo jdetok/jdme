@@ -264,7 +264,7 @@ func TestGetPlayerTeamSeason(t *testing.T) {
 func TestGetTeamRecords(t *testing.T) {
 	db := StartupTest(t)
 	var cs CurrentSeasons
-	team_recs, err := GetTeamRecords(db, &cs)
+	team_recs, err := UpdateTeamRecords(db, &cs)
 	if err != nil {
 		t.Error("failed getting team records", err)
 	}

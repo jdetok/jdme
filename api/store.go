@@ -101,6 +101,13 @@ func UpdateStructs(app *App, e *errd.Err) {
 		fmt.Println(e.BuildErr(err))
 	}
 
+	// update league top players
+	app.Store.TopLgPlayers, err = QueryTopLgPlayers(app.Database, &app.Store.CurrentSzns, "50")
+	if err != nil {
+		e.Msg = "failed to query top league players"
+		fmt.Println(e.BuildErr(err))
+	}
+
 	// update last update time
 	updateTime := time.Now()
 	app.LastUpdate = updateTime
