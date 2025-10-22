@@ -121,7 +121,9 @@ select * from (
 	a.wl, 
 	a.pts as tm_pts, 
 	f.pts as opp_pts,
-	d.pts as plr_pts
+	d.pts as plr_pts,
+	d.ast as plr_ast,
+	d.reb as plr_reb
 	from stats.tbox a
 	inner join (
 		select max(gdate) as md

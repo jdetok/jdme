@@ -76,7 +76,9 @@ async function respPlayerTitle(data, elName, ts) {
     if (ts) {
         rTitle.innerHTML = `
         Top Scorer from ${ts.recent_games[0].game_date}<br>${data.caption}
-         | ${ts.top_scorers[0].points} points`;    
+         | ${ts.top_scorers[0].points} pts | 
+         ${ts.top_scorers[0].assists} ast |
+         ${ts.top_scorers[0].rebounds} reb`;    
     } else {
         rTitle.textContent = data.caption;
     }
