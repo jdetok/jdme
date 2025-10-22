@@ -1,4 +1,3 @@
-import { showHideHvr } from "./hover.js";
 import { base } from "./listen.js";
 
 export async function lgRadioBtns() {

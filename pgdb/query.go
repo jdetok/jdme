@@ -201,36 +201,41 @@ select
     (select szn from lg.szn where szn_id = $3) as season
 `
 var TeamSznRecords = `
-select distinct on (c.sznt_id, a.szn_id, d.lg, w.wins, a.team_id)
-	d.lg, 
-	a.szn_id,
-	case
-		when d.lg = 'NBA' then szn
-		when d.lg = 'WNBA' then wszn
-	end as season,
-	case
-		when d.lg = 'NBA' then szn_desc
-		when d.lg = 'WNBA' then wszn_desc
-	end as season_desc,
-	a.team_id,
-	b.team,
-	b.team_long,
-	coalesce(w.wins, '0'),
-	coalesce(l.losses, '0')
-from stats.tbox a
-inner join lg.team b on b.team_id = a.team_id
-inner join lg.szn c on c.szn_id = a.szn_id
-inner join lg.league d on d.lg_id = b.lg_id
-left join (
-	select team_id, szn_id, coalesce(count(distinct game_id), '0') as wins
-	from stats.tbox where wl = 'W'
-	group by team_id, szn_id
-) w on w.team_id = a.team_id and w.szn_id = a.szn_id
-left join (
-	select team_id, szn_id, coalesce(count(distinct game_id), '0') as losses
-	from stats.tbox where wl = 'L'
-	group by team_id, szn_id
-) l on l.team_id = a.team_id and l.szn_id = a.szn_id
-where a.szn_id in ($1, $2)
-order by c.sznt_id, a.szn_id desc, d.lg, w.wins desc, a.team_id desc
+with team_results as (
+    select
+        d.lg, 
+        t.szn_id,
+        case
+            when d.lg = 'NBA' then szn
+            when d.lg = 'WNBA' then wszn
+        end as season,
+        case
+            when d.lg = 'NBA' then szn_desc
+            when d.lg = 'WNBA' then wszn_desc
+        end as season_desc,
+        t.team_id,
+        b.team,
+        b.team_long,
+        count(distinct case when t.wl = 'W' then t.game_id end) as wins,
+        count(distinct case when t.wl = 'L' then t.game_id end) as losses
+    from stats.tbox t
+    inner join lg.team b on b.team_id = t.team_id
+    inner join lg.szn c on c.szn_id = t.szn_id
+    inner join lg.league d on d.lg_id = b.lg_id
+    where t.szn_id in ($1, $2)
+    group by d.lg, t.szn_id, 
+             case when d.lg = 'NBA' then szn when d.lg = 'WNBA' then wszn end,
+             case when d.lg = 'NBA' then szn_desc when d.lg = 'WNBA' then wszn_desc end,
+             t.team_id, b.team, b.team_long
+)
+select lg, szn_id, season, season_desc, team_id, team, team_long, wins, losses
+from (
+    select *,
+        row_number() over (
+            partition by lg, szn_id
+            order by wins desc, losses asc, team_id
+        ) as rank
+    from team_results
+) ranked
+order by lg, rank
 `

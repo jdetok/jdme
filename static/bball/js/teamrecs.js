@@ -17,6 +17,8 @@ build table with top numPl leading scorers in the nba and wnba for their current
 respective seasons 
 */
 export async function buildTeamRecsTbl(data, elName) {
+    let teams_to_display = 5;
+
     console.log("build team recs table");
     const tblcont = document.getElementById(elName);
     const tbl = document.getElementById('trtbl');
@@ -45,8 +47,17 @@ export async function buildTeamRecsTbl(data, elName) {
     thead.appendChild(wnbaH);
     thead.appendChild(wrecH);
     tbl.appendChild(thead);
+
+    // find if length of returned records is < teams to display
+    // broke site after first day of NBA season since only 4 teams had played
+    let nba_len = data.nba_team_records.length;
+    let wnba_len = data.wnba_team_records.length;
+    if (nba_len < teams_to_display || wnba_len < teams_to_display) {
+        let smallest = (nba_len < wnba_len) ? nba_len : wnba_len;
+        teams_to_display = smallest;
+    }
     
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < teams_to_display; i++) {
         await teamRecsRow(tbl, data, i);
     }
     tblcont.appendChild(tbl);
