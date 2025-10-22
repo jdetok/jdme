@@ -6,3 +6,4 @@
 *.png
 static/archive
 tmp/
+z_json
