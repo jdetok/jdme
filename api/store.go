@@ -102,7 +102,7 @@ func UpdateStructs(app *App, e *errd.Err) {
 	}
 
 	// update league top players
-	app.Store.TopLgPlayers, err = QueryTopLgPlayers(app.Database, &app.Store.CurrentSzns, "50")
+	app.Store.TopLgPlayers, err = QueryTopLgPlayers(app.Database, &app.Store.CurrentSzns, "20")
 	if err != nil {
 		e.Msg = "failed to query top league players"
 		fmt.Println(e.BuildErr(err))

@@ -215,19 +215,19 @@ select distinct on (c.sznt_id, a.szn_id, d.lg, w.wins, a.team_id)
 	a.team_id,
 	b.team,
 	b.team_long,
-	w.wins,
-	l.losses
+	coalesce(w.wins, '0'),
+	coalesce(l.losses, '0')
 from stats.tbox a
 inner join lg.team b on b.team_id = a.team_id
 inner join lg.szn c on c.szn_id = a.szn_id
 inner join lg.league d on d.lg_id = b.lg_id
-inner join (
-	select team_id, szn_id, count(distinct game_id) as wins
+left join (
+	select team_id, szn_id, coalesce(count(distinct game_id), '0') as wins
 	from stats.tbox where wl = 'W'
 	group by team_id, szn_id
 ) w on w.team_id = a.team_id and w.szn_id = a.szn_id
-inner join (
-	select team_id, szn_id, count(distinct game_id) as losses
+left join (
+	select team_id, szn_id, coalesce(count(distinct game_id), '0') as losses
 	from stats.tbox where wl = 'L'
 	group by team_id, szn_id
 ) l on l.team_id = a.team_id and l.szn_id = a.szn_id
