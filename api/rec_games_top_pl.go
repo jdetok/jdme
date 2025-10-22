@@ -35,6 +35,8 @@ type PlayerBasic struct {
 	Player   string `json:"player"`
 	League   string `json:"league"`
 	Points   uint16 `json:"points"`
+	Assists  uint16 `json:"assists"`
+	Rebounds uint16 `json:"rebounds"`
 }
 
 type RecentGame struct {
@@ -136,7 +138,8 @@ func (rgs *RecentGames) ScanRecentGamesRows(rows *sql.Rows) {
 		rows.Scan(&rg.GameId, &rg.TeamId, &rg.PlayerId,
 			&rg.Player, &rg.League, &rg.Team,
 			&rg.TeamName, &rg.GameDate, &rg.Matchup,
-			&rg.WinLoss, &rg.Points, &rg.OppPoints, &ps.Points)
+			&rg.WinLoss, &rg.Points, &rg.OppPoints,
+			&ps.Points, &ps.Assists, &ps.Rebounds)
 
 		ps.PlayerId = rg.PlayerId
 		ps.TeamId = rg.TeamId
