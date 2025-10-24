@@ -30,7 +30,9 @@ export async function buildRGTopScorersTbl(data, elName) {
     
     /* loop through number of top scorers (should be number of games from that day)
     rgTopScorerRow adds a row to the table with player's stats/team/name etc*/
-    for (let i = 0; i < data.top_scorers.length; i++) {
+    let tlen = 5;
+    let numR = (data.top_scorers.length > tlen) ? tlen : data.top_scorers.length;
+    for (let i = 0; i < numR; i++) {
         await rgTopScorerRow(tbl, data.top_scorers[i], data);
     }
     // append the table element to the container (passed elName)
