@@ -61,7 +61,7 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 				"2006-01-02 15:04:05"),
 			)
 			// calculate current NBA/WNBA seasons
-			app.Store.CurrentSzns.GetCurrentSzns(time.Now(), &e)
+			app.Store.CurrentSzns.GetCurrentSzns(time.Now())
 
 			// update in memory structs
 			UpdateStructs(app, &e)

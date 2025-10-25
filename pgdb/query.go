@@ -2,6 +2,44 @@
 
 package pgdb
 
+var QPlayerStore = `
+select 
+	a.player_id,
+	a.player as player,
+	lower(a.player) as plr,
+	case 
+		when a.lg_id = 0 then 'nba'
+		when a.lg_id = 1 then 'wnba'
+	end as lg,
+	c.rs_max, 
+	c.rs_min,
+	coalesce(d.po_max, 0) as po_max,
+	coalesce(d.po_min, 0) as po_min,
+	b.teams
+from lg.plr a
+inner join (
+	select 
+		player_id, 
+		string_agg(distinct team_id::text, ',') as teams
+	from stats.pbox
+	group by player_id
+) b on b.player_id = a.player_id
+inner join (
+	select player_id, min(season_id) as rs_min, max(season_id) as rs_max
+	from api.plr_agg
+	where left(cast(season_id as varchar(5)), 1) = '2'
+	and right(cast(season_id as varchar(5)), 4) != '9999'
+	group by player_id
+) c on c.player_id = a.player_id
+left join (
+	select player_id, min(season_id) as po_min, max(season_id) as po_max
+	from api.plr_agg
+	where left(cast(season_id as varchar(5)), 1) = '4'
+	and right(cast(season_id as varchar(5)), 4) != '9999'
+	group by player_id
+) d on d.player_id = a.player_id
+`
+
 var VerifyTeamSzn = `
 select 1
 from api.plr_agg
