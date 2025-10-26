@@ -26,6 +26,11 @@ func TestMapPlayers(t *testing.T) {
 	}
 
 	sm.MakeMaps()
+
+	if err := sm.MapTeamIds(db); err != nil {
+		t.Error(err)
+	}
+
 	if err := sm.MapPlayers(db); err != nil {
 		t.Error(err)
 	}
@@ -42,17 +47,10 @@ func TestMapPlayers(t *testing.T) {
 		plr := sm.PlayerNameDtl[t]
 		testSzns := []uint64{22025, 22017, 22004}
 		for _, s := range testSzns {
-			// if s <= plr.MaxRSzn && s >= plr.MinRSzn {
-			// 	fmt.Printf("%s played in %d\n", plr.Name, s)
-			// } else {
-			// 	fmt.Printf("%s did not play in %d\n", plr.Name, s)
-			// }
-			sm.PlayedInSzn(plr.Lowr, s)
+			sm.PlayedInSzn(plr.Id, s)
 		}
 
 	}
-	fmt.Println(sm.SeasonPlayers[22003])
-
-	// fmt.Printf("player search: %s | value returned: %d", testSearch,
-	// 	sm.PlayerNameId[testSearch])
+	fmt.Println(sm.PlayerNameDtl["eddie house"])
+	fmt.Println(sm.SeasonPlayers[22003][2544])
 }
