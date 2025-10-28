@@ -93,7 +93,7 @@ func (app *App) Run(mux *http.ServeMux) error {
 	fmt.Printf("http server configured and starting at %v...\n",
 		app.StartTime.Format("2006-01-02 15:04:05"))
 
-	app.Store.Maps.MakeMaps()
+	app.Store.Maps.MakeMaps(app.Database)
 
 	// run the HTTP server
 	return srv.ListenAndServe()
