@@ -49,6 +49,7 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 	// call update func on intial run
 	if app.Started == 0 {
 		UpdateStructs(app, &e)
+
 		app.Started = 1
 	}
 
@@ -73,7 +74,7 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 func UpdateStructs(app *App, e *errd.Err) {
 	var err error
 
-	if err := app.Store.Maps.MapPlayers(app.Database); err != nil {
+	if err := app.Maps.MapPlayers(app.Database); err != nil {
 		e.Msg = "failed to update player map"
 		fmt.Println(e.BuildErr(err))
 	}

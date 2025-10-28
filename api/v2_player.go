@@ -37,7 +37,7 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	}
 	var wErr error
 
-	if app.Store.Maps.PNameInSzn(playerQ, seasonQ) {
+	if app.Maps.PNameInSzn(playerQ, seasonQ) {
 		_, wErr = fmt.Fprintf(w, "player %s exists in season %d\n", playerQ, seasonQ)
 	} else {
 		_, wErr = fmt.Fprintf(w, "player %s does not exist in season %d\n", playerQ, seasonQ)

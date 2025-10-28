@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/store"
@@ -16,10 +17,12 @@ in-memory player, season, team slices
 type App struct {
 	Config     Config
 	Database   *sql.DB
+	WG         *sync.WaitGroup
 	StartTime  time.Time
 	LastUpdate time.Time
 	Started    uint8
 	Store      InMemStore
+	Maps       store.StMaps
 }
 
 type InMemStore struct {
@@ -92,8 +95,6 @@ func (app *App) Run(mux *http.ServeMux) error {
 
 	fmt.Printf("http server configured and starting at %v...\n",
 		app.StartTime.Format("2006-01-02 15:04:05"))
-
-	app.Store.Maps.MakeMaps(app.Database)
 
 	// run the HTTP server
 	return srv.ListenAndServe()

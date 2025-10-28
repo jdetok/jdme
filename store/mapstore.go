@@ -139,12 +139,14 @@ func (sm *StMaps) MapPlayers(db *sql.DB) error {
 	return nil
 }
 
+// scan player results from db to maps
 func (sm *StMaps) MapPlayerRow(rows *sql.Rows, p *StPlayer) {
 	var tms string  // comma separated string to be converted to []string
 	var lowr string // run remove dia on each player's lowr
 	rows.Scan(&p.Id, &p.Name, &lowr, &p.Lg, &p.MaxRSzn, &p.MinRSzn,
 		&p.MaxPSzn, &p.MinPSzn, &tms)
 
+	// remove accents from lower case name
 	p.Lowr = RemoveDiacritics(lowr)
 
 	// split tms string from db to slice of strings
@@ -154,8 +156,7 @@ func (sm *StMaps) MapPlayerRow(rows *sql.Rows, p *StPlayer) {
 	sm.MapPlrToSzn(p)
 
 	// basic player id and name maps for simple Exists funcs
-	sm.PlrIds[p.Id] = struct{}{}
-	sm.PlrNms[p.Lowr] = struct{}{}
+	sm.MapPlrIdsNms(p)
 
 	// map player struct to id & name
 	sm.PlayerIdDtl[p.Id] = p
@@ -164,6 +165,12 @@ func (sm *StMaps) MapPlayerRow(rows *sql.Rows, p *StPlayer) {
 	// map id to name & name to id
 	sm.PlayerIdName[p.Id] = p.Lowr
 	sm.PlayerNameId[p.Lowr] = p.Id
+}
+
+// insert player id and cleaned player name as keys in PlrIds and PlrNms maps
+func (sm *StMaps) MapPlrIdsNms(p *StPlayer) {
+	sm.PlrIds[p.Id] = struct{}{}
+	sm.PlrNms[p.Lowr] = struct{}{}
 }
 
 // split comma separated string from db into slice of strings
@@ -223,11 +230,13 @@ func (sm *StMaps) PNameInSzn(searchP string, searchS int) bool {
 	return ok
 }
 
+// check if passed player id exists in PlrIds map
 func (sm *StMaps) PlrIdExists(searchP uint64) bool {
 	_, ok := sm.PlrIds[searchP]
 	return ok
 }
 
+// check if passed player name exists in PlrNms map
 func (sm *StMaps) PlrNmExists(searchP string) bool {
 	_, ok := sm.PlrNms[searchP]
 	return ok

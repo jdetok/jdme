@@ -9,6 +9,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
@@ -19,30 +20,42 @@ import (
 
 func main() {
 	e := errd.InitErr()
+
+	// load environment variables from .env file
 	err := envd.LoadDotEnv()
 	if err != nil {
 		fmt.Println(e.BuildErr(err).Error())
 	}
 
+	// set the server IP address
 	hostaddr, err := envd.GetEnvStr("SRV_IP")
 	if err != nil {
 		fmt.Println(e.BuildErr(err).Error())
 	}
 
-	// CONNECT TO POSTGRES
+	// connect to bball postgres database
 	db, err := pgdb.PostgresConn()
 	if err != nil {
 		fmt.Println(e.BuildErr(err).Error())
 	}
 
-	// initialize the app with the configs
+	// set
 	app := &api.App{
 		Config:   api.Config{Addr: hostaddr},
 		Database: db,
 		Started:  0,
+		WG:       &sync.WaitGroup{},
 	}
+	// var wg sync.WaitGroup
+	// create empty maps
+	app.WG.Add(1)
+	go func(app *api.App) {
+		defer app.WG.Done()
+		app.Maps.MakeMaps(app.Database)
+	}(app)
 
 	// update Players, Seasons, Teams in memory structs
+	app.WG.Add(1)
 	go api.CheckInMemStructs(app, 30*time.Second, 300*time.Second)
 
 	// MOUNT & RUN HTTP SERVER
@@ -51,5 +64,5 @@ func main() {
 		e.Msg = "error running api/http server"
 		log.Fatal(e.BuildErr(err).Error())
 	}
-
+	app.WG.Wait()
 }
