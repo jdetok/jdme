@@ -86,7 +86,6 @@ func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
 	- finally calls HandleSeasonId to validate the seasonId
 - call GetPlayerDash
 	- pass iq (result of ValidatePlayerSzn)
-
 */
 func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	e := errd.InitErr()

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/jdetok/go-api-jdeko.me/store"
 )
 
 /*
@@ -27,6 +29,7 @@ type InMemStore struct {
 	CurrentSzns  CurrentSeasons
 	TeamRecs     TeamRecords
 	TopLgPlayers LgTopPlayers
+	Maps         store.StMaps
 }
 
 // configs, currently only contains server address
@@ -61,6 +64,9 @@ func (app *App) Mount() *http.ServeMux {
 	mux.HandleFunc("GET /bball/league/scoring-leaders", app.HndlTopLgPlayers)
 	mux.HandleFunc("GET /bball/teamrecs", app.HndlTeamRecords)
 
+	// TESTING NEW ENDPOINTS 10/26/2025
+	mux.HandleFunc("GET /bball/v2/players", app.HndlPlayerV2)
+
 	// serve static files
 	mux.Handle("/js/", http.HandlerFunc(app.JSNostore))
 	mux.Handle("/css/", http.HandlerFunc(app.CSSNostore))
@@ -86,6 +92,8 @@ func (app *App) Run(mux *http.ServeMux) error {
 
 	fmt.Printf("http server configured and starting at %v...\n",
 		app.StartTime.Format("2006-01-02 15:04:05"))
+
+	app.Store.Maps.MakeMaps()
 
 	// run the HTTP server
 	return srv.ListenAndServe()

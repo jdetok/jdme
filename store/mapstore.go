@@ -5,9 +5,23 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
+
+func RemoveDiacritics(input string) string {
+	t := transform.Chain(
+		norm.NFD,
+		runes.Remove(runes.In(unicode.Mn)),
+		norm.NFC,
+	)
+	output, _, _ := transform.String(t, input)
+	return output
+}
 
 // TODO: season map[uint64]map[uint64]string
 
@@ -18,6 +32,7 @@ type StMaps struct {
 	PlayerIdName  map[uint64]string    // id as key, name as val
 	PlayerNameId  map[string]uint64    // player name as key, id as val (for lookup)
 	SeasonPlayers map[uint64]map[uint64]string
+	SeasonPNames  map[int]map[string]struct{}
 	Teams         map[uint64]*StTeam
 	TeamIds       map[string]uint64
 }
@@ -41,6 +56,7 @@ func (sm *StMaps) MakeMaps() {
 	sm.PlayerIdName = map[uint64]string{}
 	sm.PlayerNameId = map[string]uint64{}
 	sm.SeasonPlayers = map[uint64]map[uint64]string{}
+	sm.SeasonPNames = map[int]map[string]struct{}{}
 }
 
 // team struct
@@ -87,10 +103,12 @@ func (sm *StMaps) MapPlayers(db *sql.DB) error {
 	//
 	for rows.Next() {
 		var p StPlayer
-		var tms string // comma separated string to be converted to []string
-		rows.Scan(&p.Id, &p.Name, &p.Lowr, &p.Lg, &p.MaxRSzn, &p.MinRSzn,
+		var tms string  // comma separated string to be converted to []string
+		var lowr string // run remove dia on each player's lowr
+		rows.Scan(&p.Id, &p.Name, &lowr, &p.Lg, &p.MaxRSzn, &p.MinRSzn,
 			&p.MaxPSzn, &p.MinPSzn, &tms)
 
+		p.Lowr = RemoveDiacritics(lowr)
 		// split tms string to slice of strings, get converted teamid uint from sm.TeamIds
 		teamsStrArr := strings.SplitSeq(tms, ",")
 		for t := range teamsStrArr {
@@ -106,6 +124,11 @@ func (sm *StMaps) MapPlayers(db *sql.DB) error {
 			}
 			// ADD PLAYER ID:NAME MAP TO SEASON MAP FOR EACH SEASON PLAYED
 			sm.SeasonPlayers[s][p.Id] = p.Name
+
+			if sm.SeasonPNames[int(s)] == nil {
+				sm.SeasonPNames[int(s)] = map[string]struct{}{}
+			}
+			sm.SeasonPNames[int(s)][p.Lowr] = struct{}{}
 		}
 
 		// map player struct to id & name
@@ -128,4 +151,14 @@ func (sm *StMaps) PlayedInSzn(searchP, szn uint64) bool {
 	}
 	fmt.Printf("%d played in %d\n", searchP, szn)
 	return true
+}
+
+func (sm *StMaps) PlayerExists(searchP string) bool {
+	_, ok := sm.PlayerNameId[searchP]
+	return ok
+}
+
+func (sm *StMaps) PNameInSzn(searchP string, searchS int) bool {
+	_, ok := sm.SeasonPNames[searchS][searchP]
+	return ok
 }

@@ -73,6 +73,11 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 func UpdateStructs(app *App, e *errd.Err) {
 	var err error
 
+	if err := app.Store.Maps.MapPlayers(app.Database); err != nil {
+		e.Msg = "failed to update player map"
+		fmt.Println(e.BuildErr(err))
+	}
+
 	// update in memory players slice
 	app.Store.Players, err = UpdatePlayers(app.Database)
 	if err != nil {
