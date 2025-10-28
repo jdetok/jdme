@@ -36,7 +36,7 @@ type StMaps struct {
 	// new ones
 	PlrIds       map[uint64]struct{}
 	PlrNms       map[string]struct{}
-	SeasonPlrNms map[int]map[string]struct{}
+	SeasonPlrNms map[int]map[string]uint64
 	SeasonPlrIds map[int]map[uint64]string
 }
 
@@ -53,25 +53,37 @@ type StPlayer struct {
 	Teams   []uint64 // teams player has played for
 }
 
+// INITIAL MAP SETUP: must create empty maps before attempting to insert keys
+// calls MapTeams and MapSeasons to setup an empty map for
+// each season and team nested map
 func (sm *StMaps) MakeMaps(db *sql.DB) {
 	sm.PlayerIdDtl = map[uint64]*StPlayer{}
 	sm.PlayerNameDtl = map[string]*StPlayer{}
 	sm.PlayerIdName = map[uint64]string{}
 	sm.PlayerNameId = map[string]uint64{}
 	sm.SeasonPlayers = map[uint64]map[uint64]string{}
-	sm.SeasonPlrNms = map[int]map[string]struct{}{}
+
+	// map of seasons with nested map of player ids/names (cleaned)
+	sm.SeasonPlrNms = map[int]map[string]uint64{}
+	sm.SeasonPlrIds = map[int]map[uint64]string{}
+
+	// map of player ids & player names to verify ONLY if player exists in the db
 	sm.PlrIds = map[uint64]struct{}{}
 	sm.PlrNms = map[string]struct{}{}
-	if err := sm.MapTeamIds(db); err != nil {
+
+	// setup nested team maps
+	if err := sm.MapTeams(db); err != nil {
 		fmt.Println(err)
 	}
+
+	// setup nested season maps
 	if err := sm.MapSeasons(db); err != nil {
 		fmt.Println(err)
 	}
 }
 
 // get all team ids from db, convert each to a uint64, map to string version
-func (sm *StMaps) MapTeamIds(db *sql.DB) error {
+func (sm *StMaps) MapTeams(db *sql.DB) error {
 	sm.TeamIds = map[string]uint64{}
 	// get all team ids
 	teams, err := db.Query("select distinct team_id from stats.tbox")
@@ -93,11 +105,8 @@ func (sm *StMaps) MapTeamIds(db *sql.DB) error {
 
 // get all team ids from db, convert each to a uint64, map to string version
 func (sm *StMaps) MapSeasons(db *sql.DB) error {
-	sm.SeasonPlrNms = map[int]map[string]struct{}{}
-	sm.SeasonPlrIds = map[int]map[uint64]string{}
-
 	// to handle season id = 0
-	sm.SeasonPlrNms[0] = map[string]struct{}{}
+	sm.SeasonPlrNms[0] = map[string]uint64{}
 	sm.SeasonPlrIds[0] = map[uint64]string{}
 
 	// get all season ids
@@ -115,7 +124,7 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 		}
 		// create empty map for each season
 		sm.SeasonPlrIds[szn] = map[uint64]string{}
-		sm.SeasonPlrNms[szn] = map[string]struct{}{}
+		sm.SeasonPlrNms[szn] = map[string]uint64{}
 	}
 	return nil
 }
@@ -191,7 +200,7 @@ func (sm *StMaps) CleanTeamsSlice(p *StPlayer, tms string) {
 // iterate through each season played add the player to the season players map
 func (sm *StMaps) MapPlrToSzn(p *StPlayer) {
 	for s := p.MinRSzn; s <= p.MaxRSzn; s++ {
-		sm.SeasonPlrNms[int(s)][p.Lowr] = struct{}{}
+		sm.SeasonPlrNms[int(s)][p.Lowr] = p.Id
 		sm.SeasonPlrIds[int(s)][p.Id] = p.Lowr
 	}
 }
