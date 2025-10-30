@@ -22,7 +22,8 @@ type App struct {
 	LastUpdate time.Time
 	Started    uint8
 	Store      InMemStore
-	Maps       store.StMaps
+	// Maps       store.StMaps
+	MStore store.MapStore
 }
 
 type InMemStore struct {

@@ -8,12 +8,18 @@ import (
 )
 
 // read player from query string and clean the value (remove accents, lowercase)
-func (app *App) PlayerFromQ(r *http.Request) string {
-	p := r.URL.Query().Get("player")
-	p_lwr := strings.ToLower(p)
+func (app *App) PlayerFromQ(r *http.Request) any {
+	pStr := r.URL.Query().Get("player")
+	// check if integer
+	plrIdInt, err := strconv.ParseUint(pStr, 10, 64)
+	if err == nil {
+		fmt.Printf("integer player id requested: %d\n", plrIdInt)
+		return plrIdInt
+	}
+	p_lwr := strings.ToLower(pStr)
 	p_cln := RemoveDiacritics(p_lwr)
 
-	fmt.Printf("raw request: %s | cleaned: %s\n", p, p_cln)
+	fmt.Printf("player request (raw): %s | cleaned: %s\n", pStr, p_cln)
 	return p_cln
 }
 
@@ -30,17 +36,25 @@ func (app *App) SeasonFromQ(r *http.Request) (int, error) {
 
 // new endpoint for use with new player store data structure
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
-	playerQ := app.PlayerFromQ(r)
+	var exists bool
 	seasonQ, sznErr := app.SeasonFromQ(r)
 	if sznErr != nil {
 		http.Error(w, sznErr.Error(), http.StatusUnprocessableEntity)
 	}
+
+	playerQ := app.PlayerFromQ(r)
+	if plrId, ok := playerQ.(uint64); ok {
+		exists = app.MStore.Maps.PlrIdSznExists(plrId, seasonQ)
+	} else {
+		exists = app.MStore.Maps.PlrSznExists(playerQ.(string), seasonQ)
+	}
+
 	var wErr error
 
-	if app.Maps.PNameInSzn(playerQ, seasonQ) {
-		_, wErr = fmt.Fprintf(w, "player %s exists in season %d\n", playerQ, seasonQ)
+	if exists {
+		_, wErr = fmt.Fprintf(w, "player %v exists in season %d\n", playerQ, seasonQ)
 	} else {
-		_, wErr = fmt.Fprintf(w, "player %s does not exist in season %d\n", playerQ, seasonQ)
+		_, wErr = fmt.Fprintf(w, "player %v does not exist in season %d\n", playerQ, seasonQ)
 	}
 
 	if wErr != nil {

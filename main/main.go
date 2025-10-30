@@ -14,6 +14,7 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/api"
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
+	"github.com/jdetok/go-api-jdeko.me/store"
 	"github.com/jdetok/golib/envd"
 	"github.com/jdetok/golib/errd"
 )
@@ -46,12 +47,15 @@ func main() {
 		Started:  0,
 		WG:       &sync.WaitGroup{},
 	}
+	app.MStore.Maps = &store.StMaps{}
+
 	// var wg sync.WaitGroup
 	// create empty maps
 	app.WG.Add(1)
 	go func(app *api.App) {
 		defer app.WG.Done()
-		app.Maps.MakeMaps(app.Database)
+		// app.Maps.MakeMaps(app.Database)
+		app.MStore.Maps.MakeMaps(app.Database)
 	}(app)
 
 	// update Players, Seasons, Teams in memory structs
