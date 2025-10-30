@@ -31,12 +31,6 @@ type MapStore struct {
 	mu   sync.RWMutex
 }
 
-func (ms *MapStore) Get() *StMaps {
-	ms.mu.RLock()
-	defer ms.mu.RUnlock()
-	return ms.Maps
-}
-
 func (ms *MapStore) Set(newMaps *StMaps) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
@@ -47,7 +41,7 @@ func (ms *MapStore) Rebuild(db *sql.DB) error {
 	fmt.Println("Rebuilding StMaps...")
 	temp := MakeMaps(db)
 
-	if err := temp.MapTeams(db); err != nil {
+	if err := temp.MapTeamIds(db); err != nil {
 		return err
 	}
 	if err := temp.MapSeasons(db); err != nil {
@@ -63,14 +57,9 @@ func (ms *MapStore) Rebuild(db *sql.DB) error {
 	return nil
 }
 
-func (ms *MapStore) MakeMaps(db *sql.DB) {
-	ms.mu.Lock()
-	defer ms.mu.Unlock()
-
-	if ms.Maps == nil {
-		ms.Maps = &StMaps{}
-	}
-	ms.Maps.MakeMaps(db)
+func (ms *MapStore) Setup(db *sql.DB) {
+	fmt.Println("MAP STORE SETUP STARTED")
+	ms.Set(MakeMaps(db))
 }
 
 // rewrite global stores of players, teams, etc using hash maps rather than arrays
@@ -110,6 +99,7 @@ type StPlayer struct {
 // calls MapTeams and MapSeasons to setup an empty map for
 // each season and team nested map
 func MakeMaps(db *sql.DB) *StMaps {
+	fmt.Println("creating empty maps")
 	var sm StMaps
 	sm.PlayerIdDtl = map[uint64]*StPlayer{}
 	sm.PlayerNameDtl = map[string]*StPlayer{}
@@ -131,7 +121,7 @@ func MakeMaps(db *sql.DB) *StMaps {
 	sm.SznTmPlrIds = map[int]map[uint64]map[uint64]string{}
 
 	// setup nested team maps
-	if err := sm.MapTeams(db); err != nil {
+	if err := sm.MapTeamIds(db); err != nil {
 		fmt.Println(err)
 	}
 
@@ -142,39 +132,9 @@ func MakeMaps(db *sql.DB) *StMaps {
 	return &sm
 }
 
-func (sm *StMaps) MakeMaps(db *sql.DB) {
-	sm.PlayerIdDtl = map[uint64]*StPlayer{}
-	sm.PlayerNameDtl = map[string]*StPlayer{}
-	sm.PlayerIdName = map[uint64]string{}
-	sm.PlayerNameId = map[string]uint64{}
-	sm.SeasonPlayers = map[int]map[uint64]string{}
-
-	// map of seasons with nested map of player ids/names (cleaned)
-	sm.SeasonPlrNms = map[int]map[string]uint64{}
-	sm.SeasonPlrIds = map[int]map[uint64]string{}
-
-	// map of player ids & player names to verify ONLY if player exists in the db
-	sm.PlrIds = map[uint64]struct{}{}
-	sm.PlrNms = map[string]struct{}{}
-
-	// holds all team ids
-	sm.TeamIds = map[string]uint64{}
-
-	sm.SznTmPlrIds = map[int]map[uint64]map[uint64]string{}
-
-	// setup nested team maps
-	if err := sm.MapTeams(db); err != nil {
-		fmt.Println(err)
-	}
-
-	// setup nested season maps
-	if err := sm.MapSeasons(db); err != nil {
-		fmt.Println(err)
-	}
-}
-
 // get all team ids from db, convert each to a uint64, map to string version
-func (sm *StMaps) MapTeams(db *sql.DB) error {
+func (sm *StMaps) MapTeamIds(db *sql.DB) error {
+	fmt.Println("mapping team id strings to uint64")
 	// get all team ids
 	teams, err := db.Query("select distinct team_id from stats.tbox")
 	if err != nil {
@@ -195,6 +155,7 @@ func (sm *StMaps) MapTeams(db *sql.DB) error {
 
 // get all team ids from db, convert each to a uint64, map to string version
 func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
+	fmt.Println("mapping team ids to season: ", szn)
 	// get all team ids
 	teams, err := db.Query(
 		"select distinct team_id from stats.tbox where szn_id = $1", szn)
@@ -217,6 +178,7 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 
 // get all team ids from db, convert each to a uint64, map to string version
 func (sm *StMaps) MapSeasons(db *sql.DB) error {
+	fmt.Println("mapping seasons")
 	// to handle season id = 0
 	sm.SeasonPlrNms[0] = map[string]uint64{}
 	sm.SeasonPlrIds[0] = map[uint64]string{}
@@ -239,7 +201,7 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 		sm.SeasonPlrNms[szn] = map[string]uint64{}
 		sm.SznTmPlrIds[szn] = map[uint64]map[uint64]string{}
 
-		if err := sm.MapSznTeams(db, szn); err != nil {
+		if err = sm.MapSznTeams(db, szn); err != nil {
 			return err
 		}
 	}
@@ -249,26 +211,7 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 // query all player detail from db, map to id/name
 // called in UpdateStructs func to refresh the data
 func (sm *StMaps) MapPlayers(db *sql.DB) error {
-	// get data for player struct (every player in lg.plr table)
-	rows, err := db.Query(pgdb.QPlayerStore)
-	if err != nil {
-		return err
-	}
-
-	// each player creates a StPlayer struct that gets mapped to player id and
-	// name also creates a map for each season and player (to determine whether a
-	// player played in a particular season). also need to map teams
-	for rows.Next() {
-		var p StPlayer
-		if err := sm.MapPlayerRow(db, rows, &p); err != nil {
-			return fmt.Errorf("MapPlayerRow call failed\n** %w", err)
-		}
-	}
-	return nil
-}
-
-// map concurrently
-func (sm *StMaps) MapPlayersCC(db *sql.DB) error {
+	fmt.Println("mapping all players")
 	// get data for player struct (every player in lg.plr table)
 	rows, err := db.Query(pgdb.QPlayerStore)
 	if err != nil {
@@ -289,6 +232,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB) error {
 
 // scan player results from db to maps
 func (sm *StMaps) MapPlayerRow(db *sql.DB, rows *sql.Rows, p *StPlayer) error {
+	fmt.Printf("adding %s|%d to maps\n", p.Lowr, p.Id)
 	var tms string  // comma separated string to be converted to []string
 	var lowr string // run remove dia on each player's lowr
 	rows.Scan(&p.Id, &p.Name, &lowr, &p.Lg, &p.MaxRSzn, &p.MinRSzn,
@@ -325,6 +269,7 @@ func (sm *StMaps) MapPlayerRow(db *sql.DB, rows *sql.Rows, p *StPlayer) error {
 
 // called from within season loop
 func (sm *StMaps) MapSznTmPlr(db *sql.DB, p *StPlayer) error {
+	fmt.Printf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
 	q := `
 select szn_id, string_agg(distinct team_id::text, ',')
 from stats.pbox
@@ -338,13 +283,18 @@ group by player_id, szn_id`
 			"failed to query teams by season for %s|%d seasons %d through %d\n%w",
 			p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn, err)
 	}
+	count := 0
 	for tmsRows.Next() {
+		count++
+		fmt.Println("mapping row", count)
 		var szn int
 		var tmStr string
 		tmsRows.Scan(&szn, &tmStr)
 
 		tmsItr := strings.SplitSeq(tmStr, ",")
+
 		for t := range tmsItr {
+			fmt.Println("")
 			teamId := sm.TeamIds[t]
 			if sm.SznTmPlrIds[szn] == nil {
 				sm.SznTmPlrIds[szn] = map[uint64]map[uint64]string{}
@@ -382,6 +332,7 @@ func (sm *StMaps) CleanTeamsSlice(p *StPlayer, tms string) {
 
 // iterate through each season played add the player to the season players map
 func (sm *StMaps) MapPlrToSzn(p *StPlayer) error {
+	fmt.Printf("mapping %s|%d to season maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
 	sm.SeasonPlrNms[0][p.Lowr] = p.Id
 	sm.SeasonPlrIds[0][p.Id] = p.Lowr
 	for s := p.MinRSzn; s <= p.MaxRSzn; s++ {
@@ -389,75 +340,4 @@ func (sm *StMaps) MapPlrToSzn(p *StPlayer) error {
 		sm.SeasonPlrIds[int(s)][p.Id] = p.Lowr
 	}
 	return nil
-}
-
-// check if player id is in season id map
-func (sm *StMaps) PlayedInSzn(searchP uint64, szn int) bool {
-	_, ok := sm.SeasonPlayers[szn][searchP]
-	if !ok {
-		fmt.Printf("no match for season %d and player %d\n", szn, searchP)
-		return false
-	}
-	fmt.Printf("%d played in %d\n", searchP, szn)
-	return true
-}
-
-func (sm *StMaps) PlayerExists(searchP string) bool {
-	_, ok := sm.PlayerNameId[searchP]
-	return ok
-}
-
-// search SeasonPlrNms or SeasonPlrIds
-// move string logic to PlayerFromQ
-func (sm *StMaps) PlrExistsInSzn(searchP string, searchS int) bool {
-	var ok bool
-	plrIdInt, err := strconv.ParseUint(searchP, 10, 64)
-
-	// search by player id if searchP successfully converts to int
-	if err == nil {
-		// only verify player name exists in map if 0 season
-		if searchS == 0 {
-			return sm.PlrIdExists(plrIdInt)
-		} // verify player id exists in passed season's map
-		_, ok = sm.SeasonPlrIds[searchS][plrIdInt]
-	} else {
-		// search by name (lowercase, accidentals removed) if failed to convert
-		// to int if season is 0
-		if searchS == 0 { // only verify player id if 0 season
-			return sm.PlrNmExists(searchP)
-		}
-		// verify player name exists in passed season's map
-		_, ok = sm.SeasonPlrNms[searchS][searchP]
-	}
-	return ok
-}
-
-func (sm *StMaps) PlrIdSznExists(searchP uint64, searchS int) bool {
-	// verify player name exists in passed season's map
-	_, ok := sm.SeasonPlrIds[searchS][searchP]
-	return ok
-}
-
-func (sm *StMaps) PlrSznExists(searchP string, searchS int) bool {
-	// verify player name exists in passed season's map
-	_, ok := sm.SeasonPlrNms[searchS][searchP]
-	return ok
-}
-
-// check if passed player id exists in PlrIds map
-func (sm *StMaps) PlrIdExists(searchP uint64) bool {
-	_, ok := sm.PlrIds[searchP]
-	return ok
-}
-
-// check if passed player name exists in PlrNms map
-func (sm *StMaps) PlrNmExists(searchP string) bool {
-	_, ok := sm.PlrNms[searchP]
-	return ok
-}
-
-// check if passed player name exists in PlrNms map
-func (sm *StMaps) PlrSznTmExists(plrId, tmId uint64, szn int) bool {
-	_, ok := sm.SznTmPlrIds[szn][tmId][plrId]
-	return ok
 }

@@ -42,9 +42,18 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, sznErr.Error(), http.StatusUnprocessableEntity)
 	}
 
+	// 1610612744
+	teamQ := r.URL.Query().Get("team")
+
 	playerQ := app.PlayerFromQ(r)
 	if plrId, ok := playerQ.(uint64); ok {
-		exists = app.MStore.Maps.PlrIdSznExists(plrId, seasonQ)
+		if teamQ != "" {
+			tmId, _ := strconv.ParseUint(teamQ, 10, 64)
+			exists = app.MStore.Maps.PlrSznTmExists(plrId, tmId, seasonQ)
+		} else {
+			exists = app.MStore.Maps.PlrIdSznExists(plrId, seasonQ)
+		}
+
 	} else {
 		exists = app.MStore.Maps.PlrSznExists(playerQ.(string), seasonQ)
 	}
@@ -52,7 +61,7 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	var wErr error
 
 	if exists {
-		_, wErr = fmt.Fprintf(w, "player %v exists in season %d\n", playerQ, seasonQ)
+		_, wErr = fmt.Fprintf(w, "player %v team %v exists in season %d\n", playerQ, teamQ, seasonQ)
 	} else {
 		_, wErr = fmt.Fprintf(w, "player %v does not exist in season %d\n", playerQ, seasonQ)
 	}

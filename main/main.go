@@ -55,7 +55,7 @@ func main() {
 	go func(app *api.App) {
 		defer app.WG.Done()
 		// app.Maps.MakeMaps(app.Database)
-		app.MStore.Maps.MakeMaps(app.Database)
+		app.MStore.Setup(app.Database)
 	}(app)
 
 	// update Players, Seasons, Teams in memory structs
