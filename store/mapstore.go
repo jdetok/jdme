@@ -41,13 +41,7 @@ func (ms *MapStore) Rebuild(db *sql.DB) error {
 	fmt.Println("Rebuilding StMaps...")
 	temp := MakeMaps(db)
 
-	if err := temp.MapTeamIds(db); err != nil {
-		return err
-	}
-	if err := temp.MapSeasons(db); err != nil {
-		return err
-	}
-	if err := temp.MapPlayers(db); err != nil {
+	if err := temp.MapPlayersCC(db); err != nil {
 		fmt.Println("Error in MapPlayers:", err)
 		return err
 	}
@@ -64,6 +58,7 @@ func (ms *MapStore) Setup(db *sql.DB) {
 
 // rewrite global stores of players, teams, etc using hash maps rather than arrays
 type StMaps struct {
+	mu            sync.RWMutex
 	PlayerIdDtl   map[uint64]*StPlayer // id as key, struct as val
 	PlayerNameDtl map[string]*StPlayer // mame as key, struct as val
 	PlayerIdName  map[uint64]string    // id as key, name as val
@@ -121,14 +116,17 @@ func MakeMaps(db *sql.DB) *StMaps {
 	sm.SznTmPlrIds = map[int]map[uint64]map[uint64]string{}
 
 	// setup nested team maps
+	fmt.Println("creating empty team maps")
 	if err := sm.MapTeamIds(db); err != nil {
 		fmt.Println(err)
 	}
 
 	// setup nested season maps
+	fmt.Println("creating empty season maps")
 	if err := sm.MapSeasons(db); err != nil {
 		fmt.Println(err)
 	}
+
 	return &sm
 }
 
@@ -232,7 +230,7 @@ func (sm *StMaps) MapPlayers(db *sql.DB) error {
 
 // scan player results from db to maps
 func (sm *StMaps) MapPlayerRow(db *sql.DB, rows *sql.Rows, p *StPlayer) error {
-	fmt.Printf("adding %s|%d to maps\n", p.Lowr, p.Id)
+
 	var tms string  // comma separated string to be converted to []string
 	var lowr string // run remove dia on each player's lowr
 	rows.Scan(&p.Id, &p.Name, &lowr, &p.Lg, &p.MaxRSzn, &p.MinRSzn,
@@ -264,6 +262,7 @@ func (sm *StMaps) MapPlayerRow(db *sql.DB, rows *sql.Rows, p *StPlayer) error {
 	// map id to name & name to id
 	sm.PlayerIdName[p.Id] = p.Lowr
 	sm.PlayerNameId[p.Lowr] = p.Id
+	fmt.Printf("added %s|%d to maps\n", p.Lowr, p.Id)
 	return nil
 }
 
