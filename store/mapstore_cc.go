@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 )
 
 func (sm *StMaps) MapPlayersCC(db *sql.DB) error {
-	fmt.Println("mapping all players (concurrent workers)")
+	start := time.Now()
+	fmt.Println("mapping all players (concurrent workers) at", start)
 
 	rows, err := db.Query(pgdb.QPlayerStore)
 	if err != nil {
@@ -96,7 +98,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB) error {
 	go func() {
 		wg.Wait()
 		close(results)
-		fmt.Println("finished with", count, "rows")
+		fmt.Println("finished with", count, "rows after", time.Since(start))
 		// logging goes here
 	}()
 	return nil
@@ -154,7 +156,7 @@ group by player_id, szn_id`
 		tmsItr := strings.SplitSeq(tmStr, ",")
 		for t := range tmsItr {
 			// access uint64 version of team id created early in sm.TeamIDs
-			teamId := sm.getTeamIDUintCC(t)
+			teamId := sm.GetTeamIDUintCC(t)
 
 			sm.mu.Lock()
 			// create empty map for the seasonid to safely create team id maps
@@ -175,7 +177,7 @@ group by player_id, szn_id`
 }
 
 // access a teamId from sm.TeamIds concurrently
-func (sm *StMaps) getTeamIDUintCC(t string) uint64 {
+func (sm *StMaps) GetTeamIDUintCC(t string) uint64 {
 	sm.mu.RLock()
 	teamId := sm.TeamIds[t]
 	sm.mu.RUnlock()
