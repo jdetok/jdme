@@ -24,6 +24,6 @@ func PostgresConn() (*sql.DB, error) {
 
 	// set max connections
 	db.SetMaxOpenConns(100)
-	db.SetMaxIdleConns(100)
+	db.SetMaxIdleConns(25)
 	return db, nil
 }

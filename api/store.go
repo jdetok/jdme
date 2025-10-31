@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
@@ -64,8 +65,25 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 			// calculate current NBA/WNBA seasons
 			app.Store.CurrentSzns.GetCurrentSzns(time.Now())
 
+			var wg sync.WaitGroup
+
 			// update in memory structs
-			UpdateStructs(app, &e)
+			wg.Add(1)
+			go func(wg *sync.WaitGroup, app *App, e *errd.Err) {
+				defer wg.Done()
+				UpdateStructs(app, e)
+			}(&wg, app, &e)
+
+			// update maps
+			wg.Add(1)
+			go func(wg *sync.WaitGroup) {
+				defer wg.Done()
+				if err := app.MStore.Rebuild(app.Database); err != nil {
+					e.Msg = "failed to update player map"
+					fmt.Println(e.BuildErr(err))
+				}
+			}(&wg)
+			wg.Wait()
 		}
 	}
 }
@@ -73,11 +91,6 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 // update players, seasons, and teams in memory structs slices
 func UpdateStructs(app *App, e *errd.Err) {
 	var err error
-
-	if err = app.MStore.Rebuild(app.Database); err != nil {
-		e.Msg = "failed to update player map"
-		fmt.Println(e.BuildErr(err))
-	}
 
 	// update in memory players slice
 	app.Store.Players, err = UpdatePlayers(app.Database)

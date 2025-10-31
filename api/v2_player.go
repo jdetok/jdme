@@ -44,10 +44,11 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 
 	// 1610612744
 	teamQ := r.URL.Query().Get("team")
-
+	fmt.Println(teamQ)
 	playerQ := app.PlayerFromQ(r)
 	if plrId, ok := playerQ.(uint64); ok {
 		if teamQ != "" {
+
 			tmId, _ := strconv.ParseUint(teamQ, 10, 64)
 			exists = app.MStore.Maps.PlrSznTmExists(plrId, tmId, seasonQ)
 		} else {
