@@ -1,4 +1,4 @@
-package store
+package memstore
 
 import (
 	"database/sql"
@@ -7,6 +7,7 @@ import (
 	"sync"
 	"unicode"
 
+	"github.com/jdetok/go-api-jdeko.me/logd"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -35,11 +36,11 @@ func (ms *MapStore) Set(newMaps *StMaps) {
 	ms.Maps = newMaps
 }
 
-func (ms *MapStore) Rebuild(db *sql.DB) error {
+func (ms *MapStore) Rebuild(db *sql.DB, lg *logd.Logd) error {
 	fmt.Println("Rebuilding StMaps...")
 	temp := MakeMaps(db)
 
-	if err := temp.MapPlayersCC(db); err != nil {
+	if err := temp.MapPlayersCC(db, lg); err != nil {
 		fmt.Println("Error in MapPlayers:", err)
 		return err
 	}

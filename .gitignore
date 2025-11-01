@@ -8,3 +8,4 @@ static/archive
 tmp/
 z_json
 .vscode
+z_log/

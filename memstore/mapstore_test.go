@@ -1,8 +1,9 @@
-package store
+package memstore
 
 import (
 	"testing"
 
+	"github.com/jdetok/go-api-jdeko.me/logd"
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/envd"
 )
@@ -19,7 +20,7 @@ func TestMapPlayersCC(t *testing.T) {
 	}
 	sm := MakeMaps(db)
 
-	if sm.MapPlayersCC(db); err != nil {
+	if sm.MapPlayersCC(db, &logd.Logd{}); err != nil {
 		t.Error(err)
 	}
 

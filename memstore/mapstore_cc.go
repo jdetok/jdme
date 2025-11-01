@@ -1,4 +1,4 @@
-package store
+package memstore
 
 import (
 	"database/sql"
@@ -7,12 +7,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jdetok/go-api-jdeko.me/logd"
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 )
 
-func (sm *StMaps) MapPlayersCC(db *sql.DB) error {
+func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	start := time.Now()
-	fmt.Println("mapping all players (concurrent workers) at", start)
+	lg.Infof("mapping all players (concurrent workers)")
 
 	rows, err := db.Query(pgdb.QPlayerStore)
 	if err != nil {
@@ -98,7 +99,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB) error {
 	go func() {
 		wg.Wait()
 		close(results)
-		fmt.Println("finished with", count, "rows after", time.Since(start))
+		lg.Infof("finished with %d rows after %v", count, time.Since(start))
 		// logging goes here
 	}()
 	return nil

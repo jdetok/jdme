@@ -2,13 +2,12 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/store"
+	"github.com/jdetok/go-api-jdeko.me/logd"
+	"github.com/jdetok/go-api-jdeko.me/memstore"
 )
 
 /*
@@ -16,16 +15,17 @@ main struct referenced through the app. contains configs, , pool,
 in-memory player, season, team slices
 */
 type App struct {
+	Addr       string
 	Config     Config
 	Database   *sql.DB
-	WG         *sync.WaitGroup
 	StartTime  time.Time
 	LastUpdate time.Time
 	Started    uint8
 	Store      InMemStore
 	// Maps       store.StMaps
-	MStore store.MapStore
+	MStore memstore.MapStore
 	Logf   *os.File
+	Lg     *logd.Logd
 }
 
 type InMemStore struct {
@@ -35,7 +35,7 @@ type InMemStore struct {
 	CurrentSzns  CurrentSeasons
 	TeamRecs     TeamRecords
 	TopLgPlayers LgTopPlayers
-	Maps         store.StMaps
+	Maps         memstore.StMaps
 }
 
 // configs, currently only contains server address
@@ -57,6 +57,7 @@ the root handler "/" must remain at the end of the function
 */
 func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
+	app.Lg.Infof("new mux server created, setting up endpoint handlers")
 
 	// define endpoints
 	mux.HandleFunc("GET /about", app.HndlAbt)
@@ -96,7 +97,7 @@ func (app *App) Run(mux *http.ServeMux) error {
 	// set the time for caching
 	app.StartTime = time.Now()
 
-	fmt.Printf("http server configured and starting at %v...\n",
+	app.Lg.Infof("http server configured | running server at %v...\n",
 		app.StartTime.Format("2006-01-02 15:04:05"))
 
 	// run the HTTP server

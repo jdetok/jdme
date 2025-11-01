@@ -44,12 +44,12 @@ type Team struct {
 launch goroutines to update the global players, seasons, and team stores
 updates at every interval
 */
-func CheckInMemStructs(app *App, interval, threshold time.Duration) {
+func (app *App) CheckInMemStructs(interval, threshold time.Duration) {
 	e := errd.InitErr()
 
 	// call update func on intial run
 	if app.Started == 0 {
-		UpdateStructs(app, &e)
+		app.UpdateStructs(&e)
 
 		app.Started = 1
 	}
@@ -71,14 +71,14 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 			wg.Add(1)
 			go func(wg *sync.WaitGroup, app *App, e *errd.Err) {
 				defer wg.Done()
-				UpdateStructs(app, e)
+				app.UpdateStructs(e)
 			}(&wg, app, &e)
 
 			// update maps
 			wg.Add(1)
 			go func(wg *sync.WaitGroup) {
 				defer wg.Done()
-				if err := app.MStore.Rebuild(app.Database); err != nil {
+				if err := app.MStore.Rebuild(app.Database, app.Lg); err != nil {
 					e.Msg = "failed to update player map"
 					fmt.Println(e.BuildErr(err))
 				}
@@ -89,7 +89,7 @@ func CheckInMemStructs(app *App, interval, threshold time.Duration) {
 }
 
 // update players, seasons, and teams in memory structs slices
-func UpdateStructs(app *App, e *errd.Err) {
+func (app *App) UpdateStructs(e *errd.Err) {
 	var err error
 
 	// update in memory players slice
