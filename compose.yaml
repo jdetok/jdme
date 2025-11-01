@@ -16,6 +16,7 @@ services:
       - .:/app
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
+      - ./log:/app/log
     restart: unless-stopped
 
 networks:

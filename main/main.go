@@ -48,7 +48,13 @@ func main() {
 		WG:       &sync.WaitGroup{},
 	}
 	app.MStore.Maps = &store.StMaps{}
+	f, err := api.SetupLogf("./log/applog")
+	if err != nil {
+		log.Fatal(e.BuildErr(err))
+	}
+	app.Logf = f
 
+	api.WriteLogf(app.Logf, "testing log write")
 	// build new map store
 	app.MStore.Setup(app.Database)
 	if err := app.MStore.Rebuild(app.Database); err != nil {

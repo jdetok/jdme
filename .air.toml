@@ -22,7 +22,8 @@ tmp_dir = "tmp"
     "./api/resp",
     "./pgdb",
     "./static",  
-    "./main"
+    "./main",
+    "./store"
   ]
 
   exclude = ["**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.svg", "**/test*.go"]

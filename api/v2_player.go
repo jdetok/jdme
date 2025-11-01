@@ -36,6 +36,7 @@ func (app *App) SeasonFromQ(r *http.Request) (int, error) {
 
 // new endpoint for use with new player store data structure
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
+	WriteLogf(app.Logf, "v2 player handler request")
 	var exists bool
 	seasonQ, sznErr := app.SeasonFromQ(r)
 	if sznErr != nil {

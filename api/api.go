@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
@@ -24,6 +25,7 @@ type App struct {
 	Store      InMemStore
 	// Maps       store.StMaps
 	MStore store.MapStore
+	Logf   *os.File
 }
 
 type InMemStore struct {
