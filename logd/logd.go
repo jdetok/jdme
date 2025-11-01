@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -14,6 +15,8 @@ const (
 	WARNING string = "* WARNING"
 	ERROR   string = "** ERROR"
 	FATAL   string = "*** FATAL ERROR"
+	HTTP    string = "HTTP"
+	HTTPERR string = "HTTPERR"
 )
 
 type LogdW struct {
@@ -33,7 +36,7 @@ func NewLogd(out io.Writer) *Logd {
 }
 
 func (l *Logd) log(level, msg string, args ...any) {
-	prefix := fmt.Sprintf("[%s]", level)
+	prefix := fmt.Sprintf("[%s] ", level)
 	l.lg.SetPrefix(prefix)
 	msgf := fmt.Sprintf(msg, args...)
 
@@ -71,3 +74,28 @@ func (l *Logd) Infof(msg string, args ...any)  { l.log(INFO, msg, args...) }
 func (l *Logd) Warnf(msg string, args ...any)  { l.log(WARNING, msg, args...) }
 func (l *Logd) Errorf(msg string, args ...any) { l.log(ERROR, msg, args...) }
 func (l *Logd) Fatalf(msg string, args ...any) { l.log(ERROR, msg, args...) }
+
+// default logger for http requests
+func (l *Logd) LogHTTP(r *http.Request) {
+	l.log(HTTP, `
++++ REQUEST RECEIVED - %v
+- Request URL: %v
+- Method: %v | Request URI: %v
+- Referrer: %v
+- Remote Addr: %v
+- User Agent: %v`,
+		time.Now().Format("2006-01-02 15:04:05"),
+		r.URL,
+		r.Method,
+		r.RequestURI,
+		r.RemoteAddr,
+		r.Referer(),
+		r.UserAgent(),
+	)
+}
+
+// actual err gets logged, just msg string gets sent as http errora
+func (l *Logd) HTTPErr(w http.ResponseWriter, err error, code int, msg string, args ...any) {
+	l.log(HTTPERR, fmt.Sprintf("%s\n**%v", msg, err), args...)
+	http.Error(w, msg, code)
+}

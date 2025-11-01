@@ -8,3 +8,5 @@
 - ### 9/10/2025 added top scorers interactive box
 - ### 9/12/2025 created documentation with go doc
     - moved api to its own package, isolated main
+
+- ### 11/1/2025: converted to better in-project logger

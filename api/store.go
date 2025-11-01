@@ -2,12 +2,10 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
-	"github.com/jdetok/golib/errd"
 )
 
 /*
@@ -45,11 +43,9 @@ launch goroutines to update the global players, seasons, and team stores
 updates at every interval
 */
 func (app *App) CheckInMemStructs(interval, threshold time.Duration) {
-	e := errd.InitErr()
-
 	// call update func on intial run
 	if app.Started == 0 {
-		app.UpdateStructs(&e)
+		app.UpdateStructs()
 
 		app.Started = 1
 	}
@@ -59,78 +55,78 @@ func (app *App) CheckInMemStructs(interval, threshold time.Duration) {
 	defer ticker.Stop()
 	for range ticker.C {
 		if time.Since(app.LastUpdate) > threshold {
-			fmt.Printf("refreshing store at %v\n", time.Now().Format(
-				"2006-01-02 15:04:05"),
-			)
-			// calculate current NBA/WNBA seasons
-			app.Store.CurrentSzns.GetCurrentSzns(time.Now())
+			app.Lg.Infof("refreshing in-mem store")
 
 			var wg sync.WaitGroup
 
+			// calculate current NBA/WNBA seasons
+			app.Store.CurrentSzns.GetCurrentSzns(time.Now())
+
 			// update in memory structs
 			wg.Add(1)
-			go func(wg *sync.WaitGroup, app *App, e *errd.Err) {
+			go func(wg *sync.WaitGroup, app *App) {
 				defer wg.Done()
-				app.UpdateStructs(e)
-			}(&wg, app, &e)
+				app.UpdateStructs()
+			}(&wg, app)
 
 			// update maps
 			wg.Add(1)
-			go func(wg *sync.WaitGroup) {
+			go func(wg *sync.WaitGroup, app *App) {
 				defer wg.Done()
 				if err := app.MStore.Rebuild(app.Database, app.Lg); err != nil {
-					e.Msg = "failed to update player map"
-					fmt.Println(e.BuildErr(err))
+					app.Lg.Errorf("failed to update player map")
 				}
-			}(&wg)
+			}(&wg, app)
 			wg.Wait()
 		}
 	}
 }
 
 // update players, seasons, and teams in memory structs slices
-func (app *App) UpdateStructs(e *errd.Err) {
-	var err error
+func (app *App) UpdateStructs() {
+	app.Lg.Infof("updating in memory structs")
 
-	// update in memory players slice
-	app.Store.Players, err = UpdatePlayers(app.Database)
-	if err != nil {
-		e.Msg = "failed to get players"
-		fmt.Println(e.BuildErr(err))
+	var errP error
+	msgP := "updating players structs"
+	app.Store.Players, errP = UpdatePlayers(app.Database)
+	if errP != nil {
+		app.Lg.Errorf("failed %s\n%v", msgP, errP)
 	}
 
 	// update in memory seasons slice
-	app.Store.Seasons, err = UpdateSeasons(app.Database)
-	if err != nil {
-		e.Msg = "failed to get seasons"
-		fmt.Println(e.BuildErr(err))
+	var errS error
+	msgS := "updating seasons structs"
+	app.Store.Seasons, errS = UpdateSeasons(app.Database)
+	if errS != nil {
+		app.Lg.Errorf("failed %s\n%v", msgS, errS)
 	}
 
 	// update in memory teams slice
-	app.Store.Teams, err = UpdateTeams(app.Database)
-	if err != nil {
-		e.Msg = "failed to get teams"
-		fmt.Println(e.BuildErr(err))
+	var errT error
+	msgE := "updating teams structs"
+	app.Store.Teams, errT = UpdateTeams(app.Database)
+	if errT != nil {
+		app.Lg.Errorf("failed %s\n%v", msgE, errP)
 	}
-
 	// update team records
-	app.Store.TeamRecs, err = UpdateTeamRecords(app.Database, &app.Store.CurrentSzns)
-	if err != nil {
-		e.Msg = "failed to update team records"
-		fmt.Println(e.BuildErr(err))
+	var errTR error
+	msgTR := "updating team records"
+	app.Store.TeamRecs, errTR = UpdateTeamRecords(app.Database, &app.Store.CurrentSzns)
+	if errTR != nil {
+		app.Lg.Errorf("failed %s\n%v", msgTR, errTR)
 	}
-
 	// update league top players
-	app.Store.TopLgPlayers, err = QueryTopLgPlayers(app.Database, &app.Store.CurrentSzns, "50")
-	if err != nil {
-		e.Msg = "failed to query top league players"
-		fmt.Println(e.BuildErr(err))
+	var errLP error
+	msgLP := "updating league top players struct"
+	app.Store.TopLgPlayers, errLP = QueryTopLgPlayers(app.Database, &app.Store.CurrentSzns, "50")
+	if errLP != nil {
+		app.Lg.Errorf("failed %s\n%v", msgLP, errLP)
 	}
 
 	// update last update time
 	updateTime := time.Now()
 	app.LastUpdate = updateTime
-	fmt.Printf("finished refreshing store at %v\n", app.LastUpdate)
+	app.Lg.Infof("finished refreshing store")
 }
 
 /*
@@ -138,11 +134,9 @@ query the database to update global slice of player structs (in memory player st
 query also gets player's min and max seasons (reg season and playoffs)
 */
 func UpdatePlayers(db *sql.DB) ([]Player, error) {
-	e := errd.InitErr()
 	rows, err := db.Query(pgdb.PlayersSeason)
 	if err != nil {
-		e.Msg = "query failed"
-		return nil, e.BuildErr(err)
+		return nil, err
 	}
 	var players []Player
 	for rows.Next() {
@@ -162,11 +156,9 @@ query the database for all seasons, populates global seasons store
 example: seasonId: 22025 | season: 2024-25 | WSeason: 2025-26
 */
 func UpdateSeasons(db *sql.DB) ([]Season, error) {
-	e := errd.InitErr()
 	rows, err := db.Query(pgdb.AllSeasons)
 	if err != nil {
-		e.Msg = "error querying db"
-		e.BuildErr(err)
+		return nil, err
 	}
 
 	var seasons []Season
@@ -180,11 +172,9 @@ func UpdateSeasons(db *sql.DB) ([]Season, error) {
 
 // query database for global teams store
 func UpdateTeams(db *sql.DB) ([]Team, error) {
-	e := errd.InitErr()
 	rows, err := db.Query(pgdb.Teams)
 	if err != nil {
-		e.Msg = "error querying db"
-		e.BuildErr(err)
+		return nil, err
 	}
 
 	var teams []Team
@@ -199,14 +189,12 @@ func UpdateTeams(db *sql.DB) ([]Team, error) {
 // query db for team season records to populate records table
 // moved to store rather than querying for every request
 func UpdateTeamRecords(db *sql.DB, cs *CurrentSeasons) (TeamRecords, error) {
-	e := errd.InitErr()
 	var team_recs TeamRecords
 
 	sl := cs.LgSznsByMonth(time.Now())
 	rows, err := db.Query(pgdb.TeamSznRecords, sl.SznId, sl.WSznId)
 	if err != nil {
-		e.Msg = "error getting team records"
-		return team_recs, e.BuildErr(err)
+		return team_recs, err
 	}
 	for rows.Next() {
 		var tr TeamRecord

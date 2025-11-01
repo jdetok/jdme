@@ -16,16 +16,14 @@ in-memory player, season, team slices
 */
 type App struct {
 	Addr       string
-	Config     Config
 	Database   *sql.DB
 	StartTime  time.Time
 	LastUpdate time.Time
 	Started    uint8
 	Store      InMemStore
-	// Maps       store.StMaps
-	MStore memstore.MapStore
-	Logf   *os.File
-	Lg     *logd.Logd
+	MStore     memstore.MapStore
+	Logf       *os.File
+	Lg         *logd.Logd
 }
 
 type InMemStore struct {
@@ -35,12 +33,6 @@ type InMemStore struct {
 	CurrentSzns  CurrentSeasons
 	TeamRecs     TeamRecords
 	TopLgPlayers LgTopPlayers
-	Maps         memstore.StMaps
-}
-
-// configs, currently only contains server address
-type Config struct {
-	Addr string
 }
 
 // accept slice of bytes in JSON structure and write to response writers
@@ -87,7 +79,7 @@ func (app *App) Run(mux *http.ServeMux) error {
 
 	// server configuration
 	srv := &http.Server{
-		Addr:         app.Config.Addr,
+		Addr:         app.Addr,
 		Handler:      mux,
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 10,
@@ -97,8 +89,7 @@ func (app *App) Run(mux *http.ServeMux) error {
 	// set the time for caching
 	app.StartTime = time.Now()
 
-	app.Lg.Infof("http server configured | running server at %v...\n",
-		app.StartTime.Format("2006-01-02 15:04:05"))
+	app.Lg.Infof("http server configured | running server at %v...\n", app.Addr)
 
 	// run the HTTP server
 	return srv.ListenAndServe()

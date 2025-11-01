@@ -36,7 +36,7 @@ func (app *App) SeasonFromQ(r *http.Request) (int, error) {
 
 // new endpoint for use with new player store data structure
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
-	app.Lg.Infof("v2 player handler request")
+	app.Lg.LogHTTP(r)
 	var exists bool
 	seasonQ, sznErr := app.SeasonFromQ(r)
 	if sznErr != nil {
@@ -50,7 +50,7 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	if plrId, ok := playerQ.(uint64); ok {
 		if teamQ != "" {
 			tmId := app.MStore.Maps.GetTeamIDUintCC(teamQ)
-			// tmId, _ := strconv.ParseUint(teamQ, 10, 64)
+
 			exists = app.MStore.Maps.PlrSznTmExists(plrId, tmId, seasonQ)
 		} else {
 			exists = app.MStore.Maps.PlrIdSznExists(plrId, seasonQ)
@@ -73,4 +73,5 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 			fmt.Sprintf("failed to write HTTP response\n**%s", wErr),
 			http.StatusInternalServerError)
 	}
+	app.Lg.Infof("served /v2/player request")
 }

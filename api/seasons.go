@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-
-	"github.com/jdetok/golib/errd"
 )
 
 // hold current nba and wnba seasons based on date
@@ -29,8 +27,6 @@ returns slice of two season strings for date (generally pass time.Now())
 calling in 2025 will return 2024-25 and 2025-26 and so on
 */
 func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) {
-	e := errd.InitErr()
-	// dt := time.Now()
 	dt := now
 	// current year | year + 1 || e.g. 2025: cyyy=2025, cy=26
 	var cyyy string = dt.Format("2006")
@@ -47,16 +43,16 @@ func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) {
 	// append a 2 to front of current year, return as uint64
 	cint, err := strconv.ParseUint("2"+cyyy, 10, 64)
 	if err != nil {
-		e.Msg = "error converting month to int"
-		fmt.Println(e.BuildErr(err))
+		msg := "error converting month to int"
+		fmt.Printf("%s\n%v\n", msg, err)
 	}
 	cs.CurSznId = cint
 
 	// append a 2 to front of prev year, return as uint64
 	pint, err := strconv.ParseUint("2"+pyyy, 10, 64)
 	if err != nil {
-		e.Msg = "error converting month to int"
-		fmt.Println(e.BuildErr(err))
+		msg := "error converting month to int"
+		fmt.Printf("%s\n%v\n", msg, err)
 	}
 	cs.PrevSznId = pint
 }
@@ -71,23 +67,23 @@ times of year in which the "current" WNBA season is different than the current
 NBA season.
 */
 func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
-	e := errd.InitErr()
 	// var cs CurrentSeasons
 	cs.GetCurrentSzns(now)
 
 	// convert current month to int
 	m, err := strconv.Atoi(now.Format("1"))
 	if err != nil {
-		e.Msg = "error converting month to int"
-		fmt.Println(e.BuildErr(err))
+		msg := "error converting month to int"
+		fmt.Printf("%s\n%v\n", msg, err)
+
 	}
 	fmt.Println("month: ", m)
 
 	// convert current day to int
 	d, err := strconv.Atoi(now.Format("2"))
 	if err != nil {
-		e.Msg = "error converting month to int"
-		fmt.Println(e.BuildErr(err))
+		msg := "error converting month to int"
+		fmt.Printf("%s\n%v\n", msg, err)
 	}
 	fmt.Println("day: ", d)
 

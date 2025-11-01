@@ -24,7 +24,7 @@ func main() {
 	app := &api.App{}
 
 	// logger setup - opens a *os.File which implements io writer interface
-	f, err := logd.SetupLogdF("./log/applog")
+	f, err := logd.SetupLogdF("./z_log/applog")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-
-	"github.com/jdetok/golib/errd"
 )
 
 type PlayerQuery struct {
@@ -30,8 +28,7 @@ type PQueryIds struct {
 
 // top numPl players for each league
 func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
-	e := errd.InitErr()
-	LogHTTP(r)
+	app.Lg.LogHTTP(r)
 
 	// new LgTopPlayers to get from in memory store
 	var lt LgTopPlayers
@@ -41,7 +38,7 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	numPl, err := strconv.ParseUint(numPlStr, 10, 64)
 	if err != nil {
 		msg := "failed to convert numPlStr to int"
-		e.HTTPErr(w, msg, err)
+		app.Lg.HTTPErr(w, err, http.StatusInternalServerError, msg)
 	}
 
 	// append numPl to NBA/WNBA LgTopPlayer from memory store
@@ -54,20 +51,19 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	js, err := MarshalTopPlayers(&lt)
 	if err != nil {
 		msg := "failed to marshal top 5 league players struct to JSON"
-		e.HTTPErr(w, msg, err)
+		app.Lg.HTTPErr(w, err, http.StatusInternalServerError, msg)
 	}
 	app.JSONWriter(w, js)
 }
 
 // team records for current/most recent reg. seasons for each league
 func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
-	e := errd.InitErr()
-	LogHTTP(r)
+	app.Lg.LogHTTP(r)
 
 	js, err := TeamRecordsJSON(&app.Store.TeamRecs)
 	if err != nil {
 		msg := "failed to marshal team records struct to JSON"
-		e.HTTPErr(w, msg, err)
+		app.Lg.HTTPErr(w, err, http.StatusInternalServerError, msg)
 	}
 	app.JSONWriter(w, js)
 }
@@ -88,8 +84,7 @@ func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
 	- pass iq (result of ValidatePlayerSzn)
 */
 func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
-	e := errd.InitErr()
-	LogHTTP(r)
+	app.Lg.LogHTTP(r)
 
 	// pq holds all query parameters as strings
 	var pq PlayerQuery
@@ -114,14 +109,14 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	iq, err := ValidatePlayerSzn(app.Store.Players, &app.Store.CurrentSzns, &pq, &rp.ErrorMsg)
 	if err != nil {
 		msg := fmt.Sprintf("validate player %s", pq.Player)
-		e.HTTPErr(w, msg, err)
+		app.Lg.HTTPErr(w, err, http.StatusUnprocessableEntity, msg)
 	}
 
 	// query the player & build JSON response, returned as []byte to write
 	js, err := rp.GetPlayerDash(app.Database, &iq)
 	if err != nil {
 		msg := fmt.Sprintf("server failed to return player dash for %s", pq.Player)
-		e.HTTPErr(w, msg, err)
+		app.Lg.HTTPErr(w, err, http.StatusInternalServerError, msg)
 	}
 	// write JSON response
 	app.JSONWriter(w, js)
@@ -129,15 +124,13 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 
 // /games/recent handler
 func (app *App) HndlRecentGames(w http.ResponseWriter, r *http.Request) {
-	e := errd.InitErr()
-	LogHTTP(r)
+	app.Lg.LogHTTP(r)
 
 	var rgs RecentGames
 	js, err := rgs.GetRecentGames(app.Database)
 	if err != nil {
-		e.Msg = "failed to get recent games"
 		msg := "server failed to return recent games"
-		e.HTTPErr(w, msg, err)
+		app.Lg.HTTPErr(w, err, http.StatusUnprocessableEntity, msg)
 	}
 	app.JSONWriter(w, js)
 }
@@ -145,7 +138,7 @@ func (app *App) HndlRecentGames(w http.ResponseWriter, r *http.Request) {
 // /seasons handler
 // FOR SEASONS SELECTOR - CALLED ON PAGE LOAD
 func (app *App) HndlSeasons(w http.ResponseWriter, r *http.Request) {
-	LogHTTP(r)
+	app.Lg.LogHTTP(r)
 	season := r.URL.Query().Get("szn")
 	w.Header().Set("Content-Type", "application/json")
 	if season == "" { // send all szns when szn is not in q str, used most often
@@ -164,7 +157,7 @@ func (app *App) HndlSeasons(w http.ResponseWriter, r *http.Request) {
 // /teams handler
 // FOR TEAMS SELECTOR - CALLED ON PAGE LOAD
 func (app *App) HndlTeams(w http.ResponseWriter, r *http.Request) {
-	LogHTTP(r)
+	app.Lg.LogHTTP(r)
 	team := r.URL.Query().Get("team")
 	w.Header().Set("Content-Type", "application/json")
 	if team == "" { // send all teams when team is not in q str, used most often
