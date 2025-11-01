@@ -8,7 +8,6 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/envd"
-	"github.com/jdetok/golib/errd"
 )
 
 func TestHandleSeasonId(t *testing.T) {
@@ -55,47 +54,44 @@ func TestLgSznsByMonth(t *testing.T) {
 	fmt.Println("WNBA SeasonID | Season:", sl.WSznId, "|", sl.WSzn)
 }
 func TestQueryTopLgPlayers(t *testing.T) {
-	e := errd.InitErr()
 	err := envd.LoadDotEnvFile("../.env")
 	if err != nil {
-		t.Error(e.BuildErr(err).Error())
+		t.Error(err)
 	}
 	db, err := pgdb.PostgresConn()
 	if err != nil {
-		t.Error(e.BuildErr(err).Error())
+		t.Error(err)
 	}
 	var cs CurrentSeasons
 	lt, err := QueryTopLgPlayers(db, &cs, "10")
 	if err != nil {
-		t.Error(e.BuildErr(err).Error())
+		t.Error(err)
 	}
 	js, err := MarshalTopPlayers(&lt)
 	if err != nil {
-		t.Error(e.BuildErr(err).Error())
+		t.Error(err)
 	}
 	fmt.Println(string(js))
 }
 
 // RETURN DATABASE FOR TESTING
 func StartupTest(t *testing.T) *sql.DB {
-	e := errd.InitErr()
 	err := envd.LoadDotEnvFile("../.env")
 	if err != nil {
-		e.Msg = "failed loading .env file"
-		t.Fatal(e.BuildErr(err))
+		msg := "failed loading .env file"
+		t.Fatal(fmt.Errorf("%s\n%v", msg, err))
 	}
 
 	db, err := pgdb.PostgresConn()
 	if err != nil {
-		e.Msg = "failed connecting to postgres"
-		t.Fatal(e.BuildErr(err))
+		msg := "failed connecting to postgres"
+		t.Fatal(fmt.Errorf("%s\n%v", msg, err))
 	}
 	return db
 }
 
 // TEST PLAYER DASH PLAYER AND TEAM TOP SCORER QUERIES
 func TestGetPlayerDash(t *testing.T) {
-	e := errd.InitErr()
 	db := StartupTest(t)
 	var pIds = []uint64{2544, 2544}    // lebron
 	var sIds = []uint64{22024, 22024}  // 2425 reg season
@@ -111,8 +107,8 @@ func TestGetPlayerDash(t *testing.T) {
 		msg := fmt.Sprintf("pId: %d | sId: %d | tId: %d", iq.PId, iq.SId, iq.TId)
 		js, err := rp.GetPlayerDash(db, &iq)
 		if err != nil {
-			e.Msg = fmt.Sprintf("failed getting player dash\n%s", msg)
-			t.Error(e.BuildErr(err))
+			emsg := fmt.Sprintf("failed getting player dash\n%s", msg)
+			t.Error(fmt.Errorf("%s\n%v", emsg, err))
 		}
 		fmt.Println(string(js))
 	}
@@ -120,13 +116,12 @@ func TestGetPlayerDash(t *testing.T) {
 
 // TEST PLAYERS STORE QUERY
 func TestPlayerStore(t *testing.T) {
-	e := errd.InitErr()
 	db := StartupTest(t)
 	var ps []Player
 	rows, err := db.Query(pgdb.PlayersSeason)
 	if err != nil {
-		e.Msg = "failed getting players"
-		t.Error(e.BuildErr(err))
+		msg := "failed getting players"
+		t.Error(fmt.Errorf("%s\n%v", msg, err))
 	}
 	for rows.Next() {
 		var p Player
@@ -134,18 +129,16 @@ func TestPlayerStore(t *testing.T) {
 			&p.PSeasonIdMax, &p.PSeasonIdMin)
 		ps = append(ps, p)
 	}
-	// fmt.Println(ps)
 }
 
 // TEST TEAMS STORE QUERY
 func TestTeamStore(t *testing.T) {
-	e := errd.InitErr()
 	db := StartupTest(t)
 	var ts []Team
 	rows, err := db.Query(pgdb.Teams)
 	if err != nil {
-		e.Msg = "failed getting teams"
-		t.Error(e.BuildErr(err))
+		msg := "failed getting teams"
+		t.Error(fmt.Errorf("%s\n%v", msg, err))
 	}
 
 	for rows.Next() {
@@ -153,18 +146,17 @@ func TestTeamStore(t *testing.T) {
 		rows.Scan(&t.League, &t.TeamId, &t.TeamAbbr, &t.CityTeam)
 		ts = append(ts, t)
 	}
-	// fmt.Println(ts)
+	fmt.Println(ts)
 }
 
 // TEST SEASONS STORE QUERY
 func TestSeasonStore(t *testing.T) {
-	e := errd.InitErr()
 	db := StartupTest(t)
 	var sz []Season
 	rows, err := db.Query(pgdb.AllSeasons)
 	if err != nil {
-		e.Msg = "failed getting seasons"
-		t.Error(e.BuildErr(err))
+		msg := "failed getting seasons"
+		t.Error(fmt.Errorf("%s\n%v", msg, err))
 	}
 
 	for rows.Next() {
@@ -172,35 +164,8 @@ func TestSeasonStore(t *testing.T) {
 		rows.Scan(&s.SeasonId, &s.Season, &s.WSeason)
 		sz = append(sz, s)
 	}
-	// fmt.Println(sz)
+	fmt.Println(sz)
 }
-
-// func TestVerifyTeamQuery(t *testing.T) {
-// 	// db := StartupTest(t)
-
-// 	err := envd.LoadDotEnvFile("../.env")
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-// 	db, err := pgdb.PostgresConn()
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	rows, err := db.Query(pgdb.VerifyTeamSzn, 22024, 1610612747, 2544)
-// 	// rows.
-// 	if err != nil {
-// 		t.Error("failed getting seasons")
-// 	}
-// 	if rows.Next() {
-// 		fmt.Println("player verified")
-// 	} else {
-// 		fmt.Println("player not verified")
-// 	}
-// 	// for rows.Next() {
-// 	// 	fmt.Println("verif")
-// 	// }
-// }
 
 func TestVerifyPlayerTeam(t *testing.T) {
 	db := StartupTest(t)

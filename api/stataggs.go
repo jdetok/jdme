@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
-	"github.com/jdetok/golib/errd"
 )
 
 type TeamRecords struct {
@@ -30,11 +29,10 @@ type TeamRecord struct {
 
 // get from memory
 func TeamRecordsJSON(team_recs *TeamRecords) ([]byte, error) {
-	e := errd.InitErr()
 	js, err := json.Marshal(team_recs)
 	if err != nil {
-		e.Msg = "error marshaling team records"
-		return nil, e.BuildErr(err)
+		msg := "error marshaling team records"
+		return nil, fmt.Errorf("%s\n%v", msg, err)
 	}
 	return js, nil
 }
@@ -89,7 +87,6 @@ this must be maintained for the logic to work. at the end of the for loop the sI
 variable is set to the WNBA season - it's declared as the NBA season before the loop begins
 */
 func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlayers, error) {
-	e := errd.InitErr()
 
 	var lt LgTopPlayers
 
@@ -103,10 +100,10 @@ func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlaye
 		// query database
 		r, err := db.Query(pgdb.LeagueTopScorers, sId, lg, numPl)
 		if err != nil {
-			e.Msg = fmt.Sprintf(
+			msg := fmt.Sprintf(
 				"failed to query database for top 5 lg players: sznId: %s | lg: %s\n",
 				sId, lg)
-			return lt, e.NewErr()
+			return lt, fmt.Errorf("%s\n%v", msg, err)
 		}
 
 		// create a Top5 struct for each row, append to appropriate NBA/WNBA member
@@ -129,10 +126,9 @@ func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlaye
 
 // marshal LgTop5 struct into JSON []byte
 func MarshalTopPlayers(lt *LgTopPlayers) ([]byte, error) {
-	e := errd.InitErr()
 	js, err := json.Marshal(lt)
 	if err != nil {
-		return nil, e.BuildErr(err)
+		return nil, err
 	}
 	return js, nil
 }
@@ -142,18 +138,17 @@ returns json of the top scorer (regardless of team) stats from each of most
 recent night's games. used on page load and to populate recent top scorers table
 */
 func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
-	e := errd.InitErr()
 	rows, err := db.Query(pgdb.RecGameTopScorers)
 	if err != nil {
-		e.Msg = "query failed"
-		return nil, e.BuildErr(err)
+		msg := "recent games query failed"
+		return nil, fmt.Errorf("%s\n%v", msg, err)
 	}
 
 	rgs.ScanRecentGamesRows(rows)
 	js, err := json.Marshal(rgs)
 	if err != nil {
-		e.Msg = "json marshal failed"
-		return nil, e.BuildErr(err)
+		msg := "json marshal failed"
+		return nil, fmt.Errorf("%s\n%v", msg, err)
 	}
 	return js, nil
 }

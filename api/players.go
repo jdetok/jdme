@@ -11,20 +11,18 @@ import (
 	"unicode"
 
 	"github.com/jdetok/go-api-jdeko.me/pgdb"
-	"github.com/jdetok/golib/errd"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
 
 func GetPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (PlayerTeamSeason, error) {
-	e := errd.InitErr()
 	var pltmszn PlayerTeamSeason
 	rows, err := db.Query(pgdb.PlTmSzn, iq.PId, iq.TId, iq.SId)
 	if err != nil {
-		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+		msg := fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
 			iq.SId, iq.TId, iq.PId)
-		return pltmszn, e.BuildErr(err)
+		return pltmszn, fmt.Errorf("%s\n%v", msg, err)
 	}
 
 	for rows.Next() {
@@ -35,13 +33,12 @@ func GetPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (PlayerTeamSeason, error) {
 
 // TODO: if sId 88888 doesn't need to do season
 func VerifyPlayerTeam(db *sql.DB, iq *PQueryIds) (bool, error) {
-	e := errd.InitErr()
 	fmt.Println("VerifyPlayerTeam func called")
 	rows, err := db.Query(pgdb.PlayerTeamBool, iq.PId, iq.TId)
 	if err != nil {
-		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+		msg := fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
 			iq.SId, iq.TId, iq.PId)
-		return false, e.BuildErr(err)
+		return false, fmt.Errorf("%s\n%v", msg, err)
 	}
 	// just need to know if a row exists -
 	return rows.Next(), nil
@@ -49,13 +46,12 @@ func VerifyPlayerTeam(db *sql.DB, iq *PQueryIds) (bool, error) {
 
 // TODO: if sId 88888 doesn't need to do season
 func VerifyPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (bool, error) {
-	e := errd.InitErr()
 	fmt.Println("VerifyPlayerTeamSeason func called")
 	rows, err := db.Query(pgdb.VerifyTeamSzn, iq.SId, iq.TId, iq.PId)
 	if err != nil {
-		e.Msg = fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
+		msg := fmt.Sprintf("error verifying season|team|player | %d | %d | %d",
 			iq.SId, iq.TId, iq.PId)
-		return false, e.BuildErr(err)
+		return false, fmt.Errorf("%s\n%v", msg, err)
 	}
 	// just need to know if a row exists -
 	return rows.Next(), nil
@@ -70,19 +66,18 @@ loads. the response is scanned into the structs defined in resp.go, before being
 marshalled into json and returned to write as the http response
 */
 func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
-	e := errd.InitErr()
 	// query player, scan to structs, call struct functions
 	// appends RespObj to r.Results
 	if err := r.BuildPlayerRespStructs(db, iq); err != nil {
-		e.Msg = fmt.Sprintf("failed to query playerId %d seasonId %d", iq.PId, iq.SId)
-		return nil, e.BuildErr(err)
+		msg := fmt.Sprintf("failed to query playerId %d seasonId %d", iq.PId, iq.SId)
+		return nil, fmt.Errorf("%s\n%v", msg, err)
 	}
 
 	// marshall Resp struct to JSON, return as []byte
 	js, err := json.Marshal(r)
 	if err != nil {
-		e.Msg = "failed to marshal structs to json"
-		return nil, e.BuildErr(err)
+		msg := "failed to marshal structs to json"
+		return nil, fmt.Errorf("%s\n%v", msg, err)
 	}
 	return js, nil
 }
@@ -94,7 +89,6 @@ func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
 swtiches query and arguments based on whether teamId = 0
 */
 func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
-	e := errd.InitErr()
 	var args []uint64
 	var q string
 	var plr_or_tm string
@@ -106,30 +100,27 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 		if iq.SId == 88888 {
 			ptValid, err = VerifyPlayerTeam(db, iq)
 			if err != nil {
-				e.Msg = "error executing team player validation query"
-				return e.BuildErr(err)
+				msg := "error executing team player validation query"
+				return fmt.Errorf("%s\n%v", msg, err)
 			}
 		} else {
 			ptValid, err = VerifyPlayerTeamSeason(db, iq)
 			if err != nil {
-				e.Msg = "error executing team player validation query"
-				return e.BuildErr(err)
+				msg := "error executing team player validation query"
+				return fmt.Errorf("%s\n%v", msg, err)
 			}
 		}
 
 		if !(ptValid) {
 			pltmszn_str, err := GetPlayerTeamSeason(db, iq)
 			if err != nil {
-				e.Msg = "error getting strings from ids"
-				return e.BuildErr(err)
+				msg := "error getting strings from ids"
+				return fmt.Errorf("%s\n%v", msg, err)
 			}
 			errmsg := fmt.Sprintf(
 				"%s has not played for %s",
 				pltmszn_str.Player, pltmszn_str.Team)
 			r.ErrorMsg = errmsg
-			e.Msg = errmsg
-			// return nil
-			// return e.NewErr()
 		}
 		fmt.Printf(
 			"Player %d Team %d Season %d validated in BuildPlayerRespStructs func\n",
@@ -144,8 +135,8 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	// rows , err := db.Query(q, iq.PId, iq.SId)
 	rows, err := db.Query(q, args[0], args[1])
 	if err != nil {
-		e.Msg = "error during player dash query"
-		return e.BuildErr(err)
+		msg := "error during player dash query"
+		return fmt.Errorf("%s\n%v", msg, err)
 	}
 
 	var t RespSeasonTmp // temp seasons for NBA/WNBA, handled after loop
@@ -225,19 +216,19 @@ func ValidatePlayerSzn(
 	pq *PlayerQuery,
 	errStr *string) (PQueryIds, error) {
 	//
-	e := errd.InitErr()
 	var iq PQueryIds
 
 	sId, err := strconv.ParseUint(pq.Season, 10, 32)
 	if err != nil {
-		e.Msg = fmt.Sprintf("failed to convert season %s to int", pq.Season)
-		return iq, e.BuildErr(err)
+		msg := fmt.Sprintf("failed to convert season %s to int", pq.Season)
+		return iq, fmt.Errorf("%s\n%v", msg, err)
 	}
 
 	tId, err := strconv.ParseUint(pq.Team, 10, 64)
 	if err != nil {
-		e.Msg = fmt.Sprintf("failed to convert team %s to int", pq.Team)
-		return iq, e.BuildErr(err)
+		msg := fmt.Sprintf("failed to convert team %s to int", pq.Team)
+		return iq, fmt.Errorf("%s\n%v", msg, err)
+
 	}
 	iq.TId = tId
 	// var pId uint64
@@ -270,8 +261,8 @@ func ValidatePlayerSzn(
 			return iq, nil
 		}
 	}
-	e.Msg = "player not in memory"
-	return iq, e.NewErr()
+	msg := "player not in memory"
+	return iq, fmt.Errorf("%s\n%v", msg, err)
 }
 
 // fill RespPlayerMeta captions fields with formatted strings for each playerdash
@@ -412,7 +403,6 @@ active players from the passed season id
 */
 // func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
 func SlicePlayersSzn(players []Player, cs *CurrentSeasons, pq *PlayerQuery) ([]Player, error) {
-	e := errd.InitErr()
 	var plslice []Player
 
 	if pq.Team != "0" {
@@ -421,8 +411,8 @@ func SlicePlayersSzn(players []Player, cs *CurrentSeasons, pq *PlayerQuery) ([]P
 
 	seasonId, err := strconv.ParseUint(pq.Season, 10, 64)
 	if err != nil {
-		e.Msg = fmt.Sprintf("failed to convert %s to int", pq.Season)
-		return nil, e.BuildErr(err)
+		msg := fmt.Sprintf("failed to convert %s to int", pq.Season)
+		return nil, fmt.Errorf("%s\n%v", msg, err)
 	}
 	//
 	// get struct with current seasons

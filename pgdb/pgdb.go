@@ -2,9 +2,9 @@ package pgdb
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jdetok/golib/errd"
 	"github.com/jdetok/golib/pgresd"
 )
 
@@ -13,13 +13,12 @@ import (
 configs must be setup in .env file at project root
 */
 func PostgresConn() (*sql.DB, error) {
-	e := errd.InitErr()
 	pg := pgresd.GetEnvPG()
 	pg.MakeConnStr()
 	db, err := pg.Conn()
 	if err != nil {
-		e.Msg = "error connecting to postgres"
-		return nil, e.BuildErr(err)
+		msg := "error connecting to postgres"
+		return nil, fmt.Errorf("%s\n%w", msg, err)
 	}
 
 	// set max connections
