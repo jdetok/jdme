@@ -7,6 +7,8 @@ services:
       dockerfile: Dockerfile
     image: jdekome_api_dev
     container_name: jdekome_api_dev
+    environment:
+      TZ: "America/Chicago"
     networks:
       net_jdekome_dev:
         ipv4_address: 10.0.97.10
@@ -15,7 +17,6 @@ services:
     volumes:
       - .:/app
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
       - ./z_log:/app/z_log
     restart: unless-stopped
 
