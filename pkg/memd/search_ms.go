@@ -1,6 +1,7 @@
 package memd
 
 import (
+	"fmt"
 	"strconv"
 )
 
@@ -55,6 +56,11 @@ func (sm *StMaps) PlrNmExists(searchP string) bool {
 
 // check if passed player name exists in PlrNms map
 func (sm *StMaps) PlrSznTmExists(plrId, tmId uint64, szn int) bool {
+	fmt.Println("in season:", len(sm.SznTmPlrIds[szn]))
+	fmt.Println("in team:", len(sm.SznTmPlrIds[szn][tmId]))
+	for _, p := range sm.SznTmPlrIds[szn][tmId] {
+		fmt.Println(p)
+	}
 	_, ok := sm.SznTmPlrIds[szn][tmId][plrId]
 	return ok
 }

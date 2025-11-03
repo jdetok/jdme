@@ -40,19 +40,22 @@ func (app *App) SeasonFromQ(r *http.Request) (int, error) {
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	app.Lg.LogHTTP(r)
 	var exists bool
+
+	// get season from query string
 	seasonQ, sznErr := app.SeasonFromQ(r)
 	if sznErr != nil {
 		http.Error(w, sznErr.Error(), http.StatusUnprocessableEntity)
 	}
 
-	// 1610612744
+	// get team from query string
 	teamQ := r.URL.Query().Get("team")
-	fmt.Println(teamQ)
+
+	// get player from query string
 	playerQ := app.PlayerFromQ(r)
 	if plrId, ok := playerQ.(uint64); ok {
 		if teamQ != "" {
 			tmId := app.MStore.Maps.GetTeamIDUintCC(teamQ)
-
+			fmt.Println("team id int:", tmId)
 			exists = app.MStore.Maps.PlrSznTmExists(plrId, tmId, seasonQ)
 		} else {
 			exists = app.MStore.Maps.PlrIdSznExists(plrId, seasonQ)
@@ -65,11 +68,18 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	var wErr error
 
 	if exists {
-		_, wErr = fmt.Fprintf(w, "player %v team %v exists in season %d\n", playerQ, teamQ, seasonQ)
+		if teamQ != "" {
+			_, wErr = fmt.Fprintf(w, "player %v team %v exists in season %d\n", playerQ, teamQ, seasonQ)
+		} else {
+			_, wErr = fmt.Fprintf(w, "player %v exists in season %d\n", playerQ, seasonQ)
+		}
 	} else {
-		_, wErr = fmt.Fprintf(w, "player %v does not exist in season %d\n", playerQ, seasonQ)
+		if teamQ != "" {
+			_, wErr = fmt.Fprintf(w, "player %v for team %v does not exist in season %d\n", playerQ, teamQ, seasonQ)
+		} else {
+			_, wErr = fmt.Fprintf(w, "player %v does not exist in season %d\n", playerQ, seasonQ)
+		}
 	}
-
 	if wErr != nil {
 		http.Error(w,
 			fmt.Sprintf("failed to write HTTP response\n**%s", wErr),

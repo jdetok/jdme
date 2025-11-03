@@ -68,10 +68,6 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 			MinPSzn: minP,
 		}
 
-		// split comma separated string with teams to p.Teams
-		tmIds := sm.SplitTeams(p, tms)
-		p.Teams = tmIds
-
 		// add one worker to semaphore and waitgroup
 		sem <- struct{}{}
 		wg.Add(1)
@@ -85,6 +81,10 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 
 			// clean the player name (lower case, remove accents)
 			p.Lowr = clnd.RemoveDiacritics(lowrStr)
+
+			// split comma separated string with teams to p.Teams
+			tmIds := sm.SplitTeams(p, tms)
+			p.Teams = tmIds
 
 			// player exists maps
 			sm.MapPlrIdCC(p)
