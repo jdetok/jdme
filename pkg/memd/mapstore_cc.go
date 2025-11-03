@@ -1,16 +1,20 @@
-package memstore
+package memd
 
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/logd"
-	"github.com/jdetok/go-api-jdeko.me/pgdb"
+	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
 
+// query all players from DB, loop through rows serially, then launch goroutines
+// to process and map the data for each player concurrently
 func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	start := time.Now()
 	lg.Infof("mapping all players (concurrent workers)")
@@ -21,14 +25,18 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	}
 	defer rows.Close()
 
+	// waitgroup
+	var wg sync.WaitGroup
+
 	// concurrency controls
 	const maxWorkers = 100
 	sem := make(chan struct{}, maxWorkers)
-	var wg sync.WaitGroup
 
+	// channels for results and errors
 	results := make(chan *StPlayer)
 	errCh := make(chan error, 1)
 
+	// read the results channel, add player to maps
 	go func() {
 		for p := range results {
 			sm.MapPlrIDDtlCC(p)
@@ -60,23 +68,34 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 			MinPSzn: minP,
 		}
 
+		// split comma separated string with teams to p.Teams
+		tmIds := sm.SplitTeams(p, tms)
+		p.Teams = tmIds
+
+		// add one worker to semaphore and waitgroup
 		sem <- struct{}{}
 		wg.Add(1)
-		// to make concurrent safe, need to make functions accept *StPlayer rather than StMaps
+
+		// launch goroutine to process and map data
 		go func(p *StPlayer, lowrStr, tms string) {
 			defer wg.Done()
 			defer func() { <-sem }()
 
 			fmt.Println("worker", count, "running")
 
-			p.Lowr = RemoveDiacritics(lowrStr)
+			// clean the player name (lower case, remove accents)
+			p.Lowr = clnd.RemoveDiacritics(lowrStr)
 
+			// player exists maps
 			sm.MapPlrIdCC(p)
 			sm.MapPlrNmCC(p)
 
+			// player exists in season maps
 			sm.MapPlrIdToSznCC(p)
 			sm.MapPlrNmToSznCC(p)
 
+			// query team(s) played for each season from min-max player season,
+			// add player to map for each team played for in each season played
 			if err := sm.MapSznTmPlrCC(db, p); err != nil {
 				errCh <- fmt.Errorf(
 					"error occured mapping player season/teams %s | %d\n%v",
@@ -100,7 +119,6 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 		wg.Wait()
 		close(results)
 		lg.Infof("finished with %d rows after %v", count, time.Since(start))
-		// logging goes here
 	}()
 	return nil
 }
@@ -172,7 +190,6 @@ group by player_id, szn_id`
 			sm.SznTmPlrIds[szn][teamId][p.Id] = p.Lowr
 			sm.mu.Unlock()
 		}
-
 	}
 	return nil
 }
@@ -180,42 +197,57 @@ group by player_id, szn_id`
 // access a teamId from sm.TeamIds concurrently
 func (sm *StMaps) GetTeamIDUintCC(t string) uint64 {
 	sm.mu.RLock()
-	teamId := sm.TeamIds[t]
+	var teamId uint64
+	var ok bool
+	var err error
+	if teamId, ok = sm.TeamIds[t]; !ok {
+		// convert and add to map if doesn't already exist
+		teamId, err = strconv.ParseUint(t, 10, 64)
+		if err != nil {
+			fmt.Println("fuck")
+		}
+		sm.TeamIds[t] = teamId
+	}
 	sm.mu.RUnlock()
 	return teamId
 }
 
-// insert player id and cleaned player name as keys in PlrIds and PlrNms maps
+// add player id as key to sm.PlrIds
 func (sm *StMaps) MapPlrIdCC(p *StPlayer) {
 	sm.mu.Lock()
 	sm.PlrIds[p.Id] = struct{}{}
 	sm.mu.Unlock()
 }
 
+// add cleaned player name as key to sm.PlrIds
 func (sm *StMaps) MapPlrNmCC(p *StPlayer) {
 	sm.mu.Lock()
 	sm.PlrNms[p.Lowr] = struct{}{}
 	sm.mu.Unlock()
 }
 
+// map StPlayer struct to player id
 func (sm *StMaps) MapPlrIDDtlCC(p *StPlayer) {
 	sm.mu.Lock()
 	sm.PlayerIdDtl[p.Id] = p
 	sm.mu.Unlock()
 }
 
+// map StPlayer struct to cleaned player name
 func (sm *StMaps) MapPlrNmDtlCC(p *StPlayer) {
 	sm.mu.Lock()
 	sm.PlayerNameDtl[p.Lowr] = p
 	sm.mu.Unlock()
 }
 
+// map player id to cleaned player name
 func (sm *StMaps) MapPlrNmIdCC(p *StPlayer) {
 	sm.mu.Lock()
 	sm.PlayerNameId[p.Lowr] = p.Id
 	sm.mu.Unlock()
 }
 
+// map cleaned player name to player id
 func (sm *StMaps) MapPlrIdNmCC(p *StPlayer) {
 	sm.mu.Lock()
 	sm.PlayerIdName[p.Id] = p.Lowr

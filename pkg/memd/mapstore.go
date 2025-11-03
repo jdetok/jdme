@@ -1,41 +1,80 @@
-package memstore
+package memd
 
 import (
 	"database/sql"
 	"fmt"
 	"strconv"
+	"strings"
 	"sync"
-	"unicode"
 
-	"github.com/jdetok/go-api-jdeko.me/logd"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
+	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 )
 
-func RemoveDiacritics(input string) string {
-	t := transform.Chain(
-		norm.NFD,
-		runes.Remove(runes.In(unicode.Mn)),
-		norm.NFC,
-	)
-	output, _, _ := transform.String(t, input)
-	return output
-}
-
-// TODO: season map[uint64]map[uint64]string
-
+// MapStore object assigned in the global api struct
 type MapStore struct {
 	Maps *StMaps
-	mu   sync.RWMutex
+
+	// read write mutex for safely rewriting StMaps struct
+	mu sync.RWMutex
 }
 
+// rewrite global stores of players, teams, etc using hash maps rather than arrays
+type StMaps struct {
+	// read write mutex for safe concurrent writes to map
+	mu sync.RWMutex
+
+	// string team id as key, converted uint64 team id as val
+	TeamIds map[string]uint64
+
+	// structs that only hold whether a player exists (id and name keys)
+	PlrIds map[uint64]struct{}
+	PlrNms map[string]struct{}
+
+	// player id or name (cleaned) as key, StPlayer struct as value
+	PlayerIdDtl   map[uint64]*StPlayer // id as key, struct as val
+	PlayerNameDtl map[string]*StPlayer // mame as key, struct as val
+
+	// id as key, name as val and vice versa
+	PlayerIdName map[uint64]string // id as key, name as val
+	PlayerNameId map[string]uint64 // player name as key, id as val (for lookup)
+
+	// map players (id:name and name:id) to a szn id
+	// used to determine whether player exists in season
+	SeasonPlrNms map[int]map[string]uint64
+	SeasonPlrIds map[int]map[uint64]string
+
+	// maps a player id to a team id, which is mapped to a season
+	// used to determine whether a given player played for a given team in a given season
+	SznTmPlrIds map[int]map[uint64]map[uint64]string
+}
+
+// player struct - to be stored as value in a map of player id keys
+type StPlayer struct {
+	Id      uint64
+	Name    string
+	Lowr    string // name all lower case
+	Lg      string
+	MaxRSzn int
+	MinRSzn int
+	MaxPSzn int
+	MinPSzn int
+	Teams   []uint64 // teams player has played for
+}
+
+// ran at start of runtime to setup empty maps
+func (ms *MapStore) Setup(db *sql.DB) {
+	fmt.Println("MAP STORE SETUP STARTED")
+	ms.Set(MakeMaps(db))
+}
+
+// assign pointer to rebuilt maps struct to existing struct
 func (ms *MapStore) Set(newMaps *StMaps) {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
 	ms.Maps = newMaps
 }
 
+// rebuild maps in new temp StMaps structs, replace old one
 func (ms *MapStore) Rebuild(db *sql.DB, lg *logd.Logd) error {
 	fmt.Println("Rebuilding StMaps...")
 	temp := MakeMaps(db)
@@ -50,45 +89,6 @@ func (ms *MapStore) Rebuild(db *sql.DB, lg *logd.Logd) error {
 	return nil
 }
 
-func (ms *MapStore) Setup(db *sql.DB) {
-	fmt.Println("MAP STORE SETUP STARTED")
-	ms.Set(MakeMaps(db))
-}
-
-// rewrite global stores of players, teams, etc using hash maps rather than arrays
-type StMaps struct {
-	mu            sync.RWMutex
-	PlayerIdDtl   map[uint64]*StPlayer // id as key, struct as val
-	PlayerNameDtl map[string]*StPlayer // mame as key, struct as val
-	PlayerIdName  map[uint64]string    // id as key, name as val
-	PlayerNameId  map[string]uint64    // player name as key, id as val (for lookup)
-	SeasonPlayers map[int]map[uint64]string
-	TeamIds       map[string]uint64
-	// new ones
-	PlrIds       map[uint64]struct{}
-	PlrNms       map[string]struct{}
-	SeasonPlrNms map[int]map[string]uint64
-	SeasonPlrIds map[int]map[uint64]string
-
-	// season team player map
-	// example: SznTmPlrIds[szn][tm][plr]
-	SznTmPlrIds map[int]map[uint64]map[uint64]string
-}
-
-// player struct - to be stored as value in a map of player id keys
-type StPlayer struct {
-	Id          uint64
-	Name        string
-	Lowr        string // name all lower case
-	Lg          string
-	MaxRSzn     int
-	MinRSzn     int
-	MaxPSzn     int
-	MinPSzn     int
-	Teams       []uint64 // teams player has played for
-	TmsRostered map[uint64]uint64
-}
-
 // INITIAL MAP SETUP: must create empty maps before attempting to insert keys
 // calls MapTeams and MapSeasons to setup an empty map for
 // each season and team nested map
@@ -99,7 +99,6 @@ func MakeMaps(db *sql.DB) *StMaps {
 	sm.PlayerNameDtl = map[string]*StPlayer{}
 	sm.PlayerIdName = map[uint64]string{}
 	sm.PlayerNameId = map[string]uint64{}
-	sm.SeasonPlayers = map[int]map[uint64]string{}
 
 	// map of seasons with nested map of player ids/names (cleaned)
 	sm.SeasonPlrNms = map[int]map[string]uint64{}
@@ -116,7 +115,7 @@ func MakeMaps(db *sql.DB) *StMaps {
 
 	// setup nested team maps
 	fmt.Println("creating empty team maps")
-	if err := sm.MapTeamIds(db); err != nil {
+	if err := sm.MapTeamIdUints(db); err != nil {
 		fmt.Println(err)
 	}
 
@@ -130,7 +129,7 @@ func MakeMaps(db *sql.DB) *StMaps {
 }
 
 // get all team ids from db, convert each to a uint64, map to string version
-func (sm *StMaps) MapTeamIds(db *sql.DB) error {
+func (sm *StMaps) MapTeamIdUints(db *sql.DB) error {
 	fmt.Println("mapping team id strings to uint64")
 	// get all team ids
 	teams, err := db.Query("select distinct team_id from stats.tbox")
@@ -182,7 +181,9 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 	return nil
 }
 
-// get all team ids from db, convert each to a uint64, map to string version
+// accept season as argument, query db for all teams with games played that
+// season, create an empty map inside each season team map
+// MapTeamIdUints MUST be called first
 func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 	fmt.Println("mapping team ids to season: ", szn)
 	// get all team ids
@@ -193,14 +194,27 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 	}
 	// convert each team id string to uint64
 	for teams.Next() {
+		// scan team id to a string
 		var idstr string
 		teams.Scan(&idstr)
-		id, err := strconv.ParseUint(idstr, 10, 64)
-		if err != nil {
-			return err
-		}
-		sm.TeamIds[idstr] = id
-		sm.SznTmPlrIds[szn][id] = map[uint64]string{}
+
+		// get the team id as uint64
+		teamId := sm.GetTeamIDUintCC(idstr)
+
+		// create an empty map (ready for player maps) inside [szn][teamId]
+		sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
 	}
 	return nil
+}
+
+// accept comma separated string of team ids, split and append to teams slice
+func (sm *StMaps) SplitTeams(p *StPlayer, tms string) []uint64 {
+	var tmIds []uint64
+	tmsItr := strings.SplitSeq(tms, ",")
+	for t := range tmsItr {
+		// access uint64 version of team id created early in sm.TeamIDs
+		teamId := sm.GetTeamIDUintCC(t)
+		tmIds = append(tmIds, teamId)
+	}
+	return tmIds
 }

@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
-	"github.com/jdetok/go-api-jdeko.me/logd"
-	"github.com/jdetok/go-api-jdeko.me/memstore"
-	"github.com/jdetok/go-api-jdeko.me/pgdb"
+	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/jdetok/golib/envd"
 )
 
@@ -54,18 +54,18 @@ func main() {
 	if err != nil {
 		app.Lg.Fatalf("failed to create connection to postgres\n%v", err)
 	}
-	app.Database = db
+	app.DB = db
 
 	// build new map store
-	app.MStore.Maps = &memstore.StMaps{}
-	app.MStore.Setup(app.Database)
-	if err := app.MStore.Rebuild(app.Database, app.Lg); err != nil {
+	app.MStore.Maps = &memd.StMaps{}
+	app.MStore.Setup(app.DB)
+	if err := app.MStore.Rebuild(app.DB, app.Lg); err != nil {
 		app.Lg.Fatalf("failed to build in memory map stores")
 	}
 	app.Lg.Infof("in memory map store setup complete")
 
 	// set started = 0 so first check to update store runs setups
-	app.Started = 0
+	app.Started = false
 
 	// update Players, Seasons, Teams in memory structs
 	go app.CheckInMemStructs(30*time.Second, 300*time.Second)

@@ -1,10 +1,10 @@
-package memstore
+package memd
 
 import (
 	"testing"
 
-	"github.com/jdetok/go-api-jdeko.me/logd"
-	"github.com/jdetok/go-api-jdeko.me/pgdb"
+	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/jdetok/golib/envd"
 )
 

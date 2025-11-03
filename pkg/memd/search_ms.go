@@ -1,25 +1,8 @@
-package memstore
+package memd
 
 import (
-	"fmt"
 	"strconv"
 )
-
-// check if player id is in season id map
-func (sm *StMaps) PlayedInSzn(searchP uint64, szn int) bool {
-	_, ok := sm.SeasonPlayers[szn][searchP]
-	if !ok {
-		fmt.Printf("no match for season %d and player %d\n", szn, searchP)
-		return false
-	}
-	fmt.Printf("%d played in %d\n", searchP, szn)
-	return true
-}
-
-func (sm *StMaps) PlayerExists(searchP string) bool {
-	_, ok := sm.PlayerNameId[searchP]
-	return ok
-}
 
 // search SeasonPlrNms or SeasonPlrIds
 // move string logic to PlayerFromQ
