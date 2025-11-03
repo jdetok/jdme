@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
 )
 
 // read player from query string and clean the value (remove accents, lowercase)
@@ -17,7 +19,7 @@ func (app *App) PlayerFromQ(r *http.Request) any {
 		return plrIdInt
 	}
 	p_lwr := strings.ToLower(pStr)
-	p_cln := RemoveDiacritics(p_lwr)
+	p_cln := clnd.RemoveDiacritics(p_lwr)
 
 	fmt.Printf("player request (raw): %s | cleaned: %s\n", pStr, p_cln)
 	return p_cln

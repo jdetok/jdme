@@ -6,13 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pgdb"
+	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/jdetok/golib/envd"
 )
 
 func TestHandleSeasonId(t *testing.T) {
 
-	var p = Player{}
+	var p = memd.Player{}
 	p.League = "NBA"
 	p.Name = "LeBron James"
 	p.PlayerId = 2544
@@ -48,7 +49,7 @@ func TestLgSznsByMonth(t *testing.T) {
 		return
 	}
 	fmt.Println("test date: ", dt)
-	var cs CurrentSeasons
+	var cs memd.CurrentSeasons
 	sl := cs.LgSznsByMonth(dt)
 	fmt.Println("NBA SeasonID | Season:", sl.SznId, "|", sl.Szn)
 	fmt.Println("WNBA SeasonID | Season:", sl.WSznId, "|", sl.WSzn)
@@ -62,12 +63,12 @@ func TestQueryTopLgPlayers(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	var cs CurrentSeasons
-	lt, err := QueryTopLgPlayers(db, &cs, "10")
+	var cs memd.CurrentSeasons
+	lt, err := memd.QueryTopLgPlayers(db, &cs, "10")
 	if err != nil {
 		t.Error(err)
 	}
-	js, err := MarshalTopPlayers(&lt)
+	js, err := memd.MarshalTopPlayers(&lt)
 	if err != nil {
 		t.Error(err)
 	}
@@ -117,14 +118,14 @@ func TestGetPlayerDash(t *testing.T) {
 // TEST PLAYERS STORE QUERY
 func TestPlayerStore(t *testing.T) {
 	db := StartupTest(t)
-	var ps []Player
+	var ps []memd.Player
 	rows, err := db.Query(pgdb.PlayersSeason)
 	if err != nil {
 		msg := "failed getting players"
 		t.Error(fmt.Errorf("%s\n%v", msg, err))
 	}
 	for rows.Next() {
-		var p Player
+		var p memd.Player
 		rows.Scan(&p.PlayerId, &p.Name, &p.League, &p.SeasonIdMax, &p.SeasonIdMin,
 			&p.PSeasonIdMax, &p.PSeasonIdMin)
 		ps = append(ps, p)
@@ -134,7 +135,7 @@ func TestPlayerStore(t *testing.T) {
 // TEST TEAMS STORE QUERY
 func TestTeamStore(t *testing.T) {
 	db := StartupTest(t)
-	var ts []Team
+	var ts []memd.Team
 	rows, err := db.Query(pgdb.Teams)
 	if err != nil {
 		msg := "failed getting teams"
@@ -142,7 +143,7 @@ func TestTeamStore(t *testing.T) {
 	}
 
 	for rows.Next() {
-		var t Team
+		var t memd.Team
 		rows.Scan(&t.League, &t.TeamId, &t.TeamAbbr, &t.CityTeam)
 		ts = append(ts, t)
 	}
@@ -152,7 +153,7 @@ func TestTeamStore(t *testing.T) {
 // TEST SEASONS STORE QUERY
 func TestSeasonStore(t *testing.T) {
 	db := StartupTest(t)
-	var sz []Season
+	var sz []memd.Season
 	rows, err := db.Query(pgdb.AllSeasons)
 	if err != nil {
 		msg := "failed getting seasons"
@@ -160,7 +161,7 @@ func TestSeasonStore(t *testing.T) {
 	}
 
 	for rows.Next() {
-		var s Season
+		var s memd.Season
 		rows.Scan(&s.SeasonId, &s.Season, &s.WSeason)
 		sz = append(sz, s)
 	}
@@ -228,13 +229,13 @@ func TestGetPlayerTeamSeason(t *testing.T) {
 
 func TestGetTeamRecords(t *testing.T) {
 	db := StartupTest(t)
-	var cs CurrentSeasons
-	team_recs, err := UpdateTeamRecords(db, &cs)
+	var cs memd.CurrentSeasons
+	team_recs, err := memd.UpdateTeamRecords(db, &cs)
 	if err != nil {
 		t.Error("failed getting team records", err)
 	}
 
-	js, err := TeamRecordsJSON(&team_recs)
+	js, err := memd.TeamRecordsJSON(&team_recs)
 	if err != nil {
 		t.Error("failed to marshal JSON", err)
 	}

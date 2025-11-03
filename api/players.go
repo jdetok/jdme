@@ -8,12 +8,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode"
 
-	"github.com/jdetok/go-api-jdeko.me/pgdb"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
+	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
 
 func GetPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (PlayerTeamSeason, error) {
@@ -197,7 +194,7 @@ accept slice of Player structs and a season id, call slicePlayerSzn to create
 a new slice with only players from the specified season. then, generate a
 random number and return the player at that index in the slice
 */
-func RandomPlayerId(pl []Player, cs *CurrentSeasons, pq *PlayerQuery) uint64 {
+func RandomPlayerId(pl []memd.Player, cs *memd.CurrentSeasons, pq *PlayerQuery) uint64 {
 	players, _ := SlicePlayersSzn(pl, cs, pq)
 	numPlayers := len(players)
 	randNum := rand.IntN(numPlayers)
@@ -211,8 +208,8 @@ is called. a player ID also can be passed as the player parameter, it will just
 be converted to an int and returned
 */
 func ValidatePlayerSzn(
-	players []Player,
-	cs *CurrentSeasons,
+	players []memd.Player,
+	cs *memd.CurrentSeasons,
 	pq *PlayerQuery,
 	errStr *string) (PQueryIds, error) {
 	//
@@ -283,19 +280,19 @@ func (m *RespPlayerMeta) MakePlayerDashCaptions(plr_or_tm string) {
 	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages %s %s", delim, stat_lbl_ender)
 }
 
-/*
-use the transform package to remove accidentals
-e.g. Dončić becomes doncic
-*/
-func RemoveDiacritics(input string) string {
-	t := transform.Chain(
-		norm.NFD,
-		runes.Remove(runes.In(unicode.Mn)),
-		norm.NFC,
-	)
-	output, _, _ := transform.String(t, input)
-	return output
-}
+// /*
+// use the transform package to remove accidentals
+// e.g. Dončić becomes doncic
+// */
+// func RemoveDiacritics(input string) string {
+// 	t := transform.Chain(
+// 		norm.NFD,
+// 		runes.Remove(runes.In(unicode.Mn)),
+// 		norm.NFC,
+// 	)
+// 	output, _, _ := transform.String(t, input)
+// 	return output
+// }
 
 // use league and player id to build the URL containing a player's headshot
 func (m *RespPlayerMeta) MakeHeadshotUrl() {
@@ -326,7 +323,7 @@ regular season and playoffs, the function will verify the player played in said
 season, and return either their max or min (whichever is closer) season  if they
 did not
 */
-func HandleSeasonId(sId uint64, p *Player, team bool, errStr *string) uint64 {
+func HandleSeasonId(sId uint64, p *memd.Player, team bool, errStr *string) uint64 {
 	if sId == 99999 || sId == 29999 { // agg seasons
 		msg := fmt.Sprintf("aggregate season requested%d | %d\n", sId, sId)
 		fmt.Println(msg)
@@ -402,8 +399,8 @@ accept the slice of all players and a seasonId, return a slice with just the
 active players from the passed season id
 */
 // func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
-func SlicePlayersSzn(players []Player, cs *CurrentSeasons, pq *PlayerQuery) ([]Player, error) {
-	var plslice []Player
+func SlicePlayersSzn(players []memd.Player, cs *memd.CurrentSeasons, pq *PlayerQuery) ([]memd.Player, error) {
+	var plslice []memd.Player
 
 	if pq.Team != "0" {
 		fmt.Println("team not 0")

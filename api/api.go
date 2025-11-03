@@ -6,33 +6,21 @@ import (
 	"os"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/logd"
-	"github.com/jdetok/go-api-jdeko.me/memstore"
+	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 )
 
-/*
-main struct referenced through the app. contains configs, , pool,
-in-memory player, season, team slices
-*/
+// GLOBAL APP STRUCT
 type App struct {
 	Addr       string
-	Database   *sql.DB
+	DB         *sql.DB
 	StartTime  time.Time
 	LastUpdate time.Time
-	Started    uint8
-	Store      InMemStore
-	MStore     memstore.MapStore
+	Started    bool
+	Store      memd.InMemStore
+	MStore     memd.MapStore
 	Logf       *os.File
 	Lg         *logd.Logd
-}
-
-type InMemStore struct {
-	Players      []Player
-	Seasons      []Season
-	Teams        []Team
-	CurrentSzns  CurrentSeasons
-	TeamRecs     TeamRecords
-	TopLgPlayers LgTopPlayers
 }
 
 // accept slice of bytes in JSON structure and write to response writers

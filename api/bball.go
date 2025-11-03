@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 )
 
 type PlayerQuery struct {
@@ -31,7 +34,7 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	app.Lg.LogHTTP(r)
 
 	// new LgTopPlayers to get from in memory store
-	var lt LgTopPlayers
+	var lt memd.LgTopPlayers
 
 	// get number of players from query string & convert to int
 	numPlStr := r.URL.Query().Get("num")
@@ -48,7 +51,7 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// marshal new LgTopPlayers to json
-	js, err := MarshalTopPlayers(&lt)
+	js, err := memd.MarshalTopPlayers(&lt)
 	if err != nil {
 		msg := "failed to marshal top 5 league players struct to JSON"
 		app.Lg.HTTPErr(w, err, http.StatusInternalServerError, msg)
@@ -60,7 +63,7 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
 	app.Lg.LogHTTP(r)
 
-	js, err := TeamRecordsJSON(&app.Store.TeamRecs)
+	js, err := memd.TeamRecordsJSON(&app.Store.TeamRecs)
 	if err != nil {
 		msg := "failed to marshal team records struct to JSON"
 		app.Lg.HTTPErr(w, err, http.StatusInternalServerError, msg)
@@ -103,7 +106,7 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	pq.League = r.URL.Query().Get("league")
 
 	// get player from query string
-	pq.Player = RemoveDiacritics(r.URL.Query().Get("player"))
+	pq.Player = clnd.RemoveDiacritics(r.URL.Query().Get("player"))
 
 	// validate player & get playerid/season id
 	iq, err := ValidatePlayerSzn(app.Store.Players, &app.Store.CurrentSzns, &pq, &rp.ErrorMsg)
@@ -113,7 +116,7 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// query the player & build JSON response, returned as []byte to write
-	js, err := rp.GetPlayerDash(app.Database, &iq)
+	js, err := rp.GetPlayerDash(app.DB, &iq)
 	if err != nil {
 		msg := fmt.Sprintf("server failed to return player dash for %s", pq.Player)
 		app.Lg.HTTPErr(w, err, http.StatusInternalServerError, msg)
@@ -126,8 +129,8 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 func (app *App) HndlRecentGames(w http.ResponseWriter, r *http.Request) {
 	app.Lg.LogHTTP(r)
 
-	var rgs RecentGames
-	js, err := rgs.GetRecentGames(app.Database)
+	var rgs memd.RecentGames
+	js, err := rgs.GetRecentGames(app.DB)
 	if err != nil {
 		msg := "server failed to return recent games"
 		app.Lg.HTTPErr(w, err, http.StatusUnprocessableEntity, msg)
