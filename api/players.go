@@ -105,12 +105,12 @@ swtiches query and arguments based on whether teamId = 0
 func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	var args []any
 	var q string
-	var plr_or_tm string
+	var pOrT string
 	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
 	if iq.TId > 0 {
 		var ptValid bool
 		var err error
-		plr_or_tm = "tm"
+		pOrT = "tm"
 		if iq.SId == 88888 {
 			ptValid, err = VerifyPlayerTeam(db, iq)
 			if err != nil {
@@ -142,58 +142,29 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 		args = []any{iq.PId, iq.TId}
 		q = pgdb.TstTeamPlayer
 	} else {
-		plr_or_tm = "plr"
+		pOrT = "plr"
 		args = []any{iq.PId, iq.SId}
 		q = pgdb.PlayerDash
 	}
-	// rows , err := db.Query(q, iq.PId, iq.SId)
-	rows, err := db.Query(q, args[0], args[1])
-	if err != nil {
-		msg := "error during player dash query"
-		return fmt.Errorf("%s\n%v", msg, err)
+	if err := r.ProcessRows(db, pOrT, q, args[0], args[1]); err != nil {
+		return err
 	}
-
-	var t RespSeasonTmp // temp seasons for NBA/WNBA, handled after loop
-	var rp RespObj
-	for rows.Next() {
-		// temp structs, handled in hndlRespRow
-		var s RespPlayerStats
-		var p RespPlayerSznOvw
-		// 8/6 2PM - MOVED Season/WSeason FROM END TO AFTER SeasonId
-		// two rows are returned, one for each stattype
-		rows.Scan( // MUST BE IN ORDER OF QUERY
-			&rp.Meta.PlayerId, &rp.Meta.TeamId, &rp.Meta.League,
-			&rp.Meta.SeasonId, &t.Season, &t.WSeason, &rp.Meta.StatType,
-			&rp.Meta.Player, &rp.Meta.Team, &rp.Meta.TeamName,
-			&rp.SeasonOvw.GamesPlayed, &p.Minutes,
-			&s.Box.Points, &s.Box.Assists, &s.Box.Rebounds,
-			&s.Box.Steals, &s.Box.Blocks,
-			&s.Shtg.Fg.Makes, &s.Shtg.Fg.Attempts, &s.Shtg.Fg.Percent,
-			&s.Shtg.Fg3.Makes, &s.Shtg.Fg3.Attempts, &s.Shtg.Fg3.Percent,
-			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent)
-		// switch on stat type to assign stats to appropriate struct
-		rp.HandleStatTypeSznOvw(&p, &s)
-	}
-
-	// assign nba or wnba season only based on league
-	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season, plr_or_tm)
-
-	// build table captions & image urls
-	rp.Meta.MakePlayerDashCaptions(plr_or_tm)
-	rp.Meta.MakeHeadshotUrl()
-	// rp.Meta.
-	rp.Meta.TeamLogoUrl = MakeTeamLogoUrl(rp.Meta.League, strconv.FormatUint(rp.Meta.TeamId, 10))
-
-	// append built respObj to Resp, return
-	r.Results = append(r.Results, rp)
 	return nil
 }
 
 func (r *Resp) BuildPlayerRespV2(db *sql.DB, iq *PQueryIds) error {
-	var plr_or_tm string = "plr"
+	pOrT := "plr"
 	q := pgdb.TmSznPlr
+	if err := r.ProcessRows(db, pOrT, q, iq.PId, iq.TId, iq.SId); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *Resp) ProcessRows(db *sql.DB, pOrT, q string, args ...any) error {
+
 	// rows , err := db.Query(q, iq.PId, iq.SId)
-	rows, err := db.Query(q, iq.PId, iq.TId, iq.SId)
+	rows, err := db.Query(q, args...)
 	if err != nil {
 		msg := "error during player dash query"
 		return fmt.Errorf("%s\n%v", msg, err)
@@ -222,10 +193,10 @@ func (r *Resp) BuildPlayerRespV2(db *sql.DB, iq *PQueryIds) error {
 	}
 
 	// assign nba or wnba season only based on league
-	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season, plr_or_tm)
+	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season, pOrT)
 
 	// build table captions & image urls
-	rp.Meta.MakePlayerDashCaptions(plr_or_tm)
+	rp.Meta.MakePlayerDashCaptions(pOrT)
 	rp.Meta.MakeHeadshotUrl()
 	// rp.Meta.
 	rp.Meta.TeamLogoUrl = MakeTeamLogoUrl(rp.Meta.League, strconv.FormatUint(rp.Meta.TeamId, 10))
