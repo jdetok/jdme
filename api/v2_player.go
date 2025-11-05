@@ -78,13 +78,13 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		}
 	}
-
+	// use TmSznPlr
 	var rp Resp
 	iq := PQueryIds{PId: plrId, TId: teamQ, SId: seasonQ}
 
 	fmt.Printf("%d | %d | %d\n", iq.PId, iq.SId, iq.TId)
 
-	js, err := rp.GetPlayerDash(app.DB, &iq)
+	js, err := rp.GetPlayerDashV2(app.DB, &iq)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

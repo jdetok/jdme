@@ -13,6 +13,48 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
 
+/*
+primary database query function for the /players endpoint. queries the api
+tables in the database sing the passed player, season, team ID to get the
+player's stats. defaults to TeamTopScorerDash query, which gets the dash for
+the top scorer of the most recent night's games. this is called when the site
+loads. the response is scanned into the structs defined in resp.go, before being
+marshalled into json and returned to write as the http response
+*/
+func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
+	// query player, scan to structs, call struct functions
+	// appends RespObj to r.Results
+	if err := r.BuildPlayerRespStructs(db, iq); err != nil {
+		msg := fmt.Sprintf("failed to query playerId %d seasonId %d", iq.PId, iq.SId)
+		return nil, fmt.Errorf("%s\n%v", msg, err)
+	}
+
+	// marshall Resp struct to JSON, return as []byte
+	js, err := json.Marshal(r)
+	if err != nil {
+		msg := "failed to marshal structs to json"
+		return nil, fmt.Errorf("%s\n%v", msg, err)
+	}
+	return js, nil
+}
+
+func (r *Resp) GetPlayerDashV2(db *sql.DB, iq *PQueryIds) ([]byte, error) {
+	// query player, scan to structs, call struct functions
+	// appends RespObj to r.Results
+	if err := r.BuildPlayerRespV2(db, iq); err != nil {
+		msg := fmt.Sprintf("failed to query playerId %d seasonId %d", iq.PId, iq.SId)
+		return nil, fmt.Errorf("%s\n%v", msg, err)
+	}
+
+	// marshall Resp struct to JSON, return as []byte
+	js, err := json.Marshal(r)
+	if err != nil {
+		msg := "failed to marshal structs to json"
+		return nil, fmt.Errorf("%s\n%v", msg, err)
+	}
+	return js, nil
+}
+
 func GetPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (PlayerTeamSeason, error) {
 	var pltmszn PlayerTeamSeason
 	rows, err := db.Query(pgdb.PlTmSzn, iq.PId, iq.TId, iq.SId)
@@ -52,31 +94,6 @@ func VerifyPlayerTeamSeason(db *sql.DB, iq *PQueryIds) (bool, error) {
 	}
 	// just need to know if a row exists -
 	return rows.Next(), nil
-}
-
-/*
-primary database query function for the /players endpoint. queries the api
-tables in the database sing the passed player, season, team ID to get the
-player's stats. defaults to TeamTopScorerDash query, which gets the dash for
-the top scorer of the most recent night's games. this is called when the site
-loads. the response is scanned into the structs defined in resp.go, before being
-marshalled into json and returned to write as the http response
-*/
-func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
-	// query player, scan to structs, call struct functions
-	// appends RespObj to r.Results
-	if err := r.BuildPlayerRespStructs(db, iq); err != nil {
-		msg := fmt.Sprintf("failed to query playerId %d seasonId %d", iq.PId, iq.SId)
-		return nil, fmt.Errorf("%s\n%v", msg, err)
-	}
-
-	// marshall Resp struct to JSON, return as []byte
-	js, err := json.Marshal(r)
-	if err != nil {
-		msg := "failed to marshal structs to json"
-		return nil, fmt.Errorf("%s\n%v", msg, err)
-	}
-	return js, nil
 }
 
 // query player, scan to structs, call struct functions
@@ -131,6 +148,52 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 	}
 	// rows , err := db.Query(q, iq.PId, iq.SId)
 	rows, err := db.Query(q, args[0], args[1])
+	if err != nil {
+		msg := "error during player dash query"
+		return fmt.Errorf("%s\n%v", msg, err)
+	}
+
+	var t RespSeasonTmp // temp seasons for NBA/WNBA, handled after loop
+	var rp RespObj
+	for rows.Next() {
+		// temp structs, handled in hndlRespRow
+		var s RespPlayerStats
+		var p RespPlayerSznOvw
+		// 8/6 2PM - MOVED Season/WSeason FROM END TO AFTER SeasonId
+		// two rows are returned, one for each stattype
+		rows.Scan( // MUST BE IN ORDER OF QUERY
+			&rp.Meta.PlayerId, &rp.Meta.TeamId, &rp.Meta.League,
+			&rp.Meta.SeasonId, &t.Season, &t.WSeason, &rp.Meta.StatType,
+			&rp.Meta.Player, &rp.Meta.Team, &rp.Meta.TeamName,
+			&rp.SeasonOvw.GamesPlayed, &p.Minutes,
+			&s.Box.Points, &s.Box.Assists, &s.Box.Rebounds,
+			&s.Box.Steals, &s.Box.Blocks,
+			&s.Shtg.Fg.Makes, &s.Shtg.Fg.Attempts, &s.Shtg.Fg.Percent,
+			&s.Shtg.Fg3.Makes, &s.Shtg.Fg3.Attempts, &s.Shtg.Fg3.Percent,
+			&s.Shtg.Ft.Makes, &s.Shtg.Ft.Attempts, &s.Shtg.Ft.Percent)
+		// switch on stat type to assign stats to appropriate struct
+		rp.HandleStatTypeSznOvw(&p, &s)
+	}
+
+	// assign nba or wnba season only based on league
+	t.SwitchSznByLeague(&rp.Meta.League, &rp.Meta.Season, plr_or_tm)
+
+	// build table captions & image urls
+	rp.Meta.MakePlayerDashCaptions(plr_or_tm)
+	rp.Meta.MakeHeadshotUrl()
+	// rp.Meta.
+	rp.Meta.TeamLogoUrl = MakeTeamLogoUrl(rp.Meta.League, strconv.FormatUint(rp.Meta.TeamId, 10))
+
+	// append built respObj to Resp, return
+	r.Results = append(r.Results, rp)
+	return nil
+}
+
+func (r *Resp) BuildPlayerRespV2(db *sql.DB, iq *PQueryIds) error {
+	var plr_or_tm string = "plr"
+	q := pgdb.TmSznPlr
+	// rows , err := db.Query(q, iq.PId, iq.SId)
+	rows, err := db.Query(q, iq.PId, iq.TId, iq.SId)
 	if err != nil {
 		msg := "error during player dash query"
 		return fmt.Errorf("%s\n%v", msg, err)
