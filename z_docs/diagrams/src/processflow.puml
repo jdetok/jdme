@@ -1,0 +1,38 @@
+@startuml processflow
+
+start
+
+:program started in main();
+:memory allocated for global App struct;
+:call SetupLogdF() & NewLogd()\n to start concurrent safe logger;
+:LoadDotEnv() and GetEnvStr()\nare called to read .env file and\nset environment variables;
+:PostresConn() is called to setup\nglobal *sql.DB;
+:MapStore.Setup() is called to build\n global MapStore (in App struct)\n and build all inital maps;
+
+fork
+    :goroutine starts to periodically rebuild\n persistent data structures in memory;
+    repeat
+    if (n seconds passed?) then (yes)
+        fork
+            :MapStore.Rebuild() is\ncalled to rebuild all\nmaps at a new memory\nlocation, replaces pointer\nto StMaps within \nMapstore when done;
+        fork again
+            :App.UpdateStructs\nis called to update\nog in-mem structs;
+        end fork
+    else (no)
+    endif
+    repeat while (wait and check again)
+
+fork again
+    :http server & mux handler are mounted;
+    fork 
+        :static listeners;
+    fork again
+        :bball listeners;
+    fork again
+        :bronto listeners;
+    end fork
+end fork
+
+stop
+
+@enduml

@@ -14,7 +14,6 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/api"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/jdetok/golib/envd"
 )
@@ -57,9 +56,7 @@ func main() {
 	app.DB = db
 
 	// build new map store
-	app.MStore.Maps = &memd.StMaps{}
-	app.MStore.Setup(app.DB)
-	if err := app.MStore.Rebuild(app.DB, app.Lg); err != nil {
+	if err := app.MStore.Setup(app.DB, app.Lg); err != nil {
 		app.Lg.Fatalf("failed to build in memory map stores")
 	}
 	app.Lg.Infof("in memory map store setup complete")
@@ -74,11 +71,8 @@ func main() {
 	mux := app.Mount()
 	app.Lg.Infof("http mux server mounted, starting server")
 
-	// run the http mux server
-	// if err := app.Run(mux); err != nil {
-	// 	app.Lg.Fatalf("FATAL server failed to run\n%v", err)
-	// }
 	if err := app.RunGraceful(mux); err != nil {
 		app.Lg.Fatalf("FATAL server failed to run\n%v", err)
 	}
+
 }

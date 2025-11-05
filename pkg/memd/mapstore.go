@@ -62,9 +62,12 @@ type StPlayer struct {
 }
 
 // ran at start of runtime to setup empty maps
-func (ms *MapStore) Setup(db *sql.DB) {
-	fmt.Println("MAP STORE SETUP STARTED")
-	ms.Set(MakeMaps(db))
+func (ms *MapStore) Setup(db *sql.DB, lg *logd.Logd) error {
+	ms.Set(MakeMaps(db)) // empty maps
+	if err := ms.Rebuild(db, lg); err != nil {
+		return err
+	} // map data
+	return nil
 }
 
 // assign pointer to rebuilt maps struct to existing struct
