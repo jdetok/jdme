@@ -26,7 +26,7 @@ type PlayerTeamSeason struct {
 type PQueryIds struct {
 	PId uint64
 	TId uint64
-	SId uint64
+	SId int
 }
 
 // top numPl players for each league

@@ -17,7 +17,7 @@ type TeamRecords struct {
 
 type TeamRecord struct {
 	League     string `json:"league"`
-	SeasonId   uint64 `json:"season_id"`
+	SeasonId   int    `json:"season_id"`
 	Season     string `json:"season"`
 	SeasonDesc string `json:"season_desc"`
 	TeamId     uint64 `json:"team_id"`
@@ -95,7 +95,7 @@ func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlaye
 
 	// query appropriate season for each league
 	var lgs = [2]string{"nba", "wnba"}
-	var sId string = strconv.FormatUint(sl.SznId, 10)
+	var sId string = strconv.Itoa(sl.SznId)
 	for _, lg := range lgs {
 		// query database
 		r, err := db.Query(pgdb.LeagueTopScorers, sId, lg, numPl)
@@ -119,7 +119,7 @@ func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlaye
 		}
 
 		// after first run set wnba season
-		sId = strconv.FormatUint(sl.WSznId, 10)
+		sId = strconv.Itoa(sl.WSznId)
 	}
 	return lt, nil
 }

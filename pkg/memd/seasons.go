@@ -8,16 +8,16 @@ import (
 
 // hold current nba and wnba seasons based on date
 type SeasonLeague struct {
-	SznId  uint64
-	WSznId uint64
+	SznId  int
+	WSznId int
 	Szn    string
 	WSzn   string
 }
 
 // used in GetCurrentSzns to make seasons/ids from current year
 type CurrentSeasons struct {
-	PrevSznId uint64
-	CurSznId  uint64
+	PrevSznId int
+	CurSznId  int
 	PrevSzn   string
 	CurSzn    string
 }
@@ -41,7 +41,7 @@ func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) {
 	cs.CurSzn = fmt.Sprint(cyyy, "-", cy)
 
 	// append a 2 to front of current year, return as uint64
-	cint, err := strconv.ParseUint("2"+cyyy, 10, 64)
+	cint, err := strconv.Atoi("2" + cyyy)
 	if err != nil {
 		msg := "error converting month to int"
 		fmt.Printf("%s\n%v\n", msg, err)
@@ -49,7 +49,7 @@ func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) {
 	cs.CurSznId = cint
 
 	// append a 2 to front of prev year, return as uint64
-	pint, err := strconv.ParseUint("2"+pyyy, 10, 64)
+	pint, err := strconv.Atoi("2" + pyyy)
 	if err != nil {
 		msg := "error converting month to int"
 		fmt.Printf("%s\n%v\n", msg, err)

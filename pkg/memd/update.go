@@ -27,10 +27,10 @@ type Player struct {
 	PlayerId     uint64
 	Name         string
 	League       string
-	SeasonIdMax  uint64
-	SeasonIdMin  uint64
-	PSeasonIdMax uint64
-	PSeasonIdMin uint64
+	SeasonIdMax  int
+	SeasonIdMin  int
+	PSeasonIdMax int
+	PSeasonIdMin int
 }
 
 type Season struct {

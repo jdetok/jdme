@@ -22,7 +22,7 @@ func TestHandleSeasonId(t *testing.T) {
 	p.PSeasonIdMin = 42005
 	p.SeasonIdMin = 22003
 	var errStr string
-	testSzn := uint64(22025)
+	testSzn := 22025
 	resSzn := HandleSeasonId(testSzn, &p, false, &errStr)
 
 	if resSzn != testSzn {
@@ -95,7 +95,7 @@ func StartupTest(t *testing.T) *sql.DB {
 func TestGetPlayerDash(t *testing.T) {
 	db := StartupTest(t)
 	var pIds = []uint64{2544, 2544}    // lebron
-	var sIds = []uint64{22024, 22024}  // 2425 reg season
+	var sIds = []int{22024, 22024}     // 2425 reg season
 	var tIds = []uint64{0, 1610612743} // first should be plr query, second tm
 
 	for i := range pIds {

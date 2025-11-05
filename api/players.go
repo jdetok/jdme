@@ -86,7 +86,7 @@ func (r *Resp) GetPlayerDash(db *sql.DB, iq *PQueryIds) ([]byte, error) {
 swtiches query and arguments based on whether teamId = 0
 */
 func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
-	var args []uint64
+	var args []any
 	var q string
 	var plr_or_tm string
 	// QUERY SEASON PLAYERDASH FOR pId OR FOR TOP SCORER OF TEAM (tId) PASSED
@@ -122,11 +122,11 @@ func (r *Resp) BuildPlayerRespStructs(db *sql.DB, iq *PQueryIds) error {
 		fmt.Printf(
 			"Player %d Team %d Season %d validated in BuildPlayerRespStructs func\n",
 			iq.PId, iq.TId, iq.SId)
-		args = []uint64{iq.PId, iq.TId}
+		args = []any{iq.PId, iq.TId}
 		q = pgdb.TstTeamPlayer
 	} else {
 		plr_or_tm = "plr"
-		args = []uint64{iq.PId, iq.SId}
+		args = []any{iq.PId, iq.SId}
 		q = pgdb.PlayerDash
 	}
 	// rows , err := db.Query(q, iq.PId, iq.SId)
@@ -215,7 +215,7 @@ func ValidatePlayerSzn(
 	//
 	var iq PQueryIds
 
-	sId, err := strconv.ParseUint(pq.Season, 10, 32)
+	sId, err := strconv.Atoi(pq.Season)
 	if err != nil {
 		msg := fmt.Sprintf("failed to convert season %s to int", pq.Season)
 		return iq, fmt.Errorf("%s\n%v", msg, err)
@@ -323,7 +323,7 @@ regular season and playoffs, the function will verify the player played in said
 season, and return either their max or min (whichever is closer) season  if they
 did not
 */
-func HandleSeasonId(sId uint64, p *memd.Player, team bool, errStr *string) uint64 {
+func HandleSeasonId(sId int, p *memd.Player, team bool, errStr *string) int {
 	if sId == 99999 || sId == 29999 { // agg seasons
 		msg := fmt.Sprintf("aggregate season requested%d | %d\n", sId, sId)
 		fmt.Println(msg)
@@ -406,7 +406,7 @@ func SlicePlayersSzn(players []memd.Player, cs *memd.CurrentSeasons, pq *PlayerQ
 		fmt.Println("team not 0")
 	}
 
-	seasonId, err := strconv.ParseUint(pq.Season, 10, 64)
+	seasonId, err := strconv.Atoi(pq.Season)
 	if err != nil {
 		msg := fmt.Sprintf("failed to convert %s to int", pq.Season)
 		return nil, fmt.Errorf("%s\n%v", msg, err)
