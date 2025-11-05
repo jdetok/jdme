@@ -5,6 +5,13 @@ import (
 	"strconv"
 )
 
+func (sm *StMaps) GetPlrIdFromName(name string) (uint64, error) {
+	if plrId, ok := sm.PlayerNameId[name]; ok {
+		return plrId, nil
+	}
+	return 0, fmt.Errorf("couldn't get player id from %s", name)
+}
+
 // search SeasonPlrNms or SeasonPlrIds
 // move string logic to PlayerFromQ
 func (sm *StMaps) PlrExistsInSzn(searchP string, searchS int) bool {

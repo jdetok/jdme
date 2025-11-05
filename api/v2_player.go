@@ -52,7 +52,7 @@ func (app *App) TeamFromQ(r *http.Request) (uint64, error) {
 // new endpoint for use with new player store data structure
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	app.Lg.LogHTTP(r)
-	var exists bool
+	// var exists bool
 
 	// get season from query string
 	seasonQ, sznErr := app.SeasonFromQ(r)
@@ -68,35 +68,26 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 
 	// get player from query string
 	playerQ := app.PlayerFromQ(r)
-	if plrId, ok := playerQ.(uint64); ok {
-		if teamQ != 0 {
-			exists = app.MStore.Maps.PlrSznTmExists(plrId, teamQ, seasonQ)
-		} else {
-			exists = app.MStore.Maps.PlrIdSznExists(plrId, seasonQ)
-		}
+
+	var plrId uint64
+	if _, ok := playerQ.(uint64); ok {
+		plrId = playerQ.(uint64)
 	} else {
-		exists = app.MStore.Maps.PlrSznExists(playerQ.(string), seasonQ)
+		plrId, err = app.MStore.Maps.GetPlrIdFromName(playerQ.(string))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		}
 	}
 
-	var wErr error
+	var rp Resp
+	iq := PQueryIds{PId: plrId, TId: teamQ, SId: seasonQ}
 
-	if exists {
-		if teamQ != 0 {
-			_, wErr = fmt.Fprintf(w, "player %v team %v exists in season %d\n", playerQ, teamQ, seasonQ)
-		} else {
-			_, wErr = fmt.Fprintf(w, "player %v exists in season %d\n", playerQ, seasonQ)
-		}
-	} else {
-		if teamQ != 0 {
-			_, wErr = fmt.Fprintf(w, "player %v for team %v does not exist in season %d\n", playerQ, teamQ, seasonQ)
-		} else {
-			_, wErr = fmt.Fprintf(w, "player %v does not exist in season %d\n", playerQ, seasonQ)
-		}
+	fmt.Printf("%d | %d | %d\n", iq.PId, iq.SId, iq.TId)
+
+	js, err := rp.GetPlayerDash(app.DB, &iq)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	if wErr != nil {
-		http.Error(w,
-			fmt.Sprintf("failed to write HTTP response\n**%s", wErr),
-			http.StatusInternalServerError)
-	}
+	app.JSONWriter(w, js)
 	app.Lg.Infof("served /v2/player request")
 }
