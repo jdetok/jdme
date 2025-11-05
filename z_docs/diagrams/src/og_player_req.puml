@@ -1,0 +1,35 @@
+@startuml og_player_req
+
+start
+:HTTP request to /players;
+:mux server calls HndlPlayer();
+:get and clean values from query string;
+:ValidatePlayerSzn();
+
+if (player val == "random"?) then (yes)
+    :RandomPlayerId() is called;
+    :Return random playerId;
+else (no)
+    :check if player exists in InMemStore;
+    if (player exists?) then (yes)
+        :Return valid playerId;
+    else (no)
+        :Return error;
+        stop
+    endif
+endif
+
+:call GetPlayerDash();
+:query database for player stats;
+
+if (database error?) then (yes)
+    :Return error;
+    stop
+else (no)
+    :scan db rows to response structs;
+    :marshall structs to JSON;
+    :write to http.ResponseWriter;
+endif
+
+stop
+@enduml
