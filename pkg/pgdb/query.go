@@ -38,6 +38,9 @@ left join (
 	and right(cast(season_id as varchar(5)), 4) != '9999'
 	group by player_id
 ) d on d.player_id = a.player_id
+-- dev limit
+order by rs_max desc
+limit 1000
 `
 
 var VerifyTeamSzn = `

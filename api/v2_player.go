@@ -15,9 +15,9 @@ func (app *App) PlayerFromQ(r *http.Request) any {
 	// check if integer
 	plrIdInt, err := strconv.ParseUint(pStr, 10, 64)
 	if err == nil {
-		fmt.Printf("integer player id requested: %d\n", plrIdInt)
 		return plrIdInt
 	}
+
 	p_lwr := strings.ToLower(pStr)
 	p_cln := clnd.RemoveDiacritics(p_lwr)
 
@@ -36,6 +36,19 @@ func (app *App) SeasonFromQ(r *http.Request) (int, error) {
 	return s_int, nil
 }
 
+func (app *App) TeamFromQ(r *http.Request) (uint64, error) {
+	var teamId uint64 = 0
+	var err error
+	t := r.URL.Query().Get("team")
+	if t != "" {
+		teamId, err = app.MStore.Maps.GetTeamIDUintCC(t)
+		if err != nil {
+			return teamId, err
+		}
+	}
+	return teamId, nil
+}
+
 // new endpoint for use with new player store data structure
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	app.Lg.LogHTTP(r)
@@ -48,19 +61,19 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get team from query string
-	teamQ := r.URL.Query().Get("team")
+	teamQ, err := app.TeamFromQ(r)
+	if err != nil {
+		http.Error(w, sznErr.Error(), http.StatusUnprocessableEntity)
+	}
 
 	// get player from query string
 	playerQ := app.PlayerFromQ(r)
 	if plrId, ok := playerQ.(uint64); ok {
-		if teamQ != "" {
-			tmId := app.MStore.Maps.GetTeamIDUintCC(teamQ)
-			fmt.Println("team id int:", tmId)
-			exists = app.MStore.Maps.PlrSznTmExists(plrId, tmId, seasonQ)
+		if teamQ != 0 {
+			exists = app.MStore.Maps.PlrSznTmExists(plrId, teamQ, seasonQ)
 		} else {
 			exists = app.MStore.Maps.PlrIdSznExists(plrId, seasonQ)
 		}
-
 	} else {
 		exists = app.MStore.Maps.PlrSznExists(playerQ.(string), seasonQ)
 	}
@@ -68,13 +81,13 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	var wErr error
 
 	if exists {
-		if teamQ != "" {
+		if teamQ != 0 {
 			_, wErr = fmt.Fprintf(w, "player %v team %v exists in season %d\n", playerQ, teamQ, seasonQ)
 		} else {
 			_, wErr = fmt.Fprintf(w, "player %v exists in season %d\n", playerQ, seasonQ)
 		}
 	} else {
-		if teamQ != "" {
+		if teamQ != 0 {
 			_, wErr = fmt.Fprintf(w, "player %v for team %v does not exist in season %d\n", playerQ, teamQ, seasonQ)
 		} else {
 			_, wErr = fmt.Fprintf(w, "player %v does not exist in season %d\n", playerQ, seasonQ)

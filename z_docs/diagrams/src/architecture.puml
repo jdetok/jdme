@@ -1,45 +1,92 @@
 @startuml architecture
 skinparam packageStyle rect
+skinparam defaultFontName "Arial"
+skinparam classFontSize 12
+skinparam classAttributeFontSize 11
+skinparam classStereotypeFontSize 11
+skinparam classPadding 8
+skinparam classBorderThickness 1
+skinparam classBorderColor DarkGray
+skinparam classBackgroundColor #0404c507
+skinparam shadowing true
+left to right direction
 
 package api {
-    class App {
-        + DB *sql.DB
-        + Store memd.InMemStore
-        + MStore memd.MapStore
-        + Lg *logd.Logd
-        + Run()
-        + Mount()
-        + JSONWriter()
-        + RunGraceful()
+    namespace GLOBAL {
+        class App {
+            + DB *sql.DB
+            + Store memd.InMemStore
+            + MStore memd.MapStore
+            + Lg *logd.Logd
+            + Run()
+            + Mount()
+            + JSONWriter()
+            + RunGraceful()
+        }
+        class MapStore {
+            + mu sync.RWMutex
+            + Maps *StMaps
+            + Setup()
+            + Set()
+            + Rebuild()
+        }
+        class InMemStore {
+            + Players []Player
+            + Seasons []Season
+            + Teams []Team
+            + CurrentSzns CurrentSeasons
+            + TeamRecs TeamRecords
+            + TopLgPlayers LgTopPlayers
+        }
     }
+    
     namespace handlers {
         namespace bball {
-            class statagg {
-                + HndlTeamRecords()
-                + HndlTopLgPlayers()
-                + HndlRecentGames()
+            left to right direction
+            namespace aggs {
+                class top_players {
+                    + HndlTopLgPlayers()
+                }
+                class team_records {
+                    + HndlTeamRecords()
+                }
+                class recent_game {
+                    + HndlRecentGames()
+                }
             }
+            
             class selectors {
                 + HndlTeams()
                 + HndlSeasons()
             }
-            class players {
-                + HndlPlayer()
+            namespace og_player {
+                class PlayerQuery {
+                    + Player string
+                    + Team string
+                    + Season string
+                }
+                class PlayerTeamSeason {
+                    + Player string
+                    + Team string
+                    + Season string
+                }
+                class PQueryIds {
+                    + PId uint64x
+                    + TId uint64x
+                    + SId uint64x
+                }
+                class og_handle_player {
+                    + HndlPlayer()
+                }
+                
             }
-            class PlayerQuery {
-                + Player string
-                + Team string
-                + Season string
-            }
-            class PlayerTeamSeason {
-                + Player string
-                + Team string
-                + Season string
-            }
-            class PQueryIds {
-                + PId uint64x
-                + TId uint64x
-                + SId uint64x
+            namespace v2_player {
+                class v2_handle_player {
+                    + HndlPlayerV2()
+                    + PlayerFromQ()
+                    + SeasonFromQ()
+                    + TeamFromQ()
+                }
             }
         }
         class static {
@@ -52,24 +99,108 @@ package api {
             + JSNostore()
         }
     }
+    PlayerTeamSeason ..|> og_handle_player
+    PQueryIds ..|> og_handle_player
+    PlayerQuery ..|> og_handle_player
+    
+    namespace response {
+        left to right direction
+        class Resp {
+            + Results []RespObj
+            + ErrorMsg string
+            + BuildPlayerRespStructs()
+            + GetPlayerDash()
+        }
+        class RespObj {
+            + Meta RespPlayerMeta
+            + SeasonOvw RespPlayerSznOvw
+            + Totals RespPlayerStats
+            + PerGame RespPlayerStats
+            + HandleStatTypeSznOvw()
+        }
+        RespObj ..|> Resp
+        class RespPlayerMeta {
+            + PlayerId uint64
+            + TeamId uint64
+            + League string
+            + SeasonId uint64
+            + StatType string
+            + Player string
+            + Team string
+            + TeamName string
+            + Season string
+            + Caption string
+            + CaptionShort string
+            + BoxCapTot string
+            + BoxCapAvg string
+            + ShtgCapTot string
+            + ShtgCapAvg string
+            + HeadshotUrl string
+            + TeamLogoUrl string
+            + MakeHeadshotUrl()
+            + MakePlayerDashCaptions()
+        }
+        RespPlayerMeta ..|> RespObj
+        class RespPlayerSznOvw {
+            + GamesPlayed uint16
+            + Minutes float32
+            + MinutesPerGame float32
+        }
+        RespPlayerSznOvw ..|> RespObj
+        class RespPlayerStats {
+            + Box RespPlayerStatsBox
+            + Shtg RespPlayerStatsShtg
+        }
+        RespPlayerStats ..|> RespObj
+        class RespPlayerStatsBox {
+            + Points float32
+            + Assists float32
+            + Rebounds float32
+            + Steals float32
+            + Blocks float32
+        }
+        RespPlayerStatsBox ..|> RespPlayerStats
+        class RespPlayerStatsShtg {
+            + Fg RespPlayerStatsShtgType
+            + Fg3 RespPlayerStatsShtgType
+            + Ft RespPlayerStatsShtgType
+        }
+        RespPlayerStatsShtg ..|> RespPlayerStats
+        class RespPlayerStatsShtgType {
+            + Makes float32
+            + Attempts float32
+            + Percent string
+        }
+        RespPlayerStatsShtgType ..|> RespPlayerStatsShtg
+        class RespSeasonTmp {
+            + Season string
+            + WSeason string
+            + SwitchSznByLeague()
+        }
+    }
 }
 package pgdb {
     class Connection {
         + PostgresConn()
     }
-    class Queries {
-        + QPlayerStore
-        + VerifyTeamSzn
-        + PlayerTeamBool
-        + AllSeasons
-        + PlayersSeason
-        + Teams
-        + PlayerDash
-        + TeamTopScorerDash
-        + RecGameTopScorers
-        + LeagueTopScorers
-        + TeamSznRecords
+    namespace QUERIES {
+        class mapstore_q {
+            + QPlayerStore
+            + VerifyTeamSzn
+            + PlayerTeamBool
+            + AllSeasons
+            + PlayersSeason
+            + Teams
+            + PlayerDash
+            + TeamTopScorerDash
+            + RecGameTopScorers
+            + LeagueTopScorers
+            + TeamSznRecords
+        }
     }
+    
+    Connection --> App
+    ' mapstore_q ..|> StMaps
 }
 package clnd {
     class CleanNames {
@@ -87,37 +218,28 @@ package logd {
     }
 }
 package memd {
-    namespace new_inmem_mapstore {
-        class MapStore {
-            + mu sync.RWMutex
-            + Maps *StMaps
-            + Setup()
-            + Set()
-            + Rebuild()
-        }
-        
-        class StMaps {
-            + mu sync.RWMutex
-            + TeamIds [string]:int
-            + PlrIds [playerId]:
-            + PlrNms [playerName]:
-            + PlayerIdDtl   [playerId]:*StPlayer
-            + PlayerNameDtl [playerName]:*StPlayer
-            + PlayerIdName [pId]:name
-            + PlayerNameId [name]:pId
-            + SeasonPlrNms [szn][pName]:pId
-            + SeasonPlrIds [szn][pId]:pName
-            + SznTmPlrIds [szn][tmId][pId]
-            + MapTeamIdUints()
-            + MapSeasons()
-            + MapSznTeams()
-            + SplitTeams()
-            + PlrExistsInSzn()
-            + PlrSznExists()
-            + PlrIdExists()
-            + PlrNmExists()
-            + PlrSznTmExists()
-        }
+
+    class StMaps {
+        + mu sync.RWMutex
+        + TeamIds [string]:int
+        + PlrIds [playerId]:
+        + PlrNms [playerName]:
+        + PlayerIdDtl   [playerId]:*StPlayer
+        + PlayerNameDtl [playerName]:*StPlayer
+        + PlayerIdName [pId]:name
+        + PlayerNameId [name]:pId
+        + SeasonPlrNms [szn][pName]:pId
+        + SeasonPlrIds [szn][pId]:pName
+        + SznTmPlrIds [szn][tmId][pId]
+        + MapTeamIdUints()
+        + MapSeasons()
+        + MapSznTeams()
+        + SplitTeams()
+        + PlrExistsInSzn()
+        + PlrSznExists()
+        + PlrIdExists()
+        + PlrNmExists()
+        + PlrSznTmExists()
     }
     
     namespace current_seasons {
@@ -138,14 +260,6 @@ package memd {
         }
     }
     namespace og_inmem_arrays_store {
-        class InMemStore {
-        + Players []Player
-        + Seasons []Season
-        + Teams []Team
-        + CurrentSzns CurrentSeasons
-        + TeamRecs TeamRecords
-        + TopLgPlayers LgTopPlayers
-        }
         class Player {
             + PlayerId uint64
             + Name string
@@ -195,9 +309,7 @@ package memd {
             + Wins       uint16
             + Losses     uint16
         }
-    }
-
-    namespace recent_games {
+    
         class RecentGames {
             + TopScorers []PlayerBasic
             + Games      []RecentGame
@@ -232,37 +344,35 @@ package memd {
     }
 }
 
-CleanNames --> players
-CleanNames --> StMaps
+CleanNames ..|> og_handle_player
+CleanNames ..|> v2_player
+CleanNames ..|> StMaps
 
-Connection --> App
-Queries --> bball
 
 MapStore --> App
 InMemStore --> App
-Logd --> App
+Logd ..|> App
 
-Player --> InMemStore
-Season --> InMemStore
-Team --> InMemStore
-CurrentSeasons --> InMemStore
-TeamRecords --> InMemStore
-LgTopPlayers --> InMemStore
+Player --|> InMemStore
+Season --|> InMemStore
+Team --|> InMemStore
+CurrentSeasons --|> InMemStore
+TeamRecords --|> InMemStore
+LgTopPlayers --|> InMemStore
 
-RecentGames --> statagg
-LgTopPlayers --> statagg
-TeamRecords --> statagg
+RecentGames --|> recent_game
+LgTopPlayers --|> top_players
+TeamRecords --|> team_records
 
-TeamRecord --> TeamRecords
-TopPlayers --> LgTopPlayers
+TeamRecord --|> TeamRecords
+TopPlayers --|> LgTopPlayers
 
-PlayerBasic --> RecentGames
-RecentGame --> RecentGames
+PlayerBasic --|> RecentGames
+RecentGame --|> RecentGames
 
-StMaps --> MapStore
-
-PlayerTeamSeason --> players
-PQueryIds --> players
-PlayerQuery --> players
+StMaps --|> MapStore
+Resp <|--|> handlers
+Resp <--> og_handle_player
+Resp <--> v2_handle_player
 
 @enduml

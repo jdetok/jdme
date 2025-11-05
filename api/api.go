@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
@@ -81,4 +83,46 @@ func (app *App) Run(mux *http.ServeMux) error {
 
 	// run the HTTP server
 	return srv.ListenAndServe()
+}
+
+func (app *App) RunGraceful(mux *http.ServeMux) error {
+	// server configuration
+	srv := &http.Server{
+		Addr:         app.Addr,
+		Handler:      mux,
+		WriteTimeout: time.Second * 30,
+		ReadTimeout:  time.Second * 10,
+		IdleTimeout:  time.Minute,
+	}
+
+	// set the time for caching
+	app.StartTime = time.Now()
+	app.Lg.Infof("http server configured | running server at %v...\n", app.Addr)
+
+	errCh := make(chan error, 1)
+	go func() {
+		err := srv.ListenAndServe()
+		if err != nil {
+			app.Lg.Errorf("a listen error occured")
+		} // send regardless so channel doesn't block
+		errCh <- err
+	}()
+
+	// listen for termination signals
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case sig := <-quit:
+		app.Lg.Infof("shutdown signal received: %v", sig)
+		return nil
+	case err := <-errCh:
+		if err != nil {
+			app.Lg.Errorf("server stopped with error: %v", err)
+			return err
+		}
+	}
+	return nil
+	// run the HTTP server
+	// return srv.ListenAndServe()
 }

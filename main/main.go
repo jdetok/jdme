@@ -75,7 +75,10 @@ func main() {
 	app.Lg.Infof("http mux server mounted, starting server")
 
 	// run the http mux server
-	if err := app.Run(mux); err != nil {
+	// if err := app.Run(mux); err != nil {
+	// 	app.Lg.Fatalf("FATAL server failed to run\n%v", err)
+	// }
+	if err := app.RunGraceful(mux); err != nil {
 		app.Lg.Fatalf("FATAL server failed to run\n%v", err)
 	}
 }

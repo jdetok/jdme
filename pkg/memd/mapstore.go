@@ -79,6 +79,18 @@ func (ms *MapStore) Rebuild(db *sql.DB, lg *logd.Logd) error {
 	fmt.Println("Rebuilding StMaps...")
 	temp := MakeMaps(db)
 
+	// setup nested team maps
+	fmt.Println("creating empty team maps")
+	if err := temp.MapTeamIdUints(db); err != nil {
+		fmt.Println(err)
+	}
+
+	// setup nested season maps
+	fmt.Println("creating empty season maps")
+	if err := temp.MapSeasons(db); err != nil {
+		fmt.Println(err)
+	}
+
 	if err := temp.MapPlayersCC(db, lg); err != nil {
 		fmt.Println("Error in MapPlayers:", err)
 		return err
@@ -111,19 +123,8 @@ func MakeMaps(db *sql.DB) *StMaps {
 	// holds all team ids
 	sm.TeamIds = map[string]uint64{}
 
+	// [szn][teamId][player]
 	sm.SznTmPlrIds = map[int]map[uint64]map[uint64]string{}
-
-	// setup nested team maps
-	fmt.Println("creating empty team maps")
-	if err := sm.MapTeamIdUints(db); err != nil {
-		fmt.Println(err)
-	}
-
-	// setup nested season maps
-	fmt.Println("creating empty season maps")
-	if err := sm.MapSeasons(db); err != nil {
-		fmt.Println(err)
-	}
 
 	return &sm
 }
@@ -199,7 +200,10 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 		teams.Scan(&idstr)
 
 		// get the team id as uint64
-		teamId := sm.GetTeamIDUintCC(idstr)
+		teamId, err := sm.GetTeamIDUintCC(idstr)
+		if err != nil {
+			return err
+		}
 
 		// create an empty map (ready for player maps) inside [szn][teamId]
 		sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
@@ -208,13 +212,16 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 }
 
 // accept comma separated string of team ids, split and append to teams slice
-func (sm *StMaps) SplitTeams(p *StPlayer, tms string) []uint64 {
+func (sm *StMaps) SplitTeams(p *StPlayer, tms string) ([]uint64, error) {
 	var tmIds []uint64
 	tmsItr := strings.SplitSeq(tms, ",")
 	for t := range tmsItr {
 		// access uint64 version of team id created early in sm.TeamIDs
-		teamId := sm.GetTeamIDUintCC(t)
+		teamId, err := sm.GetTeamIDUintCC(t)
+		if err != nil {
+			return nil, err
+		}
 		tmIds = append(tmIds, teamId)
 	}
-	return tmIds
+	return tmIds, nil
 }

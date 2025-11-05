@@ -83,7 +83,10 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 			p.Lowr = clnd.RemoveDiacritics(lowrStr)
 
 			// split comma separated string with teams to p.Teams
-			tmIds := sm.SplitTeams(p, tms)
+			tmIds, err := sm.SplitTeams(p, tms)
+			if err != nil {
+				errCh <- err
+			}
 			p.Teams = tmIds
 
 			// player exists maps
@@ -175,7 +178,10 @@ group by player_id, szn_id`
 		tmsItr := strings.SplitSeq(tmStr, ",")
 		for t := range tmsItr {
 			// access uint64 version of team id created early in sm.TeamIDs
-			teamId := sm.GetTeamIDUintCC(t)
+			teamId, err := sm.GetTeamIDUintCC(t)
+			if err != nil {
+				return err
+			}
 
 			sm.mu.Lock()
 			// create empty map for the seasonid to safely create team id maps
@@ -195,7 +201,7 @@ group by player_id, szn_id`
 }
 
 // access a teamId from sm.TeamIds concurrently
-func (sm *StMaps) GetTeamIDUintCC(t string) uint64 {
+func (sm *StMaps) GetTeamIDUintCC(t string) (uint64, error) {
 	sm.mu.RLock()
 	var teamId uint64
 	var ok bool
@@ -204,12 +210,12 @@ func (sm *StMaps) GetTeamIDUintCC(t string) uint64 {
 		// convert and add to map if doesn't already exist
 		teamId, err = strconv.ParseUint(t, 10, 64)
 		if err != nil {
-			fmt.Println("fuck")
+			return 0, err
 		}
 		sm.TeamIds[t] = teamId
 	}
 	sm.mu.RUnlock()
-	return teamId
+	return teamId, nil
 }
 
 // add player id as key to sm.PlrIds
