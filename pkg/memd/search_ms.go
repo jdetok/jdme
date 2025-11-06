@@ -5,6 +5,15 @@ import (
 	"strconv"
 )
 
+// return players max reg season
+func (sm *StMaps) GetSznFromPlrId(plrId uint64) (int, error) {
+	if p, ok := sm.PlayerIdDtl[plrId]; ok {
+		fmt.Println(p)
+		return p.MaxRSzn, nil
+	}
+	return 0, fmt.Errorf("no season found for %d", plrId)
+}
+
 func (sm *StMaps) GetPlrIdFromName(name string) (uint64, error) {
 	if plrId, ok := sm.PlayerNameId[name]; ok {
 		return plrId, nil

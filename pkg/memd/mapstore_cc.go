@@ -39,10 +39,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	// read the results channel, add player to maps
 	go func() {
 		for p := range results {
-			sm.MapPlrIDDtlCC(p)
-			sm.MapPlrNmDtlCC(p)
-			sm.MapPlrIdNmCC(p)
-			sm.MapPlrNmIdCC(p)
+			lg.Infof("%s complete", p.Name)
 		}
 	}()
 
@@ -89,6 +86,10 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 			}
 			p.Teams = tmIds
 
+			sm.MapPlrIDDtlCC(p)
+			sm.MapPlrNmDtlCC(p)
+			sm.MapPlrIdNmCC(p)
+			sm.MapPlrNmIdCC(p)
 			// player exists maps
 			sm.MapPlrIdCC(p)
 			sm.MapPlrNmCC(p)
@@ -125,6 +126,10 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	}()
 	return nil
 }
+
+// func (sm *StMaps) MapPlrIDDtlCC() {
+
+// }
 
 // map player name to season played by player
 func (sm *StMaps) MapPlrNmToSznCC(p *StPlayer) {
