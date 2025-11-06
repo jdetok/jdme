@@ -37,7 +37,7 @@ left join (
 ) d on d.player_id = a.player_id
 -- dev limit
 order by rs_max desc
-limit 1000
+-- limit 1000
 `
 
 var VerifyTeamSzn = `

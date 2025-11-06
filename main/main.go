@@ -55,11 +55,11 @@ func main() {
 	}
 	app.DB = db
 
-	// build new map store
-	if err := app.MStore.Setup(app.DB, app.Lg); err != nil {
+	if err := app.MStore.SetupFromBuild(app.DB, app.Lg); err != nil {
 		app.Lg.Fatalf("failed to build in memory map stores")
 	}
 	app.Lg.Infof("in memory map store setup complete")
+	app.MStore.Persist()
 
 	// set started = 0 so first check to update store runs setups
 	app.Started = false

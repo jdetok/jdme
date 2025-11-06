@@ -2,7 +2,9 @@ package memd
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -16,6 +18,32 @@ type MapStore struct {
 
 	// read write mutex for safely rewriting StMaps struct
 	mu sync.RWMutex
+}
+
+func (ms *MapStore) Persist() {
+	fp := "maps.json"
+	js, err := json.MarshalIndent(ms.Maps, "", " ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := os.WriteFile(fp, js, 0644); err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+
+func (ms *MapStore) BuildFromPersist() {
+	fp := "maps.json"
+	b, err := os.ReadFile(fp)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := json.Unmarshal(b, ms.Maps); err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
 // rewrite global stores of players, teams, etc using hash maps rather than arrays
@@ -113,6 +141,14 @@ func (ms *MapStore) Setup(db *sql.DB, lg *logd.Logd) error {
 	if err := ms.Rebuild(db, lg); err != nil {
 		return err
 	} // map data
+	return nil
+}
+
+func (ms *MapStore) SetupFromBuild(db *sql.DB, lg *logd.Logd) error {
+	ms.Set(MakeMaps(db)) // empty maps
+	ms.BuildFromPersist()
+
+	// map data
 	return nil
 }
 

@@ -14,20 +14,42 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
 
-// new endpoint for use with new player store data structure
+// /v2/players handler
+// REQUIRED ARGS: season, player
+// season must be a five digit integer e.g. 22025
+// 88888 will retrieve player's most recent season
+// player and team can be passed as either strings or integer
+// player as string should be player name e.g. "lebron james"
+// player="random" can be passed to get a random player filtered by other params
+// player as int should be player id e.g. 2544
+// team as string should be team abbreviation e.g. "lal"
+// team as int should be team id i.e. 1610617247
+// OPTIONAL ARGS: league, team
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	app.Lg.LogHTTP(r)
 	var err error
-	// get season from query string
-	seasonQ, err := app.SeasonFromQ(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
-	} // get most recent season for 0 or 88888
 
 	var lgQ int
 	lgQ, err = app.LgFromQ(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	}
+
+	// get season from query string
+	seasonQ, err := app.SeasonFromQ(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	} // get most recent season for 0 or 88888
+	if seasonQ == 0 || seasonQ == 88888 {
+		sl := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
+		switch lgQ {
+		case 0:
+			seasonQ = sl.SznId
+		case 1:
+			seasonQ = sl.WSznId
+		default:
+			seasonQ = sl.SznId
+		}
 	}
 
 	// get team from query string
@@ -60,7 +82,7 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 		plrId = plrIdUint
 	}
 
-	// HANDLE RANDOM PLAYER
+	// handle random player by league
 	if plrId == 77777 {
 		rPlrId := app.MStore.Maps.RandomPlrIdV2(tmId, seasonQ, lgQ)
 		plrId = rPlrId
@@ -105,10 +127,10 @@ func (app *App) SeasonFromQ(r *http.Request) (int, error) {
 		return 0, fmt.Errorf("INVALID SEASON: could not convert %s to an int\n%s",
 			s, err.Error())
 	}
-	if s_int == 0 || s_int == 88888 {
-		sl := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
-		return sl.SznId, nil
-	}
+	// if s_int == 0 || s_int == 88888 {
+	// 	sl := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
+	// 	return sl.SznId, nil
+	// }
 
 	return s_int, nil
 }
@@ -195,10 +217,6 @@ func (r *Resp) BuildPlayerRespV2(db *sql.DB, sm *memd.StMaps, iq *PQueryIds) err
 		args = []any{iq.PId, iq.SId}
 		fmt.Println("team 0 args:", args)
 	}
-
-	// if iq.PId == 0 {
-	// 	iq.PId = sm.RandomPlrIdV2(iq.PId, iq.TId, iq.SId)
-	// }
 
 	if err := r.ProcessRows(db, pOrT, q, args...); err != nil {
 		return err

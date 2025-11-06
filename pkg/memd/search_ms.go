@@ -113,10 +113,8 @@ func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
 	switch lg {
 	case 0:
 		m = sm.NSznTmPlrIds[sId][tId]
-		// m //
 	case 1:
 		m = sm.WSznTmPlrIds[sId][tId]
-		// m //
 	case 10:
 		m = sm.SznTmPlrIds[sId][tId]
 	default:
