@@ -88,7 +88,7 @@ func UpdatePlayers(db *sql.DB) ([]Player, error) {
 			&p.SeasonIdMin, &p.PSeasonIdMax, &p.PSeasonIdMin)
 
 		// remove diacritics from names in database for imrpvoved searching
-		p.Name = clnd.RemoveDiacritics(p.Name)
+		p.Name = clnd.ConvToASCII(p.Name)
 		players = append(players, p)
 	}
 	return players, nil

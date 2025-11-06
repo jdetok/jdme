@@ -106,7 +106,7 @@ func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	pq.League = r.URL.Query().Get("league")
 
 	// get player from query string
-	pq.Player = clnd.RemoveDiacritics(r.URL.Query().Get("player"))
+	pq.Player = clnd.ConvToASCII(r.URL.Query().Get("player"))
 
 	// validate player & get playerid/season id
 	iq, err := ValidatePlayerSzn(app.Store.Players, &app.Store.CurrentSzns, &pq, &rp.ErrorMsg)

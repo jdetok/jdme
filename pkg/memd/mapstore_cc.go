@@ -36,6 +36,8 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	results := make(chan *StPlayer)
 	errCh := make(chan error, 1)
 
+	sm.PlayerNameId["random"] = 77777
+
 	// read the results channel, add player to maps
 	go func() {
 		for p := range results {
@@ -48,8 +50,8 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	for rows.Next() {
 		count++
 		var id uint64
-		var name, lowrStr, lg, tms string
-		var maxR, minR, maxP, minP int
+		var name, lowrStr, tms string
+		var maxR, minR, maxP, minP, lg int
 
 		if err := rows.Scan(&id, &name, &lowrStr, &lg, &maxR, &minR, &maxP, &minP, &tms); err != nil {
 			return err
@@ -77,7 +79,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 			fmt.Println("worker", count, "running")
 
 			// clean the player name (lower case, remove accents)
-			p.Lowr = clnd.RemoveDiacritics(lowrStr)
+			p.Lowr = clnd.ConvToASCII(lowrStr)
 
 			// split comma separated string with teams to p.Teams
 			tmIds, err := sm.SplitTeams(p, tms)
@@ -197,10 +199,45 @@ group by player_id, szn_id`
 			if sm.SznTmPlrIds[szn][teamId] == nil {
 				sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
 			}
+
+			if sm.SznTmPlrIds[szn][0] == nil {
+				sm.SznTmPlrIds[szn][0] = map[uint64]string{}
+			}
+
 			// add this player's id to the corresponding season/team inner map
 			sm.SznTmPlrIds[szn][teamId][p.Id] = p.Lowr
+			sm.SznTmPlrIds[szn][0][p.Id] = p.Lowr
+
+			switch p.Lg {
+			case 0:
+				if sm.NSznTmPlrIds[szn] == nil {
+					sm.NSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+				}
+				if sm.NSznTmPlrIds[szn][teamId] == nil {
+					sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
+				}
+				if sm.NSznTmPlrIds[szn][0] == nil {
+					sm.NSznTmPlrIds[szn][0] = map[uint64]string{}
+				}
+				sm.NSznTmPlrIds[szn][teamId][p.Id] = p.Lowr
+				sm.NSznTmPlrIds[szn][0][p.Id] = p.Lowr
+
+			case 1:
+				if sm.WSznTmPlrIds[szn] == nil {
+					sm.WSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+				}
+				if sm.WSznTmPlrIds[szn][teamId] == nil {
+					sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
+				}
+				if sm.WSznTmPlrIds[szn][0] == nil {
+					sm.WSznTmPlrIds[szn][0] = map[uint64]string{}
+				}
+				sm.WSznTmPlrIds[szn][teamId][p.Id] = p.Lowr
+				sm.WSznTmPlrIds[szn][0][p.Id] = p.Lowr
+			}
 			sm.mu.Unlock()
 		}
+
 	}
 	return nil
 }

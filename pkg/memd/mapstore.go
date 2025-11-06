@@ -24,7 +24,12 @@ type StMaps struct {
 	mu sync.RWMutex
 
 	// string team id as key, converted uint64 team id as val
-	TeamIds map[string]uint64
+	TeamIds    map[string]uint64 // string(1610612747):uint64(1610612747)
+	TeamIdLg   map[uint64]int
+	TmIdAbbr   map[uint64]string // 1610612747:lal
+	TmAbbrId   map[string]uint64 // lal:1610612747
+	LgTmIdAbbr map[int]map[uint64]string
+	LgTmAbbrId map[int]map[string]uint64
 
 	// structs that only hold whether a player exists (id and name keys)
 	PlrIds map[uint64]struct{}
@@ -45,7 +50,9 @@ type StMaps struct {
 
 	// maps a player id to a team id, which is mapped to a season
 	// used to determine whether a given player played for a given team in a given season
-	SznTmPlrIds map[int]map[uint64]map[uint64]string
+	SznTmPlrIds  map[int]map[uint64]map[uint64]string
+	NSznTmPlrIds map[int]map[uint64]map[uint64]string
+	WSznTmPlrIds map[int]map[uint64]map[uint64]string
 }
 
 // player struct - to be stored as value in a map of player id keys
@@ -53,12 +60,51 @@ type StPlayer struct {
 	Id      uint64
 	Name    string
 	Lowr    string // name all lower case
-	Lg      string
+	Lg      int
 	MaxRSzn int
 	MinRSzn int
 	MaxPSzn int
 	MinPSzn int
 	Teams   []uint64 // teams player has played for
+}
+
+// INITIAL MAP SETUP: must create empty maps before attempting to insert keys
+// calls MapTeams and MapSeasons to setup an empty map for
+// each season and team nested map
+func MakeMaps(db *sql.DB) *StMaps {
+	fmt.Println("creating empty maps")
+	var sm StMaps
+	sm.PlayerIdDtl = map[uint64]*StPlayer{}
+	sm.PlayerNameDtl = map[string]*StPlayer{}
+	sm.PlayerIdName = map[uint64]string{}
+	sm.PlayerNameId = map[string]uint64{}
+
+	// map of seasons with nested map of player ids/names (cleaned)
+	sm.SeasonPlrNms = map[int]map[string]uint64{}
+	sm.SeasonPlrIds = map[int]map[uint64]string{}
+
+	// map of player ids & player names to verify ONLY if player exists in the db
+	sm.PlrIds = map[uint64]struct{}{}
+	sm.PlrNms = map[string]struct{}{}
+
+	// holds all team ids
+	sm.TeamIds = map[string]uint64{}
+	sm.TeamIdLg = map[uint64]int{}
+	sm.TmIdAbbr = map[uint64]string{}
+	sm.TmAbbrId = map[string]uint64{}
+	sm.LgTmIdAbbr = map[int]map[uint64]string{}
+	sm.LgTmAbbrId = map[int]map[string]uint64{}
+	sm.LgTmIdAbbr[0] = map[uint64]string{}
+	sm.LgTmIdAbbr[1] = map[uint64]string{}
+	sm.LgTmAbbrId[0] = map[string]uint64{}
+	sm.LgTmAbbrId[1] = map[string]uint64{}
+
+	// [szn][teamId][player]
+	sm.SznTmPlrIds = map[int]map[uint64]map[uint64]string{}
+	sm.NSznTmPlrIds = map[int]map[uint64]map[uint64]string{}
+	sm.WSznTmPlrIds = map[int]map[uint64]map[uint64]string{}
+
+	return &sm
 }
 
 // ran at start of runtime to setup empty maps
@@ -104,51 +150,41 @@ func (ms *MapStore) Rebuild(db *sql.DB, lg *logd.Logd) error {
 	return nil
 }
 
-// INITIAL MAP SETUP: must create empty maps before attempting to insert keys
-// calls MapTeams and MapSeasons to setup an empty map for
-// each season and team nested map
-func MakeMaps(db *sql.DB) *StMaps {
-	fmt.Println("creating empty maps")
-	var sm StMaps
-	sm.PlayerIdDtl = map[uint64]*StPlayer{}
-	sm.PlayerNameDtl = map[string]*StPlayer{}
-	sm.PlayerIdName = map[uint64]string{}
-	sm.PlayerNameId = map[string]uint64{}
-
-	// map of seasons with nested map of player ids/names (cleaned)
-	sm.SeasonPlrNms = map[int]map[string]uint64{}
-	sm.SeasonPlrIds = map[int]map[uint64]string{}
-
-	// map of player ids & player names to verify ONLY if player exists in the db
-	sm.PlrIds = map[uint64]struct{}{}
-	sm.PlrNms = map[string]struct{}{}
-
-	// holds all team ids
-	sm.TeamIds = map[string]uint64{}
-
-	// [szn][teamId][player]
-	sm.SznTmPlrIds = map[int]map[uint64]map[uint64]string{}
-
-	return &sm
-}
-
 // get all team ids from db, convert each to a uint64, map to string version
 func (sm *StMaps) MapTeamIdUints(db *sql.DB) error {
 	fmt.Println("mapping team id strings to uint64")
 	// get all team ids
-	teams, err := db.Query("select distinct team_id from stats.tbox")
+	teams, err := db.Query(`
+	select distinct a.team_id, lower(b.team), b.lg_id
+	from stats.tbox a 
+	join lg.team b on b.team_id = a.team_id
+	`)
 	if err != nil {
 		return err
 	}
 	// convert each team id string to uint64
 	for teams.Next() {
 		var idstr string
-		teams.Scan(&idstr)
+		var abbr string
+		var lg int
+		teams.Scan(&idstr, &abbr, &lg)
 		id, err := strconv.ParseUint(idstr, 10, 64)
 		if err != nil {
 			return err
 		}
+		// uint64 team id mapped to string team id
 		sm.TeamIds[idstr] = id
+
+		// map teamid to league
+		sm.TeamIdLg[id] = lg
+
+		// id mapped to abbr | abbr mapped to id
+		sm.TmIdAbbr[id] = abbr
+		sm.TmAbbrId[abbr] = id
+
+		// map team to league
+		sm.LgTmIdAbbr[lg][id] = abbr
+		sm.LgTmAbbrId[lg][abbr] = id
 	}
 	return nil
 }
@@ -176,7 +212,10 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 		// create empty map for each season
 		sm.SeasonPlrIds[szn] = map[uint64]string{}
 		sm.SeasonPlrNms[szn] = map[string]uint64{}
+
 		sm.SznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+		sm.NSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+		sm.WSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
 
 		if err = sm.MapSznTeams(db, szn); err != nil {
 			return err
@@ -196,6 +235,7 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 	if err != nil {
 		return err
 	}
+
 	// convert each team id string to uint64
 	for teams.Next() {
 		// scan team id to a string
@@ -210,6 +250,8 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 
 		// create an empty map (ready for player maps) inside [szn][teamId]
 		sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
+		sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
+		sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
 	}
 	return nil
 }

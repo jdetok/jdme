@@ -12,7 +12,7 @@ import (
 use the transform package to remove accidentals
 e.g. Dončić becomes doncic
 */
-func RemoveDiacritics(input string) string {
+func ConvToASCII(input string) string {
 	t := transform.Chain(
 		norm.NFD,
 		runes.Remove(runes.In(unicode.Mn)),

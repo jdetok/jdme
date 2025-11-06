@@ -7,10 +7,7 @@ select
 	a.player_id,
 	a.player as player,
 	lower(a.player) as plr,
-	case 
-		when a.lg_id = 0 then 'nba'
-		when a.lg_id = 1 then 'wnba'
-	end as lg,
+	a.lg_id,
 	c.rs_max, 
 	c.rs_min,
 	coalesce(d.po_max, 0) as po_max,

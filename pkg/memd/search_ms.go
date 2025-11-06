@@ -2,8 +2,28 @@ package memd
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"strconv"
 )
+
+func (sm *StMaps) GetPlrLg(plrId uint64) (int, error) {
+	p, ok := sm.PlayerIdDtl[plrId]
+	if !ok {
+		return 999, fmt.Errorf("couldn't find player %d", plrId)
+	}
+	return p.Lg, nil
+}
+
+// THIS CAUSES ISSUE WITH NBA/WNBA ABBR OVERLAP. NEED TO TRACK LEAGUE TOO.
+func (sm *StMaps) GetLgTmIdFromAbbr(abbr string, lg int) (uint64, error) {
+	var tmId uint64
+	var ok bool
+	tmId, ok = sm.LgTmAbbrId[lg][abbr]
+	if !ok {
+		return 0, fmt.Errorf("couldn't get teamId from team abbr %s", abbr)
+	}
+	return tmId, nil
+}
 
 // return players max reg season
 func (sm *StMaps) GetSznFromPlrId(plrId uint64) (int, error) {
@@ -14,6 +34,7 @@ func (sm *StMaps) GetSznFromPlrId(plrId uint64) (int, error) {
 	return 0, fmt.Errorf("no season found for %d", plrId)
 }
 
+// ["random"] returns 0
 func (sm *StMaps) GetPlrIdFromName(name string) (uint64, error) {
 	if plrId, ok := sm.PlayerNameId[name]; ok {
 		return plrId, nil
@@ -79,4 +100,38 @@ func (sm *StMaps) PlrSznTmExists(plrId, tmId uint64, szn int) bool {
 	}
 	_, ok := sm.SznTmPlrIds[szn][tmId][plrId]
 	return ok
+}
+
+// get subset of players in tId team, sId season, lg league
+// get random number <= number of those players
+// return player in index of that random number
+// if lg is 0 only nba, 1 only wnba, 10 both
+// if tId is 0, all players in season used
+func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
+	// get list of pId from [szn].values()
+	var m map[uint64]string
+	switch lg {
+	case 0:
+		m = sm.NSznTmPlrIds[sId][tId]
+		// m //
+	case 1:
+		m = sm.WSznTmPlrIds[sId][tId]
+		// m //
+	case 10:
+		m = sm.SznTmPlrIds[sId][tId]
+	default:
+		m = sm.SznTmPlrIds[sId][tId]
+	}
+
+	plrs := make([]uint64, 0, len(m))
+
+	for id := range m {
+		plrs = append(plrs, id)
+	}
+
+	if len(plrs) == 0 {
+		return 0
+	}
+	randNum := rand.IntN(len(plrs))
+	return plrs[randNum]
 }
