@@ -1,6 +1,7 @@
 import { base } from "./listen.js"
 import { checkBoxGroupValue, lgRadioBtns } from "./ui.js";
 import { getPlayerStats, buildPlayerDash } from "./player_dash.js";
+import { getPlayerStatsV2 } from "./player_dash_v2.js";
 
 /*
 get the top scorer from each game from the most recent night where games occured
@@ -24,7 +25,7 @@ export async function getRecentGamesData() {
 export async function buildLoadDash(recent_game_data) {
     const top_scorer = recent_game_data.top_scorers[0].player_id;
     const lg = await lgRadioBtns();
-    let js = await getPlayerStats(base, top_scorer, 88888, 0, lg);
+    let js = await getPlayerStatsV2(base, top_scorer, 88888, 0, lg);
     await buildPlayerDash(js.player[0], recent_game_data);
 }
 
@@ -61,7 +62,7 @@ export async function searchPlayer() {
             0);
 
         // build response player dash section
-        let js = await getPlayerStats(base, player, season, team, lg);
+        let js = await getPlayerStatsV2(base, player, season, team, lg);
         if (js) {
             await setPHold(js.player[0].player_meta.player);
             await buildPlayerDash(js.player[0], 0);
@@ -91,8 +92,12 @@ export async function randPlayerBtn() {
             {box: 'post', slct: 'ps_slct'}, 
             {box: 'reg', slct: 'rs_slct'}, 
             88888);
+        const team = await checkBoxGroupValue(
+            {box: 'nbaTm', slct: 'tm_slct'}, 
+            {box: 'wnbaTm', slct: 'wTm_slct'}, 
+            0);
         console.log(`searching random player for season ${season}`);
-        let js = await getPlayerStats(base, 'random', season, 0, lg);
+        let js = await getPlayerStatsV2(base, 'random', season, team, lg);
         if (js) {
             await buildPlayerDash(js.player[0], 0);
             await setPHold(js.player[0].player_meta.player);
