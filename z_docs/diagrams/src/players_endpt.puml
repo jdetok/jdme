@@ -1,0 +1,67 @@
+@startuml players_endpt
+title Process Flow: GET Requests to /v2/players Endpoint
+start
+:HTTP request to /v2/players;
+:mux server calls HndlPlayerV2();
+:"league" value read from query string;
+:"season" value read from query string;
+split
+:"team" value read from query string;
+
+if (team ID (int) or abbrev. (string)?) then (team ID passed)
+    :get mapped uint64\nversion of team id;
+else (team abbrev. passed)
+    if (abbrev. mapped to\nleague exists?) then (yes)
+    else (no)
+        :Return error;
+        stop
+    endif
+    :get team ID from\nmatching abbrev.;
+endif
+split again
+:"player" value read from query string;
+if (player ID (int) or name (string)?) then (player ID passed)
+    :convert to uint;
+    if (player id exists in memory?) then (yes)
+    else (no)
+        :return error;
+        stop
+    endif
+else (player name passed)
+    :convert to lower case and standard ASCII;
+    if (matching player id exists?) then (yes)
+    else (no)
+        :return error;
+        stop
+    endif
+    :get matching player id from in memory store;
+endif
+end split
+if (passed 0 or 88888 as season?) then (yes)
+    :get current active season based on league;
+else (no)
+endif
+if (player id 77777 ("random") requested) then (yes)
+:get random player within passed season/team/league;
+else (no)
+endif
+:ValiSznTmPlr() validates arguments passed exist in store;
+if (player exists in season for team?) then (yes)
+else (no)
+    if (player ID exists generally) then (yes)
+        if (player ID exists in season) then (yes)
+            :invalid, but return same\nplrId and season but teamId 0;
+        else (no)
+            :get player's last season,\nreturn that with teamId 0;
+        endif
+    else (no)
+        :Return error;
+        stop    
+    endif
+endif
+:create PQueryIds struct with valid\npId, tId, sId args to get a player dash;
+:call GetPlayerDashV2() to get player stats;
+:write JSON to http response writer;
+
+stop
+@enduml

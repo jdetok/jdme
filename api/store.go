@@ -44,6 +44,8 @@ func (app *App) CheckInMemStructs(interval, threshold time.Duration) {
 				}
 			}(&wg, app)
 			wg.Wait()
+
+			app.MStore.Persist()
 		}
 	}
 }

@@ -28,6 +28,7 @@ import (
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	app.Lg.LogHTTP(r)
 	var err error
+	var rp Resp
 
 	var lgQ int
 	lgQ, err = app.LgFromQ(r)
@@ -40,17 +41,6 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 	} // get most recent season for 0 or 88888
-	if seasonQ == 0 || seasonQ == 88888 {
-		sl := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
-		switch lgQ {
-		case 0:
-			seasonQ = sl.SznId
-		case 1:
-			seasonQ = sl.WSznId
-		default:
-			seasonQ = sl.SznId
-		}
-	}
 
 	// get team from query string
 	teamQ, err := app.TeamFromQ(r)
@@ -82,14 +72,30 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 		plrId = plrIdUint
 	}
 
+	if seasonQ == 0 || seasonQ == 88888 {
+		sl := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
+		switch lgQ {
+		case 0:
+			seasonQ = sl.SznId
+		case 1:
+			seasonQ = sl.WSznId
+		default:
+			seasonQ = sl.SznId
+		}
+	}
+
 	// handle random player by league
 	if plrId == 77777 {
 		rPlrId := app.MStore.Maps.RandomPlrIdV2(tmId, seasonQ, lgQ)
 		plrId = rPlrId
 	}
-
-	var rp Resp
-	iq := PQueryIds{PId: plrId, TId: tmId, SId: seasonQ}
+	fmt.Printf("validating %d | %d | %d\n", plrId, tmId, seasonQ)
+	stp, err := app.MStore.Maps.ValiSznTmPlr(plrId, tmId, seasonQ)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+	}
+	fmt.Printf("validated %d | %d | %d\n", stp.PId, stp.TId, stp.SId)
+	iq := PQueryIds{PId: stp.PId, TId: stp.TId, SId: stp.SId}
 
 	fmt.Printf("%d | %d | %d\n", iq.PId, iq.SId, iq.TId)
 
@@ -127,10 +133,6 @@ func (app *App) SeasonFromQ(r *http.Request) (int, error) {
 		return 0, fmt.Errorf("INVALID SEASON: could not convert %s to an int\n%s",
 			s, err.Error())
 	}
-	// if s_int == 0 || s_int == 88888 {
-	// 	sl := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
-	// 	return sl.SznId, nil
-	// }
 
 	return s_int, nil
 }

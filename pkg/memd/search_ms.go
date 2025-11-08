@@ -14,6 +14,40 @@ func (sm *StMaps) GetPlrLg(plrId uint64) (int, error) {
 	return p.Lg, nil
 }
 
+type SznTmPlr struct {
+	PId uint64
+	TId uint64
+	SId int
+}
+
+func (sm *StMaps) ValiSznTmPlr(plrId, tmId uint64, sId int) (*SznTmPlr, error) {
+	// return if valid
+
+	if _, ok := sm.SznTmPlrIds[sId][tmId][plrId]; ok {
+		return &SznTmPlr{PId: plrId, TId: tmId, SId: sId}, nil
+	}
+	fmt.Println("past first one")
+	// not ok, first check player exists
+	if _, ok := sm.PlrIds[plrId]; !ok {
+		return nil, fmt.Errorf("player %d doesn't exist", plrId)
+	}
+
+	fmt.Println("past second one")
+
+	// check player exists in team
+	if _, ok := sm.SeasonPlrIds[sId][plrId]; ok {
+		return &SznTmPlr{PId: plrId, TId: 0, SId: sId}, nil
+	}
+
+	// player exists, but not in that season or team. get most recent
+	if p, ok := sm.PlayerIdDtl[plrId]; ok {
+		maxSzn := p.MaxRSzn
+		fmt.Println("past fourth one")
+		return &SznTmPlr{PId: plrId, TId: 0, SId: maxSzn}, nil
+	}
+	return nil, fmt.Errorf("couldn't validate %d | %d | %d", plrId, tmId, sId)
+}
+
 // THIS CAUSES ISSUE WITH NBA/WNBA ABBR OVERLAP. NEED TO TRACK LEAGUE TOO.
 func (sm *StMaps) GetLgTmIdFromAbbr(abbr string, lg int) (uint64, error) {
 	var tmId uint64

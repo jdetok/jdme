@@ -59,7 +59,7 @@ func main() {
 		app.Lg.Fatalf("failed to build in memory map stores")
 	}
 	app.Lg.Infof("in memory map store setup complete")
-	app.MStore.Persist()
+	// app.MStore.Persist()
 
 	// set started = 0 so first check to update store runs setups
 	app.Started = false

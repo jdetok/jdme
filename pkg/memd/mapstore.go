@@ -141,6 +141,7 @@ func (ms *MapStore) Setup(db *sql.DB, lg *logd.Logd) error {
 	if err := ms.Rebuild(db, lg); err != nil {
 		return err
 	} // map data
+	// ms.Persist()
 	return nil
 }
 
