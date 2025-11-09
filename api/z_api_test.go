@@ -8,6 +8,7 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/go-api-jdeko.me/pkg/resp"
 	"github.com/jdetok/golib/envd"
 )
 
@@ -23,7 +24,7 @@ func TestHandleSeasonId(t *testing.T) {
 	p.SeasonIdMin = 22003
 	var errStr string
 	testSzn := 22025
-	resSzn := HandleSeasonId(testSzn, &p, false, &errStr)
+	resSzn := resp.HandleSeasonId(testSzn, &p, false, &errStr)
 
 	if resSzn != testSzn {
 		fmt.Printf("season was manipulated: test season: %d result season %d\n",
@@ -99,8 +100,8 @@ func TestGetPlayerDash(t *testing.T) {
 	var tIds = []uint64{0, 1610612743} // first should be plr query, second tm
 
 	for i := range pIds {
-		var rp Resp
-		iq := PQueryIds{
+		var rp resp.RespPlayerDash
+		iq := resp.PQueryIds{
 			PId: pIds[i],
 			TId: tIds[i],
 			SId: sIds[i],
@@ -171,13 +172,13 @@ func TestSeasonStore(t *testing.T) {
 func TestVerifyPlayerTeam(t *testing.T) {
 	db := StartupTest(t)
 
-	iq := PQueryIds{
+	iq := resp.PQueryIds{
 		PId: 2544,
 		SId: 22024,
 		TId: 1610612747,
 	}
 
-	ptVerif, err := VerifyPlayerTeam(db, &iq)
+	ptVerif, err := resp.VerifyPlayerTeam(db, &iq)
 	if err != nil {
 		t.Error(err)
 	}
@@ -193,13 +194,13 @@ func TestVerifyPlayerTeam(t *testing.T) {
 func TestQueryPlayerTeam(t *testing.T) {
 	db := StartupTest(t)
 
-	iq := PQueryIds{
+	iq := resp.PQueryIds{
 		PId: 2544,
 		SId: 22024,
 		TId: 1610612747,
 	}
 
-	ptVerif, err := VerifyPlayerTeam(db, &iq)
+	ptVerif, err := resp.VerifyPlayerTeam(db, &iq)
 	if err != nil {
 		t.Error(err)
 	}
@@ -215,12 +216,12 @@ func TestQueryPlayerTeam(t *testing.T) {
 
 func TestGetPlayerTeamSeason(t *testing.T) {
 	db := StartupTest(t)
-	iq := PQueryIds{
+	iq := resp.PQueryIds{
 		PId: 2544,
 		SId: 22024,
 		TId: 1610612747,
 	}
-	pltmszn, err := GetPlayerTeamSeason(db, &iq)
+	pltmszn, err := resp.GetPlayerTeamSeason(db, &iq)
 	if err != nil {
 		t.Error("failed getting pltmszn")
 	}

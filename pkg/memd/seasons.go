@@ -8,18 +8,22 @@ import (
 
 // hold current nba and wnba seasons based on date
 type SeasonLeague struct {
-	SznId  int
-	WSznId int
-	Szn    string
-	WSzn   string
+	SznId   int
+	PSznId  int
+	WSznId  int
+	WPSznId int
+	Szn     string
+	WSzn    string
 }
 
 // used in GetCurrentSzns to make seasons/ids from current year
 type CurrentSeasons struct {
-	PrevSznId int
-	CurSznId  int
-	PrevSzn   string
-	CurSzn    string
+	PrevSznId  int
+	CurSznId   int
+	PrevPSznId int
+	CurPSznId  int
+	PrevSzn    string
+	CurSzn     string
 }
 
 /*
@@ -55,6 +59,22 @@ func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) {
 		fmt.Printf("%s\n%v\n", msg, err)
 	}
 	cs.PrevSznId = pint
+
+	// append a 2 to front of current year, return as uint64
+	pcint, err := strconv.Atoi("4" + cyyy)
+	if err != nil {
+		msg := "error converting month to int"
+		fmt.Printf("%s\n%v\n", msg, err)
+	}
+	cs.CurPSznId = pcint
+
+	// append a 2 to front of prev year, return as uint64
+	ppint, err := strconv.Atoi("4" + pyyy)
+	if err != nil {
+		msg := "error converting month to int"
+		fmt.Printf("%s\n%v\n", msg, err)
+	}
+	cs.PrevPSznId = ppint
 }
 
 /*
@@ -108,6 +128,8 @@ func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
 		sl.Szn = cs.CurSzn
 		sl.WSznId = cs.CurSznId
 		sl.WSzn = cs.CurSzn
+		sl.PSznId = cs.CurPSznId
+		sl.WPSznId = cs.CurPSznId
 	}
 
 	return sl

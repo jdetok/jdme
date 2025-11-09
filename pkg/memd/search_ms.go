@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/rand/v2"
 	"strconv"
+
+	"github.com/jdetok/go-api-jdeko.me/pkg/errd"
 )
 
 func (sm *StMaps) GetPlrLg(plrId uint64) (int, error) {
@@ -29,7 +31,8 @@ func (sm *StMaps) ValiSznTmPlr(plrId, tmId uint64, sId int) (*SznTmPlr, error) {
 	fmt.Println("past first one")
 	// not ok, first check player exists
 	if _, ok := sm.PlrIds[plrId]; !ok {
-		return nil, fmt.Errorf("player %d doesn't exist", plrId)
+		return nil, &errd.ValidationError{Val: plrId}
+		// return nil, fmt.Errorf("player %d doesn't exist", plrId)
 	}
 
 	fmt.Println("past second one")
