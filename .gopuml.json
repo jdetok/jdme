@@ -1,0 +1,18 @@
+{
+    "project_name": "jdeko.me api",
+    "project_root": ".",
+    "languages": [
+        ".go"
+    ],
+    "exclude_dirs": [
+        ".git",
+        "z_docs",
+        "tmp",
+        "static"
+    ],
+    "puml_out_dir": "pumlout",
+    "class_diagram_file": "uml_class",
+    "class_diagram_title": "Class Diagram",
+    "activity_diagram_file": "uml_activity",
+    "activity_diagram_title": "Activity Diagram"
+}

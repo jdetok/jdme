@@ -7,72 +7,49 @@ github.com/jdetok/golib
 package main
 
 import (
-	"io"
+	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
-	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/go-api-jdeko.me/pgdb"
 	"github.com/jdetok/golib/envd"
+	"github.com/jdetok/golib/errd"
 )
 
 func main() {
-
-	app := &api.App{}
-
-	// logger setup - opens a *os.File which implements io writer interface
-	f, err := logd.SetupLogdF("./z_log/applog")
+	e := errd.InitErr()
+	err := envd.LoadDotEnv()
 	if err != nil {
-		log.Fatal(err)
-	}
-	app.Logf = f
-
-	// SETUP MAIN APP LOGGER
-	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f))
-
-	// log file created confirmation
-	app.Lg.Infof("started app and created log file")
-
-	// load environment variables from .env file
-	err = envd.LoadDotEnv()
-	if err != nil {
-		app.Lg.Fatalf("failed to load variables in .env file to env\n%v", err)
+		fmt.Println(e.BuildErr(err).Error())
 	}
 
-	// set the server IP address
 	hostaddr, err := envd.GetEnvStr("SRV_IP")
 	if err != nil {
-		app.Lg.Fatalf("failed to get server IP from .env\n%v", err)
+		fmt.Println(e.BuildErr(err).Error())
 	}
-	app.Addr = hostaddr
 
-	// connect to bball postgres database
+	// CONNECT TO POSTGRES
 	db, err := pgdb.PostgresConn()
 	if err != nil {
-		app.Lg.Fatalf("failed to create connection to postgres\n%v", err)
+		fmt.Println(e.BuildErr(err).Error())
 	}
-	app.DB = db
 
-	if err := app.MStore.SetupFromBuild(app.DB, app.Lg); err != nil {
-		app.Lg.Fatalf("failed to build in memory map stores")
+	// initialize the app with the configs
+	app := &api.App{
+		Config:   api.Config{Addr: hostaddr},
+		Database: db,
+		Started:  0,
 	}
-	app.Lg.Infof("in memory map store setup complete")
-	// app.MStore.Persist()
-
-	// set started = 0 so first check to update store runs setups
-	app.Started = false
 
 	// update Players, Seasons, Teams in memory structs
-	go app.CheckInMemStructs(30*time.Second, 300*time.Second)
+	go api.CheckInMemStructs(app, 30*time.Second, 300*time.Second)
 
-	// mount mux server, sets up all endpoint handlers
+	// MOUNT & RUN HTTP SERVER
 	mux := app.Mount()
-	app.Lg.Infof("http mux server mounted, starting server")
-
-	if err := app.RunGraceful(mux); err != nil {
-		app.Lg.Fatalf("FATAL server failed to run\n%v", err)
+	if err := app.Run(mux); err != nil {
+		e.Msg = "error running api/http server"
+		log.Fatal(e.BuildErr(err).Error())
 	}
 
 }
