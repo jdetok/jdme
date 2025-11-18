@@ -7,3 +7,5 @@
 static/archive
 tmp/
 z_json
+proxy/ssl/
+proxy/*.conf
