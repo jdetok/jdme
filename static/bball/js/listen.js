@@ -3,8 +3,9 @@
 import * as ui from "./ui.js"
 import { makeScoringLeaders } from "./lg_ldg_scorers.js"
 import { buildRGTopScorersTbl } from "./rg_ldg_scorers.js";
+import { getTeamRecords, buildTeamRecsTbl } from "./teamrecs.js";
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
-    getRecentGamesData} from "./player_search.js"
+    getRecentGamesData, clearSearchBar } from "./player_search.js"
 
 export const base = "https://jdeko.me/bball";
 
@@ -15,8 +16,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     await clearSearch();
     await holdPlayerBtn();
 });
-
+// TODO: separate UI setup and table builds
 export async function buildOnLoadElements() {
+    // empty search bar on load
+    await clearSearchBar();
+    
+    // load team records table
+    let trjs = await getTeamRecords();
+    await buildTeamRecsTbl(trjs, 'team_recs_tbl');
+
     // scoring leaders (number of players table based on screen width)
     await makeScoringLeaders(numScoringLeaders());
 

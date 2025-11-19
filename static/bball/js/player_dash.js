@@ -33,7 +33,7 @@ export async function getPlayerStats(base, player, season, team, lg) { // add se
     try {
         const r = await fetch(req);
         if (!r.ok) {
-            throw new Error(`HTTP Error: ${r.status}`);
+            throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
         }
         
         // get json, set first object in player array as data var
@@ -76,7 +76,9 @@ async function respPlayerTitle(data, elName, ts) {
     if (ts) {
         rTitle.innerHTML = `
         Top Scorer from ${ts.recent_games[0].game_date}<br>${data.caption}
-         | ${ts.top_scorers[0].points} points`;    
+         | ${ts.top_scorers[0].points} pts | 
+         ${ts.top_scorers[0].assists} ast |
+         ${ts.top_scorers[0].rebounds} reb`;    
     } else {
         rTitle.textContent = data.caption;
     }

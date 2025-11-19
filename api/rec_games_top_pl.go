@@ -20,8 +20,8 @@ type TopPlayers struct {
 }
 
 type LgTopPlayers struct {
-	NBATop5  []TopPlayers `json:"nba"`
-	WNBATop5 []TopPlayers `json:"wnba"`
+	NBATop  []TopPlayers `json:"nba"`
+	WNBATop []TopPlayers `json:"wnba"`
 }
 
 type RecentGames struct {
@@ -35,6 +35,8 @@ type PlayerBasic struct {
 	Player   string `json:"player"`
 	League   string `json:"league"`
 	Points   uint16 `json:"points"`
+	Assists  uint16 `json:"assists"`
+	Rebounds uint16 `json:"rebounds"`
 }
 
 type RecentGame struct {
@@ -85,9 +87,9 @@ func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlaye
 			r.Scan(&t.PlayerId, &t.Player, &t.Season, &t.Team, &t.Points)
 			switch lg {
 			case "nba":
-				lt.NBATop5 = append(lt.NBATop5, t)
+				lt.NBATop = append(lt.NBATop, t)
 			case "wnba":
-				lt.WNBATop5 = append(lt.WNBATop5, t)
+				lt.WNBATop = append(lt.WNBATop, t)
 			}
 		}
 
@@ -136,7 +138,8 @@ func (rgs *RecentGames) ScanRecentGamesRows(rows *sql.Rows) {
 		rows.Scan(&rg.GameId, &rg.TeamId, &rg.PlayerId,
 			&rg.Player, &rg.League, &rg.Team,
 			&rg.TeamName, &rg.GameDate, &rg.Matchup,
-			&rg.WinLoss, &rg.Points, &rg.OppPoints, &ps.Points)
+			&rg.WinLoss, &rg.Points, &rg.OppPoints,
+			&ps.Points, &ps.Assists, &ps.Rebounds)
 
 		ps.PlayerId = rg.PlayerId
 		ps.TeamId = rg.TeamId

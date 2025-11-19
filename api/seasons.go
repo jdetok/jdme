@@ -106,7 +106,7 @@ func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
 
 	// october 21 through end of year - both leagues get current szn
 	// this is based on the 2025-26 NBA season starting on 10/21 - update day each year
-	if m >= 10 && d >= 21 {
+	if (m == 10 && d >= 21) || m > 10 {
 		sl.SznId = cs.CurSznId
 		sl.Szn = cs.CurSzn
 		sl.WSznId = cs.CurSznId

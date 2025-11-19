@@ -49,6 +49,7 @@ func main() {
 	mux := app.Mount()
 	if err := app.Run(mux); err != nil {
 		e.Msg = "error running api/http server"
+		fmt.Println(err)
 		log.Fatal(e.BuildErr(err).Error())
 	}
 

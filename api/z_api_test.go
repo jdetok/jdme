@@ -260,3 +260,19 @@ func TestGetPlayerTeamSeason(t *testing.T) {
 	}
 	fmt.Println(pltmszn)
 }
+
+func TestGetTeamRecords(t *testing.T) {
+	db := StartupTest(t)
+	var cs CurrentSeasons
+	team_recs, err := UpdateTeamRecords(db, &cs)
+	if err != nil {
+		t.Error("failed getting team records", err)
+	}
+
+	js, err := TeamRecordsJSON(&team_recs)
+	if err != nil {
+		t.Error("failed to marshal JSON", err)
+	}
+
+	fmt.Println(string(js))
+}

@@ -121,7 +121,9 @@ select * from (
 	a.wl, 
 	a.pts as tm_pts, 
 	f.pts as opp_pts,
-	d.pts as plr_pts
+	d.pts as plr_pts,
+	d.ast as plr_ast,
+	d.reb as plr_reb
 	from stats.tbox a
 	inner join (
 		select max(gdate) as md
@@ -200,23 +202,42 @@ select
     (select team from lg.team where team_id = $2) as team,
     (select szn from lg.szn where szn_id = $3) as season
 `
-
-/*
-select
-	player_id, team_id, lg,
-	max(szn_id) as szn_id, max(szn_desc) as szn_desc, max(wszn_desc) as wszn_desc,
-	max(stype) as stype, max(player) as player, max(team) as team, max(team_long) as team_long,
-	sum(gp) as gp, sum(minutes) as minutes, sum(points) as point, sum(assists) as assists,
-	sum(rebounds) as rebounds, sum(steals) as steals, sum(blocks) as blocks,
-	round(avg(fgm), 2) as fgm, round(avg(fga), 2) as fga,
-	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as fgp,
-	round(avg(f3m), 2) as f3m, round(avg(f3a), 2) as f3a,
-	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as f3p,
-	round(avg(ftm), 2) as ftm, round(avg(fta), 2) as fta,
-	round(avg(to_number(substring(fgp, 0, 5), '99.99')), 2) as ftp
-from api.v_plr_szn_tot
-where player_id = 2544
-and team_id = 1610612747
-group by player_id, team_id, lg
-
-*/
+var TeamSznRecords = `
+with team_results as (
+    select
+        d.lg, 
+        t.szn_id,
+        case
+            when d.lg = 'NBA' then szn
+            when d.lg = 'WNBA' then wszn
+        end as season,
+        case
+            when d.lg = 'NBA' then szn_desc
+            when d.lg = 'WNBA' then wszn_desc
+        end as season_desc,
+        t.team_id,
+        b.team,
+        b.team_long,
+        count(distinct case when t.wl = 'W' then t.game_id end) as wins,
+        count(distinct case when t.wl = 'L' then t.game_id end) as losses
+    from stats.tbox t
+    inner join lg.team b on b.team_id = t.team_id
+    inner join lg.szn c on c.szn_id = t.szn_id
+    inner join lg.league d on d.lg_id = b.lg_id
+    where t.szn_id in ($1, $2)
+    group by d.lg, t.szn_id, 
+             case when d.lg = 'NBA' then szn when d.lg = 'WNBA' then wszn end,
+             case when d.lg = 'NBA' then szn_desc when d.lg = 'WNBA' then wszn_desc end,
+             t.team_id, b.team, b.team_long
+)
+select lg, szn_id, season, season_desc, team_id, team, team_long, wins, losses
+from (
+    select *,
+        row_number() over (
+            partition by lg, szn_id
+            order by wins desc, losses asc, team_id
+        ) as rank
+    from team_results
+) ranked
+order by lg, rank
+`

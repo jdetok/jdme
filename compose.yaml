@@ -1,28 +1,27 @@
-# docker compose file to run api on localhost:8080
-
 services:
-  jdekome_go_dev:
+  api_jdme:
     build:
       context: .
       dockerfile: Dockerfile
-    image: jdekome_api_dev
-    container_name: jdekome_api_dev
-    networks:
-      net_jdekome_dev:
-        ipv4_address: 10.0.97.10
-    ports: 
+    image: img_api_jdme
+    container_name: api_jdme
+    ports:
       - "8080:8080"
+    networks:
+      jdme_net:
+        ipv4_address: 10.7.19.10
+      dbnet:
+        ipv4_address: 10.0.13.152
     volumes:
-      - .:/app
+      - ./log:/app/log
+      - ./:/app
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
     restart: unless-stopped
 
 networks:
-  net_jdekome_dev:
-    name: net_jdekome_dev
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.97.0/24
-          gateway: 10.0.97.1
+  jdme_net: 
+    external: true
+
+  dbnet:
+    external: true
