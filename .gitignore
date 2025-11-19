@@ -6,3 +6,6 @@
 *.png
 static/archive
 tmp/
+.vscode/
+ref/
+z_log/
