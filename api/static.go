@@ -5,6 +5,7 @@ import (
 )
 
 const fsPath string = "/app/static"
+const wikiPath string = "/app/wiki/public/docs"
 const bballPath string = "/app/static/bball/bball.html"
 const abtPath string = "/app/static/about/about.html"
 const bballAbtPath string = "/app/static/about/bball_about.html"
@@ -15,6 +16,13 @@ func (app *App) HndlRoot(w http.ResponseWriter, r *http.Request) {
 	LogHTTP(r)
 	w.Header().Set("Cache-Control", "no-store")
 	http.FileServer(http.Dir(fsPath)).ServeHTTP(w, r)
+}
+
+func (app *App) ServeDocs(w http.ResponseWriter, r *http.Request) {
+	LogHTTP(r)
+	w.Header().Set("Cache-Control", "no-store")
+	fs := http.FileServer(http.Dir(wikiPath))
+	http.StripPrefix("/docs/", fs).ServeHTTP(w, r)
 }
 
 // /about handler, serves static files from the about directory
