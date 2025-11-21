@@ -1,6 +1,6 @@
 module github.com/jdetok/go-api-jdeko.me
 
-go 1.24.3
+go 1.25.1
 
 require (
 	github.com/go-sql-driver/mysql v1.9.3

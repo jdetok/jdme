@@ -10,3 +10,5 @@ tmp/
 ref/
 z_log/
 wiki/public/
+proxy/ssl/
+proxy/*.conf
