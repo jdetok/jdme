@@ -23,7 +23,7 @@ tmp_dir = "tmp"
     "./pgdb",
     "./static",  
     "./main",
-    "./wiki"
+    "./wiki/public"
   ]
 
   exclude = ["**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.svg", "**/test*.go"]

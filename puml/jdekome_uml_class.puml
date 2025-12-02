@@ -1,0 +1,275 @@
+@startuml jdekome-api | Sample Class Diagram
+package api {
+	package rec_games_top_pl {
+		class rec_games_top_pl_funcs {
+			+ QueryTopLgPlayers() LgTopPlayers, error
+			+ MarshalTopPlayers() []byte, error
+		}
+		class TopPlayers {
+			+ PlayerId uint64
+			+ Player string
+			+ Season string
+			+ Team string
+			+ Points uint32
+		}
+		class LgTopPlayers {
+			+ NBATop []TopPlayers
+			+ WNBATop []TopPlayers
+		}
+		class RecentGames {
+			+ TopScorers []PlayerBasic
+			+ Games []RecentGame
+			+ GetRecentGames() []byte, error
+			+ ScanRecentGamesRows() 
+		}
+		class PlayerBasic {
+			+ PlayerId uint64
+			+ TeamId uint64
+			+ Player string
+			+ League string
+			+ Points uint16
+			+ Assists uint16
+			+ Rebounds uint16
+		}
+		class RecentGame {
+			+ GameId uint64
+			+ TeamId uint64
+			+ PlayerId uint64
+			+ Player string
+			+ League string
+			+ Team string
+			+ TeamName string
+			+ GameDate string
+			+ Matchup string
+			+ WinLoss string
+			+ Points uint16
+			+ OppPoints uint16
+		}
+	}
+	package store {
+		class store_funcs {
+			+ CheckInMemStructs() 
+			+ UpdateStructs() 
+			+ UpdatePlayers() []Player, error
+			+ UpdateSeasons() []Season, error
+			+ UpdateTeams() []Team, error
+			+ UpdateTeamRecords() TeamRecords, error
+		}
+		class Player {
+			+ PlayerId uint64
+			+ Name string
+			+ League string
+			+ SeasonIdMax uint64
+			+ SeasonIdMin uint64
+			+ PSeasonIdMax uint64
+			+ PSeasonIdMin uint64
+		}
+		class Season {
+			+ SeasonId string
+			+ Season string
+			+ WSeason string
+		}
+		class Team {
+			+ League string
+			+ TeamId string
+			+ TeamAbbr string
+			+ CityTeam string
+			+ LogoUrl string
+		}
+	}
+	package team_records {
+		class team_records_funcs {
+			+ TeamRecordsJSON() []byte, error
+		}
+		class TeamRecords {
+			+ NBARecords []TeamRecord
+			+ WNBARecords []TeamRecord
+		}
+		class TeamRecord {
+			+ League string
+			+ SeasonId uint64
+			+ Season string
+			+ SeasonDesc string
+			+ TeamId uint64
+			+ Team string
+			+ TeamLong string
+			+ Wins uint16
+			+ Losses uint16
+		}
+	}
+	package z_api_test {
+		class z_api_test_funcs {
+			+ TestHandleSeasonId() 
+			+ TestLgSznsByMonth() 
+			+ TestQueryTopLgPlayers() 
+			+ StartupTest() *sql.DB 
+			+ TestGetPlayerDash() 
+			+ TestPlayerStore() 
+			+ TestTeamStore() 
+			+ TestSeasonStore() 
+			+ TestVerifyPlayerTeam() 
+			+ TestQueryPlayerTeam() 
+			+ TestGetPlayerTeamSeason() 
+			+ TestGetTeamRecords() 
+		}
+	}
+	package api {
+		class App {
+			+ Config Config
+			+ Database *sql.DB
+			+ StartTime time.Time
+			+ LastUpdate time.Time
+			+ Started uint8
+			+ Store InMemStore
+			+ JSONWriter() 
+			+ Mount() *http.ServeMux 
+			+ Run() error 
+		}
+		class InMemStore {
+			+ Players []Player
+			+ Seasons []Season
+			+ Teams []Team
+			+ CurrentSzns CurrentSeasons
+			+ TeamRecs TeamRecords
+			+ TopLgPlayers LgTopPlayers
+		}
+		class Config {
+			+ Addr string
+		}
+	}
+	package bball {
+		class PlayerQuery {
+			+ Player string
+			+ Team string
+			+ Season string
+			+ League string
+		}
+		class PlayerTeamSeason {
+			+ Player string
+			+ Team string
+			+ Season string
+		}
+		class PQueryIds {
+			+ PId uint64
+			+ TId uint64
+			+ SId uint64
+		}
+	}
+	package players {
+		class players_funcs {
+			+ GetPlayerTeamSeason() PlayerTeamSeason, error
+			+ VerifyPlayerTeam() bool, error
+			+ VerifyPlayerTeamSeason() bool, error
+			+ RandomPlayerId() uint64 
+			+ RemoveDiacritics() string 
+			+ MakeTeamLogoUrl() string 
+			+ HandleSeasonId() uint64 
+			+ SlicePlayersSzn() []Player, error
+		}
+	}
+	package seasons {
+		class SeasonLeague {
+			+ SznId uint64
+			+ WSznId uint64
+			+ Szn string
+			+ WSzn string
+		}
+		class CurrentSeasons {
+			+ PrevSznId uint64
+			+ CurSznId uint64
+			+ PrevSzn string
+			+ CurSzn string
+			+ GetCurrentSzns() 
+			+ LgSznsByMonth() SeasonLeague 
+		}
+	}
+	package static {
+	}
+	package resp {
+		class Resp {
+			+ Results []RespObj
+			+ ErrorMsg string
+		}
+		class RespObj {
+			+ Meta RespPlayerMeta
+			+ SeasonOvw RespPlayerSznOvw
+			+ Totals RespPlayerStats
+			+ PerGame RespPlayerStats
+		}
+		class RespPlayerMeta {
+			+ PlayerId uint64
+			+ TeamId uint64
+			+ League string
+			+ SeasonId uint64
+			+ StatType string
+			+ Player string
+			+ Team string
+			+ TeamName string
+			+ Season string
+			+ Caption string
+			+ CaptionShort string
+			+ BoxCapTot string
+			+ BoxCapAvg string
+			+ ShtgCapTot string
+			+ ShtgCapAvg string
+			+ HeadshotUrl string
+			+ TeamLogoUrl string
+		}
+		class RespPlayerSznOvw {
+			+ GamesPlayed uint16
+			+ Minutes float32
+			+ MinutsPerGame float32
+		}
+		class RespPlayerStats {
+			+ Box RespPlayerStatsBox
+			+ Shtg RespPlayerStatsShtg
+		}
+		class RespPlayerStatsBox {
+			+ Points float32
+			+ Assists float32
+			+ Rebounds float32
+			+ Steals float32
+			+ Blocks float32
+		}
+		class RespPlayerStatsShtg {
+			+ Fg RespPlayerStatsShtgType
+			+ Fg3 RespPlayerStatsShtgType
+			+ Ft RespPlayerStatsShtgType
+		}
+		class RespPlayerStatsShtgType {
+			+ Makes float32
+			+ Attempts float32
+			+ Percent string
+		}
+		class RespSeasonTmp {
+			+ Season string
+			+ WSeason string
+		}
+	}
+	package logh {
+		class logh_funcs {
+			+ LogHTTP() 
+		}
+	}
+}
+package main {
+	package main {
+		class main_funcs {
+			+ main() 
+		}
+	}
+}
+package pgdb {
+	package pgdb {
+		class pgdb_funcs {
+			+ PostgresConn() *sql.DB, error
+		}
+	}
+	package query {
+	}
+}
+api <-- pgdb
+main <-- api
+main <-- pgdb
+
+@enduml

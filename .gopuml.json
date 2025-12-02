@@ -1,0 +1,17 @@
+{
+    "project_name": "jdekome-api",
+    "project_root": "/Users/jdeto/dev/go/src/github.com/jdetok/go-api-jdeko.me",
+    "languages": [
+        ".go"
+    ],
+    "exclude_dirs": [
+        ".git",
+        "z_docs",
+        "templates"
+    ],
+    "puml_out_dir": "puml",
+    "class_diagram_file": "jdekome_uml_class",
+    "class_diagram_title": "Sample Class Diagram",
+    "activity_diagram_file": "sample_uml_activity",
+    "activity_diagram_title": "Sample Activity Diagram"
+}
