@@ -17,13 +17,18 @@ tmp_dir = "tmp"
 
 [watch]
   dirs = [
-   "./api",
-    "./api/store",
-    "./api/resp",
-    "./pgdb",
-    "./static",  
-    "./main",
-    "./store"
+    "./api",
+    "./pkg/*"
   ]
 
-  exclude = ["**/*.png", "**/*.jpg", "**/*.jpeg", "**/*.gif", "**/*.svg", "**/test*.go"]
+  exclude = [
+    "z_docs/",
+    "z_log",
+    ".vscode",
+    "**/*.png", 
+    "**/*.jpg",
+    "**/*.jpeg",
+    "**/*.gif", 
+    "**/*.svg", 
+    "**/test*.go"
+  ]

@@ -50,6 +50,12 @@ func (app *App) Mount() *http.ServeMux {
 	// TESTING NEW ENDPOINTS 10/26/2025
 	mux.HandleFunc("GET /bball/v2/players", app.HndlPlayerV2)
 
+	mux.HandleFunc("/docs", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/docs/", http.StatusMovedPermanently)
+	})
+
+	mux.Handle("/docs/", http.HandlerFunc(app.ServeDocs))
+	// mux.HandleFunc("/docs/", app.HndlWiki)
 	// serve static files
 	mux.Handle("/js/", http.HandlerFunc(app.JSNostore))
 	mux.Handle("/css/", http.HandlerFunc(app.CSSNostore))

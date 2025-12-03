@@ -6,7 +6,16 @@
 static/*.png
 static/archive
 tmp/
+<<<<<<< HEAD
 z_json
 .vscode
 z_log/
 ref/
+=======
+.vscode/
+ref/
+z_log/
+wiki/public/
+proxy/ssl/
+proxy/*.conf
+>>>>>>> origin
