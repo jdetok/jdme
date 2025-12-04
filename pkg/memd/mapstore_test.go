@@ -1,6 +1,7 @@
 package memd
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
@@ -57,6 +58,34 @@ func TestMapPlayersCC(t *testing.T) {
 		t.Errorf("should exist for %d | %d", onlyl, lal)
 	}
 
+}
+
+func TestMapSznTeams(t *testing.T) {
+	err := envd.LoadDotEnvFile("../../.env")
+	if err != nil {
+		t.Error(err)
+	}
+
+	db, err := pgdb.PostgresConn()
+	if err != nil {
+		t.Error(err)
+	}
+
+	sm := MakeMaps(db)
+	if err := sm.MapSeasons(db); err != nil {
+		t.Error(err)
+	}
+
+	// setup nested team maps
+	fmt.Println("creating empty team maps")
+	if err := sm.MapTeamIdUints(db); err != nil {
+		fmt.Println(err)
+	}
+
+	szn := 42024
+	fmt.Println(sm.NSznTmPlrIds[szn])
+
+	fmt.Println(sm.TeamIdLg)
 }
 
 // import (

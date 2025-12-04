@@ -232,7 +232,8 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 	// to handle season id = 0
 	sm.SeasonPlrNms[0] = map[string]uint64{}
 	sm.SeasonPlrIds[0] = map[uint64]string{}
-
+	sm.SeasonPlrNms[1] = map[string]uint64{}
+	sm.SeasonPlrIds[1] = map[uint64]string{}
 	// get all season ids
 	szns, err := db.Query("select distinct szn_id from stats.tbox")
 	if err != nil {
@@ -268,7 +269,10 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 	fmt.Println("mapping team ids to season: ", szn)
 	// get all team ids
 	teams, err := db.Query(
-		"select distinct team_id from stats.tbox where szn_id = $1", szn)
+		`select distinct a.team_id, b.lg_id 
+		from stats.tbox a
+		inner join lg.team b on b.team_id = a.team_id
+		where szn_id = $1`, szn)
 	if err != nil {
 		return err
 	}
@@ -276,21 +280,58 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 	// convert each team id string to uint64
 	for teams.Next() {
 		// scan team id to a string
-		var idstr string
-		teams.Scan(&idstr)
+		var idstr, lgstr string
+		if err := teams.Scan(&idstr, &lgstr); err != nil {
+			return err
+		}
 
 		// get the team id as uint64
 		teamId, err := sm.GetTeamIDUintCC(idstr)
 		if err != nil {
 			return err
 		}
-
-		// create an empty map (ready for player maps) inside [szn][teamId]
 		sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
-		sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
-		sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
+		switch lgstr {
+		case "0":
+			sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
+		case "1":
+			sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
+		}
 	}
 	return nil
+}
+
+func (sm *StMaps) MapTeamToSzn(szn int, teamId uint64) {
+	sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
+	fmt.Println(sm.TeamIdLg[teamId])
+	switch sm.TeamIdLg[teamId] {
+	case 0:
+		fmt.Printf("%d played in nba playoff season %d\n", szn, teamId)
+		sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
+	case 1:
+		fmt.Printf("%d played in wnba playoff season %d\n", szn, teamId)
+		sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
+	}
+}
+
+// check if team had playoff games in season
+func (sm *StMaps) MapPlayoffSzn(db *sql.DB, szn int, teamId uint64) (bool, error) {
+	qTmSznExists := (`select exists (select team_id from stats.tbox where szn_id = $1 and team_id = $2)`)
+	var exists bool
+	row := db.QueryRow(qTmSznExists, szn, teamId)
+	if err := row.Scan(&exists); err != nil {
+		return false, err
+	}
+	if !exists {
+		return false, nil
+	}
+
+	sm.MapTeamToSzn(szn, teamId)
+	// sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
+	// sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
+	// sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
+
+	return true, nil
 }
 
 // accept comma separated string of team ids, split and append to teams slice

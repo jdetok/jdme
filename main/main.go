@@ -65,7 +65,7 @@ func main() {
 	app.Started = false
 
 	// update Players, Seasons, Teams in memory structs
-	go app.CheckInMemStructs(30*time.Second, 300*time.Second)
+	go app.CheckInMemStructs(300*time.Second, 30*time.Second)
 
 	// mount mux server, sets up all endpoint handlers
 	mux := app.Mount()

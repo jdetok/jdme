@@ -137,10 +137,23 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 func (sm *StMaps) MapPlrNmToSznCC(p *StPlayer) {
 	sm.mu.Lock()
 	// set 0 season
-	sm.SeasonPlrNms[0][p.Lowr] = p.Id
+	if _, ok := sm.SeasonPlrNms[0][p.Lowr]; !ok {
+		sm.SeasonPlrNms[0][p.Lowr] = p.Id
+	}
+
 	for s := p.MinRSzn; s <= p.MaxRSzn; s++ {
 		sm.SeasonPlrNms[int(s)][p.Lowr] = p.Id
 	}
+
+	if p.MinPSzn > 0 {
+		if _, ok := sm.SeasonPlrNms[1][p.Lowr]; !ok {
+			sm.SeasonPlrNms[1][p.Lowr] = p.Id
+		}
+		for s := p.MinPSzn; s <= p.MaxPSzn; s++ {
+			sm.SeasonPlrNms[int(s)][p.Lowr] = p.Id
+		}
+	}
+	// fmt.Println(p.MaxPSzn, " | ", p.MinPSzn)
 	sm.mu.Unlock()
 }
 
@@ -148,10 +161,23 @@ func (sm *StMaps) MapPlrNmToSznCC(p *StPlayer) {
 func (sm *StMaps) MapPlrIdToSznCC(p *StPlayer) {
 	sm.mu.Lock()
 	// set 0 season
-	sm.SeasonPlrIds[0][p.Id] = p.Lowr
-	for s := p.MinRSzn; s <= p.MaxRSzn; s++ {
-		sm.SeasonPlrIds[int(s)][p.Id] = p.Lowr
+	if _, ok := sm.SeasonPlrIds[0][p.Id]; !ok {
+		sm.SeasonPlrIds[0][p.Id] = p.Lowr
 	}
+
+	for rs := p.MinRSzn; rs <= p.MaxRSzn; rs++ {
+		sm.SeasonPlrIds[int(rs)][p.Id] = p.Lowr
+	}
+
+	if p.MinPSzn > 0 {
+		if _, ok := sm.SeasonPlrIds[1][p.Id]; !ok {
+			sm.SeasonPlrIds[1][p.Id] = p.Lowr
+		}
+		for ps := p.MinPSzn; ps <= p.MaxPSzn; ps++ {
+			sm.SeasonPlrIds[int(ps)][p.Id] = p.Lowr
+		}
+	}
+
 	sm.mu.Unlock()
 }
 
@@ -202,6 +228,9 @@ group by player_id, szn_id`
 
 			if sm.SznTmPlrIds[szn][0] == nil {
 				sm.SznTmPlrIds[szn][0] = map[uint64]string{}
+			}
+			if sm.SznTmPlrIds[szn][1] == nil {
+				sm.SznTmPlrIds[szn][1] = map[uint64]string{}
 			}
 
 			// add this player's id to the corresponding season/team inner map
