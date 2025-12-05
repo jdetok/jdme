@@ -7,7 +7,7 @@ import { getTeamRecords, buildTeamRecsTbl } from "./teamrecs.js";
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
     getRecentGamesData, clearSearchBar } from "./player_search.js"
 
-export const base = "http://localhost:8080/bball";
+export const base = "https://jdeko.me/bball";
 
 document.addEventListener('DOMContentLoaded', async () => {
     await buildOnLoadElements();
