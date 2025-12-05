@@ -29,7 +29,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	var wg sync.WaitGroup
 
 	// concurrency controls
-	const maxWorkers = 100
+	const maxWorkers = 30
 	sem := make(chan struct{}, maxWorkers)
 
 	// channels for results and errors
@@ -39,7 +39,9 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	sm.PlayerNameId["random"] = 77777
 
 	// read the results channel, add player to maps
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		for p := range results {
 			lg.Infof("%s complete", p.Name)
 		}
@@ -76,7 +78,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 			defer wg.Done()
 			defer func() { <-sem }()
 
-			fmt.Println("worker", count, "running")
+			// fmt.Println("worker", count, "running")
 
 			// clean the player name (lower case, remove accents)
 			p.Lowr = clnd.ConvToASCII(lowrStr)
@@ -102,12 +104,11 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 
 			// query team(s) played for each season from min-max player season,
 			// add player to map for each team played for in each season played
-			if err := sm.MapSznTmPlrCC(db, p); err != nil {
+			if err := sm.MapSznTmPlPO(db, p); err != nil {
 				errCh <- fmt.Errorf(
 					"error occured mapping player season/teams %s | %d\n%v",
 					p.Lowr, p.Id, err)
 			}
-
 			select {
 			case results <- p:
 			case <-errCh:
@@ -196,7 +197,7 @@ group by player_id, szn_id`
 	if err != nil {
 		return fmt.Errorf("season team player query failed %d: %w", p.Id, err)
 	}
-	fmt.Println("MapSznTmPlrCC query finished, processesing rows player", p.Lowr)
+	// fmt.Println("MapSznTmPlrCC query finished, processesing rows player", p.Lowr)
 
 	for tmsRows.Next() {
 		var szn int
@@ -206,6 +207,97 @@ group by player_id, szn_id`
 			return err
 		}
 
+		// scan writes a comma seperated string of team ids to tmStr
+		// split to slice of strings & iterate over each
+		tmsItr := strings.SplitSeq(tmStr, ",")
+		for t := range tmsItr {
+			// access uint64 version of team id created early in sm.TeamIDs
+			teamId, err := sm.GetTeamIDUintCC(t)
+			if err != nil {
+				return err
+			}
+
+			sm.mu.Lock()
+			// create empty map for the seasonid to safely create team id maps
+			if sm.SznTmPlrIds[szn] == nil {
+				sm.SznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+			}
+			// create empty map for each team id in each season
+			if sm.SznTmPlrIds[szn][teamId] == nil {
+				sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
+			}
+
+			if sm.SznTmPlrIds[szn][0] == nil {
+				sm.SznTmPlrIds[szn][0] = map[uint64]string{}
+			}
+			if sm.SznTmPlrIds[szn][1] == nil {
+				sm.SznTmPlrIds[szn][1] = map[uint64]string{}
+			}
+
+			// add this player's id to the corresponding season/team inner map
+			sm.SznTmPlrIds[szn][teamId][p.Id] = p.Lowr
+			sm.SznTmPlrIds[szn][0][p.Id] = p.Lowr
+
+			switch p.Lg {
+			case 0:
+				if sm.NSznTmPlrIds[szn] == nil {
+					sm.NSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+				}
+				if sm.NSznTmPlrIds[szn][teamId] == nil {
+					sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
+				}
+				if sm.NSznTmPlrIds[szn][0] == nil {
+					sm.NSznTmPlrIds[szn][0] = map[uint64]string{}
+				}
+				sm.NSznTmPlrIds[szn][teamId][p.Id] = p.Lowr
+				sm.NSznTmPlrIds[szn][0][p.Id] = p.Lowr
+
+			case 1:
+				if sm.WSznTmPlrIds[szn] == nil {
+					sm.WSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+				}
+				if sm.WSznTmPlrIds[szn][teamId] == nil {
+					sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
+				}
+				if sm.WSznTmPlrIds[szn][0] == nil {
+					sm.WSznTmPlrIds[szn][0] = map[uint64]string{}
+				}
+				sm.WSznTmPlrIds[szn][teamId][p.Id] = p.Lowr
+				sm.WSznTmPlrIds[szn][0][p.Id] = p.Lowr
+			}
+			sm.mu.Unlock()
+		}
+
+	}
+	return nil
+}
+
+// playoff safe copy
+func (sm *StMaps) MapSznTmPlPO(db *sql.DB, p *StPlayer) error {
+	fmt.Printf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
+	q := `
+select szn_id, string_agg(distinct team_id::text, ',')
+from stats.pbox
+where player_id = $1 
+and substr(szn_id::text, 2, 4)::int between 
+substr($2::text, 2, 4)::int and substr($3::text, 2, 4)::int
+group by player_id, szn_id
+	`
+
+	tmsRows, err := db.Query(q, p.Id, p.MinRSzn, p.MaxRSzn)
+	if err != nil {
+		return fmt.Errorf("season team player query failed %d: %w", p.Id, err)
+	}
+	// fmt.Println("MapSznTmPlrCC query finished, processesing rows player", p.Lowr)
+
+	for tmsRows.Next() {
+		var szn int
+		var tmStr string
+		err = tmsRows.Scan(&szn, &tmStr)
+		if err != nil {
+			return err
+		}
+		//
 		// scan writes a comma seperated string of team ids to tmStr
 		// split to slice of strings & iterate over each
 		tmsItr := strings.SplitSeq(tmStr, ",")

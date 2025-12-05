@@ -168,5 +168,6 @@ func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
 		return 0
 	}
 	randNum := rand.IntN(len(plrs))
+	fmt.Println(plrs[randNum])
 	return plrs[randNum]
 }

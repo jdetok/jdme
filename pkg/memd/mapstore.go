@@ -239,6 +239,10 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
+	sm.SznTmPlrIds[0] = map[uint64]map[uint64]string{}
+	sm.NSznTmPlrIds[0] = map[uint64]map[uint64]string{}
+	sm.WSznTmPlrIds[0] = map[uint64]map[uint64]string{}
+
 	// convert each season id string to int
 	for szns.Next() {
 		var sznStr string
@@ -290,7 +294,11 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 		if err != nil {
 			return err
 		}
+		if sm.SznTmPlrIds[szn] == nil {
+			// !!
+		}
 		sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
+		sm.SznTmPlrIds[0][teamId] = map[uint64]string{}
 		switch lgstr {
 		case "0":
 			sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}

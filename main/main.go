@@ -67,6 +67,12 @@ func main() {
 	// update Players, Seasons, Teams in memory structs
 	go app.CheckInMemStructs(300*time.Second, 30*time.Second)
 
+	go func(a *api.App) {
+		if err := app.MStore.Rebuild(app.DB, app.Lg); err != nil {
+			app.Lg.Errorf("failed to update player map")
+		}
+	}(app)
+
 	// mount mux server, sets up all endpoint handlers
 	mux := app.Mount()
 	app.Lg.Infof("http mux server mounted, starting server")

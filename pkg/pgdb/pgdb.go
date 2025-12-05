@@ -22,7 +22,7 @@ func PostgresConn() (*sql.DB, error) {
 	}
 
 	// set max connections
-	db.SetMaxOpenConns(100)
+	db.SetMaxOpenConns(50)
 	db.SetMaxIdleConns(25)
 	return db, nil
 }

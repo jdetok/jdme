@@ -24,11 +24,13 @@ func PlayerFromQ(r *http.Request, m *memd.StMaps) (uint64, error) {
 	// clean string & remove accents on letters (all standard ascii)
 	cleanPlrReq := CleanPlayerReq(pStr)
 
+	fmt.Println("in player_req: ", pStr)
 	// check if requested player name exists in maps, reutrn player id if so
 	plrIdUint, err := m.GetPlrIdFromName(cleanPlrReq)
 	if err != nil {
 		return 0, &errd.ValidationError{Val: pStr}
 	}
+
 	return plrIdUint, nil
 	// fmt.Printf("player request (raw): %s | cleaned: %s\n", pStr, p_cln)
 	// return p_cln
@@ -62,7 +64,7 @@ func SeasonFromQ(r *http.Request, maxRSzn, maxPSzn int) (int, error) {
 			s, err)
 	}
 
-	if s_int > maxSzn && s_int != 88888 {
+	if s_int > maxSzn && s_int != 88888 && s_int != 29999 && s_int != 49999 {
 		return 0, fmt.Errorf("INVALID SEASON: %s | must be less than %d", s,
 			maxSzn)
 	}
