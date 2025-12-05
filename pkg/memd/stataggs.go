@@ -91,7 +91,10 @@ func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlaye
 	var lt LgTopPlayers
 
 	// current seasons by league
-	sl := cs.LgSznsByMonth(time.Now())
+	sl, err := cs.LgSznsByMonth(time.Now())
+	if err != nil {
+		return lt, err
+	}
 
 	// query appropriate season for each league
 	var lgs = [2]string{"nba", "wnba"}

@@ -50,13 +50,12 @@ func MakeMaps() *StMaps {
 
 // marshal to a json file for quick reload
 func (ms *MapStore) Persist() error {
-	fp := "maps.json"
+	// fp := "maps.json"
 	js, err := json.MarshalIndent(ms.Maps, "", " ")
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
-	if err := os.WriteFile(fp, js, 0644); err != nil {
+	if err := os.WriteFile(ms.PersistPath, js, 0644); err != nil {
 		return err
 	}
 	return nil

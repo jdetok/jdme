@@ -51,7 +51,10 @@ func TestLgSznsByMonth(t *testing.T) {
 	}
 	fmt.Println("test date: ", dt)
 	var cs memd.CurrentSeasons
-	sl := cs.LgSznsByMonth(dt)
+	sl, err := cs.LgSznsByMonth(dt)
+	if err != nil {
+		t.Error(err)
+	}
 	fmt.Println("NBA SeasonID | Season:", sl.SznId, "|", sl.Szn)
 	fmt.Println("WNBA SeasonID | Season:", sl.WSznId, "|", sl.WSzn)
 }

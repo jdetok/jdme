@@ -33,7 +33,10 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// get season from query string
-	sl := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
+	sl, err := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
+	if err != nil {
+		app.ErrHTTP(w, err, &rp.Meta, http.StatusUnprocessableEntity)
+	}
 	seasonQ, err := resp.SeasonFromQ(r, sl.WSznId, sl.WPSznId)
 	if err != nil {
 		app.ErrHTTP(w, err, &rp.Meta, http.StatusUnprocessableEntity)
@@ -69,7 +72,6 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 	plrId = playerQ
 
 	if seasonQ == 0 || seasonQ == 88888 {
-		sl := app.Store.CurrentSzns.LgSznsByMonth(time.Now())
 		switch lgQ {
 		case 0:
 			seasonQ = sl.SznId

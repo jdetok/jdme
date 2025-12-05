@@ -20,38 +20,45 @@ import (
 )
 
 func main() {
-
 	app := &api.App{}
+	app.Started = false
+	var quickstart bool = false
 
-	// logger setup - opens a *os.File which implements io writer interface
+	// main logger
 	f, err := logd.SetupLogdF("./z_log/applog")
 	if err != nil {
 		log.Fatal(err)
 	}
-	app.Logf = f
+
+	// debug logger
 	df, err := logd.SetupLogdF("./z_log/debug_applog")
 	if err != nil {
 		log.Fatal(err)
 	}
-	app.QLogf = df
 
+	// http logger
 	hf, err := logd.SetupLogdF("./z_log/http_log")
 	if err != nil {
 		log.Fatal(err)
 	}
-	// SETUP MAIN APP LOGGER
-	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df, hf)
 
-	// log file created confirmation
+	// Logd setup with each logger
+	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df, hf)
 	app.Lg.Infof("started app and created log file")
 
-	// load environment variables from .env file
+	// persist file for quickstart
+	fp := "./persist_data/maps.json"
+	persistP, err := filepath.Abs(fp)
+	if err != nil {
+		app.Lg.Fatalf("failed to get absolute path of %s\n**%v\n", fp, err)
+	}
+	app.MStore.PersistPath = persistP
+	app.Lg.Warnf("path: %s", app.MStore.PersistPath)
+
 	err = envd.LoadDotEnv()
 	if err != nil {
 		app.Lg.Fatalf("failed to load variables in .env file to env\n%v", err)
 	}
-
-	// set the server IP address
 	hostaddr, err := envd.GetEnvStr("SRV_IP")
 	if err != nil {
 		app.Lg.Fatalf("failed to get server IP from .env\n%v", err)
@@ -65,37 +72,13 @@ func main() {
 	}
 	app.DB = db
 
-	fp := "./persist_data/maps.json"
-	persistP, err := filepath.Abs(fp)
-	if err != nil {
-		app.Lg.Fatalf("failed to get absolute path of %s\n**%v\n", fp, err)
-	}
-	app.MStore.PersistPath = persistP
-
-	// if err := app.MStore.SetupFromPersist(); err != nil {
-	// 	app.Lg.Fatalf("failed to build in memory map stores: %v", err)
-	// }
-	// app.Lg.Infof("in memory map store setup complete")
-	// app.MStore.Persist()
-
-	// set started = 0 so first check to update store runs setups
-	app.Started = false
-
 	// update Players, Seasons, Teams in memory structs
-	// go app.CheckInMemStructs(300*time.Second, 30*time.Second)
 	go func(*api.App) {
-		err := app.UpdateStore(false, 300*time.Second, 30*time.Second)
+		err := app.UpdateStore(quickstart, 300*time.Second, 30*time.Second)
 		if err != nil {
 			app.Lg.Fatalf("error updating store: %v", err)
 		}
 	}(app)
-	// go app.CheckInMemStructs(300*time.Second, 30*time.Second)
-
-	// go func(*sync.WaitGroup, *api.App) {
-	// 	if err := app.MStore.Rebuild(app.DB, app.Lg); err != nil {
-	// 		app.Lg.Errorf("failed to update player map")
-	// 	}
-	// }(wg, app)
 
 	// mount mux server, sets up all endpoint handlers
 	mux := app.Mount()

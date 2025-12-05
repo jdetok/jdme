@@ -52,7 +52,10 @@ type Team struct {
 func UpdateTeamRecords(db *sql.DB, cs *CurrentSeasons) (TeamRecords, error) {
 	var team_recs TeamRecords
 
-	sl := cs.LgSznsByMonth(time.Now())
+	sl, err := cs.LgSznsByMonth(time.Now())
+	if err != nil {
+		return team_recs, err
+	}
 	rows, err := db.Query(pgdb.TeamSznRecords, sl.SznId, sl.WSznId)
 	if err != nil {
 		return team_recs, err

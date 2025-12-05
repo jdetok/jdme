@@ -26,7 +26,7 @@ func TestLen(t *testing.T) {
 func TestMapPlayersCC(t *testing.T) {
 
 	m := &MapStore{}
-	l := logd.NewLogd(os.Stdout)
+	l := logd.NewLogd(os.Stdout, os.Stdout, os.Stdout)
 
 	err := envd.LoadDotEnvFile("../../.env")
 	if err != nil {
@@ -42,27 +42,9 @@ func TestMapPlayersCC(t *testing.T) {
 		t.Error(err)
 	}
 
-	// sm := MakeMaps(db)
-	// if err := sm.MapSeasons(db); err != nil {
-	// 	t.Error(err)
-	// }
-
-	// // setup nested team maps
-	// fmt.Println("creating empty team maps")
-	// if err := sm.MapTeamIdUints(db); err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// if sm.MapPlayersCC(db, &logd.Logd{}); err != nil {
-	// 	t.Error(err)
-	// }
-
 	var luka uint64 = 1629029
 	var dal uint64 = 1610612742
 	var lal uint64 = 1610612747
-	// var both int = 22024
-	// var onlyd int = 22025
-	// var onlyl int = 22023
 
 	var po_fail int = 42022
 	var po_pass int = 42024
@@ -82,25 +64,6 @@ func TestMapPlayersCC(t *testing.T) {
 	}
 
 	fmt.Println(len(m.Maps.TeamIds))
-
-	// p3 := sm.SznTmPlrIds[onlyd][dal][luka]
-	// if p3 == "" {
-	// 	t.Errorf("should exist for %d | %d", onlyd, dal)
-	// }
-	// p4 := sm.SznTmPlrIds[onlyd][lal][luka]
-	// if p4 != "" {
-	// 	t.Errorf("should NOT exist for %d | %d", onlyd, lal)
-
-	// }
-	// p5 := sm.SznTmPlrIds[onlyl][dal][luka]
-	// if p5 != "" {
-	// 	t.Errorf("should NOT exist for %d | %d", onlyl, dal)
-	// }
-	// p6 := sm.SznTmPlrIds[onlyl][lal][luka]
-	// if p6 == "" {
-	// 	t.Errorf("should exist for %d | %d", onlyl, lal)
-	// }
-
 }
 
 func TestMapSznTeams(t *testing.T) {
@@ -114,7 +77,7 @@ func TestMapSznTeams(t *testing.T) {
 		t.Error(err)
 	}
 
-	sm := MakeMaps(db)
+	sm := MakeMaps()
 	if err := sm.MapSeasons(db); err != nil {
 		t.Error(err)
 	}

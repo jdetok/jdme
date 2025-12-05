@@ -421,7 +421,10 @@ func SlicePlayersSzn(players []memd.Player, cs *memd.CurrentSeasons, pq *PlayerQ
 	}
 	//
 	// get struct with current seasons
-	sl := cs.LgSznsByMonth(time.Now())
+	sl, err := cs.LgSznsByMonth(time.Now())
+	if err != nil {
+		return nil, err
+	}
 
 	for _, p := range players { // EXPAND THIS IF TO CATCH PLAYOFF SEASONS AS WELL
 

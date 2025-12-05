@@ -109,20 +109,11 @@ func (sm *StMaps) MapTeamIdUints(db *sql.DB) error {
 // get all team ids from db, convert each to a uint64, map to string version
 func (sm *StMaps) MapSeasons(db *sql.DB) error {
 	fmt.Println("mapping seasons")
-	// to handle season id = 0
-	// sm.SeasonPlrNms[0] = map[string]uint64{}
-	// sm.SeasonPlrIds[0] = map[uint64]string{}
-	// get all season ids
-
 	sm.InitAggSznMaps()
-
 	szns, err := db.Query("select distinct szn_id from stats.tbox")
 	if err != nil {
 		return err
 	}
-	// sm.SznTmPlrIds[0] = map[uint64]map[uint64]string{}
-	// sm.NSznTmPlrIds[0] = map[uint64]map[uint64]string{}
-	// sm.WSznTmPlrIds[0] = map[uint64]map[uint64]string{}
 
 	// convert each season id string to int
 	for szns.Next() {
@@ -247,10 +238,6 @@ func (sm *StMaps) MapPlayoffSzn(db *sql.DB, szn int, teamId uint64) (bool, error
 	}
 
 	sm.MapTeamToSzn(szn, teamId)
-	// sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
-	// sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
-	// sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
-
 	return true, nil
 }
 

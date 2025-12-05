@@ -30,7 +30,7 @@ type CurrentSeasons struct {
 returns slice of two season strings for date (generally pass time.Now())
 calling in 2025 will return 2024-25 and 2025-26 and so on
 */
-func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) {
+func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) error {
 	dt := now
 	// current year | year + 1 || e.g. 2025: cyyy=2025, cy=26
 	var cyyy string = dt.Format("2006")
@@ -47,34 +47,31 @@ func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) {
 	// append a 2 to front of current year, return as uint64
 	cint, err := strconv.Atoi("2" + cyyy)
 	if err != nil {
-		msg := "error converting month to int"
-		fmt.Printf("%s\n%v\n", msg, err)
+		return fmt.Errorf("** error converting month to int\n* %v", err)
 	}
 	cs.CurSznId = cint
 
 	// append a 2 to front of prev year, return as uint64
 	pint, err := strconv.Atoi("2" + pyyy)
 	if err != nil {
-		msg := "error converting month to int"
-		fmt.Printf("%s\n%v\n", msg, err)
+		return fmt.Errorf("error converting month to int\n%v", err)
 	}
 	cs.PrevSznId = pint
 
 	// append a 2 to front of current year, return as uint64
 	pcint, err := strconv.Atoi("4" + cyyy)
 	if err != nil {
-		msg := "error converting month to int"
-		fmt.Printf("%s\n%v\n", msg, err)
+		return fmt.Errorf("error converting month to int\n%v", err)
 	}
 	cs.CurPSznId = pcint
 
 	// append a 2 to front of prev year, return as uint64
 	ppint, err := strconv.Atoi("4" + pyyy)
 	if err != nil {
-		msg := "error converting month to int"
-		fmt.Printf("%s\n%v\n", msg, err)
+		return fmt.Errorf("error converting month to int\n%v", err)
 	}
 	cs.PrevPSznId = ppint
+	return nil
 }
 
 /*
@@ -86,15 +83,16 @@ in the same calendar year and the NBA season spans two calendar years, there are
 times of year in which the "current" WNBA season is different than the current
 NBA season.
 */
-func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
+func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) (SeasonLeague, error) {
 	// var cs CurrentSeasons
-	cs.GetCurrentSzns(now)
+	if err := cs.GetCurrentSzns(now); err != nil {
+		return SeasonLeague{}, err
+	}
 
 	// convert current month to int
 	m, err := strconv.Atoi(now.Format("1"))
 	if err != nil {
-		msg := "error converting month to int"
-		fmt.Printf("%s\n%v\n", msg, err)
+		return SeasonLeague{}, fmt.Errorf("error converting month to int\n%v", err)
 
 	}
 	// fmt.Println("month: ", m)
@@ -102,11 +100,8 @@ func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
 	// convert current day to int
 	d, err := strconv.Atoi(now.Format("2"))
 	if err != nil {
-		msg := "error converting month to int"
-		fmt.Printf("%s\n%v\n", msg, err)
+		return SeasonLeague{}, fmt.Errorf("error converting month to int\n%v", err)
 	}
-	// fmt.Println("day: ", d)
-
 	// set prev year at first (jan - april)
 	var sl = SeasonLeague{
 		SznId:  cs.PrevSznId,
@@ -132,5 +127,5 @@ func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
 		sl.WPSznId = cs.CurPSznId
 	}
 
-	return sl
+	return sl, nil
 }

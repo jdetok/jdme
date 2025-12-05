@@ -151,6 +151,7 @@ func (sm *StMaps) PlrSznTmExists(plrId, tmId uint64, szn int) bool {
 // if tId is 0, all players in season used
 func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
 	fmt.Println("random called")
+	fmt.Println(sId, tId)
 	// get list of pId from [szn].values()
 	var m map[uint64]string
 	switch lg {
@@ -163,7 +164,6 @@ func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
 	default:
 		m = sm.SznTmPlrIds[sId][tId]
 	}
-	fmt.Println(len(m))
 	plrs := make([]uint64, 0, len(m))
 
 	for id := range m {

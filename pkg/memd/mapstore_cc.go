@@ -15,9 +15,9 @@ import (
 
 // query all players from DB, loop through rows serially, then launch goroutines
 // to process and map the data for each player concurrently
-func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
+func (sm *StMaps) MapPlayersCC(db *sql.DB, lgd *logd.Logd) error {
 	start := time.Now()
-	lg.Infof("mapping all players (concurrent workers)")
+	lgd.Debugf("mapping all players (concurrent workers)")
 
 	rows, err := db.Query(pgdb.QPlayerStore)
 	if err != nil {
@@ -43,7 +43,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	go func() {
 		defer wg.Done()
 		for p := range results {
-			lg.Infof("%s complete", p.Name)
+			lgd.Debugf("%s complete", p.Name)
 		}
 	}()
 
@@ -74,7 +74,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 		wg.Add(1)
 
 		// launch goroutine to process and map data
-		go func(p *StPlayer, lowrStr, tms string) {
+		go func(lgd *logd.Logd, p *StPlayer, lowrStr, tms string) {
 			defer wg.Done()
 			defer func() { <-sem }()
 
@@ -104,7 +104,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 
 			// query team(s) played for each season from min-max player season,
 			// add player to map for each team played for in each season played
-			if err := sm.MapSznTmPlrCC(db, p); err != nil {
+			if err := sm.MapSznTmPlrCC(lgd, db, p); err != nil {
 				errCh <- fmt.Errorf(
 					"error occured mapping player season/teams %s | %d\n%v",
 					p.Lowr, p.Id, err)
@@ -113,7 +113,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 			case results <- p:
 			case <-errCh:
 			}
-		}(p, lowrStr, tms)
+		}(lgd, p, lowrStr, tms)
 	}
 
 	// check for error in rows
@@ -125,7 +125,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	go func() {
 		wg.Wait()
 		close(results)
-		lg.Infof("finished with %d rows after %v", count, time.Since(start))
+		lgd.Debugf("finished with %d rows after %v", count, time.Since(start))
 	}()
 	return nil
 }
@@ -184,9 +184,9 @@ func (sm *StMaps) MapPlrIdToSznCC(p *StPlayer) {
 
 // map a player id to a map of team ids that is mapped to a map of seasons
 // this datastructure enables verifying whether x player played for y team in z season
-func (sm *StMaps) MapSznTmPlrCC(db *sql.DB, p *StPlayer) error {
-	fmt.Printf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
-	q := `
+func (sm *StMaps) MapSznTmPlrCC(lg *logd.Logd, db *sql.DB, p *StPlayer) error {
+	lg.Debugf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
+	q := ` 
 select szn_id, string_agg(distinct team_id::text, ',')
 from stats.pbox
 where player_id = $1 
@@ -263,8 +263,8 @@ group by player_id, szn_id
 }
 
 // playoff safe copy
-func (sm *StMaps) MapSznTmPlPO(db *sql.DB, p *StPlayer) error {
-	fmt.Printf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
+func (sm *StMaps) MapSznTmPlPO(lg *logd.Logd, db *sql.DB, p *StPlayer) error {
+	lg.Debugf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
 	q := `
 select szn_id, string_agg(distinct team_id::text, ',')
 from stats.pbox
