@@ -1,6 +1,7 @@
 package memd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -10,6 +11,18 @@ import (
 	"github.com/jdetok/golib/envd"
 )
 
+func TestLen(t *testing.T) {
+	m := MapStore{}
+	fp := "../../maps.json"
+	b, err := os.ReadFile(fp)
+	if err != nil {
+		t.Error(err)
+	}
+	if err := json.Unmarshal(b, m.Maps); err != nil {
+		t.Error(err)
+	}
+	fmt.Println(len(m.Maps.TeamIds))
+}
 func TestMapPlayersCC(t *testing.T) {
 
 	m := &MapStore{}
@@ -67,6 +80,8 @@ func TestMapPlayersCC(t *testing.T) {
 	} else {
 		fmt.Printf("playoff season %d pass | %d | %d | %s\n", po_pass, lal, luka, p2)
 	}
+
+	fmt.Println(len(m.Maps.TeamIds))
 
 	// p3 := sm.SznTmPlrIds[onlyd][dal][luka]
 	// if p3 == "" {

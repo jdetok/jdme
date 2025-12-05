@@ -73,6 +73,11 @@ func (sm *StMaps) GetSznFromPlrId(plrId uint64) (int, error) {
 
 // ["random"] returns 0
 func (sm *StMaps) GetPlrIdFromName(name string) (uint64, error) {
+	fmt.Println("in gpifn:", name)
+	if name == "random" {
+		fmt.Println("returning 77777")
+		return 77777, nil
+	}
 	if plrId, ok := sm.PlayerNameId[name]; ok {
 		return plrId, nil
 	}
@@ -145,6 +150,7 @@ func (sm *StMaps) PlrSznTmExists(plrId, tmId uint64, szn int) bool {
 // if lg is 0 only nba, 1 only wnba, 10 both
 // if tId is 0, all players in season used
 func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
+	fmt.Println("random called")
 	// get list of pId from [szn].values()
 	var m map[uint64]string
 	switch lg {
@@ -157,7 +163,7 @@ func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
 	default:
 		m = sm.SznTmPlrIds[sId][tId]
 	}
-
+	fmt.Println(len(m))
 	plrs := make([]uint64, 0, len(m))
 
 	for id := range m {

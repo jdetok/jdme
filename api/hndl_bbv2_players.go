@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -79,12 +80,15 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	fmt.Println(len(app.MStore.Maps.WSznTmPlrIds[seasonQ][tmId]))
+	fmt.Println(len(app.MStore.Maps.WSznTmPlrIds[22024][tmId]))
 	// handle random player by league
 	if plrId == 77777 {
+		fmt.Println("random in handler:", plrId)
 		rPlrId := app.MStore.Maps.RandomPlrIdV2(tmId, seasonQ, lgQ)
 		plrId = rPlrId
 	}
-
+	fmt.Printf("pId %d | tId %d | sId %d\n", plrId, tmId, seasonQ)
 	// ensure requested args are valid
 	stp, err := app.MStore.Maps.ValiSznTmPlr(plrId, tmId, seasonQ)
 	if err != nil {

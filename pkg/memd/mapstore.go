@@ -230,18 +230,19 @@ func (sm *StMaps) MapTeamIdUints(db *sql.DB) error {
 func (sm *StMaps) MapSeasons(db *sql.DB) error {
 	fmt.Println("mapping seasons")
 	// to handle season id = 0
-	sm.SeasonPlrNms[0] = map[string]uint64{}
-	sm.SeasonPlrIds[0] = map[uint64]string{}
-	sm.SeasonPlrNms[1] = map[string]uint64{}
-	sm.SeasonPlrIds[1] = map[uint64]string{}
+	// sm.SeasonPlrNms[0] = map[string]uint64{}
+	// sm.SeasonPlrIds[0] = map[uint64]string{}
 	// get all season ids
+
+	sm.InitAggSznMaps()
+
 	szns, err := db.Query("select distinct szn_id from stats.tbox")
 	if err != nil {
 		return err
 	}
-	sm.SznTmPlrIds[0] = map[uint64]map[uint64]string{}
-	sm.NSznTmPlrIds[0] = map[uint64]map[uint64]string{}
-	sm.WSznTmPlrIds[0] = map[uint64]map[uint64]string{}
+	// sm.SznTmPlrIds[0] = map[uint64]map[uint64]string{}
+	// sm.NSznTmPlrIds[0] = map[uint64]map[uint64]string{}
+	// sm.WSznTmPlrIds[0] = map[uint64]map[uint64]string{}
 
 	// convert each season id string to int
 	for szns.Next() {
@@ -259,11 +260,42 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 		sm.NSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
 		sm.WSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
 
+		sm.SznTmPlrIds[szn][0] = map[uint64]string{}
+		sm.NSznTmPlrIds[szn][0] = map[uint64]string{}
+		sm.WSznTmPlrIds[szn][0] = map[uint64]string{}
+
 		if err = sm.MapSznTeams(db, szn); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (sm *StMaps) InitAggSznMaps() {
+	var aggSzns = []int{29999, 49999}
+	for _, s := range aggSzns {
+		sm.SeasonPlrNms[s] = map[string]uint64{}
+		sm.SeasonPlrIds[s] = map[uint64]string{}
+		sm.SznTmPlrIds[s] = map[uint64]map[uint64]string{}
+		sm.NSznTmPlrIds[s] = map[uint64]map[uint64]string{}
+		sm.WSznTmPlrIds[s] = map[uint64]map[uint64]string{}
+
+		sm.SznTmPlrIds[s][0] = map[uint64]string{}
+		sm.NSznTmPlrIds[s][0] = map[uint64]string{}
+		sm.WSznTmPlrIds[s][0] = map[uint64]string{}
+
+		for _, t := range sm.TeamIds {
+			sm.SznTmPlrIds[s][t] = map[uint64]string{}
+			switch sm.TeamIdLg[t] {
+			case 0:
+				sm.NSznTmPlrIds[s][t] = map[uint64]string{}
+			case 1:
+				sm.WSznTmPlrIds[s][t] = map[uint64]string{}
+			}
+			sm.SznTmPlrIds[s][t] = map[uint64]string{}
+			sm.SznTmPlrIds[s][t] = map[uint64]string{}
+		}
+	}
 }
 
 // accept season as argument, query db for all teams with games played that
@@ -294,17 +326,17 @@ func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
 		if err != nil {
 			return err
 		}
-		if sm.SznTmPlrIds[szn] == nil {
-			// !!
+
+		if sm.SznTmPlrIds[szn][teamId] == nil {
+			sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
+			switch lgstr {
+			case "0":
+				sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
+			case "1":
+				sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
+			}
 		}
-		sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
-		sm.SznTmPlrIds[0][teamId] = map[uint64]string{}
-		switch lgstr {
-		case "0":
-			sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
-		case "1":
-			sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
-		}
+
 	}
 	return nil
 }
