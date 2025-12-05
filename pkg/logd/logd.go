@@ -6,12 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sync"
+	"slices"
 	"time"
 )
 
 const (
 	INFO    string = "INFO"
+	DEBUG   string = "DEBUG"
 	WARNING string = "* WARNING"
 	ERROR   string = "** ERROR"
 	FATAL   string = "*** FATAL ERROR"
@@ -19,19 +20,25 @@ const (
 	HTTPERR string = "HTTPERR"
 )
 
-type LogdW struct {
-	mu  sync.Mutex
-	out io.Writer
-}
 type Logd struct {
-	lw *LogdW
-	lg *log.Logger
+	// lw  *LogdW
+	lg        *log.Logger
+	qlg       *log.Logger
+	hlg       *log.Logger
+	quietLvls []string
+	loudLvls  []string
+	httpLvls  []string
 }
 
-func NewLogd(out io.Writer) *Logd {
-	lw := LogdWInit(out)
-	return &Logd{lw: lw,
-		lg: log.New(lw, "", log.LstdFlags|log.Lshortfile),
+func NewLogd(lo, qo, ho io.Writer) *Logd {
+	// lw := LogdWInit(&LogdW{out: lo, loudOut: lo, quietOut: qo})
+	return &Logd{
+		lg:        log.New(lo, "", log.LstdFlags|log.Lshortfile),
+		qlg:       log.New(qo, "", log.LstdFlags|log.Lshortfile),
+		hlg:       log.New(ho, "", log.LstdFlags|log.Lshortfile),
+		quietLvls: []string{DEBUG},
+		loudLvls:  []string{INFO, WARNING, ERROR, FATAL},
+		httpLvls:  []string{HTTP, HTTPERR},
 	}
 }
 
@@ -40,22 +47,23 @@ func (l *Logd) log(level, msg string, args ...any) {
 	l.lg.SetPrefix(prefix)
 	msgf := fmt.Sprintf(msg, args...)
 
-	// calldepth set to 3 to catch original caller
-	if err := l.lg.Output(3, msgf); err != nil {
-		l.lg.Printf("failed to output log msg %s", msgf)
+	if slices.Contains(l.quietLvls, level) {
+		if err := l.qlg.Output(3, msgf); err != nil {
+			l.lg.Printf("failed to output log msg %s", msgf)
+		}
 	}
-}
 
-// setup LogdW
-func LogdWInit(w io.Writer) *LogdW {
-	return &LogdW{out: w}
-}
+	if slices.Contains(l.loudLvls, level) {
+		if err := l.lg.Output(3, msgf); err != nil {
+			l.lg.Printf("failed to output log msg %s", msgf)
+		}
+	}
 
-// concurent safe write
-func (lw *LogdW) Write(p []byte) (n int, err error) {
-	lw.mu.Lock()
-	defer lw.mu.Unlock()
-	return lw.out.Write(p)
+	if slices.Contains(l.httpLvls, level) {
+		if err := l.hlg.Output(3, msgf); err != nil {
+			l.lg.Printf("failed to output log msg %s", msgf)
+		}
+	}
 }
 
 // create and return the log file
@@ -71,6 +79,7 @@ func SetupLogdF(pathfile string) (*os.File, error) {
 
 // HIGH LEVEL FUNCS TO CALL IN SOURCE
 func (l *Logd) Infof(msg string, args ...any)  { l.log(INFO, msg, args...) }
+func (l *Logd) Debugf(msg string, args ...any) { l.log(DEBUG, msg, args...) }
 func (l *Logd) Warnf(msg string, args ...any)  { l.log(WARNING, msg, args...) }
 func (l *Logd) Errorf(msg string, args ...any) { l.log(ERROR, msg, args...) }
 func (l *Logd) Fatalf(msg string, args ...any) { l.log(ERROR, msg, args...) }

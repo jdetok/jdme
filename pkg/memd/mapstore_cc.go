@@ -26,7 +26,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lg *logd.Logd) error {
 	defer rows.Close()
 
 	// waitgroup
-	var wg sync.WaitGroup
+	var wg = &sync.WaitGroup{}
 
 	// concurrency controls
 	const maxWorkers = 30
@@ -171,7 +171,7 @@ func (sm *StMaps) MapPlrIdToSznCC(p *StPlayer) {
 	}
 
 	if p.MinPSzn > 0 {
-		if _, ok := sm.SeasonPlrIds[1][p.Id]; !ok {
+		if _, ok := sm.SeasonPlrIds[49999][p.Id]; !ok {
 			sm.SeasonPlrIds[49999][p.Id] = p.Lowr
 		}
 		for ps := p.MinPSzn; ps <= p.MaxPSzn; ps++ {

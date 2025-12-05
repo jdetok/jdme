@@ -22,6 +22,7 @@ type App struct {
 	Store      memd.InMemStore
 	MStore     memd.MapStore
 	Logf       *os.File
+	QLogf      *os.File
 	Lg         *logd.Logd
 }
 

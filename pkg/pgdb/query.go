@@ -24,15 +24,13 @@ inner join (
 inner join (
 	select player_id, min(season_id) as rs_min, max(season_id) as rs_max
 	from api.plr_agg
-	where left(cast(season_id as varchar(5)), 1) = '2'
-	and right(cast(season_id as varchar(5)), 4) != '9999'
+	where season_id between 20000 and 29998
 	group by player_id
 ) c on c.player_id = a.player_id
 left join (
 	select player_id, min(season_id) as po_min, max(season_id) as po_max
 	from api.plr_agg
-	where left(cast(season_id as varchar(5)), 1) = '4'
-	and right(cast(season_id as varchar(5)), 4) != '9999'
+	where season_id between 40000 and 49998
 	group by player_id
 ) d on d.player_id = a.player_id
 -- dev limit
@@ -311,7 +309,6 @@ and a.szn_id = $3
 group by a.player_id, a.team_id,  d.lg, a.szn_id, b.player, e.szn_desc, e.wszn_desc
 --order by a.szn_id desc
 union
-
 -- season avgs
 select 
     a.player_id, a.team_id, d.lg, a.szn_id, 

@@ -97,7 +97,7 @@ func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
 		fmt.Printf("%s\n%v\n", msg, err)
 
 	}
-	fmt.Println("month: ", m)
+	// fmt.Println("month: ", m)
 
 	// convert current day to int
 	d, err := strconv.Atoi(now.Format("2"))
@@ -105,7 +105,7 @@ func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) SeasonLeague {
 		msg := "error converting month to int"
 		fmt.Printf("%s\n%v\n", msg, err)
 	}
-	fmt.Println("day: ", d)
+	// fmt.Println("day: ", d)
 
 	// set prev year at first (jan - april)
 	var sl = SeasonLeague{

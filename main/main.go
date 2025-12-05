@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
@@ -28,9 +29,18 @@ func main() {
 		log.Fatal(err)
 	}
 	app.Logf = f
+	df, err := logd.SetupLogdF("./z_log/debug_applog")
+	if err != nil {
+		log.Fatal(err)
+	}
+	app.QLogf = df
 
+	hf, err := logd.SetupLogdF("./z_log/http_log")
+	if err != nil {
+		log.Fatal(err)
+	}
 	// SETUP MAIN APP LOGGER
-	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f))
+	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df, hf)
 
 	// log file created confirmation
 	app.Lg.Infof("started app and created log file")
@@ -55,23 +65,37 @@ func main() {
 	}
 	app.DB = db
 
-	if err := app.MStore.SetupFromBuild(app.DB, app.Lg); err != nil {
-		app.Lg.Fatalf("failed to build in memory map stores")
+	fp := "./persist_data/maps.json"
+	persistP, err := filepath.Abs(fp)
+	if err != nil {
+		app.Lg.Fatalf("failed to get absolute path of %s\n**%v\n", fp, err)
 	}
-	app.Lg.Infof("in memory map store setup complete")
+	app.MStore.PersistPath = persistP
+
+	// if err := app.MStore.SetupFromPersist(); err != nil {
+	// 	app.Lg.Fatalf("failed to build in memory map stores: %v", err)
+	// }
+	// app.Lg.Infof("in memory map store setup complete")
 	// app.MStore.Persist()
 
 	// set started = 0 so first check to update store runs setups
 	app.Started = false
 
 	// update Players, Seasons, Teams in memory structs
-	go app.CheckInMemStructs(300*time.Second, 30*time.Second)
-
-	go func(a *api.App) {
-		if err := app.MStore.Rebuild(app.DB, app.Lg); err != nil {
-			app.Lg.Errorf("failed to update player map")
+	// go app.CheckInMemStructs(300*time.Second, 30*time.Second)
+	go func(*api.App) {
+		err := app.UpdateStore(false, 300*time.Second, 30*time.Second)
+		if err != nil {
+			app.Lg.Fatalf("error updating store: %v", err)
 		}
 	}(app)
+	// go app.CheckInMemStructs(300*time.Second, 30*time.Second)
+
+	// go func(*sync.WaitGroup, *api.App) {
+	// 	if err := app.MStore.Rebuild(app.DB, app.Lg); err != nil {
+	// 		app.Lg.Errorf("failed to update player map")
+	// 	}
+	// }(wg, app)
 
 	// mount mux server, sets up all endpoint handlers
 	mux := app.Mount()
