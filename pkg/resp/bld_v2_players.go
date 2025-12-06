@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
@@ -45,6 +46,11 @@ func (r *RespPlayerDash) BuildPlayerRespV2(db *sql.DB, sm *memd.StMaps, iq *PQue
 		q = pgdb.PlayerDash
 		args = []any{iq.PId, iq.SId}
 		fmt.Println("team 0 args:", args)
+	} else {
+		if strconv.Itoa(iq.SId)[1:] == "9999" {
+			args = []any{iq.PId, iq.TId, strconv.Itoa(iq.SId)[0]}
+			q = pgdb.AggPlrTm
+		}
 	}
 
 	if err := r.ProcessRows(db, pOrT, q, args...); err != nil {

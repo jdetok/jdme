@@ -64,6 +64,7 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 
 	// get player from query string
 	var plrId uint64
+	fmt.Println(plrId)
 	playerQ, err := resp.PlayerFromQ(r, app.MStore.Maps)
 	if err != nil {
 		app.ErrHTTP(w, err, &rp.Meta, http.StatusUnprocessableEntity)
@@ -82,11 +83,8 @@ func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	fmt.Println(len(app.MStore.Maps.WSznTmPlrIds[seasonQ][tmId]))
-	fmt.Println(len(app.MStore.Maps.WSznTmPlrIds[22024][tmId]))
 	// handle random player by league
 	if plrId == 77777 {
-		fmt.Println("random in handler:", plrId)
 		rPlrId := app.MStore.Maps.RandomPlrIdV2(tmId, seasonQ, lgQ)
 		plrId = rPlrId
 	}
