@@ -1,6 +1,6 @@
 # baseURL = 'http://localhost:1313/'
 # baseURL = 'http://localhost:1313/docs/'
-baseURL = 'https://jdeko.me/docs/'
+baseURL = 'http://localhost:8080/docs/'
 languageCode = 'en-us'
 title = 'My New Hugo Site'
 uglyUrls =  false
