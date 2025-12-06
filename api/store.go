@@ -9,7 +9,7 @@ import (
 )
 
 // check whether enough time has passed to rebuild the in memory storage
-func (app *App) UpdateStore(quickstart bool, interval, threshold time.Duration) error {
+func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
 	// call update func on intial run
 	if !app.Started {
 		if err := app.UpdateStructsSafe(); err != nil {
@@ -32,7 +32,7 @@ func (app *App) UpdateStore(quickstart bool, interval, threshold time.Duration) 
 	}
 	var errRtn error = nil
 	// update structs every interval
-	ticker := time.NewTicker(interval)
+	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
 	for range ticker.C {
 		if time.Since(app.LastUpdate) < threshold {

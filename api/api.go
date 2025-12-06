@@ -56,8 +56,6 @@ func (app *App) Mount() *http.ServeMux {
 	})
 
 	mux.Handle("/docs/", http.HandlerFunc(app.ServeDocs))
-	// mux.HandleFunc("/docs/", app.HndlWiki)
-	// serve static files
 	mux.Handle("/js/", http.HandlerFunc(app.JSNostore))
 	mux.Handle("/css/", http.HandlerFunc(app.CSSNostore))
 	mux.HandleFunc("/", app.HndlRoot)

@@ -78,7 +78,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lgd *logd.Logd) error {
 			defer wg.Done()
 			defer func() { <-sem }()
 
-			// fmt.Println("worker", count, "running")
+			lgd.Debugf("worker %d running\n", count)
 
 			// clean the player name (lower case, remove accents)
 			p.Lowr = clnd.ConvToASCII(lowrStr)

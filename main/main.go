@@ -74,7 +74,7 @@ func main() {
 
 	// update Players, Seasons, Teams in memory structs
 	go func(*api.App) {
-		err := app.UpdateStore(quickstart, 300*time.Second, 30*time.Second)
+		err := app.UpdateStore(quickstart, 120*time.Minute)
 		if err != nil {
 			app.Lg.Fatalf("error updating store: %v", err)
 		}
