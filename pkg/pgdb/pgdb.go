@@ -3,6 +3,7 @@ package pgdb
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jdetok/golib/pgresd"
@@ -24,5 +25,6 @@ func PostgresConn() (*sql.DB, error) {
 	// set max connections
 	db.SetMaxOpenConns(50)
 	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(55 * time.Minute)
 	return db, nil
 }

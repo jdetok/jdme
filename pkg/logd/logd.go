@@ -82,7 +82,7 @@ func (l *Logd) Infof(msg string, args ...any)  { l.log(INFO, msg, args...) }
 func (l *Logd) Debugf(msg string, args ...any) { l.log(DEBUG, msg, args...) }
 func (l *Logd) Warnf(msg string, args ...any)  { l.log(WARNING, msg, args...) }
 func (l *Logd) Errorf(msg string, args ...any) { l.log(ERROR, msg, args...) }
-func (l *Logd) Fatalf(msg string, args ...any) { l.log(ERROR, msg, args...) }
+func (l *Logd) Fatalf(msg string, args ...any) { l.log(FATAL, msg, args...); os.Exit(1) }
 
 // default logger for http requests
 func (l *Logd) LogHTTP(r *http.Request) {

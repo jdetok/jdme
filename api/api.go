@@ -38,6 +38,7 @@ func (app *App) Mount() *http.ServeMux {
 
 	// define endpoints
 	mux.HandleFunc("GET /about", app.HndlAbt)
+	mux.HandleFunc("GET /health", app.HndlHealth)
 	mux.HandleFunc("GET /bronto", app.HndlBronto)
 	mux.HandleFunc("GET /bball", app.HndlBBall)
 	mux.HandleFunc("GET /bball/about", app.HndlBBallAbt)

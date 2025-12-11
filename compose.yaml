@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: jdekome_api_dev
-    container_name: jdekome_api_dev
+    image: api_jdme
+    container_name: api_jdme
     ports: 
       - "8080:8080"
     networks:
@@ -17,6 +17,12 @@ services:
       - ./:/app
       - /etc/localtime:/etc/localtime:ro
       - ./z_log:/app/z_log
+    healthcheck:
+      test: ["CMD", "curl", "-f", "https://jdeko.me/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
 networks:
