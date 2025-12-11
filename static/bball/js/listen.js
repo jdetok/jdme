@@ -8,6 +8,7 @@ import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
     getRecentGamesData, clearSearchBar } from "./player_search.js"
 
 export const base = "https://jdeko.me/bball";
+export const checkBoxes = ['post', 'reg', 'nbaTm', 'wnbaTm'];
 
 document.addEventListener('DOMContentLoaded', async () => {
     await buildOnLoadElements();
@@ -45,7 +46,7 @@ export async function buildOnLoadElements() {
     await ui.lgRadioBtns();
 
     // DEFAULT VALUES: clear all checkboxes, select "Both" lg radio button
-    await ui.clearCheckBoxes(['post', 'reg', 'nbaTm', 'wnbaTm']);
+    await ui.clearCheckBoxes(checkBoxes);
     document.getElementById('all_lgs').checked = 1;
 }
 

@@ -30,7 +30,7 @@ func main() {
 
 	app := &api.App{}
 	app.Started = false
-	var quickstart bool = false
+	var quickstart bool = true
 
 	// main logger
 	f, err := logd.SetupLogdF("./z_log/applog")

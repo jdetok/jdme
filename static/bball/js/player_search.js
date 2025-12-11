@@ -1,5 +1,5 @@
-import { base } from "./listen.js"
-import { checkBoxGroupValue, lgRadioBtns } from "./ui.js";
+import { base, checkBoxes } from "./listen.js"
+import { checkBoxGroupValue, lgRadioBtns, clearCheckBoxes } from "./ui.js";
 import { getPlayerStats, buildPlayerDash } from "./player_dash.js";
 import { getPlayerStatsV2 } from "./player_dash_v2.js";
 
@@ -113,9 +113,9 @@ getP
 */
 export async function playerBtnListener(player) {
     let searchB = document.getElementById('pSearch');
+    await clearCheckBoxes(checkBoxes);
     if (searchB) {
-        // searchB.value = player;
-        // searchB.value = '';
+        searchB.value = player;
         const season = await checkBoxGroupValue(
             {box: 'post', slct: 'ps_slct'}, 
             {box: 'reg', slct: 'rs_slct'}, 
@@ -124,6 +124,7 @@ export async function playerBtnListener(player) {
         const team = await checkBoxGroupValue(
             {box: 'nbaTm', slct: 'tm_slct'}, 
             {box: 'wnbaTm', slct: 'wTm_slct'}, 0);
+
 
         const lg = await lgRadioBtns();
 
