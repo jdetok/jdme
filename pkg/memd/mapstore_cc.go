@@ -98,13 +98,9 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lgd *logd.Logd) error {
 			sm.MapPlrIdCC(p)
 			sm.MapPlrNmCC(p)
 
-			// player exists in season maps
-			sm.MapPlrIdToSznCC(p)
-			sm.MapPlrNmToSznCC(p)
-
 			// query team(s) played for each season from min-max player season,
 			// add player to map for each team played for in each season played
-			if err := sm.MapSznTmPlrCC(lgd, db, p); err != nil {
+			if err := sm.MapSeasonTeamPlayers(lgd, db, p); err != nil {
 				errCh <- fmt.Errorf(
 					"error occured mapping player season/teams %s | %d\n%v",
 					p.Lowr, p.Id, err)
@@ -134,57 +130,9 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lgd *logd.Logd) error {
 
 // }
 
-// map player name to season played by player
-func (sm *StMaps) MapPlrNmToSznCC(p *StPlayer) {
-	sm.mu.Lock()
-	// set 0 season
-	if _, ok := sm.SeasonPlrNms[29999][p.Lowr]; !ok {
-		sm.SeasonPlrNms[29999][p.Lowr] = p.Id
-	}
-
-	for s := p.MinRSzn; s <= p.MaxRSzn; s++ {
-		sm.SeasonPlrNms[int(s)][p.Lowr] = p.Id
-	}
-
-	if p.MinPSzn > 0 {
-		if _, ok := sm.SeasonPlrNms[49999][p.Lowr]; !ok {
-			sm.SeasonPlrNms[49999][p.Lowr] = p.Id
-		}
-		for s := p.MinPSzn; s <= p.MaxPSzn; s++ {
-			sm.SeasonPlrNms[int(s)][p.Lowr] = p.Id
-		}
-	}
-	// fmt.Println(p.MaxPSzn, " | ", p.MinPSzn)
-	sm.mu.Unlock()
-}
-
-// map player id to each season played by player
-func (sm *StMaps) MapPlrIdToSznCC(p *StPlayer) {
-	sm.mu.Lock()
-	// set 0 season
-	if _, ok := sm.SeasonPlrIds[29999][p.Id]; !ok {
-		sm.SeasonPlrIds[29999][p.Id] = p.Lowr
-	}
-
-	for rs := p.MinRSzn; rs <= p.MaxRSzn; rs++ {
-		sm.SeasonPlrIds[int(rs)][p.Id] = p.Lowr
-	}
-
-	if p.MinPSzn > 0 {
-		if _, ok := sm.SeasonPlrIds[49999][p.Id]; !ok {
-			sm.SeasonPlrIds[49999][p.Id] = p.Lowr
-		}
-		for ps := p.MinPSzn; ps <= p.MaxPSzn; ps++ {
-			sm.SeasonPlrIds[int(ps)][p.Id] = p.Lowr
-		}
-	}
-
-	sm.mu.Unlock()
-}
-
 // map a player id to a map of team ids that is mapped to a map of seasons
 // this datastructure enables verifying whether x player played for y team in z season
-func (sm *StMaps) MapSznTmPlrCC(lg *logd.Logd, db *sql.DB, p *StPlayer) error {
+func (sm *StMaps) MapSeasonTeamPlayers(lg *logd.Logd, db *sql.DB, p *StPlayer) error {
 	lg.Debugf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
 	q := ` 
 select szn_id, string_agg(distinct team_id::text, ',')
@@ -195,16 +143,16 @@ substr($2::text, 2, 4)::int and substr($3::text, 2, 4)::int
 group by player_id, szn_id
 `
 
-	tmsRows, err := db.Query(q, p.Id, p.MinRSzn, p.MaxRSzn)
+	rows, err := db.Query(q, p.Id, p.MinRSzn, p.MaxRSzn)
 	if err != nil {
 		return fmt.Errorf("season team player query failed %d: %w", p.Id, err)
 	}
 	// fmt.Println("MapSznTmPlrCC query finished, processesing rows player", p.Lowr)
 
-	for tmsRows.Next() {
+	for rows.Next() {
 		var szn int
 		var tmStr string
-		err = tmsRows.Scan(&szn, &tmStr)
+		err = rows.Scan(&szn, &tmStr)
 		if err != nil {
 			return err
 		}
@@ -218,48 +166,54 @@ group by player_id, szn_id
 			if err != nil {
 				return err
 			}
-
 			sm.mu.Lock()
-
-			// add this player's id to the corresponding season/team inner map
-			sm.SznTmPlrIds[szn][teamId][p.Id] = p.Lowr
-			sm.SznTmPlrIds[szn][0][p.Id] = p.Lowr
-			if szn >= 40000 && szn < 50000 {
-				sm.SznTmPlrIds[49999][teamId][p.Id] = p.Lowr
-				sm.SznTmPlrIds[49999][0][p.Id] = p.Lowr
-			} else {
-				sm.SznTmPlrIds[29999][teamId][p.Id] = p.Lowr
-				sm.SznTmPlrIds[29999][0][p.Id] = p.Lowr
-			}
-
-			switch p.Lg {
-			case 0:
-				sm.NSznTmPlrIds[szn][teamId][p.Id] = p.Lowr
-				sm.NSznTmPlrIds[szn][0][p.Id] = p.Lowr
-				if szn >= 40000 && szn < 50000 {
-					sm.NSznTmPlrIds[49999][teamId][p.Id] = p.Lowr
-					sm.NSznTmPlrIds[49999][0][p.Id] = p.Lowr
-				} else {
-					sm.NSznTmPlrIds[29999][teamId][p.Id] = p.Lowr
-					sm.NSznTmPlrIds[29999][0][p.Id] = p.Lowr
-				}
-
-			case 1:
-				sm.WSznTmPlrIds[szn][teamId][p.Id] = p.Lowr
-				sm.WSznTmPlrIds[szn][0][p.Id] = p.Lowr
-				if szn >= 40000 && szn < 50000 {
-					sm.WSznTmPlrIds[49999][teamId][p.Id] = p.Lowr
-					sm.WSznTmPlrIds[49999][0][p.Id] = p.Lowr
-				} else {
-					sm.WSznTmPlrIds[29999][teamId][p.Id] = p.Lowr
-					sm.WSznTmPlrIds[29999][0][p.Id] = p.Lowr
-				}
-			}
+			sm.MapSznPlr(szn, p)
+			sm.MapSznTmPlr(szn, teamId, p)
 			sm.mu.Unlock()
 		}
 
 	}
 	return nil
+}
+
+func (sm *StMaps) MapSznPlr(szn int, p *StPlayer) {
+	var szns = []int{0, 29999, 49999, szn}
+	for _, s := range szns {
+		sm.SeasonPlrIds[s][p.Id] = p.Lowr
+		sm.SeasonPlrNms[s][p.Lowr] = p.Id
+	}
+}
+
+func (sm *StMaps) MapSznTmPlr(szn int, tId uint64, p *StPlayer) {
+	var plOff bool = (szn >= 40000 && szn < 50000)
+	var plOffSzn int = 49999
+	var rgSzn int = 29999
+
+	// season team player
+	sm.SznTmPlrIds[szn][tId][p.Id] = p.Lowr
+	sm.SznTmPlrIds[szn][0][p.Id] = p.Lowr
+	switch p.Lg {
+	case 0:
+		sm.NSznTmPlrIds[szn][tId][p.Id] = p.Lowr
+		sm.NSznTmPlrIds[szn][0][p.Id] = p.Lowr
+		if plOff {
+			sm.NSznTmPlrIds[plOffSzn][tId][p.Id] = p.Lowr
+			sm.NSznTmPlrIds[plOffSzn][0][p.Id] = p.Lowr
+		} else {
+			sm.NSznTmPlrIds[rgSzn][tId][p.Id] = p.Lowr
+			sm.NSznTmPlrIds[rgSzn][0][p.Id] = p.Lowr
+		}
+	case 1:
+		sm.WSznTmPlrIds[szn][tId][p.Id] = p.Lowr
+		sm.WSznTmPlrIds[szn][0][p.Id] = p.Lowr
+		if plOff {
+			sm.WSznTmPlrIds[plOffSzn][tId][p.Id] = p.Lowr
+			sm.WSznTmPlrIds[plOffSzn][0][p.Id] = p.Lowr
+		} else {
+			sm.WSznTmPlrIds[rgSzn][tId][p.Id] = p.Lowr
+			sm.WSznTmPlrIds[rgSzn][0][p.Id] = p.Lowr
+		}
+	}
 }
 
 // playoff safe copy
