@@ -8,6 +8,7 @@ import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
     getRecentGamesData, clearSearchBar } from "./player_search.js"
 
 export const base = "http://localhost:8080/bball";
+export const checkBoxes = ['post', 'reg', 'nbaTm', 'wnbaTm'];
 
 document.addEventListener('DOMContentLoaded', async () => {
     await buildOnLoadElements();

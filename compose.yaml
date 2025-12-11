@@ -3,20 +3,27 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: jdekome_api_dev
-    container_name: jdekome_api_dev
+    image: api_jdme
+    container_name: api_jdme
     ports: 
       - "8080:8080"
     networks:
       jdme_net:
-        ipv4_address: 10.0.7.10
-      # dbnet:
-      #   ipv4_address: 10.0.13.152
+        ipv4_address: 10.7.19.10
+      dbnet:
+        # 152 for prod, 153 for dev
+        ipv4_address: 10.0.13.153
     volumes:
       - ./log:/app/log
       - ./:/app
       - /etc/localtime:/etc/localtime:ro
       - ./z_log:/app/z_log
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     restart: unless-stopped
 
 networks:
