@@ -12,4 +12,5 @@ z_log/
 wiki/public/
 proxy/ssl/
 proxy/*.conf
+
 persist_data/
