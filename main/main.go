@@ -7,6 +7,7 @@ github.com/jdetok/golib
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -20,9 +21,16 @@ import (
 )
 
 func main() {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("panic in main: %v", r)
+			os.Exit(1)
+		}
+	}()
+
 	app := &api.App{}
 	app.Started = false
-	var quickstart bool = false
+	var quickstart bool = true
 
 	// main logger
 	f, err := logd.SetupLogdF("./z_log/applog")
@@ -73,12 +81,17 @@ func main() {
 	app.DB = db
 
 	// update Players, Seasons, Teams in memory structs
-	go func(*api.App) {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				app.Lg.Fatalf("go routine in UpdateStore func crashed: %v", r)
+			}
+		}()
 		err := app.UpdateStore(quickstart, 120*time.Minute)
 		if err != nil {
 			app.Lg.Fatalf("error updating store: %v", err)
 		}
-	}(app)
+	}()
 
 	// mount mux server, sets up all endpoint handlers
 	mux := app.Mount()
@@ -87,5 +100,4 @@ func main() {
 	if err := app.RunGraceful(mux); err != nil {
 		app.Lg.Fatalf("FATAL server failed to run\n%v", err)
 	}
-
 }

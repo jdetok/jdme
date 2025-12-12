@@ -46,7 +46,7 @@ export async function buildOnLoadElements() {
     await ui.lgRadioBtns();
 
     // DEFAULT VALUES: clear all checkboxes, select "Both" lg radio button
-    await ui.clearCheckBoxes(['post', 'reg', 'nbaTm', 'wnbaTm']);
+    await ui.clearCheckBoxes(checkBoxes);
     document.getElementById('all_lgs').checked = 1;
 }
 

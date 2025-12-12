@@ -16,8 +16,7 @@ the nba/wnba data returned by the API is stored in a postgres database running i
 # Frontend
 the site's frontend is written using only pure HTML/CSS/Javascript. all static files are served from /static by the handlers in /api/static.go. /static/bball are the current production files that serve jdeko.me/bball
 ![Alt Text](https://jdeko.me/img/jdekome_ex_080825.png "main example")
-![Alt Text](https://jdeko.me/img/site_0920.png "/bball example")
-<!-- ![Alt Text](https://jdeko.me/img/bball_ex_080825.png "/bball example") -->
+![Alt Text](https://jdeko.me/img/bball_ex_121025.png "/bball example")
 
 # other repos that power jdeko.me:
 - ### [bball-etl-cli](https://github.com/jdetok/bball-etl-cli)
