@@ -109,13 +109,14 @@ func (sm *StMaps) MapTeamIdUints(db *sql.DB) error {
 // get all team ids from db, convert each to a uint64, map to string version
 func (sm *StMaps) MapSeasons(db *sql.DB) error {
 	fmt.Println("mapping seasons")
-	sm.InitAggSznMaps()
+
+	sm.InitAggSznMaps([]int{0, 29999, 49999})
+
 	szns, err := db.Query("select distinct szn_id from stats.tbox")
 	if err != nil {
 		return err
 	}
 
-	// convert each season id string to int
 	for szns.Next() {
 		var sznStr string
 		szns.Scan(&sznStr)
@@ -123,17 +124,11 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 		if err != nil {
 			return err
 		}
-		// create empty map for each season
-		sm.SeasonPlrIds[szn] = map[uint64]string{}
-		sm.SeasonPlrNms[szn] = map[string]uint64{}
 
-		sm.SznTmPlrIds[szn] = map[uint64]map[uint64]string{}
-		sm.NSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
-		sm.WSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+		sm.InitEmptySznMaps(szn)
 
-		sm.SznTmPlrIds[szn][0] = map[uint64]string{}
-		sm.NSznTmPlrIds[szn][0] = map[uint64]string{}
-		sm.WSznTmPlrIds[szn][0] = map[uint64]string{}
+		// adds 0 as a team id in each season map
+		sm.InitTm0SznMap(szn)
 
 		if err = sm.MapSznTeams(db, szn); err != nil {
 			return err
@@ -142,31 +137,51 @@ func (sm *StMaps) MapSeasons(db *sql.DB) error {
 	return nil
 }
 
-func (sm *StMaps) InitAggSznMaps() {
-	var aggSzns = []int{29999, 49999}
+// create empty map for each season
+func (sm *StMaps) InitEmptySznMaps(szn int) {
+	sm.SeasonPlrIds[szn] = map[uint64]string{}
+	sm.SeasonPlrNms[szn] = map[string]uint64{}
+	sm.SznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+	sm.NSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+	sm.WSznTmPlrIds[szn] = map[uint64]map[uint64]string{}
+}
+
+func (sm *StMaps) InitAggSznMaps(aggSzns []int) {
 	for _, s := range aggSzns {
+		fmt.Printf("init %d maps\n", s)
+		// [aggszn] => init nested team maps
 		sm.SeasonPlrNms[s] = map[string]uint64{}
 		sm.SeasonPlrIds[s] = map[uint64]string{}
 		sm.SznTmPlrIds[s] = map[uint64]map[uint64]string{}
 		sm.NSznTmPlrIds[s] = map[uint64]map[uint64]string{}
 		sm.WSznTmPlrIds[s] = map[uint64]map[uint64]string{}
 
-		sm.SznTmPlrIds[s][0] = map[uint64]string{}
-		sm.NSznTmPlrIds[s][0] = map[uint64]string{}
-		sm.WSznTmPlrIds[s][0] = map[uint64]string{}
+		// [aggszn][teamId = 0]
+		fmt.Printf("init teamId=0 in %d \n", s)
+		sm.InitTm0SznMap(s)
 
-		for _, t := range sm.TeamIds {
-			sm.SznTmPlrIds[s][t] = map[uint64]string{}
-			switch sm.TeamIdLg[t] {
-			case 0:
-				sm.NSznTmPlrIds[s][t] = map[uint64]string{}
-			case 1:
-				sm.WSznTmPlrIds[s][t] = map[uint64]string{}
-			}
-			sm.SznTmPlrIds[s][t] = map[uint64]string{}
-			sm.SznTmPlrIds[s][t] = map[uint64]string{}
+		// init nested team map for each team
+		sm.InitTmSznMaps(s)
+	}
+}
+
+func (sm *StMaps) InitTmSznMaps(szn int) {
+	for t, lg := range sm.TeamIdLg {
+		fmt.Printf("init teamId=%d in %d \n", t, szn)
+		sm.SznTmPlrIds[szn][t] = map[uint64]string{}
+		switch lg {
+		case 0:
+			sm.NSznTmPlrIds[szn][t] = map[uint64]string{}
+		case 1:
+			sm.WSznTmPlrIds[szn][t] = map[uint64]string{}
 		}
 	}
+}
+
+func (sm *StMaps) InitTm0SznMap(szn int) {
+	sm.SznTmPlrIds[szn][0] = map[uint64]string{}
+	sm.NSznTmPlrIds[szn][0] = map[uint64]string{}
+	sm.WSznTmPlrIds[szn][0] = map[uint64]string{}
 }
 
 // accept season as argument, query db for all teams with games played that

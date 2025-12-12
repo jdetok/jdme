@@ -28,27 +28,49 @@ func (sm *StMaps) ValiSznTmPlr(plrId, tmId uint64, sId int) (*SznTmPlr, error) {
 	if _, ok := sm.SznTmPlrIds[sId][tmId][plrId]; ok {
 		return &SznTmPlr{PId: plrId, TId: tmId, SId: sId}, nil
 	}
-	fmt.Println("past first one")
-	// not ok, first check player exists
-	if _, ok := sm.PlrIds[plrId]; !ok {
-		return nil, &errd.ValidationError{Val: plrId}
-		// return nil, fmt.Errorf("player %d doesn't exist", plrId)
-	}
 
-	fmt.Println("past second one")
-
-	// check player exists in team
+	// check player exists in season , return 0 for team if so
 	if _, ok := sm.SeasonPlrIds[sId][plrId]; ok {
 		return &SznTmPlr{PId: plrId, TId: 0, SId: sId}, nil
 	}
 
-	// player exists, but not in that season or team. get most recent
+	// check player exists
+	if _, ok := sm.PlrIds[plrId]; !ok {
+		return nil, &errd.ValidationError{
+			Val: fmt.Sprintf("%d | %d | %d\n", plrId, tmId, sId)}
+	}
+	// player exists, but not in that season or team. return most recent season and team=0
 	if p, ok := sm.PlayerIdDtl[plrId]; ok {
-		maxSzn := p.MaxRSzn
-		fmt.Println("past fourth one")
-		return &SznTmPlr{PId: plrId, TId: 0, SId: maxSzn}, nil
+		return &SznTmPlr{PId: plrId, TId: 0, SId: p.MaxRSzn}, nil
 	}
 	return nil, fmt.Errorf("couldn't validate %d | %d | %d", plrId, tmId, sId)
+}
+
+// get subset of players in tId team, sId season, lg league
+// get random number <= number of those players
+// return player in index of that random number
+// if lg is 0 only nba, 1 only wnba, 10 both
+// if tId is 0, all players in season used
+func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
+	// get list of pId from [szn].values()
+	var m map[uint64]string
+	switch lg {
+	case 0:
+		m = sm.NSznTmPlrIds[sId][tId]
+	case 1:
+		m = sm.WSznTmPlrIds[sId][tId]
+	case 10:
+		m = sm.SznTmPlrIds[sId][tId]
+	default:
+		m = sm.SznTmPlrIds[sId][tId]
+	}
+
+	plrs := []uint64{}
+	for id := range m {
+		plrs = append(plrs, id)
+	}
+
+	return plrs[rand.IntN(len(plrs))]
 }
 
 // THIS CAUSES ISSUE WITH NBA/WNBA ABBR OVERLAP. NEED TO TRACK LEAGUE TOO.
@@ -142,38 +164,4 @@ func (sm *StMaps) PlrSznTmExists(plrId, tmId uint64, szn int) bool {
 	}
 	_, ok := sm.SznTmPlrIds[szn][tmId][plrId]
 	return ok
-}
-
-// get subset of players in tId team, sId season, lg league
-// get random number <= number of those players
-// return player in index of that random number
-// if lg is 0 only nba, 1 only wnba, 10 both
-// if tId is 0, all players in season used
-func (sm *StMaps) RandomPlrIdV2(tId uint64, sId, lg int) uint64 {
-	fmt.Println("random called")
-	fmt.Println(sId, tId)
-	// get list of pId from [szn].values()
-	var m map[uint64]string
-	switch lg {
-	case 0:
-		m = sm.NSznTmPlrIds[sId][tId]
-	case 1:
-		m = sm.WSznTmPlrIds[sId][tId]
-	case 10:
-		m = sm.SznTmPlrIds[sId][tId]
-	default:
-		m = sm.SznTmPlrIds[sId][tId]
-	}
-	plrs := make([]uint64, 0, len(m))
-
-	for id := range m {
-		plrs = append(plrs, id)
-	}
-
-	if len(plrs) == 0 {
-		return 0
-	}
-	randNum := rand.IntN(len(plrs))
-	fmt.Println(plrs[randNum])
-	return plrs[randNum]
 }
