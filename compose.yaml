@@ -10,14 +10,16 @@ services:
     networks:
       jdme_net:
         ipv4_address: 10.7.19.10
-      dbnet:
+      # dbnet:
         # 152 for prod, 153 for dev
-        ipv4_address: 10.0.13.153
+        # ipv4_address: 10.0.13.153
     volumes:
       - ./log:/app/log
       - ./:/app
       - /etc/localtime:/etc/localtime:ro
       - ./z_log:/app/z_log
+    environment:
+      - TZ=America/Chicago
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -33,5 +35,7 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.0.7.0/24
-          gateway: 10.0.7.1 
+        - subnet: 10.7.19.0/24
+          gateway: 10.7.19.1 
+  # dbnet:
+  #   external: true

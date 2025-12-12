@@ -7,6 +7,7 @@ github.com/jdetok/golib
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -44,6 +45,7 @@ func main() {
 	// Logd setup with each logger
 	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df, hf)
 	app.Lg.Infof("started app and created log file")
+
 
 	defer func() {
 		if r := recover(); r != nil {
@@ -84,8 +86,7 @@ func main() {
 				app.Lg.Fatalf("go routine in UpdateStore func crashed: %v", r)
 			}
 		}()
-		// err := app.UpdateStore(quickstart, 120*time.Minute)
-		err := app.UpdateStore(quickstart, 180*time.Second)
+		err := app.UpdateStore(quickstart, 120*time.Minute)
 		if err != nil {
 			app.Lg.Fatalf("error updating store: %v", err)
 		}

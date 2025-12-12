@@ -29,7 +29,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lgd *logd.Logd) error {
 	var wg = &sync.WaitGroup{}
 
 	// concurrency controls
-	const maxWorkers = 30
+	const maxWorkers = 20
 	sem := make(chan struct{}, maxWorkers)
 
 	// channels for results and errors

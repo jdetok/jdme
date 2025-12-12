@@ -10,6 +10,12 @@ import (
 
 // check whether enough time has passed to rebuild the in memory storage
 func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
+	defer func() {
+		if r := recover(); r != nil {
+			app.Lg.Fatalf("uncaught error in UpdateStore: %v", r)
+		}
+	}()
+
 	// call update func on intial run
 	if !app.Started {
 		if err := app.UpdateStructsSafe(); err != nil {
@@ -22,6 +28,7 @@ func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
 					app.MStore.PersistPath, err,
 				)
 			}
+			app.Lg.Infof("quick startup from %s complete", app.MStore.PersistPath)
 		} else {
 			if err := app.MStore.Setup(app.DB, app.Lg); err != nil {
 				return fmt.Errorf("** error failed to setup maps\n * %v", err)
