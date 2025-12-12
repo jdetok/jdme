@@ -18,6 +18,7 @@ const (
 	FATAL   string = "*** FATAL ERROR"
 	HTTP    string = "HTTP"
 	HTTPERR string = "HTTPERR"
+	QUIT    string = "QUIT"
 )
 
 type Logd struct {
@@ -37,7 +38,7 @@ func NewLogd(lo, qo, ho io.Writer) *Logd {
 		qlg:       log.New(qo, "", log.LstdFlags|log.Lshortfile),
 		hlg:       log.New(ho, "", log.LstdFlags|log.Lshortfile),
 		quietLvls: []string{DEBUG},
-		loudLvls:  []string{INFO, WARNING, ERROR, FATAL},
+		loudLvls:  []string{INFO, WARNING, ERROR, FATAL, QUIT},
 		httpLvls:  []string{HTTP, HTTPERR},
 	}
 }
@@ -83,6 +84,7 @@ func (l *Logd) Debugf(msg string, args ...any) { l.log(DEBUG, msg, args...) }
 func (l *Logd) Warnf(msg string, args ...any)  { l.log(WARNING, msg, args...) }
 func (l *Logd) Errorf(msg string, args ...any) { l.log(ERROR, msg, args...) }
 func (l *Logd) Fatalf(msg string, args ...any) { l.log(FATAL, msg, args...); os.Exit(1) }
+func (l *Logd) Quitf(msg string, args ...any)  { l.log(QUIT, msg, args...) }
 
 // default logger for http requests
 func (l *Logd) LogHTTP(r *http.Request) {

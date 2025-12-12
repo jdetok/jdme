@@ -7,95 +7,69 @@ github.com/jdetok/golib
 package main
 
 import (
-	"io"
-	"log"
-	"os"
-	"path/filepath"
+	"context"
+	"net/http"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
-	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
-	"github.com/jdetok/golib/envd"
 )
 
 func main() {
-	app := &api.App{}
-	app.Started = false
-	var quickstart bool = true
+	app := &api.App{Started: false, QuickStart: true}
 
-	// main logger
-	f, err := logd.SetupLogdF("./z_log/applog")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// debug logger
-	df, err := logd.SetupLogdF("./z_log/debug_applog")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// http logger
-	hf, err := logd.SetupLogdF("./z_log/http_log")
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Logd setup with each logger
-	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df, hf)
-	app.Lg.Infof("started app and created log file")
-
-	defer func() {
-		if r := recover(); r != nil {
-			app.Lg.Fatalf("unhandled error in main: %v", r)
-		}
-	}()
+	app.SetupLoggers()
 
 	// persist file for quickstart
-	fp := "./persist_data/maps.json"
-	persistP, err := filepath.Abs(fp)
-	if err != nil {
-		app.Lg.Fatalf("failed to get absolute path of %s\n**%v\n", fp, err)
-	}
-	app.MStore.PersistPath = persistP
-	app.Lg.Warnf("path: %s", app.MStore.PersistPath)
+	app.SetupMemPersist("./persist_data/maps.json")
 
-	err = envd.LoadDotEnv()
-	if err != nil {
-		app.Lg.Fatalf("failed to load variables in .env file to env\n%v", err)
+	if envErr := app.SetupEnv(); envErr != nil {
+		app.Lg.Fatalf("fatal error reading .env file: %v", envErr)
 	}
-	hostaddr, err := envd.GetEnvStr("SRV_IP")
-	if err != nil {
-		app.Lg.Fatalf("failed to get server IP from .env\n%v", err)
-	}
-	app.Addr = hostaddr
 
 	// connect to bball postgres database
-	db, err := pgdb.PostgresConn()
-	if err != nil {
-		app.Lg.Fatalf("failed to create connection to postgres\n%v", err)
+	if dbErr := app.SetupDB(); dbErr != nil {
+		app.Lg.Fatalf("fatal db setup error: %v", dbErr)
 	}
-	app.DB = db
 
 	// update Players, Seasons, Teams in memory structs
+	memErrCh := make(chan error, 1)
 	go func() {
-		defer func() {
-			if r := recover(); r != nil {
-				app.Lg.Fatalf("go routine in UpdateStore func crashed: %v", r)
-			}
-		}()
-		// err := app.UpdateStore(quickstart, 120*time.Minute)
-		err := app.UpdateStore(quickstart, 180*time.Second)
+		err := app.UpdateStore(app.QuickStart, 30*time.Minute)
 		if err != nil {
-			app.Lg.Fatalf("error updating store: %v", err)
+			memErrCh <- err
 		}
 	}()
 
-	// mount mux server, sets up all endpoint handlers
-	mux := app.Mount()
-	app.Lg.Infof("http mux server mounted, starting server")
+	shutdownCtx, stop := signal.NotifyContext(context.Background(),
+		syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
 
-	if err := app.RunGraceful(mux); err != nil {
-		app.Lg.Fatalf("FATAL server failed to run\n%v", err)
+	srv := app.SetupHTTPServer(app.Mount())
+	app.Lg.Infof("http server configured and endpoints mounted")
+
+	// set the time for caching
+	app.StartTime = time.Now()
+
+	go func() {
+		err := srv.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			app.Lg.Errorf("http listen error occured: %v", err)
+		}
+	}()
+
+	app.Lg.Infof("server listening at %v...\n", app.Addr)
+
+	select {
+	case <-shutdownCtx.Done():
+		app.Lg.Quitf("shutdown signal received, shutting down...")
+		ctxTimeout, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(ctxTimeout); err != nil {
+			app.Lg.Fatalf("Shutdown error: %v", err)
+		}
+	case err := <-memErrCh:
+		app.Lg.Fatalf("memory refresh failed, exiting: %v", err)
 	}
 }

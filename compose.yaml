@@ -2,7 +2,8 @@ services:
   api_jdme:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: new.Dockerfile
+      # dockerfile: Dockerfile
     image: api_jdme
     container_name: api_jdme
     ports: 
@@ -14,8 +15,8 @@ services:
         # 152 for prod, 153 for dev
         # ipv4_address: 10.0.13.153
     volumes:
-      - ./log:/app/log
-      - ./:/app
+      # - ./log:/app/log
+      # - ./:/app
       - /etc/localtime:/etc/localtime:ro
       - ./z_log:/app/z_log
     environment:
