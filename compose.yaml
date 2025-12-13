@@ -11,6 +11,9 @@ services:
     networks:
       jdme_net:
         ipv4_address: 10.7.19.10
+      lognet: 
+        ipv4_address: 10.0.199.10
+
       # dbnet:
         # 152 for prod, 153 for dev
         # ipv4_address: 10.0.13.153
@@ -19,6 +22,7 @@ services:
       # - ./:/app
       - /etc/localtime:/etc/localtime:ro
       - ./z_log:/app/z_log
+      - ./httplog:/app/httplog
     environment:
       - TZ=America/Chicago
     healthcheck:
@@ -29,6 +33,19 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  mongo:
+    image: mongo
+    container_name: jdme_log_mongo
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - TZ=America/Chicago
+    networks:
+      lognet:
+        ipv4_address: 10.0.199.199
+
+
 networks:
 # prod is external
   jdme_net: 
@@ -38,5 +55,12 @@ networks:
       config:
         - subnet: 10.7.19.0/24
           gateway: 10.7.19.1 
+  lognet:
+    name: lognet
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.199.0/24
+          gateway: 10.0.199.1
   # dbnet:
   #   external: true

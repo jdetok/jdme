@@ -48,6 +48,13 @@ func (app *App) SetupLoggers() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// // http logger
+	// jf, err := logd.SetupJSONLogdF("./httplog/http")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
 	// Logd setup with each logger
 	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df, hf)
 	app.Lg.Infof("started app and created log file")

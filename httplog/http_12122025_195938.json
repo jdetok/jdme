@@ -1,0 +1,64 @@
+{
+    "request_time": "2025-12-12T19:59:47.912068709-06:00",
+    "url": "",
+    "http_method": "GET",
+    "referer": "",
+    "remote_addr": "100.81.56.39:19207",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"
+},
+{
+    "request_time": "2025-12-12T19:59:47.942646626-06:00",
+    "url": "",
+    "http_method": "GET",
+    "referer": "http://localhost:8080/",
+    "remote_addr": "100.81.56.39:19207",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"
+},
+{
+    "request_time": "2025-12-12T19:59:47.943018751-06:00",
+    "url": "",
+    "http_method": "GET",
+    "referer": "http://localhost:8080/",
+    "remote_addr": "100.81.56.39:19322",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"
+},
+{
+    "request_time": "2025-12-12T19:59:47.945187293-06:00",
+    "url": "",
+    "http_method": "GET",
+    "referer": "http://localhost:8080/",
+    "remote_addr": "100.81.56.39:19207",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"
+},
+{
+    "request_time": "2025-12-12T19:59:47.945718168-06:00",
+    "url": "",
+    "http_method": "GET",
+    "referer": "http://localhost:8080/",
+    "remote_addr": "100.81.56.39:19322",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"
+},
+{
+    "request_time": "2025-12-12T19:59:47.945917376-06:00",
+    "url": "",
+    "http_method": "GET",
+    "referer": "http://localhost:8080/",
+    "remote_addr": "100.81.56.39:41458",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"
+},
+{
+    "request_time": "2025-12-12T19:59:47.946195584-06:00",
+    "url": "",
+    "http_method": "GET",
+    "referer": "http://localhost:8080/",
+    "remote_addr": "100.81.56.39:19141",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"
+},
+{
+    "request_time": "2025-12-12T19:59:47.946986959-06:00",
+    "url": "",
+    "http_method": "GET",
+    "referer": "http://localhost:8080/",
+    "remote_addr": "100.81.56.39:43104",
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:146.0) Gecko/20100101 Firefox/146.0"
+}
