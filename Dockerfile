@@ -1,13 +1,13 @@
 FROM golang:1.25
 
-# testing 07/20/2025 with refactored frontend in separate dir
-# RUN mkdir -p /static
-# COPY /home/jdeto/frontend_jdme/. /static/.
-
 WORKDIR /app
+
 RUN go install github.com/air-verse/air@latest
-COPY . .
+COPY go.mod go.sum ./
 RUN go mod download
 
-CMD [ "bash" ]
-ENTRYPOINT [ "air" ]
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/api ./main
+
+ENTRYPOINT [ "/app/bin/api" ]

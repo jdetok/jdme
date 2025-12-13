@@ -26,7 +26,7 @@ func TestLen(t *testing.T) {
 func TestMapPlayersCC(t *testing.T) {
 
 	m := &MapStore{}
-	l := logd.NewLogd(os.Stdout, os.Stdout, os.Stdout)
+	l := logd.NewLogd(os.Stdout, os.Stdout)
 
 	err := envd.LoadDotEnvFile("../../.env")
 	if err != nil {

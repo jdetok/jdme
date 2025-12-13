@@ -2,7 +2,7 @@ services:
   api_jdme:
     build:
       context: .
-      dockerfile: new.Dockerfile
+      dockerfile: Dockerfile
     image: api_jdme
     container_name: api_jdme
     ports: 
@@ -15,7 +15,6 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./z_log:/app/z_log
-      - ./httplog:/app/httplog
     environment:
       - TZ=America/Chicago
     healthcheck:

@@ -32,31 +32,19 @@ type App struct {
 
 func (app *App) SetupLoggers() {
 	// main logger
-	f, err := logd.SetupLogdF("./z_log/applog")
+	f, err := logd.SetupLogdF("./z_log/app/applog")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// debug logger
-	df, err := logd.SetupLogdF("./z_log/debug_applog")
+	df, err := logd.SetupLogdF("./z_log/dbg/debug")
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// http logger
-	hf, err := logd.SetupLogdF("./z_log/http_log")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// // http logger
-	// jf, err := logd.SetupJSONLogdF("./httplog/http")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	// Logd setup with each logger
-	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df, hf)
+	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df)
 	app.Lg.Infof("started app and created log file")
 }
 

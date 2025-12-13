@@ -26,7 +26,6 @@ type Logd struct {
 	// lw  *LogdW
 	lg    *log.Logger
 	qlg   *log.Logger
-	hlg   *log.Logger
 	Mongo *mongo.Client
 	// jlg         *log.Logger
 	HTTPLogJSON io.Writer
@@ -46,11 +45,10 @@ func (l *Logd) Fatalf(msg string, args ...any) {
 	os.Exit(1)
 }
 
-func NewLogd(lo, qo, ho io.Writer) *Logd {
+func NewLogd(lo, qo io.Writer) *Logd {
 	return &Logd{
 		lg:        log.New(lo, "", log.LstdFlags|log.Lshortfile),
 		qlg:       log.New(qo, "", log.LstdFlags|log.Lshortfile),
-		hlg:       log.New(ho, "", log.LstdFlags|log.Lshortfile),
 		quietLvls: []string{DEBUG},
 		loudLvls:  []string{INFO, WARNING, ERROR, FATAL, QUIT},
 		httpLvls:  []string{HTTP, HTTPERR},
@@ -70,12 +68,6 @@ func (l *Logd) log(level, msg string, args ...any) {
 
 	if slices.Contains(l.loudLvls, level) {
 		if err := l.lg.Output(3, msgf); err != nil {
-			l.lg.Printf("failed to output log msg %s", msgf)
-		}
-	}
-
-	if slices.Contains(l.httpLvls, level) {
-		if err := l.hlg.Output(3, msgf); err != nil {
 			l.lg.Printf("failed to output log msg %s", msgf)
 		}
 	}
