@@ -6,7 +6,6 @@ require (
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/jdetok/golib v0.0.0-20250806195647-85997077d681
 	github.com/joho/godotenv v1.5.1
-	go.mongodb.org/mongo-driver v1.17.6
 	go.mongodb.org/mongo-driver/v2 v2.4.1
 	golang.org/x/text v0.27.0
 )

@@ -1,5 +1,5 @@
 // MOST RECENT REQUESTS
-db.log.aggregate([
+db.http.aggregate([
     { $match: { url: { $regex: "^/.*players.*$" } } },
     { $sort: { request_time: -1 } },
     { $limit: 3 },

@@ -22,7 +22,7 @@ func main() {
 
 	app.SetupLoggers()
 
-	ml, err := logd.NewMongoLogger("httplog", "log")
+	ml, err := logd.NewMongoLogger("log", "http")
 	if err != nil {
 		app.Lg.Fatalf("failed to connect to mongo: %v", err)
 	}
