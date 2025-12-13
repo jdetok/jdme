@@ -7,8 +7,6 @@ import (
 	"os"
 	"slices"
 	"time"
-
-	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 const (
@@ -23,15 +21,12 @@ const (
 )
 
 type Logd struct {
-	// lw  *LogdW
-	lg    *log.Logger
-	qlg   *log.Logger
-	Mongo *mongo.Client
-	// jlg         *log.Logger
-	HTTPLogJSON io.Writer
-	quietLvls   []string
-	loudLvls    []string
-	httpLvls    []string
+	quietLvls []string
+	loudLvls  []string
+	httpLvls  []string
+	lg        *log.Logger
+	qlg       *log.Logger
+	Mongo     *MongoLogger
 }
 
 // HIGH LEVEL FUNCS TO CALL IN SOURCE

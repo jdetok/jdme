@@ -21,14 +21,15 @@ func main() {
 	app := &api.App{Started: false, QuickStart: true}
 
 	app.SetupLoggers()
-	cl, err := logd.SetupMongoLog()
+
+	ml, err := logd.NewMongoLogger("httplog", "log")
 	if err != nil {
 		app.Lg.Fatalf("failed to connect to mongo: %v", err)
 	}
-	app.Lg.Mongo = cl
+	app.Lg.Mongo = ml
 	// example players query: db.log.find({url: { $regex: "^/.*players.*$" } } )
 	defer func() {
-		if err := app.Lg.Mongo.Disconnect(context.TODO()); err != nil {
+		if err := app.Lg.Mongo.Client.Disconnect(context.TODO()); err != nil {
 			app.Lg.Fatalf("fatal mongo error: %v", err)
 		}
 	}()
