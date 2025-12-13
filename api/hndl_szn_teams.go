@@ -10,7 +10,7 @@ import (
 // /seasons handler
 // FOR SEASONS SELECTOR - CALLED ON PAGE LOAD
 func (app *App) HndlSeasons(w http.ResponseWriter, r *http.Request) {
-	app.Lg.LogHTTP(r)
+	app.Lg.HTTP(r)
 	season := r.URL.Query().Get("szn")
 	w.Header().Set("Content-Type", "application/json")
 	if season == "" { // send all szns when szn is not in q str, used most often
@@ -29,7 +29,7 @@ func (app *App) HndlSeasons(w http.ResponseWriter, r *http.Request) {
 // /teams handler
 // FOR TEAMS SELECTOR - CALLED ON PAGE LOAD
 func (app *App) HndlTeams(w http.ResponseWriter, r *http.Request) {
-	app.Lg.LogHTTP(r)
+	app.Lg.HTTP(r)
 	team := r.URL.Query().Get("team")
 	w.Header().Set("Content-Type", "application/json")
 	if team == "" { // send all teams when team is not in q str, used most often

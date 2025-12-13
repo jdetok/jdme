@@ -20,7 +20,8 @@ import (
 // team as int should be team id i.e. 1610617247
 // OPTIONAL ARGS: league, team
 func (app *App) HndlPlayerV2(w http.ResponseWriter, r *http.Request) {
-	app.Lg.LogHTTP(r)
+	// app.Lg.HTTP(r)
+	app.Lg.HTTP(r)
 	var err error
 
 	rp := *resp.NewRespPlayerDash(r)

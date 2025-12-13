@@ -15,4 +15,3 @@ db.log.aggregate([
         }
     }
 }]);
-

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"slices"
 	"time"
@@ -39,13 +40,14 @@ func (l *Logd) Fatalf(msg string, args ...any) {
 	l.log(FATAL, msg, args...)
 	os.Exit(1)
 }
+func (l *Logd) HTTP(r *http.Request) { l.Mongo.log(NewHTTPLog(r)) }
 
 func NewLogd(lo, qo io.Writer) *Logd {
 	return &Logd{
 		lg:        log.New(lo, "", log.LstdFlags|log.Lshortfile),
 		qlg:       log.New(qo, "", log.LstdFlags|log.Lshortfile),
 		quietLvls: []string{DEBUG},
-		loudLvls:  []string{INFO, WARNING, ERROR, FATAL, QUIT},
+		loudLvls:  []string{INFO, WARNING, ERROR, FATAL, QUIT, HTTP, HTTPERR},
 		httpLvls:  []string{HTTP, HTTPERR},
 	}
 }
@@ -53,7 +55,19 @@ func NewLogd(lo, qo io.Writer) *Logd {
 func (l *Logd) log(level, msg string, args ...any) {
 	prefix := fmt.Sprintf("[%s] ", level)
 	l.lg.SetPrefix(prefix)
-	msgf := fmt.Sprintf(msg, args...)
+
+	var msgf string
+	if len(args) > 0 && args[0] != nil {
+		r, ok := args[0].(*http.Request)
+		if ok {
+			if err := l.Mongo.log(NewHTTPLog(r)); err != nil {
+				l.lg.Printf("failed to output log msg %s", msgf)
+			}
+			msgf = fmt.Sprintf("http request at endoint: %s", r.URL.String())
+		} else {
+			msgf = fmt.Sprintf(msg, args...)
+		}
+	}
 
 	if slices.Contains(l.quietLvls, level) {
 		if err := l.qlg.Output(3, msgf); err != nil {
@@ -61,7 +75,7 @@ func (l *Logd) log(level, msg string, args ...any) {
 		}
 	}
 
-	if slices.Contains(l.loudLvls, level) {
+	if slices.Contains(l.loudLvls, level) || slices.Contains(l.httpLvls, level) {
 		if err := l.lg.Output(3, msgf); err != nil {
 			l.lg.Printf("failed to output log msg %s", msgf)
 		}

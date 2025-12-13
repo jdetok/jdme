@@ -5,7 +5,7 @@ import (
 )
 
 func (app *App) HndlHealth(w http.ResponseWriter, r *http.Request) {
-	app.Lg.LogHTTP(r)
+	app.Lg.HTTP(r)
 	if err := app.DB.Ping(); err != nil {
 		http.Error(w, "db down", 500)
 		return

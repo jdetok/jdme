@@ -11,7 +11,7 @@ import (
 
 // /games/recent handler
 func (app *App) HndlRecentGames(w http.ResponseWriter, r *http.Request) {
-	app.Lg.LogHTTP(r)
+	app.Lg.HTTP(r)
 
 	var rgs memd.RecentGames
 	js, err := rgs.GetRecentGames(app.DB)
@@ -24,7 +24,7 @@ func (app *App) HndlRecentGames(w http.ResponseWriter, r *http.Request) {
 
 // top numPl players for each league
 func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
-	app.Lg.LogHTTP(r)
+	app.Lg.HTTP(r)
 
 	// new LgTopPlayers to get from in memory store
 	var lt memd.LgTopPlayers
@@ -54,7 +54,7 @@ func (app *App) HndlTopLgPlayers(w http.ResponseWriter, r *http.Request) {
 
 // team records for current/most recent reg. seasons for each league
 func (app *App) HndlTeamRecords(w http.ResponseWriter, r *http.Request) {
-	app.Lg.LogHTTP(r)
+	app.Lg.HTTP(r)
 
 	js, err := memd.TeamRecordsJSON(&app.Store.TeamRecs)
 	if err != nil {

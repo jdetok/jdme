@@ -1,6 +1,6 @@
 import { base, checkBoxes } from "./listen.js"
 import { checkBoxGroupValue, lgRadioBtns, clearCheckBoxes } from "./ui.js";
-import { getPlayerStats, buildPlayerDash } from "./player_dash.js";
+import { buildPlayerDash } from "./player_dash.js";
 import { getPlayerStatsV2 } from "./player_dash_v2.js";
 
 /*
@@ -131,7 +131,7 @@ export async function playerBtnListener(player) {
         console.log(`player: ${player} | tm: ${team} | szn: ${season}`);
 
         // search & clear player search bar
-        let js = await getPlayerStats(base, player, season, team, lg);
+        let js = await getPlayerStatsV2(base, player, season, team, lg);
         if (js) {
             console.log(js);
             await setPHold(js.player[0].player_meta.player);
