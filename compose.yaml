@@ -10,6 +10,8 @@ services:
     networks:
       jdme_net:
         ipv4_address: 10.7.19.10
+      lognet: 
+        ipv4_address: 10.0.199.10
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./z_log:/app/z_log
@@ -25,4 +27,6 @@ services:
 
 networks:
   jdme_net: 
+    external: true
+  lognet:
     external: true

@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
+	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 )
 
 func main() {
@@ -21,6 +22,17 @@ func main() {
 
 	app.SetupLoggers()
 
+	ml, err := logd.NewMongoLogger("httplog", "log")
+	if err != nil {
+		app.Lg.Fatalf("failed to connect to mongo: %v", err)
+	}
+	app.Lg.Mongo = ml
+	// example players query: db.log.find({url: { $regex: "^/.*players.*$" } } )
+	defer func() {
+		if err := app.Lg.Mongo.Client.Disconnect(context.TODO()); err != nil {
+			app.Lg.Fatalf("fatal mongo error: %v", err)
+		}
+	}()
 	// persist file for quickstart
 	app.SetupMemPersist("./persist_data/maps.json")
 
