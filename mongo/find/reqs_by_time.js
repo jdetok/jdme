@@ -4,7 +4,7 @@ db.log.aggregate([
     { $sort: { request_time: -1 } },
     { $limit: 3 },
     { $project: {
-        _id: 0,
+        _id: 1,
         url: 1,
         time: {
             $dateToString: {
