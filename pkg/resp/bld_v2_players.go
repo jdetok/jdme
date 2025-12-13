@@ -45,7 +45,7 @@ func (r *RespPlayerDash) BuildPlayerRespV2(db *sql.DB, sm *memd.StMaps, iq *PQue
 	if iq.TId == 0 {
 		q = pgdb.PlayerDash
 		args = []any{iq.PId, iq.SId}
-		fmt.Println("team 0 args:", args)
+
 	} else {
 		if strconv.Itoa(iq.SId)[1:] == "9999" {
 			args = []any{iq.PId, iq.TId, strconv.Itoa(iq.SId)[0]}

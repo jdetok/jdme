@@ -87,7 +87,6 @@ func (sm *StMaps) GetLgTmIdFromAbbr(abbr string, lg int) (uint64, error) {
 // return players max reg season
 func (sm *StMaps) GetSznFromPlrId(plrId uint64) (int, error) {
 	if p, ok := sm.PlayerIdDtl[plrId]; ok {
-		fmt.Println(p)
 		return p.MaxRSzn, nil
 	}
 	return 0, fmt.Errorf("no season found for %d", plrId)
@@ -95,9 +94,7 @@ func (sm *StMaps) GetSznFromPlrId(plrId uint64) (int, error) {
 
 // ["random"] returns 0
 func (sm *StMaps) GetPlrIdFromName(name string) (uint64, error) {
-	fmt.Println("in gpifn:", name)
 	if name == "random" {
-		fmt.Println("returning 77777")
 		return 77777, nil
 	}
 	if plrId, ok := sm.PlayerNameId[name]; ok {
@@ -157,8 +154,6 @@ func (sm *StMaps) PlrNmExists(searchP string) bool {
 
 // check if passed player name exists in PlrNms map
 func (sm *StMaps) PlrSznTmExists(plrId, tmId uint64, szn int) bool {
-	fmt.Println("in season:", len(sm.SznTmPlrIds[szn]))
-	fmt.Println("in team:", len(sm.SznTmPlrIds[szn][tmId]))
 	for _, p := range sm.SznTmPlrIds[szn][tmId] {
 		fmt.Println(p)
 	}

@@ -119,7 +119,6 @@ func (ms *MapStore) Rebuild(db *sql.DB, lg *logd.Logd) error {
 		return err
 	}
 
-	fmt.Printf("Rebuild complete: %d players mapped\n", len(temp.PlayerIdDtl))
 	ms.Set(temp)
 	return nil
 }

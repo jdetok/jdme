@@ -37,16 +37,15 @@ func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
 			if err := app.RebuildMemStore(); err != nil {
 				return fmt.Errorf("failed to rebuild memstore after successfully building from persist: %v", err)
 			}
-			app.Lg.Infof("memstore rebuild complete")
+			app.Lg.Infof("memstore rebuild complete: %d players in memory",
+				len(app.MStore.Maps.PlayerIdName))
 		} else {
 			if err := app.MStore.Setup(app.DB, app.Lg); err != nil {
 				return fmt.Errorf("** error failed to setup maps\n * %v", err)
 			}
 		}
-		app.Lg.Infof("finished with map store setup")
 	}
-	// var errRtn error = nil
-	// update structs every interval
+
 	ticker := time.NewTicker(time.Minute)
 	defer ticker.Stop()
 	for range ticker.C {
@@ -59,61 +58,6 @@ func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
 	return nil
 }
 
-// 	app.Lg.Infof("refreshing in-mem store")
-// 	app.Store.CurrentSzns.GetCurrentSzns(time.Now())
-
-// 	var wg = &sync.WaitGroup{}
-// 	wg.Add(2) // struct update producer, map update producer, error consumer
-
-// 	var errs []error
-// 	errCh := make(chan error)
-
-// 	go func(wg *sync.WaitGroup, app *App) {
-// 		defer wg.Done()
-// 		if err := app.UpdateStructsSafe(); err != nil {
-// 			errCh <- fmt.Errorf("error updating struct slices: %v", err)
-// 		}
-// 	}(wg, app)
-
-// 	// update maps
-// 	go func(wg *sync.WaitGroup, app *App) {
-// 		defer wg.Done()
-// 		if err := app.MStore.Rebuild(app.DB, app.Lg); err != nil {
-// 			errCh <- fmt.Errorf("error updating maps: %v", err)
-// 		}
-// 	}(wg, app)
-
-// 	go func() {
-// 		wg.Wait()
-// 		close(errCh)
-// 	}()
-
-// 	for err := range errCh {
-// 		errs = append(errs, err)
-// 	}
-
-// 	if err := app.MStore.Persist(); err != nil {
-// 		errs = append(errs, err)
-// 	}
-
-//		numErrs := len(errs)
-//		if numErrs > 0 {
-//			errMsg := fmt.Sprintf("** %d error occured updating store\n")
-//			for i, err := range errs {
-//				errMsg = fmt.Sprintf("%s%s", errMsg,
-//					fmt.Sprintf("* error %d: %v\n", i, err),
-//				)
-//			}
-//			errRtn = fmt.Errorf("%s", errMsg)
-//		}
-//	}
-//
-//	if errRtn != nil {
-//		return errRtn
-//	}
-//
-// return nil
-// }
 func (app *App) RebuildMemStore() error {
 	var errRtn error = nil
 	var wg = &sync.WaitGroup{}

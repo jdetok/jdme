@@ -1,12 +1,16 @@
 package logd
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"time"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type HTTPLog struct {
+	ID         bson.ObjectID
 	ReqTime    time.Time   `bson:"request_time"`
 	URL        string      `bson:"url"`
 	Method     string      `bson:"http_method"`
@@ -27,29 +31,18 @@ func NewHTTPLog(r *http.Request) *HTTPLog {
 		Header:     r.Header,
 	}
 }
-
-// default logger for http requests
-func (l *Logd) LogHTTP(r *http.Request) {
-	var hl = NewHTTPLog(r)
-
-	if err := l.Mongo.log(hl); err != nil {
-		fmt.Println("error logging to mongo:", err)
+func (ml *MongoLogger) log(hl *HTTPLog) error {
+	result, err := ml.Coll.InsertOne(context.TODO(), hl)
+	if err != nil {
+		return err
 	}
 
-	l.log(HTTP, `
-+++ REQUEST RECEIVED - %v
-- Request URL: %v
-- Method: %v
-- Referrer: %v
-- Remote Addr: %v
-- User Agent: %v`,
-		hl.ReqTime.Format("2006-01-02 15:04:05"),
-		hl.URL,
-		hl.Method,
-		hl.RemoteAddr,
-		hl.Referer,
-		hl.UserAgent,
-	)
+	id, ok := result.InsertedID.(bson.ObjectID)
+	if ok {
+		hl.ID = id
+		return nil
+	}
+	return nil
 }
 
 // actual err gets logged, just msg string gets sent as http errora

@@ -5,6 +5,8 @@ go 1.25.1
 require (
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/jdetok/golib v0.0.0-20250806195647-85997077d681
+	github.com/joho/godotenv v1.5.1
+	go.mongodb.org/mongo-driver v1.17.6
 	go.mongodb.org/mongo-driver/v2 v2.4.1
 	golang.org/x/text v0.27.0
 )
@@ -12,7 +14,6 @@ require (
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/golang/snappy v1.0.0 // indirect
-	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect

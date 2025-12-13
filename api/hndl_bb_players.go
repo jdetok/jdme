@@ -24,7 +24,7 @@ import (
 	- pass iq (result of ValidatePlayerSzn)
 */
 func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
-	app.Lg.HTTP(r)
+	app.Lg.HTTPf(r)
 
 	// pq holds all query parameters as strings
 	var pq resp.PlayerQuery

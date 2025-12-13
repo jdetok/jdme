@@ -89,12 +89,3 @@ func getMongoAuth() (*mongoAuth, error) {
 	)
 	return &m, nil
 }
-
-func (ml *MongoLogger) log(hl *HTTPLog) error {
-	result, err := ml.Coll.InsertOne(context.TODO(), hl)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("Document inserted with ID: %s\n", result.InsertedID)
-	return nil
-}
