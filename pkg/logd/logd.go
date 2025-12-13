@@ -164,7 +164,7 @@ func (l *Logd) LogHTTP(r *http.Request) {
 
 	var lh = LogHTTP{
 		ReqTime:    time.Now(),
-		URL:        r.URL.RawQuery,
+		URL:        r.RequestURI,
 		Method:     r.Method,
 		RemoteAddr: r.RemoteAddr,
 		Referer:    r.Referer(),

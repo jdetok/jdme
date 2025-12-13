@@ -26,6 +26,7 @@ func main() {
 		app.Lg.Fatalf("failed to connect to mongo: %v", err)
 	}
 	app.Lg.Mongo = cl
+	// example players query: db.log.find({url: { $regex: "^/.*players.*$" } } )
 	defer func() {
 		if err := app.Lg.Mongo.Disconnect(context.TODO()); err != nil {
 			app.Lg.Fatalf("fatal mongo error: %v", err)
