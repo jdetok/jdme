@@ -1,0 +1,30 @@
+name: Replace localhost URLs
+on:
+    push:
+        branches:
+            - ci
+jobs:
+  replace:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repo
+          uses: actions/checkout@v4
+          with: 
+            fetch-depth: 0
+
+        - name: Replace localhost with production URL
+          run: |
+            find . -type f \( -name "*.js" -o -name "*.html" \) \
+                -exec sed -i 's|http://localhost:8080|https://myurl.com|g' {} +
+
+        - name: Commit changes if any
+          run: |
+            if git diff --quiet; then
+                echo "No changes to commit"
+            else
+                git config user.name "github-actions[bot]"
+                git config user.email "github-actions[bot]@users.noreply.github.com"
+                git add .
+                git commit -m "Replace localhost URLs"
+                git push
+            fi
