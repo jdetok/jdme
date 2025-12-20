@@ -16,18 +16,6 @@ jobs:
 
       - name: Replace localhost with production URL
         run: python3 ./scripts/ci/localhost_to_prod.py
-        # run: |
-        #   find . -type f \( -name "*.js" -o -name "*.html" \) \
-        #       -exec sed -i -E 's|http://localhost:[0-9]+|https://jdeko.me|g' {} +
 
       - name: Commit changes if any
-        run: |
-          if git diff --quiet; then
-              echo "No changes to commit"
-          else
-              git config user.name "github-actions[bot]"
-              git config user.email "github-actions[bot]@users.noreply.github.com"
-              git add .
-              git commit -m "Replace localhost URLs"
-              git push
-          fi
+        run: ./check_git_diff.sh
