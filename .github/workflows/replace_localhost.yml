@@ -6,6 +6,9 @@ on:
 jobs:
   replace:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./scripts/ci/
     permissions:
         contents: write
     steps:
@@ -15,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Replace localhost with production URL
-        run: python3 ./scripts/ci/localhost_to_prod.py
+        run: python3 ./localhost_to_prod.py
 
       - name: Commit changes if any
-        run: ./scripts/ci/check_git_diff.sh
+        run: ./check_git_diff.sh
