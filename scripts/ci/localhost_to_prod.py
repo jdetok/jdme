@@ -16,7 +16,7 @@ try:
                 if txt != new_txt:
                     path.write_text(new_txt)
                     num_replaced += 1
-                    print(f"replaced {txt} with {new_txt} in {path}")
+                    print(f"replaced match to {local_ptrn}in {path}")
             except Exception as e:
                 print(f"error occured reading {path}: {e}")
                 raise SystemExit
