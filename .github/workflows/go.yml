@@ -28,14 +28,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Debug env
-      run : |
-        echo "MONGO_HOST=$MONGO_HOST"
-        echo "PG_HOST=$PG_HOST"
-        echo "PG_PORT=$PG_PORT"
-        echo "PG_USER=$PG_USER"
-        echo "PG_PASS=$PG_PASS"
-        echo "PG_DB=$PG_DB"
+    - name: List all secrets
+      run: env | grep PG
+
 
     - name: Set up Go
       uses: actions/setup-go@v4
