@@ -5,14 +5,13 @@ import (
 	"testing"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
-	"github.com/joho/godotenv"
 )
 
 func TestDBConnection(t *testing.T) {
 	app := &api.App{Started: false, QuickStart: true}
-	if err := godotenv.Load("../.env"); err != nil {
-		t.Fatalf("fatal error reading .env file: %v", err)
-	}
+	// if err := godotenv.Load("../.env"); err != nil {
+	// 	t.Fatalf("fatal error reading .env file: %v", err)
+	// }
 
 	if err := app.SetupDB(); err != nil {
 		t.Fatalf("failed to connect to postgres: %v", err)
