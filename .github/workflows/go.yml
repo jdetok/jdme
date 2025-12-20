@@ -12,7 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      SRV_IP: ${{ secrets.SRV_IP }}
+      MONGO_HOST: ${{ secrets.MONGO_HOST }}
+      MONGO_PORT: ${{ secrets.MONGO_PORT }}
+      MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+      MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+      MONGO_INITDB_DATABASE: ${{ secrets.MONGO_INITDB_DATABASE }}
+      PG_HOST: ${{ secrets.PG_HOST }}
+      PG_USER: ${{ secrets.PG_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      PG_PASS: ${{ secrets.POSTGRES_PASSWORD }}
+      PG_DB: ${{ secrets.POSTGRES_DB }}
+    
     steps:
     - uses: actions/checkout@v4
 
