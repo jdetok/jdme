@@ -18,4 +18,4 @@ jobs:
         run: python3 ./scripts/ci/localhost_to_prod.py
 
       - name: Commit changes if any
-        run: ./check_git_diff.sh
+        run: ./scripts/ci/check_git_diff.sh
