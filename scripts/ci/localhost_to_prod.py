@@ -4,7 +4,7 @@ import pathlib
 import re
 
 local_ptrn = re.compile(r"http://localhost:[0-9]+")
-prod_url = "http://localhost:8080"
+prod_url = "https://jdeko.me"
 
 num_replaced = 0
 try: 
