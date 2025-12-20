@@ -30,6 +30,7 @@ jobs:
 
     - name: Debug env
       run : |
+        echo "MONGO_HOST=$MONGO_HOST"
         echo "PG_HOST=$PG_HOST"
         echo "PG_PORT=$PG_PORT"
         echo "PG_USER=$PG_USER"
