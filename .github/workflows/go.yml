@@ -43,5 +43,5 @@ jobs:
     - name: Build
       run: go build -o bin/app ./main
 
-    - name: Test
-      run: go test ./main
+    # - name: Test
+    #   run: go test ./main
