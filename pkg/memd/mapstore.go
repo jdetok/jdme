@@ -1,11 +1,12 @@
 package memd
 
 import (
-	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
 
 // MapStore object assigned in the global api struct
@@ -68,7 +69,7 @@ type StPlayer struct {
 }
 
 // get all team ids from db, convert each to a uint64, map to string version
-func (sm *StMaps) MapTeamIdUints(db *sql.DB) error {
+func (sm *StMaps) MapTeamIdUints(db pgdb.DB) error {
 	fmt.Println("mapping team id strings to uint64")
 	// get all team ids
 	teams, err := db.Query(`
@@ -107,7 +108,7 @@ func (sm *StMaps) MapTeamIdUints(db *sql.DB) error {
 }
 
 // get all team ids from db, convert each to a uint64, map to string version
-func (sm *StMaps) MapSeasons(db *sql.DB) error {
+func (sm *StMaps) MapSeasons(db pgdb.DB) error {
 	fmt.Println("mapping seasons")
 
 	sm.InitAggSznMaps([]int{0, 29999, 49999})
@@ -187,7 +188,7 @@ func (sm *StMaps) InitTm0SznMap(szn int) {
 // accept season as argument, query db for all teams with games played that
 // season, create an empty map inside each season team map
 // MapTeamIdUints MUST be called first
-func (sm *StMaps) MapSznTeams(db *sql.DB, szn int) error {
+func (sm *StMaps) MapSznTeams(db pgdb.DB, szn int) error {
 	fmt.Println("mapping team ids to season: ", szn)
 	// get all team ids
 	teams, err := db.Query(
@@ -241,7 +242,7 @@ func (sm *StMaps) MapTeamToSzn(szn int, teamId uint64) {
 }
 
 // check if team had playoff games in season
-func (sm *StMaps) MapPlayoffSzn(db *sql.DB, szn int, teamId uint64) (bool, error) {
+func (sm *StMaps) MapPlayoffSzn(db pgdb.DB, szn int, teamId uint64) (bool, error) {
 	qTmSznExists := (`select exists (select team_id from stats.tbox where szn_id = $1 and team_id = $2)`)
 	var exists bool
 	row := db.QueryRow(qTmSznExists, szn, teamId)

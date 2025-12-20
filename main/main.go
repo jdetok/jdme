@@ -8,18 +8,24 @@ package main
 
 import (
 	"context"
-	"net/http"
+	"fmt"
+	"log"
 	"os/signal"
 	"syscall"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	app := &api.App{Started: false, QuickStart: true}
+	app := &api.App{Started: false, QuickStart: false}
+	errCh := make(chan error, 1)
 
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("fatal error reading .env file: %v", err)
+	}
 	app.SetupLoggers()
 
 	ml, err := logd.NewMongoLogger("log", "http")
@@ -36,21 +42,17 @@ func main() {
 	// persist file for quickstart
 	app.SetupMemPersist("./persist_data/maps.json")
 
-	if envErr := app.SetupEnv(); envErr != nil {
-		app.Lg.Fatalf("fatal error reading .env file: %v", envErr)
-	}
-
 	// connect to bball postgres database
 	if dbErr := app.SetupDB(); dbErr != nil {
 		app.Lg.Fatalf("fatal db setup error: %v", dbErr)
 	}
 
 	// update Players, Seasons, Teams in memory structs
-	memErrCh := make(chan error, 1)
+
 	go func() {
 		err := app.UpdateStore(app.QuickStart, 30*time.Minute)
 		if err != nil {
-			memErrCh <- err
+			errCh <- fmt.Errorf("in mem update error: %v", err)
 		}
 	}()
 
@@ -58,20 +60,23 @@ func main() {
 		syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
 
-	srv := app.SetupHTTPServer(app.Mount())
-	app.Lg.Infof("http server configured and endpoints mounted")
+	srv, err := app.SetupHTTPServer(app.Mount())
+	if err != nil {
+		app.Lg.Fatalf("failed to setup HTTP server: %v", err)
+	}
 
 	// set the time for caching
 	app.StartTime = time.Now()
 
 	go func() {
+		app.Lg.Infof("starting server at %v...\n", app.Addr)
 		err := srv.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
-			app.Lg.Errorf("http listen error occured: %v", err)
+		// if err != nil && err != http.ErrServerClosed {
+		if err != nil {
+			errCh <- fmt.Errorf("http listen error occured: %v", err)
 		}
+		app.Lg.Infof("server started at %s\n", app.Addr)
 	}()
-
-	app.Lg.Infof("server listening at %v...\n", app.Addr)
 
 	select {
 	case <-shutdownCtx.Done():
@@ -81,7 +86,7 @@ func main() {
 		if err := srv.Shutdown(ctxTimeout); err != nil {
 			app.Lg.Fatalf("Shutdown error: %v", err)
 		}
-	case err := <-memErrCh:
-		app.Lg.Fatalf("memory refresh failed, exiting: %v", err)
+	case err := <-errCh:
+		app.Lg.Fatalf("fatal error occurred: %v", err)
 	}
 }

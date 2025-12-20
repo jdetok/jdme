@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"fmt"
 	"io"
 	"log"
@@ -17,8 +16,10 @@ import (
 
 // GLOBAL APP STRUCT
 type App struct {
-	Addr       string
-	DB         *sql.DB
+	ENDPOINTS Endpoints
+	Addr      string
+	// DB         *sql.DB
+	DB         pgdb.DB
 	StartTime  time.Time
 	LastUpdate time.Time
 	Started    bool
@@ -45,7 +46,6 @@ func (app *App) SetupLoggers() {
 
 	// Logd setup with each logger
 	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df)
-	app.Lg.Infof("started app and created log file")
 }
 
 func (app *App) SetupMemPersist(fp string) {

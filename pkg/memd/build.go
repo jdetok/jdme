@@ -1,12 +1,12 @@
 package memd
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
 
 // INITIAL MAP SETUP: must create empty maps before attempting to insert keys
@@ -73,7 +73,7 @@ func (ms *MapStore) BuildFromPersist() error {
 }
 
 // ran at start of runtime to setup empty maps
-func (ms *MapStore) Setup(db *sql.DB, lg *logd.Logd) error {
+func (ms *MapStore) Setup(db pgdb.DB, lg *logd.Logd) error {
 	ms.Set(MakeMaps()) // empty maps
 	if err := ms.Rebuild(db, lg); err != nil {
 		return err
@@ -98,7 +98,7 @@ func (ms *MapStore) Set(newMaps *StMaps) {
 }
 
 // rebuild maps in new temp StMaps structs, replace old one
-func (ms *MapStore) Rebuild(db *sql.DB, lg *logd.Logd) error {
+func (ms *MapStore) Rebuild(db pgdb.DB, lg *logd.Logd) error {
 	fmt.Println("Rebuilding StMaps...")
 	temp := MakeMaps()
 

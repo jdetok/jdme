@@ -113,15 +113,12 @@ func (app *App) RebuildMemStore() error {
 
 // update players, seasons, and teams in memory structs slices
 func (app *App) UpdateStructsSafe() error {
-	app.Lg.Infof("updating in memory structs")
-
 	var errP error
 	msgP := "updating players structs"
 	app.Store.Players, errP = memd.UpdatePlayers(app.DB)
 	if errP != nil {
 		return fmt.Errorf("failed %s\n%v", msgP, errP)
 	}
-	app.Lg.Infof("players count after update = %d", len(app.Store.Players))
 
 	// update in memory seasons slice
 	var errS error
@@ -156,6 +153,8 @@ func (app *App) UpdateStructsSafe() error {
 	// update last update time
 	updateTime := time.Now()
 	app.LastUpdate = updateTime
-	app.Lg.Infof("finished refreshing store")
+	app.Lg.Infof(`finished refreshing in-memory struct slices
++ player count: %d | + season count: %d | + team count: %d
+`, len(app.Store.Players), len(app.Store.Seasons), len(app.Store.Teams))
 	return nil
 }

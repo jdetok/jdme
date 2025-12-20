@@ -19,9 +19,9 @@ jobs:
         # run: python3 ./scripts/ci/localhost_to_prod.py local
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" || "${GITHUB_REF_NAME}" == "ci" ]]; then
-              python3 ./scripts/ci/localhost_to_prod.py
-          elif [[ "${GITHUB_REF_NAME}" == "local" ]]; then
-              python3 ./scripts/ci/localhost_to_prod.py local
+              ./scripts/ci/localhost_to_prod.py
+          elif [[ "${GITHUB_REF_NAME}" == "mac" ]]; then
+              /scripts/ci/localhost_to_prod.py local
           else
               echo "No replacement needed for branch ${GITHUB_REF_NAME}"
           fi
