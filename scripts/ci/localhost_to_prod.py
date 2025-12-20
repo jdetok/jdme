@@ -9,6 +9,7 @@ prod_url = "http://localhost:8080"
 num_replaced = 0
 try: 
     for path in pathlib.Path(".").rglob('*'):
+        print(f"in {path}")
         if path.suffix in [".js", ".html", ".css", ".go"]:
             try:
                 txt = path.read_text()
