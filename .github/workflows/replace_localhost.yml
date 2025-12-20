@@ -17,7 +17,7 @@ jobs:
         - name: Replace localhost with production URL
           run: |
             find . -type f \( -name "*.js" -o -name "*.html" \) \
-                -exec sed -i 's|http://localhost:8080|https://jdeko.me|g' {} +
+                -exec sed -i -E 's|http://localhost:[0-9]+|https://jdeko.me|g' {} +
 
         - name: Commit changes if any
           run: |
