@@ -5,7 +5,9 @@ name: Go
 
 on:
   push:
-    branches: [ "ci" ]
+    branches:  
+      - "ci" 
+      - "main"
 
 jobs:
   build:
@@ -33,7 +35,6 @@ jobs:
 
     - name: List all secrets
       run: env | grep PG
-
 
     - name: Set up Go
       uses: actions/setup-go@v4

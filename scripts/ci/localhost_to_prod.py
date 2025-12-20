@@ -1,33 +1,36 @@
 #!/usr/bin/env python3
 
 import pathlib
+import sys
 import re
 
-# local_ptrn = re.compile(r"http://localhost:[0-9]+")
-patterns = [r"https?://localhost:[0-9]+",
-            r"https?://jdeko.me[:\/]?[0-9]*"
-            ]
+patterns = [r"https?://localhost:[0-9]+/?", r"https?://jdeko.me[:\/]?[0-9]*/?"]
+filetypes = [".js", ".html", ".css", ".go"]
+exclude_dirs = [".git", "wiki", "log", "z_log", "puml", "bin"]
 
-prod_url = "https://jdeko.me"
-
-num_replaced = 0
-try: 
-    for path in pathlib.Path(".").rglob('*'):
-        print(f"in {path}")
-        if path.suffix in [".js", ".html", ".css", ".go"]:
-            try:
-                for ptrn in patterns:
-                    txt = path.read_text()
-                    # new_txt = local_ptrn.sub(prod_url, txt)
-                    new_txt = re.compile(ptrn).sub(prod_url, txt)
-                    if txt != new_txt:
-                        path.write_text(new_txt)
-                        num_replaced += 1
-                        print(f"replaced match to {ptrn} in {path}")
-            except Exception as e:
-                print(f"error occured reading {path}: {e}")
-                raise SystemExit
-except: raise SystemExit
-finally: print(f"{num_replaced} files with changs")
-    
-            
+def main():
+    repl_url = "https://jdeko.me/"
+    num_replaced = 0    
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "local":
+            repl_url = "http://localhost:8080/"
+    try: 
+        for path in pathlib.Path(".").rglob('*'):
+            if path.parts[0] in exclude_dirs: continue
+            if path.suffix in filetypes:
+                try:
+                    for ptrn in patterns:
+                        txt = path.read_text()
+                        new_txt = re.compile(ptrn).sub(repl_url, txt)
+                        if txt != new_txt:
+                            path.write_text(new_txt)
+                            num_replaced += 1
+                            print(f"replaced match to {ptrn} with {repl_url} in {path}")
+                except Exception as e:
+                    raise SystemError(f"error occured reading {path}: {e}")
+    except SystemError as e: 
+        raise SystemExit(f"exiting with error: {e}")
+    finally: print(f"{num_replaced} files with changs")
+        
+if __name__ == "__main__":
+    main()
