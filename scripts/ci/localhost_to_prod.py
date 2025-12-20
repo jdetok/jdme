@@ -17,8 +17,9 @@ try:
                     path.write_text(new_txt)
                     num_replaced += 1
                     print(f"replaced {txt} with {new_txt} in {path}")
-            except: raise SystemExit
-            finally: print(f"error occured reading {path}")
+            except Exception as e:
+                print(f"error occured reading {path}: {e}")
+                raise SystemExit
 except: raise SystemExit
 finally: print(f"{num_replaced} strings replaced")
     
