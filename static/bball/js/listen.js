@@ -7,7 +7,7 @@ import { getTeamRecords, buildTeamRecsTbl } from "./teamrecs.js";
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
     getRecentGamesData, clearSearchBar } from "./player_search.js"
 
-export const base = "https://jdeko.me/bball";
+export const base = "https://jdeko.mebball";
 export const checkBoxes = ['post', 'reg', 'nbaTm', 'wnbaTm'];
 
 document.addEventListener('DOMContentLoaded', async () => {
