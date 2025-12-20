@@ -21,6 +21,6 @@ try:
                 print(f"error occured reading {path}: {e}")
                 raise SystemExit
 except: raise SystemExit
-finally: print(f"{num_replaced} strings replaced")
+finally: print(f"{num_replaced} files with changs")
     
             
