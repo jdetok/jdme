@@ -6,7 +6,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jdetok/golib/pgresd"
+	// "github.com/jdetok/golib/pgresd"
 )
 
 // CONNECTION TO POSTGRES SERVER: MIGRATED TO POSTGRES FROM MARIADB 08/06/2025
@@ -14,7 +14,10 @@ import (
 configs must be setup in .env file at project root
 */
 func PostgresConn() (*sql.DB, error) {
-	pg := pgresd.GetEnvPG()
+	pg, err := GetEnvPG()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get env for db: %v", err)
+	}
 	pg.MakeConnStr()
 	db, err := pg.Conn()
 	if err != nil {

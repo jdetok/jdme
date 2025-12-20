@@ -6,12 +6,13 @@ name: Go
 on:
   push:
     branches: [ "ci" ]
-#   pull_request:
-#     branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
     - uses: actions/checkout@v4
 
