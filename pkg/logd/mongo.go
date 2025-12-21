@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -45,15 +45,28 @@ func NewMongoLogger(db, coll string) (*MongoLogger, error) {
 }
 
 func SetupMongoClient(auth *mongoAuth) (*mongo.Client, error) {
-	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	opts := options.Client().ApplyURI(auth.conn).SetServerAPIOptions(serverAPI)
+
+	// serverAPI := options.ServerAPI(options.ServerAPIVersion1)
+	// opts := options.Client().ApplyURI(auth.conn).SetServerAPIOptions(serverAPI)
+	// opts.SetTimeout(10 * time.Second)
+	// client, err := mongo.Connect(opts)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("failed to connect to mogno at %s: %v", auth.conn, err)
+	// }
+
+	opts := options.Client().ApplyURI(auth.conn)
+
+	fmt.Println(auth.conn)
 	client, err := mongo.Connect(opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to mogno at %s: %v", auth.conn, err)
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
 	var result bson.M
-	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{
+	if err := client.Database("admin").RunCommand(ctx, bson.D{
 		{"ping", 1}}).Decode(&result); err != nil {
 		return nil, err
 	}
@@ -63,9 +76,9 @@ func SetupMongoClient(auth *mongoAuth) (*mongo.Client, error) {
 func getMongoAuth() (*mongoAuth, error) {
 	var m mongoAuth
 
-	if err := godotenv.Load(); err != nil {
-		return nil, err
-	}
+	// if err := godotenv.Load(); err != nil {
+	// 	return nil, err
+	// }
 
 	envVars := map[string]*string{
 		"MONGO_HOST":                 &m.host,
@@ -83,7 +96,7 @@ func getMongoAuth() (*mongoAuth, error) {
 		*v = tmp
 	}
 	m.conn = fmt.Sprintf(
-		"mongodb://%s:%s@%s:%s/%s?authSource=admin",
+		"mongodb://%s:%s@%s:%s/%s?authSource=admin&directConnection=true",
 		m.user, m.pass,
 		m.host, m.port, m.db,
 	)

@@ -1,7 +1,6 @@
 package resp
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -11,7 +10,7 @@ import (
 )
 
 // after verifying player exists, query db for their stats
-func (r *RespPlayerDash) GetPlayerDashV2(db *sql.DB, sm *memd.StMaps, iq *PQueryIds) ([]byte, error) {
+func (r *RespPlayerDash) GetPlayerDashV2(db pgdb.DB, sm *memd.StMaps, iq *PQueryIds) ([]byte, error) {
 
 	// query player, scan to structs, call struct functions
 	// appends RespObj to r.Results
@@ -29,7 +28,7 @@ func (r *RespPlayerDash) GetPlayerDashV2(db *sql.DB, sm *memd.StMaps, iq *PQuery
 	return js, nil
 }
 
-func (r *RespPlayerDash) BuildPlayerRespV2(db *sql.DB, sm *memd.StMaps, iq *PQueryIds) error {
+func (r *RespPlayerDash) BuildPlayerRespV2(db pgdb.DB, sm *memd.StMaps, iq *PQueryIds) error {
 	pOrT := "plr"
 	q := pgdb.TmSznPlr
 	args := []any{iq.PId, iq.TId, iq.SId}

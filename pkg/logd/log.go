@@ -38,7 +38,7 @@ func (l *Logd) log(level, msg string, args ...any) {
 	prefix := fmt.Sprintf("[%s] ", level)
 	l.lg.SetPrefix(prefix)
 
-	var msgf string
+	var msgf string = msg
 	if len(args) > 0 && args[0] != nil {
 		r, ok := args[0].(*http.Request)
 		if ok {

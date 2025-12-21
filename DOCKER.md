@@ -11,3 +11,4 @@
 
 ## external containers
 - the API relies on an external container running the postgres db with NBA stats. this runs on the same docker engine as the production API
+test

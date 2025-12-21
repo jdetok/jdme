@@ -1,7 +1,6 @@
 package memd
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
@@ -49,7 +48,7 @@ type Team struct {
 
 // // query db for team season records to populate records table
 // // moved to store rather than querying for every request
-func UpdateTeamRecords(db *sql.DB, cs *CurrentSeasons) (TeamRecords, error) {
+func UpdateTeamRecords(db pgdb.DB, cs *CurrentSeasons) (TeamRecords, error) {
 	var team_recs TeamRecords
 
 	sl, err := cs.LgSznsByMonth(time.Now())
@@ -79,7 +78,7 @@ func UpdateTeamRecords(db *sql.DB, cs *CurrentSeasons) (TeamRecords, error) {
 query the database to update global slice of player structs (in memory player store)
 query also gets player's min and max seasons (reg season and playoffs)
 */
-func UpdatePlayers(db *sql.DB) ([]Player, error) {
+func UpdatePlayers(db pgdb.DB) ([]Player, error) {
 	rows, err := db.Query(pgdb.PlayersSeason)
 	if err != nil {
 		return nil, err
@@ -101,7 +100,7 @@ func UpdatePlayers(db *sql.DB) ([]Player, error) {
 query the database for all seasons, populates global seasons store
 example: seasonId: 22025 | season: 2024-25 | WSeason: 2025-26
 */
-func UpdateSeasons(db *sql.DB) ([]Season, error) {
+func UpdateSeasons(db pgdb.DB) ([]Season, error) {
 	rows, err := db.Query(pgdb.AllSeasons)
 	if err != nil {
 		return nil, err
@@ -117,7 +116,7 @@ func UpdateSeasons(db *sql.DB) ([]Season, error) {
 }
 
 // query database for global teams store
-func UpdateTeams(db *sql.DB) ([]Team, error) {
+func UpdateTeams(db pgdb.DB) ([]Team, error) {
 	rows, err := db.Query(pgdb.Teams)
 	if err != nil {
 		return nil, err

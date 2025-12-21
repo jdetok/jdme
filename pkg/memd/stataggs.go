@@ -86,7 +86,7 @@ set a slice of strings with both leagues to loop through. NBA is first in the sl
 this must be maintained for the logic to work. at the end of the for loop the sId
 variable is set to the WNBA season - it's declared as the NBA season before the loop begins
 */
-func QueryTopLgPlayers(db *sql.DB, cs *CurrentSeasons, numPl string) (LgTopPlayers, error) {
+func QueryTopLgPlayers(db pgdb.DB, cs *CurrentSeasons, numPl string) (LgTopPlayers, error) {
 
 	var lt LgTopPlayers
 
@@ -140,7 +140,7 @@ func MarshalTopPlayers(lt *LgTopPlayers) ([]byte, error) {
 returns json of the top scorer (regardless of team) stats from each of most
 recent night's games. used on page load and to populate recent top scorers table
 */
-func (rgs *RecentGames) GetRecentGames(db *sql.DB) ([]byte, error) {
+func (rgs *RecentGames) GetRecentGames(db pgdb.DB) ([]byte, error) {
 	rows, err := db.Query(pgdb.RecGameTopScorers)
 	if err != nil {
 		msg := "recent games query failed"

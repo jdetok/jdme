@@ -8,80 +8,128 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	app := &api.App{Started: false, QuickStart: true}
+	if err := godotenv.Load(); err != nil {
+		fmt.Printf("fatal error reading .env file: %v\n", err)
+		os.Exit(1)
+	}
 
+	app := &api.App{Started: false, QuickStart: false}
 	app.SetupLoggers()
-
 	ml, err := logd.NewMongoLogger("log", "http")
 	if err != nil {
 		app.Lg.Fatalf("failed to connect to mongo: %v", err)
 	}
-	app.Lg.Mongo = ml
-	// example players query: db.log.find({url: { $regex: "^/.*players.*$" } } )
 	defer func() {
-		if err := app.Lg.Mongo.Client.Disconnect(context.TODO()); err != nil {
+		if err := ml.Client.Disconnect(context.TODO()); err != nil {
 			app.Lg.Fatalf("fatal mongo error: %v", err)
 		}
 	}()
-	// persist file for quickstart
-	app.SetupMemPersist("./persist_data/maps.json")
-
-	if envErr := app.SetupEnv(); envErr != nil {
-		app.Lg.Fatalf("fatal error reading .env file: %v", envErr)
-	}
-
-	// connect to bball postgres database
+	app.Lg.Mongo = ml
 	if dbErr := app.SetupDB(); dbErr != nil {
 		app.Lg.Fatalf("fatal db setup error: %v", dbErr)
 	}
 
-	// update Players, Seasons, Teams in memory structs
-	memErrCh := make(chan error, 1)
-	go func() {
-		err := app.UpdateStore(app.QuickStart, 30*time.Minute)
-		if err != nil {
-			memErrCh <- err
-		}
-	}()
+	srv, err := app.SetupHTTPServer(app.Mount())
+	if err != nil {
+		app.Lg.Fatalf("failed to setup HTTP server: %v", err)
+	}
 
 	shutdownCtx, stop := signal.NotifyContext(context.Background(),
 		syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
 
-	srv := app.SetupHTTPServer(app.Mount())
-	app.Lg.Infof("http server configured and endpoints mounted")
-
-	// set the time for caching
-	app.StartTime = time.Now()
-
-	go func() {
-		err := srv.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
-			app.Lg.Errorf("http listen error occured: %v", err)
+	errCh := make(chan error, 1)
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		defer wg.Done()
+		app.Lg.Infof("starting server at %v...\n", app.Addr)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			if shutdownCtx.Err() == nil {
+				select {
+				case errCh <- fmt.Errorf("http listen error occured: %v", err):
+				default:
+				}
+			}
 		}
-	}()
+	})
+	wg.Go(func() {
+		url := fmt.Sprintf("http://%s/health", srv.Addr)
+		var lastCheck time.Time
+		thresh := 10 * time.Second
+		ticker := time.NewTicker(time.Second)
+		var fails []struct{}
+		failLimit := 5
+		defer ticker.Stop()
+		for range ticker.C {
+			if time.Since(lastCheck) >= thresh {
+				lastCheck = time.Now()
+				resp, err := http.Get(url)
+				if err != nil {
+					fails = append(fails, struct{}{})
+					app.Lg.Errorf("health check failed: %v", err)
+					if len(fails) < failLimit {
+						continue
+					} else {
+						errCh <- fmt.Errorf("health check failed %d times: %v", failLimit, err)
+						return
+					}
+				}
+				defer resp.Body.Close()
+				switch resp.StatusCode {
+				case http.StatusOK:
+					app.Lg.Infof("health check passed: %s", resp.Status)
+				default:
+					app.Lg.Infof("health check status: %s", resp.Status)
 
-	app.Lg.Infof("server listening at %v...\n", app.Addr)
+				}
+			}
+		}
+	})
+
+	wg.Go(func() { // update in memory store every
+		defer wg.Done()
+		thresh := 30 * time.Minute
+		err := app.UpdateStore(shutdownCtx, app.QuickStart, thresh)
+		if err != nil {
+			if shutdownCtx.Err() == nil {
+				select {
+				case errCh <- fmt.Errorf("in mem update error: %w", err):
+				default:
+				}
+			}
+		}
+	})
 
 	select {
 	case <-shutdownCtx.Done():
 		app.Lg.Quitf("shutdown signal received, shutting down...")
-		ctxTimeout, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		if err := srv.Shutdown(ctxTimeout); err != nil {
-			app.Lg.Fatalf("Shutdown error: %v", err)
-		}
-	case err := <-memErrCh:
-		app.Lg.Fatalf("memory refresh failed, exiting: %v", err)
+
+	case err := <-errCh:
+		app.Lg.Errorf("fatal error occurred: %v", err)
+		stop()
 	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		app.Lg.Errorf("shutdown error: %v", err)
+	}
+
+	wg.Wait()
+	app.Lg.Infof("shutdown complete")
 }

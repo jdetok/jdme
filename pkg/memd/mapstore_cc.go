@@ -1,7 +1,6 @@
 package memd
 
 import (
-	"database/sql"
 	"fmt"
 	"strconv"
 	"strings"
@@ -15,7 +14,7 @@ import (
 
 // query all players from DB, loop through rows serially, then launch goroutines
 // to process and map the data for each player concurrently
-func (sm *StMaps) MapPlayersCC(db *sql.DB, lgd *logd.Logd) error {
+func (sm *StMaps) MapPlayersCC(db pgdb.DB, lgd *logd.Logd) error {
 	start := time.Now()
 	lgd.Debugf("mapping all players (concurrent workers)")
 
@@ -132,7 +131,7 @@ func (sm *StMaps) MapPlayersCC(db *sql.DB, lgd *logd.Logd) error {
 
 // map a player id to a map of team ids that is mapped to a map of seasons
 // this datastructure enables verifying whether x player played for y team in z season
-func (sm *StMaps) MapSeasonTeamPlayers(lg *logd.Logd, db *sql.DB, p *StPlayer) error {
+func (sm *StMaps) MapSeasonTeamPlayers(lg *logd.Logd, db pgdb.DB, p *StPlayer) error {
 	lg.Debugf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
 	q := ` 
 select szn_id, string_agg(distinct team_id::text, ',')
@@ -147,7 +146,6 @@ group by player_id, szn_id
 	if err != nil {
 		return fmt.Errorf("season team player query failed %d: %w", p.Id, err)
 	}
-	// fmt.Println("MapSznTmPlrCC query finished, processesing rows player", p.Lowr)
 
 	for rows.Next() {
 		var szn int
@@ -217,7 +215,7 @@ func (sm *StMaps) MapSznTmPlr(szn int, tId uint64, p *StPlayer) {
 }
 
 // playoff safe copy
-func (sm *StMaps) MapSznTmPlPO(lg *logd.Logd, db *sql.DB, p *StPlayer) error {
+func (sm *StMaps) MapSznTmPlPO(lg *logd.Logd, db pgdb.DB, p *StPlayer) error {
 	lg.Debugf("mapping %s|%d to season team maps from %d - %d\n", p.Lowr, p.Id, p.MinRSzn, p.MaxRSzn)
 	q := `
 select szn_id, string_agg(distinct team_id::text, ',')
@@ -232,7 +230,6 @@ group by player_id, szn_id
 	if err != nil {
 		return fmt.Errorf("season team player query failed %d: %w", p.Id, err)
 	}
-	// fmt.Println("MapSznTmPlrCC query finished, processesing rows player", p.Lowr)
 
 	for tmsRows.Next() {
 		var szn int

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"fmt"
 	"testing"
 	"time"
@@ -80,7 +79,7 @@ func TestQueryTopLgPlayers(t *testing.T) {
 }
 
 // RETURN DATABASE FOR TESTING
-func StartupTest(t *testing.T) *sql.DB {
+func StartupTest(t *testing.T) pgdb.DB {
 	err := envd.LoadDotEnvFile("../.env")
 	if err != nil {
 		msg := "failed loading .env file"
