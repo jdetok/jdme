@@ -5,6 +5,7 @@ on:
         - ci
         - mac
         - main
+  pull_request:
 jobs:
   replace:
     runs-on: ubuntu-latest
