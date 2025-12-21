@@ -3,6 +3,7 @@ on:
   push:
     branches:
         - ci
+        - mac
         - main
 jobs:
   replace:
