@@ -10,14 +10,14 @@ import (
 )
 
 type HTTPLog struct {
-	ID         bson.ObjectID
-	ReqTime    time.Time   `bson:"request_time"`
-	URL        string      `bson:"url"`
-	Method     string      `bson:"http_method"`
-	Referer    string      `bson:"referer"`
-	RemoteAddr string      `bson:"remote_addr"`
-	UserAgent  string      `bson:"user_agent"`
-	Header     http.Header `bson:"header"`
+	ID         bson.ObjectID `bson:"-"`
+	ReqTime    time.Time     `bson:"request_time"`
+	URL        string        `bson:"url"`
+	Method     string        `bson:"http_method"`
+	Referer    string        `bson:"referer"`
+	RemoteAddr string        `bson:"remote_addr"`
+	UserAgent  string        `bson:"user_agent"`
+	Header     http.Header   `bson:"header"`
 }
 
 func NewHTTPLog(r *http.Request) *HTTPLog {
