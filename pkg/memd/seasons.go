@@ -95,7 +95,6 @@ func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) (SeasonLeague, error) {
 		return SeasonLeague{}, fmt.Errorf("error converting month to int\n%v", err)
 
 	}
-	// fmt.Println("month: ", m)
 
 	// convert current day to int
 	d, err := strconv.Atoi(now.Format("2"))
