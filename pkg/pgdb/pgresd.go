@@ -36,12 +36,6 @@ func GetEnvPG() (*PostGres, error) {
 		}
 		*v = tmp
 	}
-
-	// pg.Host = envd.EnvStr("PG_HOST")
-	// pg.Port = envd.EnvInt("PG_PORT")
-	// pg.User = envd.EnvStr("PG_USER")
-	// pg.Password = envd.EnvStr("PG_PASS")
-	// pg.Database = envd.EnvStr("PG_DB")
 	return &pg, nil
 }
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -9,7 +10,7 @@ import (
 )
 
 // check whether enough time has passed to rebuild the in memory storage
-func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
+func (app *App) UpdateStore(ctx context.Context, quickstart bool, threshold time.Duration) error {
 	var recoveredErr error
 	defer func() {
 		if r := recover(); r != nil {
@@ -23,6 +24,7 @@ func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
 	// call update func on intial run
 	if !app.Started {
 		app.Started = true
+		app.StartTime = time.Now()
 		if err := app.UpdateStructsSafe(); err != nil {
 			return err
 		}
@@ -40,9 +42,12 @@ func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
 			app.Lg.Infof("memstore rebuild complete: %d players in memory",
 				len(app.MStore.Maps.PlayerIdName))
 		} else {
+			app.Lg.Infof("building in-memory map store")
 			if err := app.MStore.Setup(app.DB, app.Lg); err != nil {
 				return fmt.Errorf("** error failed to setup maps\n * %v", err)
 			}
+			app.Lg.Infof("in memory map store setup complete | %d players mapped",
+				len(app.MStore.Maps.PlrIds))
 		}
 	}
 
@@ -53,6 +58,8 @@ func (app *App) UpdateStore(quickstart bool, threshold time.Duration) error {
 			// return nil // not time to update
 			continue
 		}
+		app.Lg.Infof("time since last update {%v} > threshold {%v} - rebuilding memory store",
+			time.Since(app.LastUpdate), threshold)
 		return app.RebuildMemStore()
 	}
 	return nil

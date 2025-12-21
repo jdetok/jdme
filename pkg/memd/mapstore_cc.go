@@ -146,7 +146,6 @@ group by player_id, szn_id
 	if err != nil {
 		return fmt.Errorf("season team player query failed %d: %w", p.Id, err)
 	}
-	// fmt.Println("MapSznTmPlrCC query finished, processesing rows player", p.Lowr)
 
 	for rows.Next() {
 		var szn int
@@ -231,7 +230,6 @@ group by player_id, szn_id
 	if err != nil {
 		return fmt.Errorf("season team player query failed %d: %w", p.Id, err)
 	}
-	// fmt.Println("MapSznTmPlrCC query finished, processesing rows player", p.Lowr)
 
 	for tmsRows.Next() {
 		var szn int

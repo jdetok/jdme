@@ -13,7 +13,6 @@ import (
 // calls MapTeams and MapSeasons to setup an empty map for
 // each season and team nested map
 func MakeMaps() *StMaps {
-	fmt.Println("creating empty maps")
 	var sm StMaps
 	sm.PlayerIdDtl = map[uint64]*StPlayer{}
 	sm.PlayerNameDtl = map[string]*StPlayer{}
@@ -78,7 +77,6 @@ func (ms *MapStore) Setup(db pgdb.DB, lg *logd.Logd) error {
 	if err := ms.Rebuild(db, lg); err != nil {
 		return err
 	} // map data
-	fmt.Printf("len after rebuild: %d\n", len(ms.Maps.PlrIds))
 	return nil
 }
 
@@ -99,24 +97,16 @@ func (ms *MapStore) Set(newMaps *StMaps) {
 
 // rebuild maps in new temp StMaps structs, replace old one
 func (ms *MapStore) Rebuild(db pgdb.DB, lg *logd.Logd) error {
-	fmt.Println("Rebuilding StMaps...")
+
 	temp := MakeMaps()
-
-	// setup nested team maps
-	fmt.Println("creating empty team maps")
 	if err := temp.MapTeamIdUints(db); err != nil {
-		fmt.Println(err)
+		return fmt.Errorf("error mapping teams: %v", err)
 	}
-
-	// setup nested season maps
-	fmt.Println("creating empty season maps")
 	if err := temp.MapSeasons(db); err != nil {
-		fmt.Println(err)
+		return fmt.Errorf("error mapping seasons: %v", err)
 	}
-
 	if err := temp.MapPlayersCC(db, lg); err != nil {
-		fmt.Println("Error in MapPlayers:", err)
-		return err
+		return fmt.Errorf("error mapping players: %v", err)
 	}
 
 	ms.Set(temp)

@@ -81,9 +81,7 @@ func VerifyPlayerTeamSeason(db pgdb.DB, iq *PQueryIds) (bool, error) {
 // query player, scan to structs, call struct functions
 // appends RespObj to r.Results
 // separated from GetPlayerDash 09/24/2025
-/*
-swtiches query and arguments based on whether teamId = 0
-*/
+// swtiches query and arguments based on whether teamId = 0
 func (r *RespPlayerDash) BuildPlayerRespStructs(db pgdb.DB, iq *PQueryIds) error {
 	var args []any
 	var q string
@@ -179,10 +177,8 @@ func (r *RespPlayerDash) ProcessRows(db pgdb.DB, pOrT, q string, args ...any) er
 	return nil
 }
 
-/*
-switch between totals (sums) and pergame (averages) stats based on the
-Meta.StatType field
-*/
+// switch between totals (sums) and pergame (averages) stats based on the
+// Meta.StatType field
 func (rp *RespObj) HandleStatTypeSznOvw(p *RespPlayerSznOvw, s *RespPlayerStats) {
 	switch rp.Meta.StatType {
 	case "avg":
@@ -196,11 +192,9 @@ func (rp *RespObj) HandleStatTypeSznOvw(p *RespPlayerSznOvw, s *RespPlayerStats)
 	}
 }
 
-/*
-accept slice of Player structs and a season id, call slicePlayerSzn to create
-a new slice with only players from the specified season. then, generate a
-random number and return the player at that index in the slice
-*/
+// accept slice of Player structs and a season id, call slicePlayerSzn to create
+// a new slice with only players from the specified season. then, generate a
+// random number and return the player at that index in the slice
 func RandomPlayerId(pl []memd.Player, cs *memd.CurrentSeasons, pq *PlayerQuery) uint64 {
 	players, _ := SlicePlayersSzn(pl, cs, pq)
 	numPlayers := len(players)
@@ -208,12 +202,10 @@ func RandomPlayerId(pl []memd.Player, cs *memd.CurrentSeasons, pq *PlayerQuery) 
 	return players[randNum].PlayerId
 }
 
-/*
-player name and season ID from get request passed here, returns the player's
-ID and the season ID. if 'player' variable == "random", the randPlayer function
-is called. a player ID also can be passed as the player parameter, it will just
-be converted to an int and returned
-*/
+// player name and season ID from get request passed here, returns the player's
+// ID and the season ID. if 'player' variable == "random", the randPlayer function
+// is called. a player ID also can be passed as the player parameter, it will just
+// be converted to an int and returned
 func ValidatePlayerSzn(
 	players []memd.Player,
 	cs *memd.CurrentSeasons,

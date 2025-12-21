@@ -27,18 +27,17 @@ func (app *App) SetupHTTPServer(mux *http.ServeMux) (*http.Server, error) {
 	}, nil
 }
 
-/*
-create a mux server type & return to be run
-all endpoints need to be defined in the mount function with their HTTP request
-method/endpoint name and their corresponding HandleFunc
-the root handler "/" must remain at the end of the function
-*/
+// create a mux server type & return to be run
+// all endpoints need to be defined in the mount function with their HTTP request
+// method/endpoint name and their corresponding HandleFunc
+// the root handler "/" must remain at the end of the function
 func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	app.ENDPOINTS = Endpoints{
 		"GET /about":                        app.HndlAbt,
 		"GET /health":                       app.HndlHealth,
+		"GET /dbhealth":                     app.HndlDBHealth,
 		"GET /bronto":                       app.HndlBronto,
 		"GET /bball":                        app.HndlBBall,
 		"GET /bball/about":                  app.HndlBBallAbt,

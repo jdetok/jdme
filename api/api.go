@@ -16,9 +16,8 @@ import (
 
 // GLOBAL APP STRUCT
 type App struct {
-	ENDPOINTS Endpoints
-	Addr      string
-	// DB         *sql.DB
+	ENDPOINTS  Endpoints
+	Addr       string
 	DB         pgdb.DB
 	StartTime  time.Time
 	LastUpdate time.Time

@@ -1,7 +1,6 @@
 package memd
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -70,7 +69,6 @@ type StPlayer struct {
 
 // get all team ids from db, convert each to a uint64, map to string version
 func (sm *StMaps) MapTeamIdUints(db pgdb.DB) error {
-	fmt.Println("mapping team id strings to uint64")
 	// get all team ids
 	teams, err := db.Query(`
 	select distinct a.team_id, lower(b.team), b.lg_id
@@ -109,10 +107,7 @@ func (sm *StMaps) MapTeamIdUints(db pgdb.DB) error {
 
 // get all team ids from db, convert each to a uint64, map to string version
 func (sm *StMaps) MapSeasons(db pgdb.DB) error {
-	fmt.Println("mapping seasons")
-
 	sm.InitAggSznMaps([]int{0, 29999, 49999})
-
 	szns, err := db.Query("select distinct szn_id from stats.tbox")
 	if err != nil {
 		return err
@@ -149,26 +144,18 @@ func (sm *StMaps) InitEmptySznMaps(szn int) {
 
 func (sm *StMaps) InitAggSznMaps(aggSzns []int) {
 	for _, s := range aggSzns {
-		fmt.Printf("init %d maps\n", s)
-		// [aggszn] => init nested team maps
 		sm.SeasonPlrNms[s] = map[string]uint64{}
 		sm.SeasonPlrIds[s] = map[uint64]string{}
 		sm.SznTmPlrIds[s] = map[uint64]map[uint64]string{}
 		sm.NSznTmPlrIds[s] = map[uint64]map[uint64]string{}
 		sm.WSznTmPlrIds[s] = map[uint64]map[uint64]string{}
-
-		// [aggszn][teamId = 0]
-		fmt.Printf("init teamId=0 in %d \n", s)
 		sm.InitTm0SznMap(s)
-
-		// init nested team map for each team
 		sm.InitTmSznMaps(s)
 	}
 }
 
 func (sm *StMaps) InitTmSznMaps(szn int) {
 	for t, lg := range sm.TeamIdLg {
-		fmt.Printf("init teamId=%d in %d \n", t, szn)
 		sm.SznTmPlrIds[szn][t] = map[uint64]string{}
 		switch lg {
 		case 0:
@@ -189,8 +176,6 @@ func (sm *StMaps) InitTm0SznMap(szn int) {
 // season, create an empty map inside each season team map
 // MapTeamIdUints MUST be called first
 func (sm *StMaps) MapSznTeams(db pgdb.DB, szn int) error {
-	fmt.Println("mapping team ids to season: ", szn)
-	// get all team ids
 	teams, err := db.Query(
 		`select distinct a.team_id, b.lg_id 
 		from stats.tbox a
@@ -230,13 +215,10 @@ func (sm *StMaps) MapSznTeams(db pgdb.DB, szn int) error {
 
 func (sm *StMaps) MapTeamToSzn(szn int, teamId uint64) {
 	sm.SznTmPlrIds[szn][teamId] = map[uint64]string{}
-	fmt.Println(sm.TeamIdLg[teamId])
 	switch sm.TeamIdLg[teamId] {
 	case 0:
-		fmt.Printf("%d played in nba playoff season %d\n", szn, teamId)
 		sm.NSznTmPlrIds[szn][teamId] = map[uint64]string{}
 	case 1:
-		fmt.Printf("%d played in wnba playoff season %d\n", szn, teamId)
 		sm.WSznTmPlrIds[szn][teamId] = map[uint64]string{}
 	}
 }
