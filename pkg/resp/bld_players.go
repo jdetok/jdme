@@ -12,14 +12,12 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
 
-/*
-primary database query function for the /players endpoint. queries the api
-tables in the database sing the passed player, season, team ID to get the
-player's stats. defaults to TeamTopScorerDash query, which gets the dash for
-the top scorer of the most recent night's games. this is called when the site
-loads. the response is scanned into the structs defined in resp.go, before being
-marshalled into json and returned to write as the http response
-*/
+// primary database query function for the /players endpoint. queries the api
+// tables in the database sing the passed player, season, team ID to get the
+// player's stats. defaults to TeamTopScorerDash query, which gets the dash for
+// the top scorer of the most recent night's games. this is called when the site
+// loads. the response is scanned into the structs defined in resp.go, before being
+// marshalled into json and returned to write as the http response
 func (r *RespPlayerDash) GetPlayerDash(db pgdb.DB, iq *PQueryIds) ([]byte, error) {
 	// query player, scan to structs, call struct functions
 	// appends RespObj to r.Results
@@ -280,20 +278,6 @@ func (m *RespPlayerMeta) MakePlayerDashCaptions(plr_or_tm string) {
 	m.ShtgCapAvg = fmt.Sprintf("Shooting Averages %s %s", delim, stat_lbl_ender)
 }
 
-// /*
-// use the transform package to remove accidentals
-// e.g. Dončić becomes doncic
-// */
-// func RemoveDiacritics(input string) string {
-// 	t := transform.Chain(
-// 		norm.NFD,
-// 		runes.Remove(runes.In(unicode.Mn)),
-// 		norm.NFC,
-// 	)
-// 	output, _, _ := transform.String(t, input)
-// 	return output
-// }
-
 // use league and player id to build the URL containing a player's headshot
 func (m *RespPlayerMeta) MakeHeadshotUrl() {
 	lg := strings.ToLower(m.League)
@@ -312,17 +296,15 @@ func MakeTeamLogoUrl(league, teamId string) string {
 		lg, lg, teamId)
 }
 
-/*
-accept a season id and a pointer to a Player struct, validate the player was active
-in the passed season, return a valid season ID if not. if season id starts with an
-8 the player's max regular season will be returned. if it starts with a 7, their
-max playoff season will be returned. if it starts with a 4, it will first verify
-player has played in a playoff game, and will return their max regular season if
-they haven't. a season id starting with 2 will return a regular season. for both
-regular season and playoffs, the function will verify the player played in said
-season, and return either their max or min (whichever is closer) season  if they
-did not
-*/
+// accept a season id and a pointer to a Player struct, validate the player was active
+// in the passed season, return a valid season ID if not. if season id starts with an
+// 8 the player's max regular season will be returned. if it starts with a 7, their
+// max playoff season will be returned. if it starts with a 4, it will first verify
+// player has played in a playoff game, and will return their max regular season if
+// they haven't. a season id starting with 2 will return a regular season. for both
+// regular season and playoffs, the function will verify the player played in said
+// season, and return either their max or min (whichever is closer) season  if they
+// did not
 func HandleSeasonId(sId int, p *memd.Player, team bool, errStr *string) int {
 	if sId == 99999 || sId == 29999 { // agg seasons
 		msg := fmt.Sprintf("aggregate season requested%d | %d\n", sId, sId)
@@ -394,11 +376,8 @@ func HandleSeasonId(sId int, p *memd.Player, team bool, errStr *string) int {
 	return sId
 }
 
-/*
-accept the slice of all players and a seasonId, return a slice with just the
-active players from the passed season id
-*/
-// func SlicePlayersSzn(players []Player, seasonId uint64) ([]Player, error) {
+// accept the slice of all players and a seasonId, return a slice with just the
+// active players from the passed season id
 func SlicePlayersSzn(players []memd.Player, cs *memd.CurrentSeasons, pq *PlayerQuery) ([]memd.Player, error) {
 	var plslice []memd.Player
 

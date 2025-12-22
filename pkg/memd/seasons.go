@@ -26,10 +26,8 @@ type CurrentSeasons struct {
 	CurSzn     string
 }
 
-/*
-returns slice of two season strings for date (generally pass time.Now())
-calling in 2025 will return 2024-25 and 2025-26 and so on
-*/
+// returns slice of two season strings for date (generally pass time.Now())
+// calling in 2025 will return 2024-25 and 2025-26 and so on
 func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) error {
 	dt := now
 	// current year | year + 1 || e.g. 2025: cyyy=2025, cy=26
@@ -74,15 +72,13 @@ func (cs *CurrentSeasons) GetCurrentSzns(now time.Time) error {
 	return nil
 }
 
-/*
-return SeasonLeague struct with current wnba and nba season based on the current
-month. for any given year there will be two season combinations that can exist be
-created using only the year as an int. for example, in 2025, both "2024-25" and
-"2025-26" can be generated from the year. since the WNBA season starts and ends
-in the same calendar year and the NBA season spans two calendar years, there are
-times of year in which the "current" WNBA season is different than the current
-NBA season.
-*/
+// return SeasonLeague struct with current wnba and nba season based on the current
+// month. for any given year there will be two season combinations that can exist be
+// created using only the year as an int. for example, in 2025, both "2024-25" and
+// "2025-26" can be generated from the year. since the WNBA season starts and ends
+// in the same calendar year and the NBA season spans two calendar years, there are
+// times of year in which the "current" WNBA season is different than the current
+// NBA season.
 func (cs *CurrentSeasons) LgSznsByMonth(now time.Time) (SeasonLeague, error) {
 	// var cs CurrentSeasons
 	if err := cs.GetCurrentSzns(now); err != nil {
