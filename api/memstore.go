@@ -2,7 +2,10 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -10,83 +13,105 @@ import (
 )
 
 // check whether enough time has passed to rebuild the in memory storage
-func (app *App) UpdateStore(ctx context.Context, quickstart bool, threshold time.Duration) error {
-	var recoveredErr error
-	defer func() {
-		if r := recover(); r != nil {
-			recoveredErr = r.(error)
-		}
-	}()
-	if recoveredErr != nil {
-		return recoveredErr
-	}
-
+func (app *App) UpdateStore(ctx context.Context, quickstart bool, tick, threshold time.Duration) error {
 	// call update func on intial run
 	if !app.Started {
 		app.Started = true
 		app.StartTime = time.Now()
+
 		if err := app.UpdateStructsSafe(); err != nil {
 			return err
 		}
+
+		// init empty maps
+		app.MStore.Set(memd.MakeMaps()) // empty maps
+
 		if quickstart {
-			if err := app.MStore.SetupFromPersist(); err != nil {
-				return fmt.Errorf(
-					"** error failed to setup maps from persist file %s\n * %v",
-					app.MStore.PersistPath, err,
-				)
+			// build maps from persisted JSON
+			if err := app.MStore.BuildFromPersist(); err == nil {
+				app.Lg.Infof("quick startup from %s complete", app.MStore.PersistPath)
+			} else {
+				if errors.Is(err, os.ErrNotExist) { // persist file doesn't exist, skip
+					app.Lg.Infof("no persist file found at %s, skipping quickstart and building maps...\n* %v",
+						app.MStore.PersistPath, err)
+					if err := app.MStore.Rebuild(ctx, app.DB, app.Lg, true); err != nil {
+						return fmt.Errorf("failed to build map store after skipping quickstart: %v", err)
+					}
+				} else {
+					return fmt.Errorf("** failed to setup maps from persist file %s\n * %v",
+						app.MStore.PersistPath, err,
+					)
+				}
 			}
-			app.Lg.Infof("quick startup from %s complete, rebuilding...", app.MStore.PersistPath)
-			if err := app.RebuildMemStore(); err != nil {
-				return fmt.Errorf("failed to rebuild memstore after successfully building from persist: %v", err)
-			}
-			app.Lg.Infof("memstore rebuild complete: %d players in memory",
-				len(app.MStore.Maps.PlayerIdName))
 		} else {
-			app.Lg.Infof("building in-memory map store")
-			if err := app.MStore.Setup(app.DB, app.Lg); err != nil {
-				return fmt.Errorf("** error failed to setup maps\n * %v", err)
+			app.Lg.Infof("skipping quickstart and builiding map store")
+			// persist = true for first run
+			if err := app.MStore.Rebuild(ctx, app.DB, app.Lg, true); err != nil {
+				return fmt.Errorf("failed to build map store or persist data after skipping quickstart: %v", err)
 			}
-			app.Lg.Infof("in memory map store setup complete | %d players mapped",
-				len(app.MStore.Maps.PlrIds))
 		}
 	}
 
-	ticker := time.NewTicker(time.Minute)
+	app.Lg.Infof("memstore setup complete | %d players | %d teams\n+ persisted at %s",
+		len(app.MStore.Maps.PlrIds), len(app.MStore.Maps.TeamIds),
+		app.MStore.PersistPath)
+
+	app.Lg.Infof("starting ticker to update store: tick set to: %v | threshold: %v", tick, threshold)
+
+	ticker := time.NewTicker(tick)
 	defer ticker.Stop()
-	for range ticker.C {
-		if time.Since(app.LastUpdate) < threshold {
-			// return nil // not time to update
-			continue
+	for {
+		select {
+		case <-ctx.Done():
+			app.Lg.Infof("UpdateStore exiting: %v", ctx.Err())
+			return nil
+		case <-ticker.C:
+			if time.Since(app.LastUpdate) >= threshold {
+				app.Lg.Infof("time since last update {%v} > threshold {%v} - rebuilding memory store",
+					time.Since(app.LastUpdate), threshold)
+				if err := app.RebuildMemStore(ctx); err != nil {
+					return fmt.Errorf("RebuildMemStore failed: %v", err)
+				}
+			}
 		}
-		app.Lg.Infof("time since last update {%v} > threshold {%v} - rebuilding memory store",
-			time.Since(app.LastUpdate), threshold)
-		return app.RebuildMemStore()
 	}
-	return nil
 }
 
-func (app *App) RebuildMemStore() error {
-	var errRtn error = nil
+func (app *App) RebuildMemStore(ctx context.Context) error {
 	var wg = &sync.WaitGroup{}
-	wg.Add(2) // struct update producer, map update producer, error consumer
 
 	var errs []error
-	errCh := make(chan error)
+	errCh := make(chan error, 2)
 
-	go func(wg *sync.WaitGroup, app *App) {
+	wg.Go(func() {
 		defer wg.Done()
-		if err := app.UpdateStructsSafe(); err != nil {
-			errCh <- fmt.Errorf("error updating struct slices: %v", err)
+		if ctx.Err() != nil {
+			return
 		}
-	}(wg, app)
+
+		if err := app.UpdateStructsSafe(); err != nil {
+			select {
+			case errCh <- fmt.Errorf("error updating struct slices: %w", err):
+			case <-ctx.Done():
+			}
+		}
+	})
 
 	// update maps
-	go func(wg *sync.WaitGroup, app *App) {
+	wg.Go(func() {
 		defer wg.Done()
-		if err := app.MStore.Rebuild(app.DB, app.Lg); err != nil {
-			errCh <- fmt.Errorf("error updating maps: %v", err)
+		if ctx.Err() != nil {
+			return
 		}
-	}(wg, app)
+
+		// persist = false for continuous rebuild
+		if err := app.MStore.Rebuild(ctx, app.DB, app.Lg, false); err != nil {
+			select {
+			case errCh <- fmt.Errorf("error updating maps: %w", err):
+			case <-ctx.Done():
+			}
+		}
+	})
 
 	go func() {
 		wg.Wait()
@@ -97,23 +122,17 @@ func (app *App) RebuildMemStore() error {
 		errs = append(errs, err)
 	}
 
-	if err := app.MStore.Persist(); err != nil {
+	if err := app.MStore.Persist(true); err != nil {
 		errs = append(errs, err)
 	}
 
-	numErrs := len(errs)
-	if numErrs > 0 {
-		errMsg := fmt.Sprintf("** %d error occured updating store\n", numErrs)
+	if len(errs) > 0 {
+		var emsg strings.Builder
+		fmt.Fprintf(&emsg, "** %d error occured updating store\n", len(errs))
 		for i, err := range errs {
-			errMsg = fmt.Sprintf("%s%s", errMsg,
-				fmt.Sprintf("* error %d: %v\n", i, err),
-			)
+			fmt.Fprintf(&emsg, "* error %d: %v\n", i+1, err)
 		}
-		errRtn = fmt.Errorf("%s", errMsg)
-	}
-
-	if errRtn != nil {
-		return errRtn
+		return errors.New(emsg.String())
 	}
 	return nil
 }

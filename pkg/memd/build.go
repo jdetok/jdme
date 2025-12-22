@@ -1,10 +1,12 @@
 package memd
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/errd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
@@ -47,16 +49,37 @@ func MakeMaps() *StMaps {
 	return &sm
 }
 
-// marshal to a json file for quick reload
-func (ms *MapStore) Persist() error {
-	// fp := "maps.json"
-	js, err := json.MarshalIndent(ms.Maps, "", " ")
-	if err != nil {
-		return err
+// assign pointer to rebuilt maps struct to existing struct
+func (ms *MapStore) Set(newMaps *StMaps) {
+	ms.mu.Lock()
+	ms.Maps = newMaps
+	ms.mu.Unlock()
+}
+
+// rebuild maps in new temp StMaps structs, replace old one
+func (ms *MapStore) Rebuild(ctx context.Context, db pgdb.DB, lg *logd.Logd, persist bool) error {
+	temp := MakeMaps()
+
+	if err := temp.MapTeamIdUints(db); err != nil {
+		return fmt.Errorf("error mapping teams: %v", err)
 	}
-	if err := os.WriteFile(ms.PersistPath, js, 0644); err != nil {
-		return err
+	if err := temp.MapSeasons(db); err != nil {
+		return fmt.Errorf("error mapping seasons: %v", err)
 	}
+	if err := temp.MapPlayersCC(ctx, db, lg); err != nil {
+		return fmt.Errorf("error mapping players: %v", err)
+	}
+
+	ms.Set(temp)
+
+	if persist {
+		if err := ms.Persist(true); err != nil {
+			return &errd.PersistError{
+				Err: fmt.Errorf("failed to persist memory to %s: %v",
+					ms.PersistPath, err)}
+		}
+	}
+
 	return nil
 }
 
@@ -71,44 +94,18 @@ func (ms *MapStore) BuildFromPersist() error {
 	return nil
 }
 
-// ran at start of runtime to setup empty maps
-func (ms *MapStore) Setup(db pgdb.DB, lg *logd.Logd) error {
-	ms.Set(MakeMaps()) // empty maps
-	if err := ms.Rebuild(db, lg); err != nil {
+// marshal to a json file for quick reload
+func (ms *MapStore) Persist(mini bool) error {
+	// fp := "maps.json"
+	var js []byte
+	var err error
+	if mini {
+		js, err = json.Marshal(ms.Maps)
+	} else {
+		js, err = json.MarshalIndent(ms.Maps, "", " ")
+	}
+	if err != nil {
 		return err
-	} // map data
-	return nil
-}
-
-func (ms *MapStore) SetupFromPersist() error {
-	ms.Set(MakeMaps()) // empty maps
-	if err := ms.BuildFromPersist(); err != nil {
-		return err
 	}
-	return nil
-}
-
-// assign pointer to rebuilt maps struct to existing struct
-func (ms *MapStore) Set(newMaps *StMaps) {
-	ms.mu.Lock()
-	defer ms.mu.Unlock()
-	ms.Maps = newMaps
-}
-
-// rebuild maps in new temp StMaps structs, replace old one
-func (ms *MapStore) Rebuild(db pgdb.DB, lg *logd.Logd) error {
-
-	temp := MakeMaps()
-	if err := temp.MapTeamIdUints(db); err != nil {
-		return fmt.Errorf("error mapping teams: %v", err)
-	}
-	if err := temp.MapSeasons(db); err != nil {
-		return fmt.Errorf("error mapping seasons: %v", err)
-	}
-	if err := temp.MapPlayersCC(db, lg); err != nil {
-		return fmt.Errorf("error mapping players: %v", err)
-	}
-
-	ms.Set(temp)
-	return nil
+	return os.WriteFile(ms.PersistPath, js, 0644)
 }

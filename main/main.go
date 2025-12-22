@@ -21,52 +21,78 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const (
+	ENV_FILE        = ".env"
+	PERSIST_FILE    = "./persist/maps.json"
+	APPLOG_FILE     = "./z_log/app/applog"
+	DEBUG_FILE      = "./z_log/dbg/debug"
+	MONGO_LOG_DB    = "log"
+	MONGO_HTTP_COLL = "http"
+)
+
 func main() {
-	if err := godotenv.Load(); err != nil {
+	app := &api.App{Started: false, QuickStart: true}
+	app.T = api.Timing{
+		CtxTimeout:        10 * time.Second,
+		UpdateStoreTick:   1 * time.Minute,
+		UpdateStoreThresh: 30 * time.Minute,
+		HealthCheckTick:   1 * time.Second,
+		HealthCheckThreah: 120 * time.Second,
+	}
+	app.MStore.PersistPath = PERSIST_FILE
+
+	if err := godotenv.Load(ENV_FILE); err != nil {
 		fmt.Printf("fatal error reading .env file: %v\n", err)
 		os.Exit(1)
 	}
 
-	app := &api.App{Started: false, QuickStart: true}
-	app.SetupLoggers()
-	ml, err := logd.NewMongoLogger("log", "http")
+	l, err := logd.SetupLoggers(APPLOG_FILE, DEBUG_FILE, MONGO_LOG_DB, MONGO_HTTP_COLL)
 	if err != nil {
-		app.Lg.Fatalf("failed to connect to mongo: %v", err)
+		fmt.Printf("fatal error setting up loggers: %v\n", err)
+		os.Exit(1)
 	}
-	defer func() {
-		if err := ml.Client.Disconnect(context.TODO()); err != nil {
+	app.Lg = l
+	defer func() { // disconnect from mongo when app shuts down
+		if err := l.Mongo.Client.Disconnect(context.TODO()); err != nil {
 			app.Lg.Fatalf("fatal mongo error: %v", err)
 		}
 	}()
-	app.Lg.Mongo = ml
+	app.Lg.Infof("environment variables loaded from file: %s | loggers setup successfully", ENV_FILE)
+
 	if dbErr := app.SetupDB(); dbErr != nil {
 		app.Lg.Fatalf("fatal db setup error: %v", dbErr)
 	}
+
+	app.Lg.Infof("database connection created successfully")
 
 	srv, err := app.SetupHTTPServer(app.Mount())
 	if err != nil {
 		app.Lg.Fatalf("failed to setup HTTP server: %v", err)
 	}
 
+	app.Lg.Infof("HTTP server configured successfully")
+
 	shutdownCtx, stop := signal.NotifyContext(context.Background(),
 		syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
 
-	errCh := make(chan error, 1)
+	errCh := make(chan error, 3)
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		defer wg.Done()
-		app.Lg.Infof("starting server at %v...\n", app.Addr)
+		app.Lg.Infof("starting HTTP server at %v...\n", app.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			if shutdownCtx.Err() == nil {
 				select {
 				case errCh <- fmt.Errorf("http listen error occured: %v", err):
 				default:
+					app.Lg.Infof("HTTP server listening at %v...\n", app.Addr)
 				}
 			}
 		}
 	})
 	wg.Go(func() {
+		defer wg.Done()
 		url := fmt.Sprintf("http://%s/health", srv.Addr)
 		var lastCheck time.Time
 		thresh := 60 * time.Second
@@ -83,8 +109,12 @@ func main() {
 					app.Lg.Errorf("health check failed: %v", err)
 					if len(fails) < failLimit {
 						continue
-					} else {
-						errCh <- fmt.Errorf("health check failed %d times: %v", failLimit, err)
+					}
+					if shutdownCtx.Err() == nil {
+						select {
+						case errCh <- fmt.Errorf("error occured during health check: %v", err):
+						default:
+						}
 						return
 					}
 				}
@@ -102,8 +132,16 @@ func main() {
 
 	wg.Go(func() { // update in memory store every
 		defer wg.Done()
-		thresh := 30 * time.Minute
-		err := app.UpdateStore(shutdownCtx, app.QuickStart, thresh)
+		defer func() {
+			if r := recover(); r != nil {
+				select {
+				case errCh <- fmt.Errorf("UpdateStore panic: %v", r):
+				default:
+				}
+			}
+		}()
+		err := app.UpdateStore(shutdownCtx, app.QuickStart,
+			app.T.UpdateStoreTick, app.T.UpdateStoreThresh)
 		if err != nil {
 			if shutdownCtx.Err() == nil {
 				select {
@@ -123,7 +161,7 @@ func main() {
 		stop()
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), app.T.CtxTimeout)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
