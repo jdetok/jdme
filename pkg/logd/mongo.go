@@ -56,7 +56,7 @@ func SetupMongoClient(auth *mongoAuth) (*mongo.Client, error) {
 
 	opts := options.Client().ApplyURI(auth.conn)
 
-	fmt.Println(auth.conn)
+	// fmt.Println(auth.conn)
 	client, err := mongo.Connect(opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to mogno at %s: %v", auth.conn, err)
