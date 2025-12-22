@@ -79,7 +79,6 @@ func (app *App) UpdateStore(ctx context.Context, quickstart bool, tick, threshol
 
 func (app *App) RebuildMemStore(ctx context.Context) error {
 	var wg = &sync.WaitGroup{}
-	// wg.Add(2) // struct update producer, map update producer, error consumer
 
 	var errs []error
 	errCh := make(chan error, 2)
@@ -123,7 +122,7 @@ func (app *App) RebuildMemStore(ctx context.Context) error {
 		errs = append(errs, err)
 	}
 
-	if err := app.MStore.Persist(); err != nil {
+	if err := app.MStore.Persist(true); err != nil {
 		errs = append(errs, err)
 	}
 

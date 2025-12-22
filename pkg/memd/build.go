@@ -49,43 +49,11 @@ func MakeMaps() *StMaps {
 	return &sm
 }
 
-// marshal to a json file for quick reload
-func (ms *MapStore) Persist() error {
-	// fp := "maps.json"
-	js, err := json.MarshalIndent(ms.Maps, "", " ")
-	if err != nil {
-		return err
-	}
-	if err := os.WriteFile(ms.PersistPath, js, 0644); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (ms *MapStore) BuildFromPersist() error {
-	b, err := os.ReadFile(ms.PersistPath)
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(b, ms.Maps); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (ms *MapStore) SetupFromPersist() error {
-	ms.Set(MakeMaps()) // empty maps
-	if err := ms.BuildFromPersist(); err != nil {
-		return err
-	}
-	return nil
-}
-
 // assign pointer to rebuilt maps struct to existing struct
 func (ms *MapStore) Set(newMaps *StMaps) {
 	ms.mu.Lock()
-	defer ms.mu.Unlock()
 	ms.Maps = newMaps
+	ms.mu.Unlock()
 }
 
 // rebuild maps in new temp StMaps structs, replace old one
@@ -105,7 +73,7 @@ func (ms *MapStore) Rebuild(ctx context.Context, db pgdb.DB, lg *logd.Logd, pers
 	ms.Set(temp)
 
 	if persist {
-		if err := ms.Persist(); err != nil {
+		if err := ms.Persist(true); err != nil {
 			return &errd.PersistError{
 				Err: fmt.Errorf("failed to persist memory to %s: %v",
 					ms.PersistPath, err)}
@@ -113,4 +81,31 @@ func (ms *MapStore) Rebuild(ctx context.Context, db pgdb.DB, lg *logd.Logd, pers
 	}
 
 	return nil
+}
+
+func (ms *MapStore) BuildFromPersist() error {
+	b, err := os.ReadFile(ms.PersistPath)
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(b, ms.Maps); err != nil {
+		return err
+	}
+	return nil
+}
+
+// marshal to a json file for quick reload
+func (ms *MapStore) Persist(mini bool) error {
+	// fp := "maps.json"
+	var js []byte
+	var err error
+	if mini {
+		js, err = json.Marshal(ms.Maps)
+	} else {
+		js, err = json.MarshalIndent(ms.Maps, "", " ")
+	}
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(ms.PersistPath, js, 0644)
 }
