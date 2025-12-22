@@ -27,7 +27,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	app := &api.App{Started: false, QuickStart: false}
+	app := &api.App{Started: false, QuickStart: true}
 	app.SetupLoggers()
 	ml, err := logd.NewMongoLogger("log", "http")
 	if err != nil {
@@ -69,7 +69,7 @@ func main() {
 	wg.Go(func() {
 		url := fmt.Sprintf("http://%s/health", srv.Addr)
 		var lastCheck time.Time
-		thresh := 10 * time.Second
+		thresh := 60 * time.Second
 		ticker := time.NewTicker(time.Second)
 		var fails []struct{}
 		failLimit := 5
