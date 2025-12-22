@@ -67,6 +67,7 @@ func main() {
 		}
 	})
 	wg.Go(func() {
+		defer wg.Done()
 		url := fmt.Sprintf("http://%s/health", srv.Addr)
 		var lastCheck time.Time
 		thresh := 60 * time.Second
@@ -83,8 +84,12 @@ func main() {
 					app.Lg.Errorf("health check failed: %v", err)
 					if len(fails) < failLimit {
 						continue
-					} else {
-						errCh <- fmt.Errorf("health check failed %d times: %v", failLimit, err)
+					}
+					if shutdownCtx.Err() == nil {
+						select {
+						case errCh <- fmt.Errorf("http listen error occured: %v", err):
+						default:
+						}
 						return
 					}
 				}
@@ -102,8 +107,17 @@ func main() {
 
 	wg.Go(func() { // update in memory store every
 		defer wg.Done()
+		defer func() {
+			if r := recover(); r != nil {
+				select {
+				case errCh <- fmt.Errorf("UpdateStore panic: %v", r):
+				default:
+				}
+			}
+		}()
+		tick := 1 * time.Minute
 		thresh := 30 * time.Minute
-		err := app.UpdateStore(shutdownCtx, app.QuickStart, thresh)
+		err := app.UpdateStore(shutdownCtx, app.QuickStart, tick, thresh)
 		if err != nil {
 			if shutdownCtx.Err() == nil {
 				select {

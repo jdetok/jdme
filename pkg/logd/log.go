@@ -22,7 +22,7 @@ const (
 func (l *Logd) HTTPf(r *http.Request) {
 	hl := NewHTTPLog(r)
 	l.Mongo.log(hl)
-	l.log(HTTP, "http request\n\t- %s\n\t- %s", hl.ID.String(), r.URL.String())
+	l.log(HTTP, "served %s : %s\n", r.URL.String(), hl.ID.String())
 }
 func (l *Logd) Infof(msg string, args ...any)  { l.log(INFO, msg, args...) }
 func (l *Logd) Debugf(msg string, args ...any) { l.log(DEBUG, msg, args...) }

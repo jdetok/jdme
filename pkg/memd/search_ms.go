@@ -24,7 +24,6 @@ type SznTmPlr struct {
 
 func (sm *StMaps) ValiSznTmPlr(plrId, tmId uint64, sId int) (*SznTmPlr, error) {
 	// return if valid
-
 	if _, ok := sm.SznTmPlrIds[sId][tmId][plrId]; ok {
 		return &SznTmPlr{PId: plrId, TId: tmId, SId: sId}, nil
 	}

@@ -1,6 +1,7 @@
 package memd
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -14,33 +15,27 @@ import (
 
 // query all players from DB, loop through rows serially, then launch goroutines
 // to process and map the data for each player concurrently
-func (sm *StMaps) MapPlayersCC(db pgdb.DB, lgd *logd.Logd) error {
+func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) error {
 	start := time.Now()
 	lgd.Debugf("mapping all players (concurrent workers)")
 
-	rows, err := db.Query(pgdb.QPlayerStore)
+	rows, err := db.QueryContext(ctx, pgdb.QPlayerStore)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
 
-	// waitgroup
-	var wg = &sync.WaitGroup{}
-
 	// concurrency controls
+	var wg = &sync.WaitGroup{}
 	const maxWorkers = 20
 	sem := make(chan struct{}, maxWorkers)
-
-	// channels for results and errors
+	errCh := make(chan error, maxWorkers)
 	results := make(chan *StPlayer)
-	errCh := make(chan error, 1)
 
 	sm.PlayerNameId["random"] = 77777
 
 	// read the results channel, add player to maps
-	wg.Add(1)
 	go func() {
-		defer wg.Done()
 		for p := range results {
 			lgd.Debugf("%s complete", p.Name)
 		}
@@ -49,6 +44,10 @@ func (sm *StMaps) MapPlayersCC(db pgdb.DB, lgd *logd.Logd) error {
 	count := 0
 	// scan rows serially, then spawn worker goroutine per player
 	for rows.Next() {
+		if ctx.Err() != nil {
+			break
+		}
+
 		count++
 		var id uint64
 		var name, lowrStr, tms string
@@ -68,16 +67,22 @@ func (sm *StMaps) MapPlayersCC(db pgdb.DB, lgd *logd.Logd) error {
 			MinPSzn: minP,
 		}
 
-		// add one worker to semaphore and waitgroup
-		sem <- struct{}{}
-		wg.Add(1)
+		select {
+		case sem <- struct{}{}:
+		case <-ctx.Done():
+			return ctx.Err()
+		}
 
-		// launch goroutine to process and map data
-		go func(lgd *logd.Logd, p *StPlayer, lowrStr, tms string) {
+		wg.Add(1)
+		c := count // capture worker count before it startss
+		go func(p *StPlayer, lowrStr, tms string, wrkNum int) {
 			defer wg.Done()
 			defer func() { <-sem }()
+			if ctx.Err() != nil {
+				return
+			}
 
-			lgd.Debugf("worker %d running\n", count)
+			lgd.Debugf("worker %d running\n", wrkNum)
 
 			// clean the player name (lower case, remove accents)
 			p.Lowr = clnd.ConvToASCII(lowrStr)
@@ -106,9 +111,9 @@ func (sm *StMaps) MapPlayersCC(db pgdb.DB, lgd *logd.Logd) error {
 			}
 			select {
 			case results <- p:
-			case <-errCh:
+			case <-ctx.Done():
 			}
-		}(lgd, p, lowrStr, tms)
+		}(p, lowrStr, tms, c)
 	}
 
 	// check for error in rows
@@ -117,11 +122,10 @@ func (sm *StMaps) MapPlayersCC(db pgdb.DB, lgd *logd.Logd) error {
 	}
 
 	// close results when all workers finish
-	go func() {
-		wg.Wait()
-		close(results)
-		lgd.Debugf("finished with %d rows after %v", count, time.Since(start))
-	}()
+	wg.Wait()
+	close(results)
+	lgd.Debugf("finished with %d rows after %v", count, time.Since(start))
+
 	return nil
 }
 

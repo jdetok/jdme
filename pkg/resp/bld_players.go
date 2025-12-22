@@ -206,6 +206,7 @@ func RandomPlayerId(pl []memd.Player, cs *memd.CurrentSeasons, pq *PlayerQuery) 
 // ID and the season ID. if 'player' variable == "random", the randPlayer function
 // is called. a player ID also can be passed as the player parameter, it will just
 // be converted to an int and returned
+// ONLY CALLED IN V1 PLAYER HANDLER
 func ValidatePlayerSzn(
 	players []memd.Player,
 	cs *memd.CurrentSeasons,

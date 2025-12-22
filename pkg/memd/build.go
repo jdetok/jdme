@@ -1,6 +1,7 @@
 package memd
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -71,15 +72,6 @@ func (ms *MapStore) BuildFromPersist() error {
 	return nil
 }
 
-// ran at start of runtime to setup empty maps
-func (ms *MapStore) Setup(db pgdb.DB, lg *logd.Logd) error {
-	ms.Set(MakeMaps()) // empty maps
-	if err := ms.Rebuild(db, lg); err != nil {
-		return err
-	} // map data
-	return nil
-}
-
 func (ms *MapStore) SetupFromPersist() error {
 	ms.Set(MakeMaps()) // empty maps
 	if err := ms.BuildFromPersist(); err != nil {
@@ -96,8 +88,7 @@ func (ms *MapStore) Set(newMaps *StMaps) {
 }
 
 // rebuild maps in new temp StMaps structs, replace old one
-func (ms *MapStore) Rebuild(db pgdb.DB, lg *logd.Logd) error {
-
+func (ms *MapStore) Rebuild(ctx context.Context, db pgdb.DB, lg *logd.Logd) error {
 	temp := MakeMaps()
 	if err := temp.MapTeamIdUints(db); err != nil {
 		return fmt.Errorf("error mapping teams: %v", err)
@@ -105,7 +96,7 @@ func (ms *MapStore) Rebuild(db pgdb.DB, lg *logd.Logd) error {
 	if err := temp.MapSeasons(db); err != nil {
 		return fmt.Errorf("error mapping seasons: %v", err)
 	}
-	if err := temp.MapPlayersCC(db, lg); err != nil {
+	if err := temp.MapPlayersCC(ctx, db, lg); err != nil {
 		return fmt.Errorf("error mapping players: %v", err)
 	}
 
