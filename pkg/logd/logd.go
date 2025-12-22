@@ -45,6 +45,60 @@ type HTTPLog struct {
 	Header     http.Header   `bson:"header"`
 }
 
+// make new logd object, holds io writers for log files and mongo client
+func NewLogd(lo, qo io.Writer) *Logd {
+	return &Logd{
+		lg:        log.New(lo, "", log.LstdFlags|log.Lshortfile),
+		qlg:       log.New(qo, "", log.LstdFlags|log.Lshortfile),
+		quietLvls: []string{DEBUG},
+		loudLvls:  []string{INFO, WARNING, ERROR, FATAL, QUIT, HTTP, HTTPERR},
+		httpLvls:  []string{HTTP, HTTPERR},
+	}
+}
+
+// log http requests
+func NewHTTPLog(r *http.Request) *HTTPLog {
+	return &HTTPLog{
+		ReqTime:    time.Now(),
+		URL:        r.RequestURI,
+		Method:     r.Method,
+		RemoteAddr: r.RemoteAddr,
+		Referer:    r.Referer(),
+		UserAgent:  r.UserAgent(),
+		Header:     r.Header,
+	}
+}
+
+func SetupLoggers(loudLogfName, dbgLogfName, mgoDBName, mgoCollName string) (*Logd, error) {
+	lf, err := SetupLogdF(loudLogfName)
+	if err != nil {
+		return nil, fmt.Errorf("error setting up main log file at %s: %v", loudLogfName, err)
+	}
+	df, err := SetupLogdF(dbgLogfName)
+	if err != nil {
+		return nil, fmt.Errorf("error setting up debug log file at %s: %v", dbgLogfName, err)
+	}
+
+	l := NewLogd(io.MultiWriter(os.Stdout, lf), df)
+	ml, err := mgo.NewMongoLogger("log", "http")
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to mongo: %v", err)
+	}
+	l.Mongo = ml
+	return l, nil
+}
+
+// create and return the log file
+func SetupLogdF(pathfile string) (*os.File, error) {
+	ts := time.Now().Format("01022006_150405")
+	fname := fmt.Sprintf("%s_%s.log", pathfile, ts)
+	f, err := os.Create(fname)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create file at %s\n**%w", fname, err)
+	}
+	return f, nil
+}
+
 // HIGH LEVEL FUNCS TO CALL IN SOURCE
 // log HTTP to mongo db server and to log file
 func (l *Logd) HTTPf(r *http.Request) {
@@ -120,41 +174,6 @@ func log_http_mgo(hl *HTTPLog, ml *mgo.MongoLogger) error {
 		return nil
 	}
 	return nil
-}
-
-// make new logd object, holds io writers for log files and mongo client
-func NewLogd(lo, qo io.Writer) *Logd {
-	return &Logd{
-		lg:        log.New(lo, "", log.LstdFlags|log.Lshortfile),
-		qlg:       log.New(qo, "", log.LstdFlags|log.Lshortfile),
-		quietLvls: []string{DEBUG},
-		loudLvls:  []string{INFO, WARNING, ERROR, FATAL, QUIT, HTTP, HTTPERR},
-		httpLvls:  []string{HTTP, HTTPERR},
-	}
-}
-
-// log http requests
-func NewHTTPLog(r *http.Request) *HTTPLog {
-	return &HTTPLog{
-		ReqTime:    time.Now(),
-		URL:        r.RequestURI,
-		Method:     r.Method,
-		RemoteAddr: r.RemoteAddr,
-		Referer:    r.Referer(),
-		UserAgent:  r.UserAgent(),
-		Header:     r.Header,
-	}
-}
-
-// create and return the log file
-func SetupLogdF(pathfile string) (*os.File, error) {
-	ts := time.Now().Format("01022006_150405")
-	fname := fmt.Sprintf("%s_%s.log", pathfile, ts)
-	f, err := os.Create(fname)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create file at %s\n**%w", fname, err)
-	}
-	return f, nil
 }
 
 // actual err gets logged, just msg string gets sent as http errora

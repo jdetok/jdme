@@ -17,8 +17,17 @@ import (
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
-	"github.com/jdetok/go-api-jdeko.me/pkg/mgo"
+	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/joho/godotenv"
+)
+
+const (
+	ENV_FILE        = ".env"
+	PERSIST_FILE    = "./persist/maps.json"
+	APPLOG_FILE     = "./z_log/app/applog"
+	DEBUG_FILE      = "./z_log/dbg/debug"
+	MONGO_LOG_DB    = "log"
+	MONGO_HTTP_COLL = "http"
 )
 
 func main() {
@@ -30,27 +39,26 @@ func main() {
 		HealthCheckTick:   1 * time.Second,
 		HealthCheckThreah: 120 * time.Second,
 	}
-	app.MStore.PersistPath = "./persist/maps.json"
+	app.MStore.PersistPath = PERSIST_FILE
 
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(ENV_FILE); err != nil {
 		fmt.Printf("fatal error reading .env file: %v\n", err)
 		os.Exit(1)
 	}
 
-	app.SetupLoggers()
-	ml, err := mgo.NewMongoLogger("log", "http")
+	l, err := logd.SetupLoggers(APPLOG_FILE, DEBUG_FILE, MONGO_LOG_DB, MONGO_HTTP_COLL)
 	if err != nil {
-		app.Lg.Fatalf("failed to connect to mongo: %v", err)
+		fmt.Printf("fatal error setting up loggers: %v\n", err)
+		os.Exit(1)
 	}
-	defer func() {
-		if err := ml.Client.Disconnect(context.TODO()); err != nil {
+	app.Lg = l
+	defer func() { // disconnect from mongo when app shuts down
+		if err := l.Mongo.Client.Disconnect(context.TODO()); err != nil {
 			app.Lg.Fatalf("fatal mongo error: %v", err)
 		}
 	}()
+	app.Lg.Infof("environment variables loaded from file: %s | loggers setup successfully", ENV_FILE)
 
-	app.Lg.Infof("environment variables loaded and loggers setup successfully")
-
-	app.Lg.Mongo = ml
 	if dbErr := app.SetupDB(); dbErr != nil {
 		app.Lg.Fatalf("fatal db setup error: %v", dbErr)
 	}
