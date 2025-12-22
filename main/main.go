@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/api"
-	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/mgo"
 	"github.com/joho/godotenv"
 )
 
@@ -38,7 +38,7 @@ func main() {
 	}
 
 	app.SetupLoggers()
-	ml, err := logd.NewMongoLogger("log", "http")
+	ml, err := mgo.NewMongoLogger("log", "http")
 	if err != nil {
 		app.Lg.Fatalf("failed to connect to mongo: %v", err)
 	}

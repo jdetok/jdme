@@ -1,4 +1,4 @@
-package logd
+package mgo
 
 import (
 	"context"
@@ -31,7 +31,7 @@ func NewMongoLogger(db, coll string) (*MongoLogger, error) {
 	if err != nil {
 		return nil, err
 	}
-	mongo_cl, err := SetupMongoClient(auth)
+	mongo_cl, err := setupMongoClient(auth)
 	if err != nil {
 		return nil, err
 	}
@@ -44,19 +44,8 @@ func NewMongoLogger(db, coll string) (*MongoLogger, error) {
 	}, nil
 }
 
-func SetupMongoClient(auth *mongoAuth) (*mongo.Client, error) {
-
-	// serverAPI := options.ServerAPI(options.ServerAPIVersion1)
-	// opts := options.Client().ApplyURI(auth.conn).SetServerAPIOptions(serverAPI)
-	// opts.SetTimeout(10 * time.Second)
-	// client, err := mongo.Connect(opts)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed to connect to mogno at %s: %v", auth.conn, err)
-	// }
-
+func setupMongoClient(auth *mongoAuth) (*mongo.Client, error) {
 	opts := options.Client().ApplyURI(auth.conn)
-
-	// fmt.Println(auth.conn)
 	client, err := mongo.Connect(opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to mogno at %s: %v", auth.conn, err)
@@ -75,10 +64,6 @@ func SetupMongoClient(auth *mongoAuth) (*mongo.Client, error) {
 
 func getMongoAuth() (*mongoAuth, error) {
 	var m mongoAuth
-
-	// if err := godotenv.Load(); err != nil {
-	// 	return nil, err
-	// }
 
 	envVars := map[string]*string{
 		"MONGO_HOST":                 &m.host,
