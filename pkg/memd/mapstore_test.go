@@ -9,7 +9,7 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
-	"github.com/jdetok/golib/envd"
+	"github.com/joho/godotenv"
 )
 
 func TestLen(t *testing.T) {
@@ -29,8 +29,7 @@ func TestMapPlayersCC(t *testing.T) {
 	m := &MapStore{}
 	l := logd.NewLogd(os.Stdout, os.Stdout)
 
-	err := envd.LoadDotEnvFile("../../.env")
-	if err != nil {
+	if err := godotenv.Load("../../.env"); err != nil {
 		t.Error(err)
 	}
 
@@ -68,8 +67,7 @@ func TestMapPlayersCC(t *testing.T) {
 }
 
 func TestMapSznTeams(t *testing.T) {
-	err := envd.LoadDotEnvFile("../../.env")
-	if err != nil {
+	if err := godotenv.Load("../../.env"); err != nil {
 		t.Error(err)
 	}
 
@@ -102,7 +100,6 @@ func TestMapSznTeams(t *testing.T) {
 
 // 	"github.com/jdetok/go-api-jdeko.me/api"
 // 	"github.com/jdetok/go-api-jdeko.me/pgdb"
-// 	"github.com/jdetok/golib/envd"
 // )
 
 // func TestMapPlayers(t *testing.T) {

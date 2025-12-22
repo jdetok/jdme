@@ -2,16 +2,13 @@ package api
 
 import (
 	"fmt"
-	"io"
-	"log"
+	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
-	"github.com/jdetok/golib/envd"
 )
 
 type Timing struct {
@@ -38,51 +35,57 @@ type App struct {
 	QLogf      *os.File
 	Lg         *logd.Logd
 }
+type Endpoints map[string]func(http.ResponseWriter, *http.Request)
 
-func (app *App) SetupLoggers() {
-	// main logger
-	f, err := logd.SetupLogdF("./z_log/app/applog")
-	if err != nil {
-		log.Fatal(err)
+// create a mux server type & return to be run
+// all endpoints need to be defined in the mount function with their HTTP request
+// method/endpoint name and their corresponding HandleFunc
+// the root handler "/" must remain at the end of the function
+func (app *App) Mount() *http.ServeMux {
+	mux := http.NewServeMux()
+
+	app.ENDPOINTS = Endpoints{
+		"GET /about":                        app.HndlAbt,
+		"GET /health":                       app.HndlHealth,
+		"GET /dbhealth":                     app.HndlDBHealth,
+		"GET /bronto":                       app.HndlBronto,
+		"GET /bball":                        app.HndlBBall,
+		"GET /bball/about":                  app.HndlBBallAbt,
+		"GET /bball/seasons":                app.HndlSeasons,
+		"GET /bball/teams":                  app.HndlTeams,
+		"GET /bball/player":                 app.HndlPlayer,
+		"GET /bball/games/recent":           app.HndlRecentGames,
+		"GET /bball/league/scoring-leaders": app.HndlTopLgPlayers,
+		"GET /bball/teamrecs":               app.HndlTeamRecords,
+		"GET /bball/v2/players":             app.HndlPlayerV2,
+		"/docs/":                            app.ServeDocs,
+		"/js/":                              app.JSNostore,
+		"/css/":                             app.CSSNostore,
+		"/":                                 app.HndlRoot,
 	}
 
-	// debug logger
-	df, err := logd.SetupLogdF("./z_log/dbg/debug")
-	if err != nil {
-		log.Fatal(err)
+	for pattern, handler := range app.ENDPOINTS {
+		mux.HandleFunc(pattern, handler)
 	}
 
-	// Logd setup with each logger
-	app.Lg = logd.NewLogd(io.MultiWriter(os.Stdout, f), df)
+	app.Lg.Infof("%d endpoints mounted", len(app.ENDPOINTS))
+	return mux
 }
 
-func (app *App) SetupMemPersist(fp string) {
-	persistP, err := filepath.Abs(fp)
-	if err != nil {
-		app.Lg.Fatalf("failed to get absolute path of %s\n**%v\n", fp, err)
+// intialize an http server, generally app.Mount() will be passed as the mux
+func (app *App) SetupHTTPServer(mux *http.ServeMux) (*http.Server, error) {
+	var ip string
+	var ip_env string = "SRV_IP"
+	ip = os.Getenv(ip_env)
+	if ip == "" {
+		return nil, fmt.Errorf("couldn't find %s in env", ip_env)
 	}
-	app.MStore.PersistPath = persistP
-	app.Lg.Infof("mem persist path: %s", app.MStore.PersistPath)
-}
-
-func (app *App) SetupEnv() error {
-	err := envd.LoadDotEnv()
-	if err != nil {
-		return fmt.Errorf("failed to load variables in .env file to env\n%v", err)
-	}
-	hostaddr, err := envd.GetEnvStr("SRV_IP")
-	if err != nil {
-		return fmt.Errorf("failed to get server IP from .env\n%v", err)
-	}
-	app.Addr = hostaddr
-	return nil
-}
-
-func (app *App) SetupDB() error {
-	db, err := pgdb.PostgresConn()
-	if err != nil {
-		return fmt.Errorf("failed to create connection to postgres\n%v", err)
-	}
-	app.DB = db
-	return nil
+	app.Addr = ip
+	return &http.Server{
+		Addr:         app.Addr,
+		Handler:      mux,
+		WriteTimeout: time.Second * 30,
+		ReadTimeout:  time.Second * 10,
+		IdleTimeout:  time.Minute,
+	}, nil
 }
