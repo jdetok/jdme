@@ -26,21 +26,32 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 	defer rows.Close()
 
 	// concurrency controls
-	var wg = &sync.WaitGroup{}
+
 	const maxWorkers = 20
 	sem := make(chan struct{}, maxWorkers)
 	errCh := make(chan error, maxWorkers)
-	results := make(chan *StPlayer)
+	results := make(chan *StPlayer, maxWorkers)
 
 	sm.PlayerNameId["random"] = 77777
 
 	// read the results channel, add player to maps
 	go func() {
+		// WAITGROUP SHOULD NOT WAIT HERE. func hangs if so
+		defer func() {
+			if r := recover(); r != nil {
+				select {
+				case errCh <- fmt.Errorf("results reader panicing: %v", r):
+				default:
+				}
+			}
+		}()
+
 		for p := range results {
 			lgd.Debugf("%s complete", p.Name)
 		}
 	}()
 
+	var wg = &sync.WaitGroup{}
 	count := 0
 	// scan rows serially, then spawn worker goroutine per player
 	for rows.Next() {
@@ -73,10 +84,19 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			return ctx.Err()
 		}
 
-		wg.Add(1)
 		c := count // capture worker count before it startss
+		wg.Add(1)
 		go func(p *StPlayer, lowrStr, tms string, wrkNum int) {
 			defer wg.Done()
+			defer func() {
+				if r := recover(); r != nil {
+					select {
+					case errCh <- fmt.Errorf("worker %d panicing: %v", wrkNum, r):
+					default:
+					}
+				}
+			}()
+
 			defer func() { <-sem }()
 			if ctx.Err() != nil {
 				return

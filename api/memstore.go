@@ -32,8 +32,11 @@ func (app *App) UpdateStore(ctx context.Context, quickstart bool, tick, threshol
 				app.Lg.Infof("quick startup from %s complete", app.MStore.PersistPath)
 			} else {
 				if errors.Is(err, os.ErrNotExist) { // persist file doesn't exist, skip
-					app.Lg.Infof("no persist file found at %s, skipping quickstart\n* %v",
+					app.Lg.Infof("no persist file found at %s, skipping quickstart and building maps...\n* %v",
 						app.MStore.PersistPath, err)
+					if err := app.MStore.Rebuild(ctx, app.DB, app.Lg, true); err != nil {
+						return fmt.Errorf("failed to build map store after skipping quickstart: %v", err)
+					}
 				} else {
 					return fmt.Errorf("** failed to setup maps from persist file %s\n * %v",
 						app.MStore.PersistPath, err,
@@ -42,14 +45,16 @@ func (app *App) UpdateStore(ctx context.Context, quickstart bool, tick, threshol
 			}
 		} else {
 			app.Lg.Infof("skipping quickstart and builiding map store")
-			if err := app.MStore.Rebuild(ctx, app.DB, app.Lg); err != nil {
-				return fmt.Errorf("failed to build map store after skipping quickstart: %v", err)
+			// persist = true for first run
+			if err := app.MStore.Rebuild(ctx, app.DB, app.Lg, true); err != nil {
+				return fmt.Errorf("failed to build map store or persist data after skipping quickstart: %v", err)
 			}
 		}
 	}
 
-	app.Lg.Infof("memstore setup complete | %d players | %d teams\n",
-		len(app.MStore.Maps.PlrIds), len(app.MStore.Maps.TeamIds))
+	app.Lg.Infof("memstore setup complete | %d players | %d teams\n+ persisted at %s",
+		len(app.MStore.Maps.PlrIds), len(app.MStore.Maps.TeamIds),
+		app.MStore.PersistPath)
 
 	app.Lg.Infof("starting ticker to update store: tick set to: %v | threshold: %v", tick, threshold)
 
@@ -100,7 +105,8 @@ func (app *App) RebuildMemStore(ctx context.Context) error {
 			return
 		}
 
-		if err := app.MStore.Rebuild(ctx, app.DB, app.Lg); err != nil {
+		// persist = false for continuous rebuild
+		if err := app.MStore.Rebuild(ctx, app.DB, app.Lg, false); err != nil {
 			select {
 			case errCh <- fmt.Errorf("error updating maps: %w", err):
 			case <-ctx.Done():

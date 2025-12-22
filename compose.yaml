@@ -15,6 +15,7 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./z_log:/app/z_log
+      - ./persist:/app/persist
     environment:
       - TZ=America/Chicago
     healthcheck:

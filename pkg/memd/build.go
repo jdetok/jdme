@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/errd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
@@ -88,8 +89,9 @@ func (ms *MapStore) Set(newMaps *StMaps) {
 }
 
 // rebuild maps in new temp StMaps structs, replace old one
-func (ms *MapStore) Rebuild(ctx context.Context, db pgdb.DB, lg *logd.Logd) error {
+func (ms *MapStore) Rebuild(ctx context.Context, db pgdb.DB, lg *logd.Logd, persist bool) error {
 	temp := MakeMaps()
+
 	if err := temp.MapTeamIdUints(db); err != nil {
 		return fmt.Errorf("error mapping teams: %v", err)
 	}
@@ -101,5 +103,14 @@ func (ms *MapStore) Rebuild(ctx context.Context, db pgdb.DB, lg *logd.Logd) erro
 	}
 
 	ms.Set(temp)
+
+	if persist {
+		if err := ms.Persist(); err != nil {
+			return &errd.PersistError{
+				Err: fmt.Errorf("failed to persist memory to %s: %v",
+					ms.PersistPath, err)}
+		}
+	}
+
 	return nil
 }

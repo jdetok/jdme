@@ -32,3 +32,13 @@ type RequestError struct {
 	Msg string
 	Err error
 }
+
+type PersistError struct {
+	ErrMeta
+	Err error
+}
+
+func (e *PersistError) Error() string {
+	e.GetCaller()
+	return fmt.Sprintf("%s ERROR | %v", e.Caller, e.Err)
+}

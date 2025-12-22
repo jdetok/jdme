@@ -39,7 +39,7 @@ func TestMapPlayersCC(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err := m.Rebuild(context.Background(), db, l); err != nil {
+	if err := m.Rebuild(context.Background(), db, l, false); err != nil {
 		t.Error(err)
 	}
 

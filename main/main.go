@@ -22,12 +22,14 @@ import (
 )
 
 func main() {
+	app := &api.App{Started: false, QuickStart: true}
+	app.MStore.PersistPath = "./persist/maps.json"
+
 	if err := godotenv.Load(); err != nil {
 		fmt.Printf("fatal error reading .env file: %v\n", err)
 		os.Exit(1)
 	}
 
-	app := &api.App{Started: false, QuickStart: false}
 	app.SetupLoggers()
 	ml, err := logd.NewMongoLogger("log", "http")
 	if err != nil {
@@ -52,7 +54,7 @@ func main() {
 		syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
 
-	errCh := make(chan error, 1)
+	errCh := make(chan error, 3)
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		defer wg.Done()
