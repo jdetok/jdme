@@ -62,13 +62,11 @@ order by right(cast(szn_id as varchar(5)), 4) desc,
 left(cast(szn_id as varchar(5)), 1)	
 `
 
-/*
-select each player and the min max reg/post season stats. used to populate global
-player store
-9/23/2025: updated playoff min/max coalesce calls to replace null with 0 rather
-than reg season min/max. this fixes issue where pressing random player with
-playoff season checkbox checked would get players without a playoff game
-*/
+// select each player and the min max reg/post season stats. used to populate global
+// player store
+// 9/23/2025: updated playoff min/max coalesce calls to replace null with 0 rather
+// than reg season min/max. this fixes issue where pressing random player with
+// playoff season checkbox checked would get players without a playoff game
 var PlayersSeason = `
 select 
 	a.player_id,
@@ -98,9 +96,7 @@ left join (
 ) c on c.player_id = a.player_id
 `
 
-/*
-query database for all teams, used to populate global teams store
-*/
+// query database for all teams, used to populate global teams store
 var Teams = `
 select
 	case
@@ -115,9 +111,7 @@ where team_id > 0
 // player dash from api table from passed player and season
 var PlayerDash = `select * from api.plr_agg where player_id = $1 and season_id = $2`
 
-/*
-get the player dash for most recent night's games top scorer
-*/
+// get the player dash for most recent night's games top scorer
 var TeamTopScorerDash = `
 with tstot as ( 
 select * 
@@ -136,9 +130,7 @@ inner join tstot b
 where a.stat_type = 'avg'
 `
 
-/*
-team and top player stats from most recent night's games
-*/
+// team and top player stats from most recent night's games
 var RecGameTopScorers = `
 select * from (
 	select distinct on (a.game_id, a.team_id)

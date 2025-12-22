@@ -8,10 +8,8 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-/*
-use the transform package to remove accidentals
-e.g. Dončić becomes doncic
-*/
+// use the transform package to remove accidentals
+// e.g. Dončić becomes doncic
 func ConvToASCII(input string) string {
 	t := transform.Chain(
 		norm.NFD,

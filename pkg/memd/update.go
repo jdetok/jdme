@@ -16,12 +16,10 @@ type InMemStore struct {
 	TopLgPlayers LgTopPlayers
 }
 
-/*
-Player struct meant to store basic global data for each player
-SeasonIdMax/Min are the player's first and last REGULAR season in their league
-PSeasonIdMax/Min are the player's first and last POST SEASON in their league.
-these values will default to 0 for players without any recorded games in a past season
-*/
+// Player struct meant to store basic global data for each player
+// SeasonIdMax/Min are the player's first and last REGULAR season in their league
+// PSeasonIdMax/Min are the player's first and last POST SEASON in their league.
+// these values will default to 0 for players without any recorded games in a past season
 type Player struct {
 	PlayerId     uint64
 	Name         string
@@ -46,8 +44,8 @@ type Team struct {
 	LogoUrl  string `json:"-"`
 }
 
-// // query db for team season records to populate records table
-// // moved to store rather than querying for every request
+// query db for team season records to populate records table
+// moved to store rather than querying for every request
 func UpdateTeamRecords(db pgdb.DB, cs *CurrentSeasons) (TeamRecords, error) {
 	var team_recs TeamRecords
 
@@ -74,10 +72,8 @@ func UpdateTeamRecords(db pgdb.DB, cs *CurrentSeasons) (TeamRecords, error) {
 	return team_recs, nil
 }
 
-/*
-query the database to update global slice of player structs (in memory player store)
-query also gets player's min and max seasons (reg season and playoffs)
-*/
+// query the database to update global slice of player structs (in memory player store)
+// query also gets player's min and max seasons (reg season and playoffs)
 func UpdatePlayers(db pgdb.DB) ([]Player, error) {
 	rows, err := db.Query(pgdb.PlayersSeason)
 	if err != nil {
@@ -96,10 +92,8 @@ func UpdatePlayers(db pgdb.DB) ([]Player, error) {
 	return players, nil
 }
 
-/*
-query the database for all seasons, populates global seasons store
-example: seasonId: 22025 | season: 2024-25 | WSeason: 2025-26
-*/
+// query the database for all seasons, populates global seasons store
+// example: seasonId: 22025 | season: 2024-25 | WSeason: 2025-26
 func UpdateSeasons(db pgdb.DB) ([]Season, error) {
 	rows, err := db.Query(pgdb.AllSeasons)
 	if err != nil {

@@ -22,9 +22,7 @@ type DB interface {
 }
 
 // CONNECTION TO POSTGRES SERVER: MIGRATED TO POSTGRES FROM MARIADB 08/06/2025
-/*
-configs must be setup in .env file at project root
-*/
+// configs must be setup in .env file at project root
 func PostgresConn() (DB, error) {
 	pg, err := GetEnvPG()
 	if err != nil {

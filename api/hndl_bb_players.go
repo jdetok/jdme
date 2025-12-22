@@ -9,20 +9,19 @@ import (
 )
 
 // /player handler
-/*
-- create PlayerQuery pq struct to hold query string params as strings
-- create PQueryIds iq to hold them as uint64s
-- get all as strings, remove accents from player names
-- call ValidatePlayerSzn
-	- pass pq strings, get iq uints back
-	- attempts to convert teamId and seasonId to ints
-	- calls RandomPlayerId if player name is "random"
-	- if passed as a player id it assigns that to iq.PId and moves on
-	- otherwise searches passed player name again the in-mem player slice
-	- finally calls HandleSeasonId to validate the seasonId
-- call GetPlayerDash
-	- pass iq (result of ValidatePlayerSzn)
-*/
+// - create PlayerQuery pq struct to hold query string params as strings
+// - create PQueryIds iq to hold them as uint64s
+// - get all as strings, remove accents from player names
+// - call ValidatePlayerSzn
+//   - pass pq strings, get iq uints back
+//   - attempts to convert teamId and seasonId to ints
+//   - calls RandomPlayerId if player name is "random"
+//   - if passed as a player id it assigns that to iq.PId and moves on
+//   - otherwise searches passed player name again the in-mem player slice
+//   - finally calls HandleSeasonId to validate the seasonId
+//
+// - call GetPlayerDash
+//   - pass iq (result of ValidatePlayerSzn)
 func (app *App) HndlPlayer(w http.ResponseWriter, r *http.Request) {
 	app.Lg.HTTPf(r)
 

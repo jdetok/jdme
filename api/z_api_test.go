@@ -8,11 +8,10 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/jdetok/go-api-jdeko.me/pkg/resp"
-	"github.com/jdetok/golib/envd"
+	"github.com/joho/godotenv"
 )
 
 func TestHandleSeasonId(t *testing.T) {
-
 	var p = memd.Player{}
 	p.League = "NBA"
 	p.Name = "LeBron James"
@@ -58,8 +57,7 @@ func TestLgSznsByMonth(t *testing.T) {
 	fmt.Println("WNBA SeasonID | Season:", sl.WSznId, "|", sl.WSzn)
 }
 func TestQueryTopLgPlayers(t *testing.T) {
-	err := envd.LoadDotEnvFile("../.env")
-	if err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		t.Error(err)
 	}
 	db, err := pgdb.PostgresConn()
@@ -80,8 +78,7 @@ func TestQueryTopLgPlayers(t *testing.T) {
 
 // RETURN DATABASE FOR TESTING
 func StartupTest(t *testing.T) pgdb.DB {
-	err := envd.LoadDotEnvFile("../.env")
-	if err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		msg := "failed loading .env file"
 		t.Fatal(fmt.Errorf("%s\n%v", msg, err))
 	}

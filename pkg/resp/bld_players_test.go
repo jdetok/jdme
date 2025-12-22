@@ -44,7 +44,6 @@ func TestHandleSeason(t *testing.T) {
 		p       *memd.Player
 		team    bool
 		wantErr bool
-		// errStr *string
 	}{
 		{"LeBron regular season", 22025, 22025, lbj, false, false},
 		{"Curry before first playoff", 42012, 42011, steph, false, false},

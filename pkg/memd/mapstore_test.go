@@ -9,7 +9,7 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
-	"github.com/jdetok/golib/envd"
+	"github.com/joho/godotenv"
 )
 
 func TestLen(t *testing.T) {
@@ -29,8 +29,7 @@ func TestMapPlayersCC(t *testing.T) {
 	m := &MapStore{}
 	l := logd.NewLogd(os.Stdout, os.Stdout)
 
-	err := envd.LoadDotEnvFile("../../.env")
-	if err != nil {
+	if err := godotenv.Load("../../.env"); err != nil {
 		t.Error(err)
 	}
 
@@ -68,8 +67,7 @@ func TestMapPlayersCC(t *testing.T) {
 }
 
 func TestMapSznTeams(t *testing.T) {
-	err := envd.LoadDotEnvFile("../../.env")
-	if err != nil {
+	if err := godotenv.Load("../../.env"); err != nil {
 		t.Error(err)
 	}
 
@@ -94,58 +92,3 @@ func TestMapSznTeams(t *testing.T) {
 
 	fmt.Println(sm.TeamIdLg)
 }
-
-// import (
-// 	"fmt"
-// 	"testing"
-// 	"time"
-
-// 	"github.com/jdetok/go-api-jdeko.me/api"
-// 	"github.com/jdetok/go-api-jdeko.me/pgdb"
-// 	"github.com/jdetok/golib/envd"
-// )
-
-// func TestMapPlayers(t *testing.T) {
-// 	var sm StMaps
-// 	var cs api.CurrentSeasons
-// 	cs.GetCurrentSzns(time.Now())
-
-// 	err := envd.LoadDotEnvFile("../.env")
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	db, err := pgdb.PostgresConn()
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	sm.MakeMaps()
-
-// 	if err := sm.MapTeamIds(db); err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	if err := sm.MapPlayers(db); err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	testSearch := []string{"lebron james", "stephen curry", "anthony edwards"}
-// 	for _, t := range testSearch {
-// 		// player id from name test
-// 		fmt.Printf("player search: %s | value returned: %d\n", t,
-// 			sm.PlayerNameId[t])
-
-// 		// player struct from name test
-// 		fmt.Printf("player search: %s | value returned: %v\n", t,
-// 			sm.PlayerNameDtl[t])
-// 		plr := sm.PlayerNameDtl[t]
-// 		testSzns := []uint64{22025, 22017, 22004}
-// 		for _, s := range testSzns {
-// 			sm.PlayedInSzn(plr.Id, s)
-// 		}
-
-// 	}
-// 	fmt.Println(sm.PlayerNameDtl["eddie house"])
-// 	fmt.Println(sm.SeasonPlayers[22003][2544])
-// }

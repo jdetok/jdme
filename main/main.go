@@ -1,7 +1,7 @@
 /*
 MIGRATION FROM MARIADB DATABASE SERVER TO POSTGRES DATABASE SERVER 08/06/2025
 ALSO SWITCHED FROM PROJECT-SPECIFIC LOGGER, ERROR HANDLING TO PACKAGES IN
-github.com/jdetok/golib
+
 */
 
 package main
@@ -18,6 +18,7 @@ import (
 
 	"github.com/jdetok/go-api-jdeko.me/api"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
+	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/joho/godotenv"
 )
 
@@ -59,9 +60,11 @@ func main() {
 	}()
 	app.Lg.Infof("environment variables loaded from file: %s | loggers setup successfully", ENV_FILE)
 
-	if dbErr := app.SetupDB(); dbErr != nil {
-		app.Lg.Fatalf("fatal db setup error: %v", dbErr)
+	db, err := pgdb.PostgresConn()
+	if err != nil {
+		app.Lg.Errorf("failed to create connection to postgres\n%v", err)
 	}
+	app.DB = db
 
 	app.Lg.Infof("database connection created successfully")
 
