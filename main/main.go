@@ -27,7 +27,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	app := &api.App{Started: false, QuickStart: true}
+	app := &api.App{Started: false, QuickStart: false}
 	app.SetupLoggers()
 	ml, err := logd.NewMongoLogger("log", "http")
 	if err != nil {

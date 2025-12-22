@@ -27,5 +27,5 @@ jobs:
     - name: Build
       run: go build -o bin/app ./main
 
-    # - name: Test
-    #   run: go test ./main
+    - name: Test pkg/resp
+      run: go test ./pkg/resp
