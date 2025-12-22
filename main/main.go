@@ -23,6 +23,13 @@ import (
 
 func main() {
 	app := &api.App{Started: false, QuickStart: true}
+	app.T = api.Timing{
+		CtxTimeout:        10 * time.Second,
+		UpdateStoreTick:   1 * time.Minute,
+		UpdateStoreThresh: 30 * time.Minute,
+		HealthCheckTick:   1 * time.Second,
+		HealthCheckThreah: 120 * time.Second,
+	}
 	app.MStore.PersistPath = "./persist/maps.json"
 
 	if err := godotenv.Load(); err != nil {
@@ -40,15 +47,22 @@ func main() {
 			app.Lg.Fatalf("fatal mongo error: %v", err)
 		}
 	}()
+
+	app.Lg.Infof("environment variables loaded and loggers setup successfully")
+
 	app.Lg.Mongo = ml
 	if dbErr := app.SetupDB(); dbErr != nil {
 		app.Lg.Fatalf("fatal db setup error: %v", dbErr)
 	}
 
+	app.Lg.Infof("database connection created successfully")
+
 	srv, err := app.SetupHTTPServer(app.Mount())
 	if err != nil {
 		app.Lg.Fatalf("failed to setup HTTP server: %v", err)
 	}
+
+	app.Lg.Infof("HTTP server configured successfully")
 
 	shutdownCtx, stop := signal.NotifyContext(context.Background(),
 		syscall.SIGTERM, syscall.SIGINT)
@@ -58,12 +72,13 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Go(func() {
 		defer wg.Done()
-		app.Lg.Infof("starting server at %v...\n", app.Addr)
+		app.Lg.Infof("starting HTTP server at %v...\n", app.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			if shutdownCtx.Err() == nil {
 				select {
 				case errCh <- fmt.Errorf("http listen error occured: %v", err):
 				default:
+					app.Lg.Infof("HTTP server listening at %v...\n", app.Addr)
 				}
 			}
 		}
@@ -89,7 +104,7 @@ func main() {
 					}
 					if shutdownCtx.Err() == nil {
 						select {
-						case errCh <- fmt.Errorf("http listen error occured: %v", err):
+						case errCh <- fmt.Errorf("error occured during health check: %v", err):
 						default:
 						}
 						return
@@ -117,9 +132,8 @@ func main() {
 				}
 			}
 		}()
-		tick := 1 * time.Minute
-		thresh := 30 * time.Minute
-		err := app.UpdateStore(shutdownCtx, app.QuickStart, tick, thresh)
+		err := app.UpdateStore(shutdownCtx, app.QuickStart,
+			app.T.UpdateStoreTick, app.T.UpdateStoreThresh)
 		if err != nil {
 			if shutdownCtx.Err() == nil {
 				select {
@@ -139,7 +153,7 @@ func main() {
 		stop()
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), app.T.CtxTimeout)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
