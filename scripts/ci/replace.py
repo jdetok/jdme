@@ -1,0 +1,159 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+import subprocess
+import sys
+import re
+             
+PROD_URL = "https://jdeko.me/"
+LOCL_URL = "http://localhost:8080/"
+URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
+URLS_FTYP = [".js", ".html", ".css", ".yaml"]
+PROD_CPU = "arm64"
+LOCL_CPU = "amd64"
+SUBNET = "10.7.19.0/24"
+GWAY = "10.7.19.1"
+PROD_COMPOSE = f'{' '*4}external: true'
+LOCL_COMPOSE = (f'{' '*4}name: jdme_net\n' 
+                 + f'{' '*4}driver: bridge\n'
+                 + f'{' '*4}ipam:\n{' '*6}config:\n'
+                 + f'{' '*8}- subnet: {SUBNET}\n'
+                 + f'{' '*10}gateway: {GWAY}')
+
+RE_URLS = r'https?://(?:localhost|jdeko(?:.me)?):?[0-9]*/?'
+RE_PROD_URL = rf'^(\s*PROD_URL\s+=\s+")({RE_URLS})("\s*)$'
+RE_IS_PROD = r"^(\s*IS_PROD\s*=\s*)(true|false)(\s*$)"
+RE_GOARCH = rf"^(.*GOARCH=)({LOCL_CPU}|{PROD_CPU})(.*)$"
+RE_COMPOSE = r'^(networks:\s*\s{2}\w+:\s?\n+)([\s\S]*)(\n^\s{2}\w+:)'
+
+
+def main():
+    loc = False
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "local":
+            loc = True            
+            
+    to_replace = [
+        ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
+        ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
+        ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
+        ReReplace(loc, "GOARCH", "./Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
+        ReReplace(loc, "COMPOSE NETWORK", "./compose.yaml", LOCL_COMPOSE, PROD_COMPOSE, 3, 2, RE_COMPOSE, [], [])
+    ]
+    
+    files_changed = 0
+    rplcmnts = 0
+    found = 0
+    for r in to_replace:
+        cnt = r.replace()
+        files_changed += cnt[0]
+        found += cnt[1]
+        rplcmnts += cnt[2]
+        print(f"{r.rename} SUMMARY: {cnt[0]} file(s) changed | {cnt[1]} match(es) | {cnt[2]} replacement(s) | {r.p}\n")
+    print(f"COMPLETE | {files_changed} file(s) changed | {found} match(es) | {rplcmnts} replacement(s)")
+    
+    if files_changed > 0:
+        push_changes(f"replaced {rplcmnts} string(s) in {files_changed} file(s)")
+        print("changes pushed")
+
+class ReReplace:
+    def __init__(self, loc: bool, name: str,
+                path, local_repl, prod_repl: str, 
+                capt_grps: int, grp_pos: int,
+                pattern: str, filetypes: tuple[str], exclude_dirs: tuple[str]
+                ):
+        self.p = Path(path)
+        self.rename = name
+        self.reptrn = pattern
+        self.ftypes = filetypes
+        self.exdirs = exclude_dirs
+        self.rcgrps = capt_grps
+        self.rcgpos = grp_pos
+        self.rplcmt = local_repl if loc else prod_repl
+        self.rplc_ptrn = self.get_repl_ptrn()
+        self.rfiles = self.get_files() if str(self.p) == "." else (self.p,)
+
+    def get_repl_ptrn(self) -> str:
+        if self.rcgrps == 0 or self.rcgrps is None:
+            return self.rplcmt
+        repl_ptrn = ""
+        pos = 1
+        while pos <= self.rcgrps:
+            if pos == self.rcgpos:
+                repl_ptrn += self.rplcmt
+            else: repl_ptrn += fr"\{pos}"
+            pos += 1
+        return repl_ptrn
+    
+    def get_files(self) -> tuple:
+        rfiles = []
+        for p in self.p.rglob("*"):
+            if p.parts[0] in self.exdirs: continue
+            if p.suffix in self.ftypes:
+                rfiles.append(p)
+        return tuple(rfiles)
+    
+    def replace(self) -> tuple:
+        found = 0
+        rplcd = 0
+        fc = 0
+        print(f"{self.rename}: searching for {self.reptrn} in {self.p}")
+        for file in self.rfiles:
+            f = Path(file)
+            ff = 0
+            rf = 0
+            cnt = 0
+            try:
+                txt = f.read_text()
+                new_txt, cnt = re.subn(self.reptrn, self.rplc_ptrn, txt, flags=re.MULTILINE)
+            except Exception as e:
+                print(f"error reading {f} {e}\ncontinuing...")
+                continue
+            if cnt > 0:
+                ff += cnt
+                if txt != new_txt:
+                    fc += 1
+                    rf += cnt                      
+                    try:
+                        f.write_text(new_txt)
+                    except Exception as e: 
+                        print(f"error writing to {f}: {e}\ncontinuing...")
+                        continue
+                    finally:
+                        if len(self.rfiles) > 1:
+                            print(f"  | {ff} match(es) | {rf} replacement(s) | {f}")
+            rplcd += rf
+            found += ff
+        return [fc, found, rplcd]
+                                
+
+def run(cmd:str, msg=None) -> subprocess.CompletedProcess:
+    to_run = cmd.split()
+    if msg is not None:
+        to_run.append(msg)
+    return subprocess.run(to_run, check=False, 
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+def run_commands(cmds: dict[str, str | None]):
+    for cmd, msg in cmds.items():
+        res = run(cmd, msg)
+        if res.returncode > 0:
+            raise SystemError(f"command failed: {cmd} {msg} | code {res.returncode}")
+        
+
+def push_changes(commit_msg:str):
+    diff = run("git diff --quiet")
+    if diff.returncode == 0:
+        print("no changes to push")
+        return
+    # figure out how to call
+    run_commands({
+        "git config user.name github-actions[bot]": None,
+        "git config user.email github-actions[bot]@users.noreply.github.com": None,
+        "git add .": None,
+        'git commit -m': commit_msg,
+        "git push": None
+    })
+
+if __name__ == "__main__":
+    main()

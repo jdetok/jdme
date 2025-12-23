@@ -33,6 +33,6 @@ networks:
     ipam:
       config:
         - subnet: 10.7.19.0/24
-          gateway: 10.7.19.1 
+          gateway: 10.7.19.1
   lognet:
     external: true
