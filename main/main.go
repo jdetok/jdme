@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	PROD_URL        = "http://localhost:8080/"
+	PROD_URL        = "https://jdeko.me/"
 	ENV_FILE        = ".env"
 	PERSIST_FILE    = "./persist/maps.json"
 	APPLOG_FILE     = "./z_log/app/applog"
@@ -97,7 +97,7 @@ func main() {
 	})
 	g.Go(func() error { // RUN HEALTH CHECKS
 		var lastCheck time.Time
-		healthEndpoint := "/health"
+		healthChk := "health"
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
 		var fails int
@@ -110,9 +110,9 @@ func main() {
 					lastCheck = time.Now()
 					var url string
 					if IS_PROD {
-						url = PROD_URL + healthEndpoint
+						url = PROD_URL + healthChk
 					} else {
-						url = fmt.Sprintf("http://%s%s", srv.Addr, healthEndpoint)
+						url = fmt.Sprintf("http://%s/%s", srv.Addr, healthChk)
 					}
 					resp, err := http.Get(url)
 					if err != nil {

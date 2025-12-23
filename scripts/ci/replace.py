@@ -3,42 +3,53 @@
 from pathlib import Path
 import sys
 import re
-                                
+             
+PROD_URL = "https://jdeko.me/"
+LOCL_URL = "http://localhost:8080/"
+URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
+URLS_FTYP = [".js", ".html", ".css"]
+PROD_CPU = "arm64"
+LOCL_CPU = "amd64"
+
+RE_URLS = r'https?://(?:localhost|jdeko(?:.me)?):?[0-9]*/?'
+RE_PROD_URL = rf'^(\s*PROD_URL\s+=\s+")({RE_URLS})("\s*)$'
+RE_IS_PROD = r"^(\s*IS_PROD\s*=\s*)(true|false)(\s*$)"
+RE_GOARCH = rf"^(.*GOARCH=)({LOCL_CPU}|{PROD_CPU})(.*)$"
+
 def main():
     loc = False
     if len(sys.argv) > 1:
         if sys.argv[1] == "local":
             loc = True            
-    
-    goarch_opts = {"local": "amd64", "prod": "arm64"}
+            
     to_replace = [
-        ReReplace(loc, "URLS", ".", "http://localhost:8080/", "https://jdeko.me/", 0, 0, 
-                          [r"https?://localhost:[0-9]+/?", r"https?://jdeko.me[:\/]?[0-9]*/?"], 
-                          [".js", ".html", ".css"], [".git", "wiki", "log", "z_log", "puml", "bin"]
-        ),
-        ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, 
-                              [r"^(\s*IS_PROD\s*=\s*)(true|false)(\s*$)"], [], []
-        ),
-        ReReplace(loc, "GOARCH", "./Dockerfile", goarch_opts['local'], goarch_opts['prod'], 3, 2, 
-                              [rf"^(.*GOARCH=)({goarch_opts['local']}|{goarch_opts['prod']})(.*)$"], [], []
-        )
+        ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
+        ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
+        ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
+        ReReplace(loc, "GOARCH", "./Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], [])
     ]
-    num_replaced = 0
+    
+    files = 0
+    rplcmnts = 0
+    found = 0
     for r in to_replace:
-        num_replaced += r.replace()
-
-    print(f"replacements complete: {num_replaced} files with changes")
+        cnt = r.replace()
+        files += cnt[0]
+        found += cnt[1]
+        rplcmnts += cnt[2]
+        print(f"{r.rename} SUMMARY: {cnt[0]} files changed | {cnt[1]} matches | {cnt[2]} replacements | {r.p}\n")
+    print(f"COMPLETE | {files} files changed | {found} matches | {rplcmnts} replacements")
     
 
 class ReReplace:
     def __init__(self, loc: bool, name: str,
                 path, local_repl, prod_repl: str, 
                 capt_grps: int, grp_pos: int,
-                patterns: tuple[str], filetypes: tuple[str], exclude_dirs: tuple[str]
+                pattern: str, filetypes: tuple[str], exclude_dirs: tuple[str]
                 ):
         self.p = Path(path)
         self.rename = name
-        self.rptrns = patterns
+        self.reptrn = pattern
         self.ftypes = filetypes
         self.exdirs = exclude_dirs
         self.rcgrps = capt_grps
@@ -67,32 +78,35 @@ class ReReplace:
                 rfiles.append(p)
         return tuple(rfiles)
     
-    def replace(self) -> int:
+    def replace(self) -> tuple:
         found = 0
         rplcd = 0
+        fc = 0
+        print(f"{self.rename}: searching for {self.reptrn} in {self.p}")
         for file in self.rfiles:
+            f = Path(file)
+            ff = 0
+            rf = 0
+            cnt = 0
             try:
-                f = Path(file)
-                ff = 0
-                rf = 0
                 txt = f.read_text()
-                for ptrn in self.rptrns:
-                    new_txt, cnt = re.subn(ptrn, self.rplc_ptrn, txt, flags=re.MULTILINE)
-                    if cnt > 0:
-                        ff += 1
-                        if txt != new_txt:
-                            rf += 1                        
-                            f.write_text(new_txt)
-                            # print(f"{self.rename} set to {self.rplcmt} in {f}")
-                        print(f"found {ff} | replaced {rf} | {f}")
-                rplcd += rf
-                found += ff
+                new_txt, cnt = re.subn(self.reptrn, self.rplc_ptrn, txt, flags=re.MULTILINE)
             except Exception as e:
-                raise SystemError(f"error replacing {self.rename}: {e}")
-        print(f"{self.rename} REPLACEMENT SUMMARY: found {found} | replaced {rplcd} | {self.p}")
-        return rplcd
+                print(f"error reading {f} {e}\ncontinuing...")
+                continue
+            if cnt > 0:
+                ff += cnt
+                if txt != new_txt:
+                    fc += 1
+                    rf += cnt                      
+                    try:
+                        f.write_text(new_txt)
+                    except Exception as e: 
+                        print(f"error writing to {f}: {e}\ncontinuing...")
+                        continue
+            rplcd += rf
+            found += ff
+        return [fc, found, rplcd]
                                 
-
-        
 if __name__ == "__main__":
     main()
