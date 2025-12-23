@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"golang.org/x/sync/errgroup"
 )
 
 // query all players from DB, loop through rows serially, then launch goroutines
@@ -30,6 +30,7 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 	const maxWorkers = 20
 	sem := make(chan struct{}, maxWorkers)
 	errCh := make(chan error, maxWorkers)
+	g, ctx := errgroup.WithContext(ctx)
 	results := make(chan *StPlayer, maxWorkers)
 
 	sm.PlayerNameId["random"] = 77777
@@ -51,7 +52,7 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 		}
 	}()
 
-	var wg = &sync.WaitGroup{}
+	// var wg = &sync.WaitGroup{}
 	count := 0
 	// scan rows serially, then spawn worker goroutine per player
 	for rows.Next() {
@@ -83,11 +84,14 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 		case <-ctx.Done():
 			return ctx.Err()
 		}
+		// capture loop vars
+		l := lowrStr
+		t := tms
+		wrkNum := count
 
-		c := count // capture worker count before it startss
-		wg.Add(1)
-		go func(p *StPlayer, lowrStr, tms string, wrkNum int) {
-			defer wg.Done()
+		// wg.Add(1)
+		g.Go(func() error {
+			// defer wg.Done()
 			defer func() {
 				if r := recover(); r != nil {
 					select {
@@ -99,18 +103,18 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 
 			defer func() { <-sem }()
 			if ctx.Err() != nil {
-				return
+				return ctx.Err()
 			}
 
 			lgd.Debugf("worker %d running\n", wrkNum)
 
 			// clean the player name (lower case, remove accents)
-			p.Lowr = clnd.ConvToASCII(lowrStr)
+			p.Lowr = clnd.ConvToASCII(l)
 
 			// split comma separated string with teams to p.Teams
-			tmIds, err := sm.SplitTeams(p, tms)
+			tmIds, err := sm.SplitTeams(p, t)
 			if err != nil {
-				errCh <- err
+				return err
 			}
 			p.Teams = tmIds
 
@@ -125,7 +129,7 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			// query team(s) played for each season from min-max player season,
 			// add player to map for each team played for in each season played
 			if err := sm.MapSeasonTeamPlayers(lgd, db, p); err != nil {
-				errCh <- fmt.Errorf(
+				return fmt.Errorf(
 					"error occured mapping player season/teams %s | %d\n%v",
 					p.Lowr, p.Id, err)
 			}
@@ -133,7 +137,8 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			case results <- p:
 			case <-ctx.Done():
 			}
-		}(p, lowrStr, tms, c)
+			return nil
+		})
 	}
 
 	// check for error in rows
@@ -142,7 +147,8 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 	}
 
 	// close results when all workers finish
-	wg.Wait()
+	// wg.Wait()
+	g.Wait()
 	close(results)
 	lgd.Debugf("finished with %d rows after %v", count, time.Since(start))
 

@@ -63,7 +63,7 @@ func (app *App) UpdateStore(ctx context.Context, quickstart bool, tick, threshol
 	for {
 		select {
 		case <-ctx.Done():
-			app.Lg.Infof("UpdateStore exiting: %v", ctx.Err())
+			app.Lg.Infof("UpdateStore exiting, context canceled")
 			return nil
 		case <-ticker.C:
 			if time.Since(app.LastUpdate) >= threshold {
