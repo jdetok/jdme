@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	PROD_URL        = "http://localhost:8080/"
+	PROD_URL        = "https://jdeko.me/"
 	ENV_FILE        = ".env"
 	PERSIST_FILE    = "./persist/maps.json"
 	APPLOG_FILE     = "./z_log/app/applog"
