@@ -148,7 +148,7 @@ def push_changes(commit_msg:str):
         "git config user.name github-actions[bot]",
         "git config user.email github-actions[bot]@users.noreply.github.com",
         "git add .",
-        f"git commit -m {commit_msg}",
+        f'git commit -m "{commit_msg}"',
         "git push"
     ])
 
