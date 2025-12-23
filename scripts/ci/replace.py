@@ -130,11 +130,12 @@ class ReReplace:
 def run(cmd:str, msg=None) -> subprocess.CompletedProcess:
     to_run = cmd.split()
     if msg is not None:
-        to_run = f'{to_run} "{msg}"'
+        to_run.append(msg)
+        # to_run = f'{to_run} "{msg}"'
     return subprocess.run(to_run, check=False, 
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
-def run_commands(cmds: dict[str, str]):
+def run_commands(cmds: dict[str, str | None]):
     for cmd, msg in cmds.items():
         res = run(cmd, msg)
         if res.returncode > 0:
