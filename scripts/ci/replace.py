@@ -135,7 +135,7 @@ def run(cmd:str, msg=None) -> subprocess.CompletedProcess:
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
 def run_commands(cmds: dict[str, str]):
-    for cmd, msg in cmds:
+    for cmd, msg in cmds.items():
         res = run(cmd, msg)
         if res.returncode > 0:
             raise SystemError(f"command failed: {cmd} {msg} | code {res.returncode}")
