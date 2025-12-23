@@ -25,6 +25,7 @@ type App struct {
 	ENDPOINTS  Endpoints
 	Addr       string
 	DB         pgdb.DB
+	DBConf     pgdb.DBConfig
 	StartTime  time.Time
 	LastUpdate time.Time
 	Started    bool

@@ -1,7 +1,7 @@
 /*
 MIGRATION FROM MARIADB DATABASE SERVER TO POSTGRES DATABASE SERVER 08/06/2025
 ALSO SWITCHED FROM PROJECT-SPECIFIC LOGGER, ERROR HANDLING TO PACKAGES IN
-
+github.com/jdetok/golib
 */
 
 package main
@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 
@@ -20,23 +19,30 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/joho/godotenv"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
+	PROD_URL        = "http://localhost:8080/"
 	ENV_FILE        = ".env"
 	PERSIST_FILE    = "./persist/maps.json"
 	APPLOG_FILE     = "./z_log/app/applog"
 	DEBUG_FILE      = "./z_log/dbg/debug"
 	MONGO_LOG_DB    = "log"
 	MONGO_HTTP_COLL = "http"
+	PG_OPEN         = 80
+	PG_IDLE         = 30
+	PG_LIFE         = 30
+	QUICKSTART      = true
+	IS_PROD         = true
 )
 
 func main() {
-	app := &api.App{Started: false, QuickStart: true}
+	app := &api.App{Started: false, QuickStart: QUICKSTART}
 	app.T = api.Timing{
 		CtxTimeout:        10 * time.Second,
 		UpdateStoreTick:   1 * time.Minute,
-		UpdateStoreThresh: 30 * time.Minute,
+		UpdateStoreThresh: 2 * time.Minute,
 		HealthCheckTick:   1 * time.Second,
 		HealthCheckThreah: 120 * time.Second,
 	}
@@ -60,14 +66,16 @@ func main() {
 	}()
 	app.Lg.Infof("environment variables loaded from file: %s | loggers setup successfully", ENV_FILE)
 
-	db, err := pgdb.PostgresConn()
+	// database config
+	app.DBConf = *pgdb.NewDBConf(PG_OPEN, PG_IDLE, PG_LIFE*time.Minute)
+	db, err := pgdb.PostgresConn(&app.DBConf)
 	if err != nil {
 		app.Lg.Errorf("failed to create connection to postgres\n%v", err)
 	}
 	app.DB = db
-
 	app.Lg.Infof("database connection created successfully")
 
+	// http server config
 	srv, err := app.SetupHTTPServer(app.Mount())
 	if err != nil {
 		app.Lg.Fatalf("failed to setup HTTP server: %v", err)
@@ -75,102 +83,78 @@ func main() {
 
 	app.Lg.Infof("HTTP server configured successfully")
 
-	shutdownCtx, stop := signal.NotifyContext(context.Background(),
+	sigCtx, stop := signal.NotifyContext(context.Background(),
 		syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
 
-	errCh := make(chan error, 3)
-	var wg sync.WaitGroup
-	wg.Go(func() {
-		defer wg.Done()
+	g, ctx := errgroup.WithContext(sigCtx)
+	g.Go(func() error { // LISTEN FOR HTTP REQUESTS
 		app.Lg.Infof("starting HTTP server at %v...\n", app.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			if shutdownCtx.Err() == nil {
-				select {
-				case errCh <- fmt.Errorf("http listen error occured: %v", err):
-				default:
-					app.Lg.Infof("HTTP server listening at %v...\n", app.Addr)
-				}
-			}
+			return err
 		}
+		return nil
 	})
-	wg.Go(func() {
-		defer wg.Done()
-		url := fmt.Sprintf("http://%s/health", srv.Addr)
+	g.Go(func() error { // RUN HEALTH CHECKS
 		var lastCheck time.Time
-		thresh := 60 * time.Second
+		healthEndpoint := "/health"
 		ticker := time.NewTicker(time.Second)
-		var fails []struct{}
-		failLimit := 5
 		defer ticker.Stop()
-		for range ticker.C {
-			if time.Since(lastCheck) >= thresh {
-				lastCheck = time.Now()
-				resp, err := http.Get(url)
-				if err != nil {
-					fails = append(fails, struct{}{})
-					app.Lg.Errorf("health check failed: %v", err)
-					if len(fails) < failLimit {
-						continue
+		var fails int
+		for {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-ticker.C:
+				if time.Since(lastCheck) >= app.T.HealthCheckThreah {
+					lastCheck = time.Now()
+					var url string
+					if IS_PROD {
+						url = PROD_URL + healthEndpoint
+					} else {
+						url = fmt.Sprintf("http://%s%s", srv.Addr, healthEndpoint)
 					}
-					if shutdownCtx.Err() == nil {
-						select {
-						case errCh <- fmt.Errorf("error occured during health check: %v", err):
-						default:
+					resp, err := http.Get(url)
+					if err != nil {
+						fails++
+						app.Lg.Errorf("health check to %s failed: %v", url, err)
+						if fails <= 5 {
+							continue
 						}
-						return
+						return err
 					}
-				}
-				defer resp.Body.Close()
-				switch resp.StatusCode {
-				case http.StatusOK:
-					app.Lg.Infof("health check passed: %s", resp.Status)
-				default:
-					app.Lg.Infof("health check status: %s", resp.Status)
-
+					app.Lg.Infof("received passing healthcheck from %s | %v", url, resp.Status)
+					resp.Body.Close()
 				}
 			}
 		}
 	})
 
-	wg.Go(func() { // update in memory store every
-		defer wg.Done()
-		defer func() {
-			if r := recover(); r != nil {
-				select {
-				case errCh <- fmt.Errorf("UpdateStore panic: %v", r):
-				default:
-				}
-			}
-		}()
-		err := app.UpdateStore(shutdownCtx, app.QuickStart,
+	g.Go(func() error { // update in memory store every
+		err := app.UpdateStore(ctx, app.QuickStart,
 			app.T.UpdateStoreTick, app.T.UpdateStoreThresh)
 		if err != nil {
-			if shutdownCtx.Err() == nil {
-				select {
-				case errCh <- fmt.Errorf("in mem update error: %w", err):
-				default:
-				}
+			if ctx.Err() == nil {
+				return fmt.Errorf("in mem update error: %w", err)
 			}
 		}
+		return nil
 	})
 
-	select {
-	case <-shutdownCtx.Done():
-		app.Lg.Quitf("shutdown signal received, shutting down...")
+	g.Go(func() error {
+		<-ctx.Done()
+		app.Lg.Infof("shutting down HTTP server")
 
-	case err := <-errCh:
-		app.Lg.Errorf("fatal error occurred: %v", err)
-		stop()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		return srv.Shutdown(shutdownCtx)
+	})
+
+	if err := g.Wait(); err != nil {
+		if ctx.Err() == nil {
+			app.Lg.Errorf("wait error: %v", err)
+		}
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), app.T.CtxTimeout)
-	defer cancel()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		app.Lg.Errorf("shutdown error: %v", err)
-	}
-
-	wg.Wait()
 	app.Lg.Infof("shutdown complete")
 }

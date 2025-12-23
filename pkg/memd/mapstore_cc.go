@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"golang.org/x/sync/errgroup"
 )
 
 // query all players from DB, loop through rows serially, then launch goroutines
@@ -19,39 +19,34 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 	start := time.Now()
 	lgd.Debugf("mapping all players (concurrent workers)")
 
+	sm.PlayerNameId["random"] = 77777
+
 	rows, err := db.QueryContext(ctx, pgdb.QPlayerStore)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
 
-	// concurrency controls
+	const maxWorkers = 40
 
-	const maxWorkers = 20
-	sem := make(chan struct{}, maxWorkers)
-	errCh := make(chan error, maxWorkers)
+	g, ctx := errgroup.WithContext(ctx)
+	g.SetLimit(maxWorkers)
 	results := make(chan *StPlayer, maxWorkers)
-
-	sm.PlayerNameId["random"] = 77777
 
 	// read the results channel, add player to maps
 	go func() {
 		// WAITGROUP SHOULD NOT WAIT HERE. func hangs if so
 		defer func() {
 			if r := recover(); r != nil {
-				select {
-				case errCh <- fmt.Errorf("results reader panicing: %v", r):
-				default:
-				}
+				lgd.Errorf("results reader panic: %v", r)
 			}
 		}()
-
 		for p := range results {
 			lgd.Debugf("%s complete", p.Name)
 		}
 	}()
 
-	var wg = &sync.WaitGroup{}
+	// var wg = &sync.WaitGroup{}
 	count := 0
 	// scan rows serially, then spawn worker goroutine per player
 	for rows.Next() {
@@ -68,7 +63,7 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			return err
 		}
 
-		p := &StPlayer{
+		plr := &StPlayer{
 			Id:      id,
 			Name:    name,
 			Lg:      lg,
@@ -78,39 +73,22 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			MinPSzn: minP,
 		}
 
-		select {
-		case sem <- struct{}{}:
-		case <-ctx.Done():
-			return ctx.Err()
-		}
+		// capture loop vars
+		l := lowrStr
+		p := plr
+		t := tms
+		wrkNum := count
 
-		c := count // capture worker count before it startss
-		wg.Add(1)
-		go func(p *StPlayer, lowrStr, tms string, wrkNum int) {
-			defer wg.Done()
-			defer func() {
-				if r := recover(); r != nil {
-					select {
-					case errCh <- fmt.Errorf("worker %d panicing: %v", wrkNum, r):
-					default:
-					}
-				}
-			}()
-
-			defer func() { <-sem }()
-			if ctx.Err() != nil {
-				return
-			}
-
+		g.Go(func() error {
 			lgd.Debugf("worker %d running\n", wrkNum)
 
 			// clean the player name (lower case, remove accents)
-			p.Lowr = clnd.ConvToASCII(lowrStr)
+			p.Lowr = clnd.ConvToASCII(l)
 
 			// split comma separated string with teams to p.Teams
-			tmIds, err := sm.SplitTeams(p, tms)
+			tmIds, err := sm.SplitTeams(p, t)
 			if err != nil {
-				errCh <- err
+				return err
 			}
 			p.Teams = tmIds
 
@@ -118,14 +96,13 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			sm.MapPlrNmDtlCC(p)
 			sm.MapPlrIdNmCC(p)
 			sm.MapPlrNmIdCC(p)
-			// player exists maps
 			sm.MapPlrIdCC(p)
 			sm.MapPlrNmCC(p)
 
 			// query team(s) played for each season from min-max player season,
 			// add player to map for each team played for in each season played
 			if err := sm.MapSeasonTeamPlayers(lgd, db, p); err != nil {
-				errCh <- fmt.Errorf(
+				return fmt.Errorf(
 					"error occured mapping player season/teams %s | %d\n%v",
 					p.Lowr, p.Id, err)
 			}
@@ -133,17 +110,19 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			case results <- p:
 			case <-ctx.Done():
 			}
-		}(p, lowrStr, tms, c)
+			return nil
+		})
 	}
-
-	// check for error in rows
 	if err := rows.Err(); err != nil {
 		return err
 	}
 
-	// close results when all workers finish
-	wg.Wait()
+	if err := g.Wait(); err != nil {
+		close(results)
+		return err
+	}
 	close(results)
+
 	lgd.Debugf("finished with %d rows after %v", count, time.Since(start))
 
 	return nil

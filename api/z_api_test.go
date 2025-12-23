@@ -60,7 +60,7 @@ func TestQueryTopLgPlayers(t *testing.T) {
 	if err := godotenv.Load("../.env"); err != nil {
 		t.Error(err)
 	}
-	db, err := pgdb.PostgresConn()
+	db, err := pgdb.PostgresConn(&pgdb.DBConfig{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -83,7 +83,7 @@ func StartupTest(t *testing.T) pgdb.DB {
 		t.Fatal(fmt.Errorf("%s\n%v", msg, err))
 	}
 
-	db, err := pgdb.PostgresConn()
+	db, err := pgdb.PostgresConn(&pgdb.DBConfig{})
 	if err != nil {
 		msg := "failed connecting to postgres"
 		t.Fatal(fmt.Errorf("%s\n%v", msg, err))
