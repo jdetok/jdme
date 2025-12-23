@@ -7,7 +7,7 @@ import re
 PROD_URL = "https://jdeko.me/"
 LOCL_URL = "http://localhost:8080/"
 URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
-URLS_FTYP = [".js", ".html", ".css"]
+URLS_FTYP = [".js", ".html", ".css", ".yaml"]
 PROD_CPU = "arm64"
 LOCL_CPU = "amd64"
 
