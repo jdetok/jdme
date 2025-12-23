@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
+import subprocess
 import sys
 import re
              
@@ -10,11 +11,21 @@ URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
 URLS_FTYP = [".js", ".html", ".css", ".yaml"]
 PROD_CPU = "arm64"
 LOCL_CPU = "amd64"
+SUBNET = "10.7.19.0/24"
+GWAY = "10.7.19.1"
+PROD_COMPOSE = f'{' '*4}external: true'
+LOCL_COMPOSE = (f'{' '*4}name: jdme_net\n' 
+                 + f'{' '*4}driver: bridge\n'
+                 + f'{' '*4}ipam:\n{' '*6}config:\n'
+                 + f'{' '*8}- subnet: {SUBNET}\n'
+                 + f'{' '*10}gateway: {GWAY}')
 
 RE_URLS = r'https?://(?:localhost|jdeko(?:.me)?):?[0-9]*/?'
 RE_PROD_URL = rf'^(\s*PROD_URL\s+=\s+")({RE_URLS})("\s*)$'
 RE_IS_PROD = r"^(\s*IS_PROD\s*=\s*)(true|false)(\s*$)"
 RE_GOARCH = rf"^(.*GOARCH=)({LOCL_CPU}|{PROD_CPU})(.*)$"
+RE_COMPOSE = r'^(networks:\s*\s{2}\w+:\s?\n+)([\s\S]*)(\n^\s{2}\w+:)'
+
 
 def main():
     loc = False
@@ -26,20 +37,25 @@ def main():
         ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
         ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
         ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
-        ReReplace(loc, "GOARCH", "./Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], [])
+        ReReplace(loc, "GOARCH", "./Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
+        ReReplace(loc, "COMPOSE NETWORK", "./compose.yaml", LOCL_COMPOSE, PROD_COMPOSE, 3, 2, RE_COMPOSE, [], [])
     ]
     
-    files = 0
+    files_changed = 0
     rplcmnts = 0
     found = 0
     for r in to_replace:
         cnt = r.replace()
-        files += cnt[0]
+        files_changed += cnt[0]
         found += cnt[1]
         rplcmnts += cnt[2]
-        print(f"{r.rename} SUMMARY: {cnt[0]} files changed | {cnt[1]} matches | {cnt[2]} replacements | {r.p}\n")
-    print(f"COMPLETE | {files} files changed | {found} matches | {rplcmnts} replacements")
+        print(f"{r.rename} SUMMARY: {cnt[0]} file(s) changed | {cnt[1]} match(es) | {cnt[2]} replacement(s) | {r.p}\n")
+    print(f"COMPLETE | {files_changed} file(s) changed | {found} match(es) | {rplcmnts} replacement(s)")
     
+    if files_changed > 0:
+        push_changes(f"replaced {rplcmnts} string(s) in {files_changed} file(s)")
+        
+    print("changes pushed")
 
 class ReReplace:
     def __init__(self, loc: bool, name: str,
@@ -104,9 +120,38 @@ class ReReplace:
                     except Exception as e: 
                         print(f"error writing to {f}: {e}\ncontinuing...")
                         continue
+                    finally:
+                        if len(self.rfiles) > 1:
+                            print(f"  | {ff} match(es) | {rf} replacement(s) | {f}")
             rplcd += rf
             found += ff
         return [fc, found, rplcd]
                                 
+
+def run(cmd:str) -> subprocess.CompletedProcess:
+    return subprocess.run(cmd.split(' '), check=False, 
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    
+def run_commands(cmds:tuple[str]):
+    for cmd in cmds:
+        res = run(cmd)
+        if res.returncode > 0:
+            raise SystemError(f"command failed: {cmd} | {res.returncode}")
+        
+
+def push_changes(commit_msg:str):
+    diff = run("git diff --quiet")
+    if diff.returncode == 0:
+        print("no changes to push")
+        return
+    
+    run_commands([
+        "git config user.name github-actions[bot]",
+        "git config user.email github-actions[bot]@users.noreply.github.com",
+        "git add .",
+        f"git commit -m {commit_msg}",
+        "git push"
+    ])
+
 if __name__ == "__main__":
     main()

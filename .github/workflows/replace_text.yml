@@ -27,5 +27,5 @@ jobs:
               echo "No replacement needed for branch ${GITHUB_REF_NAME}"
           fi
 
-      - name: Commit any changes
-        run: ./scripts/ci/check_git_diff.sh
+      # - name: Commit any changes
+      #   run: ./scripts/ci/check_git_diff.sh
