@@ -49,6 +49,10 @@ func PostgresConn(conf *DBConfig) (DB, error) {
 		return nil, fmt.Errorf("%s\n%w", msg, err)
 	}
 
+	if conf == nil {
+		return db, nil
+	}
+
 	// set max connections
 	db.SetMaxOpenConns(conf.MaxOpenConns)
 	db.SetMaxIdleConns(conf.MaxIdleConns)

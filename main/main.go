@@ -33,8 +33,8 @@ const (
 	PG_OPEN         = 80
 	PG_IDLE         = 30
 	PG_LIFE         = 30
-	QUICKSTART      = false
-	IS_PROD         = false
+	QUICKSTART      = true
+	IS_PROD         = true
 )
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 	app.T = api.Timing{
 		CtxTimeout:        10 * time.Second,
 		UpdateStoreTick:   1 * time.Minute,
-		UpdateStoreThresh: 3 * time.Minute,
+		UpdateStoreThresh: 2 * time.Minute,
 		HealthCheckTick:   1 * time.Second,
 		HealthCheckThreah: 120 * time.Second,
 	}

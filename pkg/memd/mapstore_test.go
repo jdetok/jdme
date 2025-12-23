@@ -33,7 +33,7 @@ func TestMapPlayersCC(t *testing.T) {
 		t.Error(err)
 	}
 
-	db, err := pgdb.PostgresConn()
+	db, err := pgdb.PostgresConn(&pgdb.DBConfig{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -71,7 +71,7 @@ func TestMapSznTeams(t *testing.T) {
 		t.Error(err)
 	}
 
-	db, err := pgdb.PostgresConn()
+	db, err := pgdb.PostgresConn(&pgdb.DBConfig{})
 	if err != nil {
 		t.Error(err)
 	}

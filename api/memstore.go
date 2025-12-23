@@ -18,10 +18,14 @@ func (app *App) UpdateStore(ctx context.Context, quickstart bool, tick, threshol
 	if !app.Started {
 		app.Started = true
 		app.StartTime = time.Now()
+		app.LastUpdate = app.StartTime
+		app.Lg.Infof("in-memory storage goroutine first started at %v", app.StartTime)
 
-		if err := app.UpdateStructsSafe(); err != nil {
+		if err := app.Store.Rebuild(app.DB); err != nil {
 			return err
 		}
+		app.Lg.Infof("app.Store refreshed | %d players | %d seasons | %d teams",
+			len(app.Store.Players), len(app.Store.Seasons), len(app.Store.Teams))
 
 		// init empty maps
 		app.MStore.Set(memd.MakeMaps()) // empty maps
@@ -67,8 +71,8 @@ func (app *App) UpdateStore(ctx context.Context, quickstart bool, tick, threshol
 			return nil
 		case <-ticker.C:
 			if time.Since(app.LastUpdate) >= threshold {
-				app.Lg.Infof("time since last update {%v} > threshold {%v} - rebuilding memory store",
-					time.Since(app.LastUpdate), threshold)
+				app.Lg.Infof("rebuilding memory store: {%v} since {%v} | threshold {%v}",
+					time.Since(app.LastUpdate), app.LastUpdate.Format("2006-01-02 15:04:05"), threshold)
 
 				app.LastUpdate = time.Now()
 
@@ -81,16 +85,14 @@ func (app *App) UpdateStore(ctx context.Context, quickstart bool, tick, threshol
 }
 
 func (app *App) RebuildMemStore(ctx context.Context) error {
-	// var wg = &sync.WaitGroup{}
-
-	// var errs []error
-	// errCh := make(chan error, 2)
-
 	g, ctx := errgroup.WithContext(ctx)
+	g.SetLimit(50)
 	g.Go(func() error {
-		if err := app.UpdateStructsSafe(); err != nil {
+		if err := app.Store.Rebuild(app.DB); err != nil {
 			return fmt.Errorf("error updating struct slices: %w", err)
 		}
+		app.Lg.Infof("app.Store refreshed | %d players | %d seasons | %d teams",
+			len(app.Store.Players), len(app.Store.Seasons), len(app.Store.Teams))
 		return nil
 	})
 
@@ -100,6 +102,8 @@ func (app *App) RebuildMemStore(ctx context.Context) error {
 		if err := app.MStore.Rebuild(ctx, app.DB, app.Lg, false); err != nil {
 			return fmt.Errorf("error updating maps: %w", err)
 		}
+		app.Lg.Infof("app.MStore refreshed | %d players | %d teams",
+			len(app.MStore.Maps.PlayerIdName), len(app.MStore.Maps.TeamIds))
 		return nil
 	})
 	if err := g.Wait(); err != nil {
@@ -109,35 +113,5 @@ func (app *App) RebuildMemStore(ctx context.Context) error {
 	if err := app.MStore.Persist(true); err != nil {
 		return fmt.Errorf("error persisting maps: %v", &errd.PersistError{Err: err})
 	}
-	return nil
-}
-
-// update players, seasons, and teams in memory structs slices
-// should be in memd
-func (app *App) UpdateStructsSafe() error {
-	var err error
-	app.Store.Players, err = memd.UpdatePlayers(app.DB)
-	if err != nil {
-		return fmt.Errorf("failed updating players structs: %v", err)
-	}
-	app.Store.Seasons, err = memd.UpdateSeasons(app.DB)
-	if err != nil {
-		return fmt.Errorf("failed updating season structs: %v", err)
-	}
-	app.Store.Teams, err = memd.UpdateTeams(app.DB)
-	if err != nil {
-		return fmt.Errorf("failed updating team structs: %v", err)
-	}
-
-	app.Store.TeamRecs, err = memd.UpdateTeamRecords(app.DB, &app.Store.CurrentSzns)
-	if err != nil {
-		return fmt.Errorf("failed updating team records: %v", err)
-	}
-	app.Store.TopLgPlayers, err = memd.QueryTopLgPlayers(app.DB, &app.Store.CurrentSzns, "50")
-	if err != nil {
-		return fmt.Errorf("failed updating league top players struct: %v", err)
-	}
-	app.Lg.Infof("struct slices refreshed | %d players | %d seasons | %d teams",
-		len(app.Store.Players), len(app.Store.Seasons), len(app.Store.Teams))
 	return nil
 }
