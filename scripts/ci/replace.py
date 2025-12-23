@@ -127,15 +127,18 @@ class ReReplace:
         return [fc, found, rplcd]
                                 
 
-def run(cmd:str) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd.split(' '), check=False, 
+def run(cmd:str, msg=None) -> subprocess.CompletedProcess:
+    to_run = cmd.split()
+    if msg is not None:
+        to_run = f'{to_run} "{msg}"'
+    return subprocess.run(to_run, check=False, 
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
-def run_commands(cmds:tuple[str]):
-    for cmd in cmds:
-        res = run(cmd)
+def run_commands(cmds: dict[str, str]):
+    for cmd, msg in cmds:
+        res = run(cmd, msg)
         if res.returncode > 0:
-            raise SystemError(f"command failed: {cmd} | {res.returncode}")
+            raise SystemError(f"command failed: {cmd} {msg} | code {res.returncode}")
         
 
 def push_changes(commit_msg:str):
@@ -143,14 +146,14 @@ def push_changes(commit_msg:str):
     if diff.returncode == 0:
         print("no changes to push")
         return
-    
-    run_commands([
-        "git config user.name github-actions[bot]",
-        "git config user.email github-actions[bot]@users.noreply.github.com",
-        "git add .",
-        f'git commit -m "{commit_msg}"',
-        "git push"
-    ])
+    # figure out how to call
+    run_commands({
+        "git config user.name github-actions[bot]": None,
+        "git config user.email github-actions[bot]@users.noreply.github.com": None,
+        "git add .": None,
+        'git commit -m': commit_msg,
+        "git push": None
+    })
 
 if __name__ == "__main__":
     main()
