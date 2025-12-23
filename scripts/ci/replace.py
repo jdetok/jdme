@@ -131,7 +131,6 @@ def run(cmd:str, msg=None) -> subprocess.CompletedProcess:
     to_run = cmd.split()
     if msg is not None:
         to_run.append(msg)
-        # to_run = f'{to_run} "{msg}"'
     return subprocess.run(to_run, check=False, 
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
