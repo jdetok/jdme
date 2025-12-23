@@ -9,6 +9,20 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+type DBConfig struct {
+	MaxOpenConns int
+	MaxIdleConns int
+	ConnMaxLife  time.Duration
+}
+
+func NewDBConf(maxOpen, maxIdle int, maxLife time.Duration) *DBConfig {
+	return &DBConfig{
+		MaxOpenConns: maxOpen,
+		MaxIdleConns: maxIdle,
+		ConnMaxLife:  maxLife,
+	}
+}
+
 type DB interface {
 	Query(query string, args ...any) (*sql.Rows, error)
 	QueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
@@ -23,7 +37,7 @@ type DB interface {
 
 // CONNECTION TO POSTGRES SERVER: MIGRATED TO POSTGRES FROM MARIADB 08/06/2025
 // configs must be setup in .env file at project root
-func PostgresConn() (DB, error) {
+func PostgresConn(conf *DBConfig) (DB, error) {
 	pg, err := GetEnvPG()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get env for db: %v", err)
@@ -36,8 +50,8 @@ func PostgresConn() (DB, error) {
 	}
 
 	// set max connections
-	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(25)
-	db.SetConnMaxLifetime(55 * time.Minute)
+	db.SetMaxOpenConns(conf.MaxOpenConns)
+	db.SetMaxIdleConns(conf.MaxIdleConns)
+	db.SetConnMaxLifetime(conf.ConnMaxLife)
 	return db, nil
 }

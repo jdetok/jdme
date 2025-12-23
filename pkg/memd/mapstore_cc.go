@@ -19,34 +19,28 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 	start := time.Now()
 	lgd.Debugf("mapping all players (concurrent workers)")
 
+	sm.PlayerNameId["random"] = 77777
+
 	rows, err := db.QueryContext(ctx, pgdb.QPlayerStore)
 	if err != nil {
 		return err
 	}
 	defer rows.Close()
 
-	// concurrency controls
+	const maxWorkers = 40
 
-	const maxWorkers = 20
-	sem := make(chan struct{}, maxWorkers)
-	errCh := make(chan error, maxWorkers)
 	g, ctx := errgroup.WithContext(ctx)
+	g.SetLimit(maxWorkers)
 	results := make(chan *StPlayer, maxWorkers)
-
-	sm.PlayerNameId["random"] = 77777
 
 	// read the results channel, add player to maps
 	go func() {
 		// WAITGROUP SHOULD NOT WAIT HERE. func hangs if so
 		defer func() {
 			if r := recover(); r != nil {
-				select {
-				case errCh <- fmt.Errorf("results reader panicing: %v", r):
-				default:
-				}
+				lgd.Errorf("results reader panic: %v", r)
 			}
 		}()
-
 		for p := range results {
 			lgd.Debugf("%s complete", p.Name)
 		}
@@ -69,7 +63,7 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			return err
 		}
 
-		p := &StPlayer{
+		plr := &StPlayer{
 			Id:      id,
 			Name:    name,
 			Lg:      lg,
@@ -79,33 +73,13 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			MinPSzn: minP,
 		}
 
-		select {
-		case sem <- struct{}{}:
-		case <-ctx.Done():
-			return ctx.Err()
-		}
 		// capture loop vars
 		l := lowrStr
+		p := plr
 		t := tms
 		wrkNum := count
 
-		// wg.Add(1)
 		g.Go(func() error {
-			// defer wg.Done()
-			defer func() {
-				if r := recover(); r != nil {
-					select {
-					case errCh <- fmt.Errorf("worker %d panicing: %v", wrkNum, r):
-					default:
-					}
-				}
-			}()
-
-			defer func() { <-sem }()
-			if ctx.Err() != nil {
-				return ctx.Err()
-			}
-
 			lgd.Debugf("worker %d running\n", wrkNum)
 
 			// clean the player name (lower case, remove accents)
@@ -122,7 +96,6 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			sm.MapPlrNmDtlCC(p)
 			sm.MapPlrIdNmCC(p)
 			sm.MapPlrNmIdCC(p)
-			// player exists maps
 			sm.MapPlrIdCC(p)
 			sm.MapPlrNmCC(p)
 
@@ -140,16 +113,16 @@ func (sm *StMaps) MapPlayersCC(ctx context.Context, db pgdb.DB, lgd *logd.Logd) 
 			return nil
 		})
 	}
-
-	// check for error in rows
 	if err := rows.Err(); err != nil {
 		return err
 	}
 
-	// close results when all workers finish
-	// wg.Wait()
-	g.Wait()
+	if err := g.Wait(); err != nil {
+		close(results)
+		return err
+	}
 	close(results)
+
 	lgd.Debugf("finished with %d rows after %v", count, time.Since(start))
 
 	return nil
