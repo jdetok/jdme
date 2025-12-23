@@ -1,4 +1,4 @@
-name: Replace localhost URLs
+name: Python regex text replacements
 on:
   push:
     branches:
@@ -17,8 +17,7 @@ jobs:
         with: 
           fetch-depth: 0
 
-      - name: Replace localhost with production URL
-        # run: python3 ./scripts/ci/localhost_to_prod.py local
+      - name: Run python script
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" || "${GITHUB_REF_NAME}" == "ci" ]]; then
               ./scripts/ci/replace.py
@@ -28,6 +27,5 @@ jobs:
               echo "No replacement needed for branch ${GITHUB_REF_NAME}"
           fi
 
-
-      - name: Commit changes if any
+      - name: Commit any changes
         run: ./scripts/ci/check_git_diff.sh
