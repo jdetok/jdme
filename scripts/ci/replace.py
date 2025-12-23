@@ -54,8 +54,7 @@ def main():
     
     if files_changed > 0:
         push_changes(f"replaced {rplcmnts} string(s) in {files_changed} file(s)")
-        
-    print("changes pushed")
+        print("changes pushed")
 
 class ReReplace:
     def __init__(self, loc: bool, name: str,
