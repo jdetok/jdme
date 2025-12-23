@@ -19,7 +19,7 @@ services:
     environment:
       - TZ=America/Chicago
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "-f", "https://jdeko.me/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -28,11 +28,6 @@ services:
 
 networks:
   jdme_net: 
-    name: jdme_net
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.7.19.0/24
-          gateway: 10.7.19.1 
+    external: true
   lognet:
     external: true
