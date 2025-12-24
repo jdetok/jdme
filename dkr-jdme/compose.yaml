@@ -121,7 +121,7 @@ services:
       lognet:
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/proxy-health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/proxy-health"]
       interval: 20s
       timeout: 5s
       retries: 5
