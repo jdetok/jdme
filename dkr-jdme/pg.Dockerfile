@@ -6,3 +6,5 @@ COPY ./db/dump/. .
 
 WORKDIR /var/lib/postgresql
 RUN mkdir dump
+
+COPY ./db/dump/. dump/.

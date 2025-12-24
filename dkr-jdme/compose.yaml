@@ -1,18 +1,20 @@
 services:
 # POSTGRES DATABASE
   postgres:
+    container_name: pgbball
+    image: jdme-pg
     build: 
       context: .
       dockerfile: pg.Dockerfile
-    image: jdme-pg
-    env_file: 
-      - ../.env
-    container_name: pgbball
-    ports:
-      - "8765:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - pg-dump:/var/lib/postgresql/dump
     networks:
       pgnet:
-        ipv4_address: 10.69.3.182
+    ports:
+      - "8765:5432"
+    env_file: 
+      - ../.env
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -h localhost -U postgres"]
@@ -20,19 +22,20 @@ services:
       timeout: 5s
       retries: 10
       start_period: 10s
-    volumes:
-      - pg-data:/var/lib/postgresql
+    
 
   # MONGO DATABASE
   mongo:
     container_name: mongo
     image: mongo
+    build:
+      context: .
+      dockerfile: mongo.Dockerfile
     restart: always
     env_file:
       - ../.env
     networks:
       lognet:
-        ipv4_address: 10.0.199.199
     ports:
       - "27017:27017"
     volumes:
@@ -51,19 +54,20 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
-        restart: true
     restart: unless-stopped
     env_file:
       - ../.env
-    # environment:    
-    #   ME_CONFIG_BASEROOT: /mongolog
     networks:
       lognet:
-        ipv4_address: 10.0.199.200
       apinet:
-        ipv4_address: 10.7.19.200
     ports:
       - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://mongox:8081/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     
   # GO API  
   api:
@@ -71,10 +75,8 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
-        restart: true
       postgres:
         condition: service_healthy
-        restart: true
     build:
       context: ..
       dockerfile: dkr-jdme/api.Dockerfile
@@ -85,11 +87,8 @@ services:
       # - TZ=America/Chicago
     networks:
       apinet:
-        ipv4_address: 10.7.19.10
       lognet: 
-        ipv4_address: 10.0.199.10
       pgnet:
-        ipv4_address: 10.69.3.10
     ports: 
       - "8080:8080"
     volumes:
@@ -97,11 +96,11 @@ services:
       - ../z_log:/app/z_log
       - ../persist:/app/persist
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
+      test: ["CMD", "curl", "-f", "http://api:8080/health"]
+      interval: 15s
       timeout: 5s
-      retries: 3
-      start_period: 30s
+      retries: 10
+      start_period: 15s
 
 # REVERSE PROXY
   nginx:
@@ -112,54 +111,41 @@ services:
     image: jdme-nginx
     depends_on:
       api:
-        condition: service_healthy
+        condition: service_started
       mongox:
-        condition: service_healthy
+        condition: service_started
     ports:
       - "80:80"
     networks:
       apinet:
-        ipv4_address: 10.7.19.211
       lognet:
-        ipv4_address: 10.0.199.210
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/proxy-health"]
-      interval: 10s
+      interval: 20s
       timeout: 5s
       retries: 5
-      start_period: 15s
+      start_period: 30s
 
-
-
+# 
 networks:
   apinet: 
     name: apinet
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.7.19.0/24
-          gateway: 10.7.19.1
 
   lognet:
     name: lognet
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.199.0/24
-          gateway: 10.0.199.1
 
   pgnet:
     name: pgnet
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.69.3.0/24
-          gateway: 10.69.3.1
 
 volumes:
   pg-data:
     name: pg-data
+  pg-dump:
+    name: pg-dump
   mongo-data:
     name: mongo-data
     # driver_opts:
