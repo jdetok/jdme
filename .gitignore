@@ -14,4 +14,4 @@ proxy/ssl/
 proxy/*.conf
 persist_data/
 dkr-jdme/proxy/ssl/
-dkr-jdme/db/dump/
+dkr-jdme/db/dump/*
