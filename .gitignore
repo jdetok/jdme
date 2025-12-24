@@ -13,3 +13,7 @@ wiki/public/
 proxy/ssl/
 proxy/*.conf
 persist_data/
+dkr-jdme/proxy/ssl/
+dkr-jdme/proxy/.htpasswd
+dkr-jdme/db/dump
+.DS_Store
