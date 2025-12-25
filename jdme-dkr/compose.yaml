@@ -64,7 +64,7 @@ services:
     image: jdme-api
     build:
       context: ..
-      dockerfile: dkr-jdme/api.Dockerfile
+      dockerfile: jdme-dkr/api.Dockerfile
     env_file:
       - ../.env
     networks:
