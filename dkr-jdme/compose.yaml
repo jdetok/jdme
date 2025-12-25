@@ -4,57 +4,46 @@ services:
     container_name: pgbball
     image: jdme-pg
     build: 
-      context: .
+      context: db/.
       dockerfile: pg.Dockerfile
-    volumes:
-      - pg-data:/var/lib/postgresql/data
-      - pg-dump:/var/lib/postgresql/dump
+    env_file: 
+      - ../.env
     networks:
       pgnet:
     ports:
       - "8765:5432"
-    env_file: 
-      - ../.env
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -h localhost -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - pg-dump:/var/lib/postgresql/dump
     
-
-  # MONGO DATABASE
+# MONGO DATABASE
   mongo:
     container_name: mongo
     image: mongo
     build:
-      context: .
+      context: mongo/.
       dockerfile: mongo.Dockerfile
-    restart: always
     env_file:
       - ../.env
     networks:
       lognet:
     ports:
       - "27017:27017"
+    restart: always
     volumes:
       - mongo-data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
 
-  # MONGO EXPRESS UI
+# MONGO EXPRESS UI
   mongox:
-    image: mongo-express
     container_name: mongox
     depends_on:
       mongo:
         condition: service_healthy
-    restart: unless-stopped
+    image: mongox
+    build:
+      context: mongo/.
+      dockerfile: mongox.Dockerfile
     env_file:
       - ../.env
     networks:
@@ -62,14 +51,9 @@ services:
       apinet:
     ports:
       - "8081:8081"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://mongox:8081/status"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+    restart: unless-stopped
     
-  # GO API  
+# GO API  
   api:
     container_name: api
     depends_on:
@@ -77,36 +61,31 @@ services:
         condition: service_healthy
       postgres:
         condition: service_healthy
+    image: jdme-api
     build:
       context: ..
       dockerfile: dkr-jdme/api.Dockerfile
-    image: jdme-api
-    restart: unless-stopped
     env_file:
       - ../.env
-      # - TZ=America/Chicago
     networks:
       apinet:
       lognet: 
       pgnet:
     ports: 
       - "8080:8080"
+    restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ../z_log:/app/z_log
-      - ../persist:/app/persist
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://api:8080/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
-      start_period: 15s
+      - applog:/app/z_log/app
+      - applog_dbg:/app/z_log/dbg
+      - appdata:/app/persist
+      - app_static:/app/static
 
 # REVERSE PROXY
   nginx:
     container_name: nginx
     build:
-      context: .
+      context: proxy/.
       dockerfile: nginx.Dockerfile
     image: jdme-nginx
     depends_on:
@@ -120,14 +99,7 @@ services:
       apinet:
       lognet:
     restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/proxy-health"]
-      interval: 20s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
-# 
 networks:
   apinet: 
     name: apinet
@@ -148,8 +120,11 @@ volumes:
     name: pg-dump
   mongo-data:
     name: mongo-data
-    # driver_opts:
-    #   type: "nfs"
-    #   o: "addr=100.107.48.54,nolock,soft,rw"
-    #   device: "/mnt/dekonet/jdme"
-
+  applog:
+    name: applog
+  applog_dbg:
+    name: applog_dbg
+  appdata: 
+    name: appdata
+  app_static:
+    name: app_static
