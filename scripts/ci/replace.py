@@ -37,8 +37,8 @@ def main():
         ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
         ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
         ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
-        ReReplace(loc, "GOARCH", "./Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
-        ReReplace(loc, "COMPOSE NETWORK", "./compose.yaml", LOCL_COMPOSE, PROD_COMPOSE, 3, 2, RE_COMPOSE, [], [])
+        ReReplace(loc, "GOARCH", "./dkr-jdme/api.Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
+        # ReReplace(loc, "COMPOSE NETWORK", "./compose.yaml", LOCL_COMPOSE, PROD_COMPOSE, 3, 2, RE_COMPOSE, [], [])
     ]
     
     files_changed = 0
