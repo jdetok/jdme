@@ -1,13 +1,30 @@
+#BUILD STAGE
+FROM golang:1.25 AS builder
+
+RUN apt-get update && apt-get install -y git \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG REPO_URL=https://github.com/jdetok/bball-etl-cli.git
+ARG REPO_REF=main
+
+RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /app
+
+WORKDIR /app
+RUN mkdir ./log
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/fetch ./cli
+
+# RUNTIME STAGE
 FROM alpine:latest
-# RUN apk add --no-cache postgresql-client bash
-RUN apk add --no-cache bash tzdata
-WORKDIR /fetch
 
-# COPY pgbkp/pg_dump.sh /usr/local/bin/pg_dump.sh
-COPY pgfetch/fetch.sh ./fetch.sh
-RUN chmod +x ./fetch.sh
+RUN apk add --no-cache bash postgresql-client tzdata
 
-RUN echo "27 10 * * * /fetch/fetch.sh" > /etc/crontabs/root
+RUN mkdir /dump
 
-# run cron in the foreground
+COPY --from=builder /app /app
+
+COPY ./pgfetch/fetch.sh /app/fetch.sh
+RUN chmod +x /app/fetch.sh
+
+RUN echo "35 00 * * * /app/fetch.sh" > /etc/crontabs/root
+
 CMD ["crond", "-f", "-L", "/var/log/cron.log"]

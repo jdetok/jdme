@@ -33,24 +33,6 @@ services:
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      # - pg-dump:/dump
-
-# DAILY PG DUMP
-  pgbkp:
-    container_name: pgbkp
-    depends_on: 
-      postgres:
-        condition: service_healthy
-    image: jdme-pgbkp
-    build: 
-      context: db/.
-      dockerfile: pgbkp/bkp.Dockerfile
-    env_file: ../.env
-    networks:
-      pgnet:
-    restart: unless-stopped
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
       - pg-dump:/dump
     
 # MONGO DATABASE
