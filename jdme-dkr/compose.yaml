@@ -118,6 +118,7 @@ services:
       lognet:
     restart: always
 
+# NETWORKS
 networks:
   apinet: 
     name: apinet
@@ -131,6 +132,7 @@ networks:
     name: pgnet
     driver: bridge
 
+# VOLUMES
 volumes:
   pg-data:
     name: pg-data

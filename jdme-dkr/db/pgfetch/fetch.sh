@@ -4,10 +4,37 @@ LOGD=/app/log
 LOGF=$LOGD/fetch_$(date +'%m%d%y_%H%M%S').log
 EXEC=bin/fetch
 PROC=scripts/dly.sql
-BACKUP_FILE="/dump/bball_$(date +%m%d%Y).sql"
+BACKUP_FILE="/dump/bball_$(date +%m%d%Y_%H%M%S).sql"
 
 export PATH=$PATH:/usr/local/go/bin
 export PGPASSWORD=$PG_PASS
+
+set -euo pipefail
+
+# defaults
+SEASON=""
+MODE="daily"
+
+usage() {
+  echo "Usage: $0 [-s szn]"
+  echo "  -s <season>   Run fetch for a specific season (e.g. 2025)"
+  exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -s|-szn)
+      SEASON="$2"
+      MODE="custom"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++ DAILY BBALL ETL STARTED
@@ -20,9 +47,11 @@ echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 " >> $LOGF
 
 # run go app
-# ./$EXEC -envf skip -mode daily || exit 1
-# ./"$EXEC" -envf skip -mode daily 2>&1 | tee -a "$LOGF"
-./"$EXEC" -envf skip -mode custom -szn 2025 2>&1 | tee -a "$LOGF"
+if [[ -n "$SEASON" ]]; then
+    ./"$EXEC" -envf skip -mode $MODE -szn $SEASON 2>&1 | tee -a "$LOGF"
+else
+    ./"$EXEC" -envf skip -mode $MODE 2>&1 | tee -a "$LOGF"
+fi
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++ GO ETL CLI APPLICATION RAN SUCCESSFULLY
