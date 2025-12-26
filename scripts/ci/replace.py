@@ -7,18 +7,18 @@ import re
              
 PROD_URL = "https://jdeko.me/"
 LOCL_URL = "http://localhost:8080/"
-URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
+URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin", "jdme-dkr"]
 URLS_FTYP = [".js", ".html", ".css", ".yaml"]
 PROD_CPU = "arm64"
 LOCL_CPU = "amd64"
-SUBNET = "10.7.19.0/24"
-GWAY = "10.7.19.1"
-PROD_COMPOSE = f'{' '*4}external: true'
-LOCL_COMPOSE = (f'{' '*4}name: jdme_net\n' 
-                 + f'{' '*4}driver: bridge\n'
-                 + f'{' '*4}ipam:\n{' '*6}config:\n'
-                 + f'{' '*8}- subnet: {SUBNET}\n'
-                 + f'{' '*10}gateway: {GWAY}')
+# SUBNET = "10.7.19.0/24"
+# GWAY = "10.7.19.1"
+# PROD_COMPOSE = f'{' '*4}external: true'
+# LOCL_COMPOSE = (f'{' '*4}name: jdme_net\n' 
+#                  + f'{' '*4}driver: bridge\n'
+#                  + f'{' '*4}ipam:\n{' '*6}config:\n'
+#                  + f'{' '*8}- subnet: {SUBNET}\n'
+#                  + f'{' '*10}gateway: {GWAY}')
 
 RE_URLS = r'https?://(?:localhost|jdeko(?:.me)?):?[0-9]*/?'
 RE_PROD_URL = rf'^(\s*PROD_URL\s+=\s+")({RE_URLS})("\s*)$'
@@ -37,7 +37,7 @@ def main():
         ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
         ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
         ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
-        ReReplace(loc, "GOARCH", "./dkr-jdme/api.Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
+        ReReplace(loc, "GOARCH", "./jdme-dkr/api.Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
         # ReReplace(loc, "COMPOSE NETWORK", "./compose.yaml", LOCL_COMPOSE, PROD_COMPOSE, 3, 2, RE_COMPOSE, [], [])
     ]
     
