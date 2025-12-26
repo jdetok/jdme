@@ -11,7 +11,7 @@ services:
     networks:
       pgnet:
     ports:
-      - "8765:5432"
+      - "9876:5432"
     restart: unless-stopped
     volumes:
       - pg-data:/var/lib/postgresql/data
