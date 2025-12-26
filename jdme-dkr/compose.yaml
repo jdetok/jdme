@@ -32,13 +32,13 @@ services:
       pgnet:
     restart: unless-stopped
     volumes:
-      - /etc/localtime:/etc/localtime:ro
       - pg-dump:/dump
+      - fetchlog:/app/log
     
 # MONGO DATABASE
   mongo:
     container_name: mongo
-    image: mongo
+    image: jdme-mongo
     build:
       context: mongo/.
       dockerfile: mongo.Dockerfile
@@ -51,6 +51,7 @@ services:
     restart: always
     volumes:
       - mongo-data:/data/db
+      - mongo-conf:/data/configdb
 
 # MONGO EXPRESS UI
   mongox:
@@ -58,7 +59,7 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
-    image: mongox
+    image: jdme-mongox
     build:
       context: mongo/.
       dockerfile: mongox.Dockerfile
@@ -93,7 +94,6 @@ services:
       - "8080:8080"
     restart: unless-stopped
     volumes:
-      - /etc/localtime:/etc/localtime:ro
       - applog:/app/z_log/app
       - applog_dbg:/app/z_log/dbg
       - appdata:/app/persist
@@ -136,8 +136,12 @@ volumes:
     name: pg-data
   pg-dump:
     name: pg-dump
+  fetchlog:
+    name: fetchlog
   mongo-data:
     name: mongo-data
+  mongo-conf:
+    name: mongo-conf
   applog:
     name: applog
   applog_dbg:
