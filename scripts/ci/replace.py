@@ -6,25 +6,17 @@ import sys
 import re
              
 PROD_URL = "https://jdeko.me/"
-LOCL_URL = "http://localhost:8080/"
-URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin", "jdme-dkr"]
-URLS_FTYP = [".js", ".html", ".css", ".yaml"]
+LOCL_URL = "http://localhost/"
+URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
+URLS_FTYP = [".js", ".html", ".css", ".yaml", ".Dockerfile"]
 PROD_CPU = "arm64"
 LOCL_CPU = "amd64"
-# SUBNET = "10.7.19.0/24"
-# GWAY = "10.7.19.1"
-# PROD_COMPOSE = f'{' '*4}external: true'
-# LOCL_COMPOSE = (f'{' '*4}name: jdme_net\n' 
-#                  + f'{' '*4}driver: bridge\n'
-#                  + f'{' '*4}ipam:\n{' '*6}config:\n'
-#                  + f'{' '*8}- subnet: {SUBNET}\n'
-#                  + f'{' '*10}gateway: {GWAY}')
 
 RE_URLS = r'https?://(?:localhost|jdeko(?:.me)?):?[0-9]*/?'
 RE_PROD_URL = rf'^(\s*PROD_URL\s+=\s+")({RE_URLS})("\s*)$'
 RE_IS_PROD = r"^(\s*IS_PROD\s*=\s*)(true|false)(\s*$)"
 RE_GOARCH = rf"^(.*GOARCH=)({LOCL_CPU}|{PROD_CPU})(.*)$"
-RE_COMPOSE = r'^(networks:\s*\s{2}\w+:\s?\n+)([\s\S]*)(\n^\s{2}\w+:)'
+RE_SSL_DKR = r"(^|# )(COPY ssl.*$)"
 
 
 def main():
@@ -38,7 +30,7 @@ def main():
         ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
         ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
         ReReplace(loc, "GOARCH", "./jdme-dkr/api.Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
-        # ReReplace(loc, "COMPOSE NETWORK", "./compose.yaml", LOCL_COMPOSE, PROD_COMPOSE, 3, 2, RE_COMPOSE, [], [])
+        ReReplace(loc, "SSL_DKR", "./jdme-dkr/proxy/nginx.Dockerfile", r"^# ", r"", 2, 1, RE_SSL_DKR, [], []),
     ]
     
     files_changed = 0
@@ -56,6 +48,8 @@ def main():
         push_changes(f"replaced {rplcmnts} string(s) in {files_changed} file(s)")
         print("changes pushed")
 
+# capt_groups -> number of capture groups in pattern
+# grp_pos -> capture group index (1:) that is replace with the replacement string
 class ReReplace:
     def __init__(self, loc: bool, name: str,
                 path, local_repl, prod_repl: str, 
