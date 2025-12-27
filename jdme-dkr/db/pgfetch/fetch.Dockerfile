@@ -25,6 +25,6 @@ COPY --from=builder /app /app
 COPY ./pgfetch/fetch.sh /app/fetch.sh
 RUN chmod +x /app/fetch.sh
 
-RUN echo "35 00 * * * /app/fetch.sh" > /etc/crontabs/root
+RUN echo "35 00 * * * /bin/sh -c 'cd /app && ./fetch.sh'" > /etc/crontabs/root
 
 CMD ["crond", "-f", "-L", "/var/log/cron.log"]

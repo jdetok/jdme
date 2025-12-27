@@ -21,7 +21,7 @@ usage() {
   exit 1
 }
 
-while [[ $# -gt 0 ]]; do
+while [[ $# > 0 ]]; do
   case "$1" in
     -s|-szn)
       SEASON="$2"
@@ -34,7 +34,6 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
-
 
 echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ++ DAILY BBALL ETL STARTED
