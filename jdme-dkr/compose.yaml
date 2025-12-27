@@ -1,0 +1,165 @@
+services:
+# POSTGRES DATABASE
+
+  # helpintopg: 
+  #   container_name: tmp
+  #   image: alpine
+  #   command: sh -c "cp -av /src/. /dest/"
+  #   volumes: 
+  #     - pg-dump:/dest
+  #     - ./datafrompg:/src:ro 
+
+  postgres:
+    container_name: pgbball
+    image: jdme-pg
+    build: 
+      context: db/.
+      dockerfile: pg.Dockerfile
+    env_file: 
+      - ../.env
+    networks:
+      pgnet:
+    ports:
+      - "9876:5432"
+    restart: unless-stopped
+    volumes:
+      - ./db/dump/prod.sql:/docker-entrypoint-initdb.d/prod.sql:ro
+      - pg-data:/var/lib/postgresql/data
+      - pg-dump:/var/lib/postgresql/dump
+
+# DAILY STATS FETCH
+  pgfetch:
+    container_name: pgfetch
+    depends_on: 
+      postgres:
+        condition: service_healthy
+    image: jdme-pgfetch
+    build: 
+      context: db/.
+      dockerfile: pgfetch/fetch.Dockerfile
+    env_file: ../.env
+    networks:
+      pgnet:
+    restart: unless-stopped
+    volumes:
+      - pg-dump:/dump
+      - fetchlog:/app/log
+    
+# MONGO DATABASE
+  mongo:
+    container_name: mongo
+    image: jdme-mongo
+    build:
+      context: mongo/.
+      dockerfile: mongo.Dockerfile
+    env_file:
+      - ../.env
+    networks:
+      lognet:
+    ports:
+      - "27017:27017"
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+      - mongo-conf:/data/configdb
+
+# MONGO EXPRESS UI
+  mongox:
+    container_name: mongox
+    depends_on:
+      mongo:
+        condition: service_healthy
+    image: jdme-mongox
+    build:
+      context: mongo/.
+      dockerfile: mongox.Dockerfile
+    env_file:
+      - ../.env
+    networks:
+      lognet:
+      apinet:
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    
+# GO API  
+  api:
+    container_name: api
+    # depends_on:
+    #   mongo:
+    #     condition: service_started
+    #   postgres:
+    #     condition: service_started
+    image: jdme-api
+    build:
+      context: ..
+      dockerfile: jdme-dkr/api.Dockerfile
+    env_file:
+      - ../.env
+    networks:
+      apinet:
+      lognet: 
+      pgnet:
+    ports: 
+      - "8080:8080"
+    # restart: unless-stopped
+    volumes:
+      - applog:/app/z_log/app
+      - applog_dbg:/app/z_log/dbg
+      - appdata:/app/persist
+      - app_static:/app/static
+
+# REVERSE PROXY
+  nginx:
+    container_name: nginx
+    build:
+      context: proxy/.
+      dockerfile: nginx.Dockerfile
+    image: jdme-nginx
+    # depends_on:
+      # api:
+      #   condition: service_healthy
+      # mongox:
+      #   condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      apinet:
+      lognet:
+    restart: always
+
+# NETWORKS
+networks:
+  apinet: 
+    name: apinet
+    driver: bridge
+
+  lognet:
+    name: lognet
+    driver: bridge
+
+  pgnet:
+    name: pgnet
+    driver: bridge
+
+# VOLUMES
+volumes:
+  pg-data:
+    name: pg-data
+  pg-dump:
+    name: pg-dump
+  fetchlog:
+    name: fetchlog
+  mongo-data:
+    name: mongo-data
+  mongo-conf:
+    name: mongo-conf
+  applog:
+    name: applog
+  applog_dbg:
+    name: applog_dbg
+  appdata: 
+    name: appdata
+  app_static:
+    name: app_static

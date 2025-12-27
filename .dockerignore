@@ -1,0 +1,8 @@
+jdme-dkr/
+scripts/
+z_docs/
+z_logs/
+tmp/
+.air.toml
+.gopuml.json
+*.md

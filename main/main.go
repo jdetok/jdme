@@ -33,7 +33,7 @@ const (
 	PG_OPEN         = 80
 	PG_IDLE         = 30
 	PG_LIFE         = 30
-	QUICKSTART      = true
+	QUICKSTART      = false
 	IS_PROD         = true
 )
 
@@ -109,11 +109,13 @@ func main() {
 				if time.Since(lastCheck) >= app.T.HealthCheckThreah {
 					lastCheck = time.Now()
 					var url string
-					if IS_PROD {
-						url = PROD_URL + healthChk
-					} else {
-						url = fmt.Sprintf("http://%s/%s", srv.Addr, healthChk)
-					}
+					// if IS_PROD {
+					// 	url = PROD_URL + healthChk
+					// } else {
+					// 	url = fmt.Sprintf("http://%s/%s", srv.Addr, healthChk)
+					// }
+					url = fmt.Sprintf("http://%s/%s", srv.Addr, healthChk)
+
 					resp, err := http.Get(url)
 					if err != nil {
 						fails++
@@ -137,6 +139,7 @@ func main() {
 			if ctx.Err() == nil {
 				return fmt.Errorf("in mem update error: %w", err)
 			}
+			return err
 		}
 		return nil
 	})
@@ -152,9 +155,7 @@ func main() {
 	})
 
 	if err := g.Wait(); err != nil {
-		if ctx.Err() == nil {
-			app.Lg.Errorf("wait error: %v", err)
-		}
+		app.Lg.Errorf("wait error: %v", err)
 	}
 	app.Lg.Infof("shutdown complete")
 }
