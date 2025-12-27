@@ -1,14 +1,5 @@
 services:
 # POSTGRES DATABASE
-
-  # helpintopg: 
-  #   container_name: tmp
-  #   image: alpine
-  #   command: sh -c "cp -av /src/. /dest/"
-  #   volumes: 
-  #     - pg-dump:/dest
-  #     - ./datafrompg:/src:ro 
-
   postgres:
     container_name: pgbball
     image: jdme-pg
@@ -85,11 +76,11 @@ services:
 # GO API  
   api:
     container_name: api
-    # depends_on:
-    #   mongo:
-    #     condition: service_started
-    #   postgres:
-    #     condition: service_started
+    depends_on:
+      mongo:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
     image: jdme-api
     build:
       context: ..
@@ -102,7 +93,7 @@ services:
       pgnet:
     ports: 
       - "8080:8080"
-    # restart: unless-stopped
+    restart: unless-stopped
     volumes:
       - applog:/app/z_log/app
       - applog_dbg:/app/z_log/dbg
@@ -116,11 +107,11 @@ services:
       context: proxy/.
       dockerfile: nginx.Dockerfile
     image: jdme-nginx
-    # depends_on:
-      # api:
-      #   condition: service_healthy
-      # mongox:
-      #   condition: service_healthy
+    depends_on:
+      api:
+        condition: service_healthy
+      mongox:
+        condition: service_healthy
     ports:
       - "80:80"
       - "443:443"
@@ -128,6 +119,8 @@ services:
       apinet:
       lognet:
     restart: always
+    volumes:
+      - proxylog:/var/log/nginx
 
 # NETWORKS
 networks:
@@ -163,3 +156,5 @@ volumes:
     name: appdata
   app_static:
     name: app_static
+  proxylog:
+    name: proxylog

@@ -1,6 +1,9 @@
 FROM nginx:stable
 
-RUN mkdir -p /etc/nginx/ssl
+RUN mkdir -p /etc/nginx/ssl 
+
+RUN touch /var/log/nginx/nginx.log
+RUN touch /var/log/nginx/err.log
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
