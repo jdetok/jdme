@@ -14,4 +14,4 @@ RUN chmod 644 /etc/nginx/.htpasswd
 # COPY ssl/cloudflare-origin.key /etc/nginx/ssl/cloudflare-origin.key
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=10 \
-  CMD ["curl", "-f", "http://localhost/proxy-health"]
+  CMD ["curl", "-f", "https://jdeko.me/proxy-health"]

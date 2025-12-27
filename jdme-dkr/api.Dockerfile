@@ -15,5 +15,5 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/api ./main
 ENTRYPOINT [ "/app/bin/api" ]
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=10 \
-  CMD ["curl", "-f", "http://localhost/health"]
-  # CMD ["curl", "-f", "http://localhost/health"]
+  CMD ["curl", "-f", "https://jdeko.me/health"]
+  # CMD ["curl", "-f", "https://jdeko.me/health"]
