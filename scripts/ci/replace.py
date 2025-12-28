@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from pathlib import Path
+import argparse
 import subprocess
 import sys
 import re
@@ -17,13 +18,14 @@ RE_PROD_URL = rf'^(\s*PROD_URL\s+=\s+")({RE_URLS})("\s*)$'
 RE_IS_PROD = r"^(\s*IS_PROD\s*=\s*)(true|false)(\s*$)"
 RE_GOARCH = rf"^(.*GOARCH=)({LOCL_CPU}|{PROD_CPU})(.*)$"
 RE_SSL_DKR = r"(^|# )(COPY ssl.*$)"
-
+RE_SSL_NGX = r"(^\s*listen 80;\s*$\n)([\s\S]*?)(^\s*access.*$)"
 
 def main():
-    loc = False
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "local":
-            loc = True            
+    args = parse_args()
+
+    loc = args.local 
+            
+    comment_nginx_ssl("jdme-dkr/proxy/nginx.conf", RE_SSL_NGX, loc)
             
     to_replace = [
         ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
@@ -45,8 +47,40 @@ def main():
     print(f"COMPLETE | {files_changed} file(s) changed | {found} match(es) | {rplcmnts} replacement(s)")
     
     if files_changed > 0:
-        push_changes(f"replaced {rplcmnts} string(s) in {files_changed} file(s)")
-        print("changes pushed")
+        msg: f"replaced {rplcmnts} string(s) in {files_changed} file(s)"
+        if args.no_push:
+            print(f"replaced {rplcmnts} string(s) in {files_changed} file(s)")    
+        else: 
+            push_changes(msg)
+            print("changes pushed")
+    
+def comment_nginx_ssl(path: Path, pattern: str, local: bool) -> str:
+    p = Path(path)
+    ptrn = re.compile(pattern, re.MULTILINE)
+    txt = p.read_text()
+    m = ptrn.search(txt)
+    if not m: 
+        return txt
+    startline = m.group(1)
+    to_comment = m.group(2)
+    endline = m.group(3)
+    
+    commented = []
+    repl_str = "# " if local else ""
+    for l in to_comment.splitlines(keepends=True):
+        new_line, _ = re.subn(r"(^\s*)(# |)", fr"{repl_str}\1", l)
+        commented.append(new_line)
+    
+    repl_block = "".join(commented)
+    replacement = f"{startline}{repl_block}{endline}"
+    
+    spos, epos = m.span()
+    new_txt = txt[:spos] + replacement + txt[epos:]
+    
+    if new_txt != txt:
+        p.write_text(new_txt)
+
+
 
 # capt_groups -> number of capture groups in pattern
 # grp_pos -> capture group index (1:) that is replace with the replacement string
@@ -148,6 +182,32 @@ def push_changes(commit_msg:str):
         'git commit -m': commit_msg,
         "git push": None
     })
+    
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Toggle nginx + docker config between local and prod"
+    )
+
+    parser.add_argument(
+        "--local", "-l",
+        action="store_true",
+        help="Apply local (non-prod) configuration"
+    )
+
+    parser.add_argument(
+        "--no-push", "-np",
+        action="store_true",
+        help="Do not push git changes"
+    )
+
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show what would change, but do not write files"
+    )
+
+    return parser.parse_args()
+
 
 if __name__ == "__main__":
     main()
