@@ -47,9 +47,9 @@ def main():
     print(f"COMPLETE | {files_changed} file(s) changed | {found} match(es) | {rplcmnts} replacement(s)")
     
     if files_changed > 0:
-        msg: f"replaced {rplcmnts} string(s) in {files_changed} file(s)"
+        msg = f"replaced {rplcmnts} string(s) in {files_changed} file(s)"
         if args.no_push:
-            print(f"replaced {rplcmnts} string(s) in {files_changed} file(s)")    
+            print(msg)    
         else: 
             push_changes(msg)
             print("changes pushed")
