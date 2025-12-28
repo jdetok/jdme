@@ -81,7 +81,6 @@ def comment_nginx_ssl(path: Path, pattern: str, local: bool) -> str:
         p.write_text(new_txt)
 
 
-
 # capt_groups -> number of capture groups in pattern
 # grp_pos -> capture group index (1:) that is replace with the replacement string
 class ReReplace:
