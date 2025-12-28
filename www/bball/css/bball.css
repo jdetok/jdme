@@ -1,0 +1,278 @@
+/* FULL SCREEN CROSSAIR POSITIONING */
+/* body::before,
+body::after {
+  content: "";
+  position: fixed;
+  background: rgba(0, 0, 0, 0.449);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+body::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+}
+
+body::after {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+} */
+
+/* GLOBAL TABLE */
+table {
+    color: rgb(236, 237, 255);
+    border: 3px solid black;
+    width: 100%;
+    border-radius: 5px;
+
+}
+table thead {
+    border-right: 1px solid black;
+}
+table tr th,
+table tr td {
+    border: 1px solid black;
+}
+
+caption {
+    font-size: 22px;
+    font-weight:lighter;
+    text-decoration: underline;
+    font-style:oblique;
+    margin-bottom: 1px;
+}
+
+/* BUTTONS WITHIN A TABLE */
+table button {
+    border: none;
+    color: rgba(211, 224, 241, 0.779);
+    font-size: 16px;
+    text-decoration: underline;
+    background-color: inherit;
+    width: 100%;
+    height: 100%;
+    box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.449);
+}
+/* MAKE SELECTS APPEAR CENTERED IN THE UI DIV */
+select {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* ERROR MESSAGE */
+.err {
+    display: none;
+}
+
+/* GRID FOR ALL ELEMENTS BEFORE RESPONSE */
+.static_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, auto);
+    grid-template-areas:
+    'lhdr chdr rhdr'
+    'l ttl r'
+    't m r';
+    gap: 10px;
+    padding: 5px;
+      margin: 0 auto;
+
+}
+
+/* .static_grid > * {
+    border: 3px solid red;
+} */
+
+/* HEADER ELEMENTS */
+/* left side hugs left */
+.lhdr {
+    grid-area: lhdr;
+    justify-self: start;
+    display: flex;
+    gap: 1rem;
+}
+/* middle perfectly centered */
+.chdr {
+    grid-area: chdr;
+    justify-self: center;
+}
+/* right side hugs right */
+.rhdr {
+    grid-area: rhdr;
+    justify-self: end;
+    display: flex;
+    gap: 1rem;
+}
+
+/* MAIN TITLE TEXT */
+#site_title {
+    grid-area: ttl;
+    font-size: 54px;
+    font-weight: bold;
+    color:blanchedalmond;
+    margin: 0 auto;
+}
+/* INFORMATIVE TEXT BOX */
+.helpbox {
+    font-style: italic;
+    border: 1.5px dashed black;
+    border-radius:10px;
+    color:rgba(245, 243, 239, 0.846);
+    padding: 5px;
+    width: 80%;
+    max-width: 80%;
+    justify-self: center;
+}
+
+.lg_tbls {
+    display: flex;
+    flex-direction: row;
+}
+
+#top_players {
+    grid-area: l;
+    align-self: start;
+}
+
+#top_lg_players {
+    grid-area: r;
+}
+
+.tstbl {
+    width: 95%;
+    margin: 0 auto;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+#lgts_title {
+    margin: 0 auto;
+    font-size: 24px;
+    color: white;
+}
+
+#team_recs_tbl {
+    grid-area: t;
+}
+
+/* UI SECTION - MAIN SELECTORS, CHECKBOXES, BUTTONS, SEARCH BOX, ETC */
+#ui {
+    border: 3px solid black;
+    border-radius: 7px;
+    grid-area: m;
+    display: grid;
+    margin: 0 auto;
+    height: fit-content;
+    width: fit-content;
+    padding: 10px;
+    max-width: fit-content;
+    align-self: end;
+    gap: 10px;
+}
+
+.uirowouter {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    max-width: 100%;
+}
+
+.uiopt {
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    max-width: 50%;
+    width: 50%;
+}
+
+.uiel {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+}
+
+#search_group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0 auto;
+    width: fit-content;
+    max-width: 100%;
+}
+/* RESPONSE CLASSES */
+/* meant to be outermost of response */
+.response {
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 auto;
+    gap: 1%;
+    width: 100%;
+} 
+
+.resptitle {
+    grid-column: 1 / -1;
+    color: rgb(232, 225, 235);
+    font-size: 40px;
+    font-weight: bold;
+    margin: 0 auto;
+    width: fit-content;
+    padding: 10px;
+}
+
+/*  response section, takes up half of screen */
+.respsect {
+    border: 3px solid black;
+    border-radius: 7px;
+    padding: 1%;
+    height: inherit;
+    align-items: center;
+}
+
+.respsect h2 {
+    color: rgb(236, 237, 255);
+    font-size: 30px;
+}
+
+.respsect h3 {
+    color: rgb(236, 237, 248);
+    font-size: 26px;
+} 
+
+/* div and img both necessary for player/team images! */
+.respimgs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+}
+
+.respimgs div {
+    width: 50%;
+}
+
+.respimgs img {
+    width: 100%;
+}
+
+.resptbls {
+    display: grid;
+    border: 3px solid black;
+    border-radius: 7px;
+    padding: 1%;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, fit-content);
+    height: inherit;
+}
+
+.btm {
+    margin-top:35px;
+    font-size: 16px;
+    color: rgb(236, 237, 255);
+}

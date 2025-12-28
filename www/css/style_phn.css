@@ -1,0 +1,54 @@
+@media (max-width: 600px) {
+    iframe {
+        width: 95%;
+        height: auto;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+    
+    .hdr {
+        font-size: 8px;
+    }
+
+    .hdr div {
+       align-items: flex-end;
+       font-size: 14px;
+    }
+
+    .hidesmall {
+        display: none;
+    }
+
+    .intro {
+        width: 95%
+    }
+    
+    .flexels {
+    flex-direction: column; 
+    align-items: center;
+    display: flex;
+
+    }
+
+    .flexel,
+    .emphitem {
+        width: 95%;
+        max-width: 100%;
+    }
+
+    ul.pics li {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    ul.pics li figure img {
+        width: 100%;
+    }
+}

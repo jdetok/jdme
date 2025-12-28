@@ -121,6 +121,7 @@ services:
     restart: always
     volumes:
       - proxylog:/var/log/nginx
+      - www:/var/www
 
 # NETWORKS
 networks:
@@ -158,3 +159,10 @@ volumes:
     name: app_static
   proxylog:
     name: proxylog
+  www:
+    name: www
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../www
