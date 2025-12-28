@@ -29,4 +29,8 @@
 - ## automated log compression
     - after n days compress logs, after n days delete the compressed logs
 
-- ## serve logs as dir with nginxs
+- ## serve logs as dir with nginx
+
+- ## create an image for serving /wiki
+    - server via nginx
+    - container should run hugo to build the site

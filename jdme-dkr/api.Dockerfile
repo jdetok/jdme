@@ -16,4 +16,3 @@ ENTRYPOINT [ "/app/bin/api" ]
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=10 \
   CMD ["curl", "-f", "http://localhost/health"]
-  # CMD ["curl", "-f", "http://localhost/health"]
