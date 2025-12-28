@@ -98,7 +98,6 @@ services:
       - applog:/app/z_log/app
       - applog_dbg:/app/z_log/dbg
       - appdata:/app/persist
-      - app_static:/app/static
 
 # REVERSE PROXY
   nginx:

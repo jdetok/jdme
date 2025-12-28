@@ -46,12 +46,12 @@ func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	app.ENDPOINTS = Endpoints{
-		"GET /about":                        app.HndlAbt,
-		"GET /health":                       app.HndlHealth,
-		"GET /dbhealth":                     app.HndlDBHealth,
-		"GET /bronto":                       app.HndlBronto,
-		"GET /bball":                        app.HndlBBall,
-		"GET /bball/about":                  app.HndlBBallAbt,
+		// "GET /about":                        app.HndlAbt,
+		"GET /health":   app.HndlHealth,
+		"GET /dbhealth": app.HndlDBHealth,
+		// "GET /bronto":                       app.HndlBronto,
+		// "GET /bball":                        app.HndlBBall,
+		// "GET /bball/about":                  app.HndlBBallAbt,
 		"GET /bball/seasons":                app.HndlSeasons,
 		"GET /bball/teams":                  app.HndlTeams,
 		"GET /bball/player":                 app.HndlPlayer,
@@ -59,10 +59,10 @@ func (app *App) Mount() *http.ServeMux {
 		"GET /bball/league/scoring-leaders": app.HndlTopLgPlayers,
 		"GET /bball/teamrecs":               app.HndlTeamRecords,
 		"GET /bball/v2/players":             app.HndlPlayerV2,
-		"/docs/":                            app.ServeDocs,
-		"/js/":                              app.JSNostore,
-		"/css/":                             app.CSSNostore,
-		"/":                                 app.HndlRoot,
+		// "/docs/":                            app.ServeDocs,
+		// "/js/":                              app.JSNostore,
+		// "/css/":                             app.CSSNostore,
+		// "/":                                 app.HndlRoot,
 	}
 
 	for pattern, handler := range app.ENDPOINTS {

@@ -33,7 +33,7 @@ const (
 	PG_OPEN         = 80
 	PG_IDLE         = 30
 	PG_LIFE         = 30
-	QUICKSTART      = true
+	QUICKSTART      = false
 	IS_PROD         = false
 )
 

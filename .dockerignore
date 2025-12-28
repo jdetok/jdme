@@ -6,3 +6,12 @@ tmp/
 .air.toml
 .gopuml.json
 *.md
+.vscode/
+.github/
+wiki/
+static/
+www/
+.git/
+.gitignore
+.dockerignore
+LICENSE
