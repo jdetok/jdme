@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -20,14 +21,40 @@ type mongoAuth struct {
 	db   string
 }
 
+type MongoEnv struct {
+	Host     string
+	Port     string
+	User     string
+	Pass     string
+	Database string
+}
+
+func (e *MongoEnv) Load() error {
+	envVars := map[string]*string{
+		"MONGO_HOST":                 &e.Host,
+		"MONGO_PORT":                 &e.Port,
+		"MONGO_INITDB_ROOT_USERNAME": &e.User,
+		"MONGO_INITDB_ROOT_PASSWORD": &e.Pass,
+		"MONGO_INITDB_DATABASE":      &e.Database,
+	}
+	for ev, v := range envVars {
+		var tmp string
+		if tmp = os.Getenv(ev); tmp == "" {
+			return fmt.Errorf("must set %s in .env", ev)
+		}
+		*v = tmp
+	}
+	return nil
+}
+
 type MongoLogger struct {
 	Client *mongo.Client
 	DB     *mongo.Database
 	Coll   *mongo.Collection
 }
 
-func NewMongoLogger(db, coll string) (*MongoLogger, error) {
-	auth, err := getMongoAuth()
+func NewMongoLogger(e *conn.DBEnv, db, coll string) (*MongoLogger, error) {
+	auth, err := getMongoAuth(e)
 	if err != nil {
 		return nil, err
 	}
@@ -44,11 +71,11 @@ func NewMongoLogger(db, coll string) (*MongoLogger, error) {
 	}, nil
 }
 
-func setupMongoClient(auth *mongoAuth) (*mongo.Client, error) {
-	opts := options.Client().ApplyURI(auth.conn)
+func setupMongoClient(authstr string) (*mongo.Client, error) {
+	opts := options.Client().ApplyURI(authstr)
 	client, err := mongo.Connect(opts)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to mogno at %s: %v", auth.conn, err)
+		return nil, fmt.Errorf("failed to connect to mogno at %s: %v", authstr, err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -62,28 +89,24 @@ func setupMongoClient(auth *mongoAuth) (*mongo.Client, error) {
 	return client, nil
 }
 
-func getMongoAuth() (*mongoAuth, error) {
-	var m mongoAuth
+func getMongoAuth(e *conn.DBEnv) (string, error) {
 
-	envVars := map[string]*string{
-		"MONGO_HOST":                 &m.host,
-		"MONGO_PORT":                 &m.port,
-		"MONGO_INITDB_ROOT_USERNAME": &m.user,
-		"MONGO_INITDB_ROOT_PASSWORD": &m.pass,
-		"MONGO_INITDB_DATABASE":      &m.db,
-	}
+	// envVars := map[string]*string{
+	// 	"MONGO_HOST":                 &m.host,
+	// 	"MONGO_PORT":                 &m.port,
+	// 	"MONGO_INITDB_ROOT_USERNAME": &m.user,
+	// 	"MONGO_INITDB_ROOT_PASSWORD": &m.pass,
+	// 	"MONGO_INITDB_DATABASE":      &m.db,
+	// }
 
-	for ev, v := range envVars {
-		var tmp string
-		if tmp = os.Getenv(ev); tmp == "" {
-			return nil, fmt.Errorf("must set %s in .env", ev)
-		}
-		*v = tmp
-	}
-	m.conn = fmt.Sprintf(
+	// for ev, v := range envVars {
+	// 	var tmp string
+	// 	if tmp = os.Getenv(ev); tmp == "" {
+	// 		return nil, fmt.Errorf("must set %s in .env", ev)
+	// 	}
+	// 	*v = tmp
+	// }
+	return fmt.Sprintf(
 		"mongodb://%s:%s@%s:%s/%s?authSource=admin&directConnection=true",
-		m.user, m.pass,
-		m.host, m.port, m.db,
-	)
-	return &m, nil
+		e.User, e.Pass, e.Host, e.Port, e.Database), nil
 }

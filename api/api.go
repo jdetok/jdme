@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
@@ -19,8 +20,15 @@ type Timing struct {
 	HealthCheckThreah time.Duration
 }
 
+type Env struct {
+	PGEnv    *conn.DBEnv
+	MongoEnv *conn.DBEnv
+	SrvIP    string
+}
+
 // GLOBAL APP STRUCT
 type App struct {
+	E          Env
 	T          Timing
 	ENDPOINTS  Endpoints
 	Addr       string
@@ -36,6 +44,27 @@ type App struct {
 	QLogf      *os.File
 	Lg         *logd.Logd
 }
+
+func (e *Env) Load() error {
+	pe, err := conn.Load("PG_HOST", "PG_PORT", "PG_USER", "PG_PASS", "PG_DB")
+	if err != nil {
+		return fmt.Errorf("failed to get postgres env: %v", err)
+	}
+	me, err := conn.Load("MONGO_HOST", "MONGO_PORT",
+		"MONGO_INITDB_ROOT_USERNAME", "MONGO_INITDB_ROOT_PASSWORD", "MONGO_INITDB_DATABASE")
+	if err != nil {
+		return fmt.Errorf("failed to get mongodb env: %v", err)
+	}
+	ip := os.Getenv("SRV_IP")
+	if ip == "" {
+		return fmt.Errorf("error getting SRV_IP in env: %v", ip)
+	}
+	e.PGEnv = pe
+	e.MongoEnv = me
+	e.SrvIP = ip
+	return nil
+}
+
 type Endpoints map[string]func(http.ResponseWriter, *http.Request)
 
 // create a mux server type & return to be run
@@ -46,12 +75,8 @@ func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	app.ENDPOINTS = Endpoints{
-		// "GET /about":                        app.HndlAbt,
-		"GET /health":   app.HndlHealth,
-		"GET /dbhealth": app.HndlDBHealth,
-		// "GET /bronto":                       app.HndlBronto,
-		// "GET /bball":                        app.HndlBBall,
-		// "GET /bball/about":                  app.HndlBBallAbt,
+		"GET /health":                       app.HndlHealth,
+		"GET /dbhealth":                     app.HndlDBHealth,
 		"GET /bball/seasons":                app.HndlSeasons,
 		"GET /bball/teams":                  app.HndlTeams,
 		"GET /bball/player":                 app.HndlPlayer,
@@ -59,10 +84,6 @@ func (app *App) Mount() *http.ServeMux {
 		"GET /bball/league/scoring-leaders": app.HndlTopLgPlayers,
 		"GET /bball/teamrecs":               app.HndlTeamRecords,
 		"GET /bball/v2/players":             app.HndlPlayerV2,
-		// "/docs/":                            app.ServeDocs,
-		// "/js/":                              app.JSNostore,
-		// "/css/":                             app.CSSNostore,
-		// "/":                                 app.HndlRoot,
 	}
 
 	for pattern, handler := range app.ENDPOINTS {

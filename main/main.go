@@ -18,7 +18,6 @@ import (
 	"github.com/jdetok/go-api-jdeko.me/api"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
-	"github.com/joho/godotenv"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -33,7 +32,7 @@ const (
 	PG_OPEN         = 80
 	PG_IDLE         = 30
 	PG_LIFE         = 30
-	QUICKSTART      = false
+	QUICKSTART      = true
 	IS_PROD         = false
 )
 
@@ -48,12 +47,13 @@ func main() {
 	}
 	app.MStore.PersistPath = PERSIST_FILE
 
-	if err := godotenv.Load(ENV_FILE); err != nil {
-		fmt.Printf("fatal error reading .env file: %v\n", err)
+	// load environment variables
+	if err := app.E.Load(); err != nil {
+		fmt.Printf("fatal error setting up environment: %v\n", err)
 		os.Exit(1)
 	}
 
-	l, err := logd.SetupLoggers(APPLOG_FILE, DEBUG_FILE, MONGO_LOG_DB, MONGO_HTTP_COLL)
+	l, err := logd.SetupLoggers(app.E.MongoEnv, APPLOG_FILE, DEBUG_FILE, MONGO_LOG_DB, MONGO_HTTP_COLL)
 	if err != nil {
 		fmt.Printf("fatal error setting up loggers: %v\n", err)
 		os.Exit(1)
@@ -64,11 +64,11 @@ func main() {
 			app.Lg.Fatalf("fatal mongo error: %v", err)
 		}
 	}()
-	app.Lg.Infof("environment variables loaded from file: %s | loggers setup successfully", ENV_FILE)
+	app.Lg.Infof("environment variables loaded | loggers setup successfully")
 
 	// database config
 	app.DBConf = *pgdb.NewDBConf(PG_OPEN, PG_IDLE, PG_LIFE*time.Minute)
-	db, err := pgdb.PostgresConn(&app.DBConf)
+	db, err := pgdb.NewPGConn(app.E.PGEnv, &app.DBConf)
 	if err != nil {
 		app.Lg.Errorf("failed to create connection to postgres\n%v", err)
 	}

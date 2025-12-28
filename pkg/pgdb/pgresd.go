@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 	_ "github.com/lib/pq"
 )
 
@@ -15,6 +16,32 @@ type PostGres struct {
 	Password string
 	Database string
 	ConnStr  string
+}
+
+type PGEnv struct {
+	Host     string
+	Port     string
+	User     string
+	Pass     string
+	Database string
+}
+
+func (e *PGEnv) Load() error {
+	envVars := map[string]*string{
+		"PG_HOST": &e.Host,
+		"PG_PORT": &e.Port,
+		"PG_USER": &e.User,
+		"PG_PASS": &e.Pass,
+		"PG_DB":   &e.Database,
+	}
+	for ev, v := range envVars {
+		var tmp string
+		if tmp = os.Getenv(ev); tmp == "" {
+			return fmt.Errorf("must set %s in .env", ev)
+		}
+		*v = tmp
+	}
+	return nil
 }
 
 func GetEnvPG() (*PostGres, error) {
@@ -37,6 +64,16 @@ func GetEnvPG() (*PostGres, error) {
 		*v = tmp
 	}
 	return &pg, nil
+}
+
+func NewPG(e *conn.DBEnv) *PostGres {
+	return &PostGres{
+		Host:     e.Host,
+		Port:     e.Port,
+		User:     e.User,
+		Password: e.Pass,
+		Database: e.Database,
+	}
 }
 
 func (pg *PostGres) MakeConnStr() {

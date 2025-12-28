@@ -45,3 +45,6 @@ the site's frontend is written using only pure HTML/CSS/Javascript. all static f
         - switched from apache to nginx for reverse proxy server
         - db containers/stats fetch containers now included in same compose
         - db backups
+    - ## setup nginx web server/reverse proxy
+        - replaced /static with /www
+        - static html/css/javascript files are served from nginx rather than from the api

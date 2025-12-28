@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 )
 
 type DBConfig struct {
@@ -33,6 +34,24 @@ type DB interface {
 	SetMaxOpenConns(n int)
 	SetMaxIdleConns(n int)
 	SetConnMaxLifetime(d time.Duration)
+}
+
+func NewPGConn(e *conn.DBEnv, conf *DBConfig) (DB, error) {
+	pg := NewPG(e)
+	pg.MakeConnStr()
+	db, err := pg.Conn()
+	if err != nil {
+		return nil, fmt.Errorf("error connecting to postgres\n%v", err)
+	}
+	if conf == nil {
+		return db, nil
+	}
+
+	// set max connections
+	db.SetMaxOpenConns(conf.MaxOpenConns)
+	db.SetMaxIdleConns(conf.MaxIdleConns)
+	db.SetConnMaxLifetime(conf.ConnMaxLife)
+	return db, nil
 }
 
 // CONNECTION TO POSTGRES SERVER: MIGRATED TO POSTGRES FROM MARIADB 08/06/2025

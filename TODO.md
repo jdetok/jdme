@@ -13,9 +13,9 @@
     - standardize column names across tables
         - some tables use plr_id, some player_id etc
 
-- ## serve static files with nginx
-    - rename static to /www and mount to volume
-    - no longer serve static pages from go
+- ## serve static files with nginx -> IN PROGRESS
+    - rename static to /www and mount to volume -> DONE
+    - no longer serve static pages from go -> DONE
     - static error pages
 
 - ## clean up environment variables
@@ -31,6 +31,7 @@
 
 - ## serve logs as dir with nginx
 
-- ## create an image for serving /wiki
+- ## create an image for serving /wiki and /cv
     - server via nginx
     - container should run hugo to build the site
+
