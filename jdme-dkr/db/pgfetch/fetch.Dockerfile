@@ -28,3 +28,6 @@ RUN chmod +x /app/fetch.sh
 RUN echo "35 00 * * * /bin/sh -c 'cd /app && ./fetch.sh'" > /etc/crontabs/root
 
 CMD ["crond", "-f", "-L", "/var/log/cron.log"]
+
+HEALTHCHECK --interval=30s --timeout=5s --retries=5 \
+    CMD pgrep crond >/dev/null || exit 1

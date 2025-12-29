@@ -17,3 +17,4 @@ jdme-dkr/proxy/ssl/
 jdme-dkr/proxy/.htpasswd
 jdme-dkr/db/dump
 .DS_Store
+b_users.sql
