@@ -18,10 +18,10 @@ DB_DUMP=1
 SEND_EMAIL=1
 
 usage() {
-  echo "Usage: $0 [-s szn] [--no-dump|-nd] [--no-email|-ne]"
-  echo "  -s <season>   Run fetch for a specific season (e.g. 2025)"
-  echo "  --no-dump, -nd  Skip pg_dump backup"
-  echo "  --no-email, -ne  Don't send confirmation email"
+  echo "CLI options: $0"
+  echo "| -s <season>    | fetch stats for a specific season (e.g. 2025)"
+  echo "| -nd|--no-dump  | Skip pg_dump backup"
+  echo "| -ne|--no-email | Don't send confirmation email"
   exit 1
 }
 
@@ -54,9 +54,9 @@ echo -e "++ $(date) | DAILY BBALL ETL STARTED\n++++ LOGGING TO: $LOGF\n" | tee -
 
 echo "++ $(date) | RUNNING GO ETL CLI APPLICATION" | tee -a $LOGF
 if [[ -n "$SEASON" ]]; then
-    ./"$EXEC" -envf skip -mode $MODE -szn $SEASON 2>&1 | tee -a $LOGF
+    ./"$EXEC" -envf skip -logf cli -mode $MODE -szn $SEASON 2>&1 | tee -a $LOGF
 else
-    ./"$EXEC" -envf skip -mode $MODE 2>&1 | tee -a $LOGF
+    ./"$EXEC" -envf skip -logf cli -mode $MODE 2>&1 | tee -a $LOGF
 fi
 echo -e "++ $(date) | GO ETL CLI APPLICATION RAN SUCCESSFULLY\n" | tee -a $LOGF
 
@@ -76,7 +76,7 @@ fi
 # email log
 if [[ $SEND_EMAIL == 1 ]]; then
   echo "++ $(date) | SENDING EMAIL"
-  ./$EXEC -mode email -logf $LOGF || exit 1
+  ./$EXEC -mode email -attach $LOGF -logf cli | tee -a $LOGF
   echo -e "++ $(date) | EMAIL SENT\n"
 else
   echo -e "++ $(date) | SKIPPING EMAIL (--no-email)\n"

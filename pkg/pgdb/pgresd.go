@@ -18,35 +18,8 @@ type PostGres struct {
 	ConnStr  string
 }
 
-type PGEnv struct {
-	Host     string
-	Port     string
-	User     string
-	Pass     string
-	Database string
-}
-
-func (e *PGEnv) Load() error {
-	envVars := map[string]*string{
-		"PG_HOST": &e.Host,
-		"PG_PORT": &e.Port,
-		"PG_USER": &e.User,
-		"PG_PASS": &e.Pass,
-		"PG_DB":   &e.Database,
-	}
-	for ev, v := range envVars {
-		var tmp string
-		if tmp = os.Getenv(ev); tmp == "" {
-			return fmt.Errorf("must set %s in .env", ev)
-		}
-		*v = tmp
-	}
-	return nil
-}
-
 func GetEnvPG() (*PostGres, error) {
 	var pg PostGres
-	// envd.LoadDotEnv()
 
 	envVars := map[string]*string{
 		"PG_HOST": &pg.Host,

@@ -3,6 +3,8 @@ package conn
 import (
 	"fmt"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type DBEnv struct {
@@ -30,4 +32,11 @@ func Load(hostN, portN, userN, passN, dbN string) (*DBEnv, error) {
 		*v = tmp
 	}
 	return e, nil
+}
+
+func LoadFromDotEnv(dotenvF, hostN, portN, userN, passN, dbN string) (*DBEnv, error) {
+	if err := godotenv.Load(dotenvF); err != nil {
+		return nil, fmt.Errorf("failed to load .env file from %s: %v", err)
+	}
+	return Load(hostN, portN, userN, passN, dbN)
 }

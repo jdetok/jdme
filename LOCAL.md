@@ -3,6 +3,22 @@
     `
     rm $(find ./z_log -maxdepth 1  -type f)
     `
+- tree command , -I flag to ignore files/dirs
+    - **FIRST, LOAD THIS ENV VAR:**
+    - `
+export EXCTR='*.sql|z_*|*.md|sql|wiki|*.png'
+    `
+        - `
+tree -I $EXCTR
+        `
+    - save to file in z_dev dir:
+        - `
+tree -I $EXCTR > z_dev/tree.txt
+        `
+    - output to mac clipboard:
+        - `
+tree -I $EXCTR | pbcopy
+        `
 
 # PROD SERVER ADMIN
 - ## MERGING IN NEW CODE
