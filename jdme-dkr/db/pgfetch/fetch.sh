@@ -54,9 +54,10 @@ echo -e "++ $(date) | DAILY BBALL ETL STARTED\n++++ LOGGING TO: $LOGF\n" | tee -
 
 echo "++ $(date) | RUNNING GO ETL CLI APPLICATION" | tee -a $LOGF
 if [[ -n "$SEASON" ]]; then
-    ./"$EXEC" -envf skip -logf cli -mode $MODE -szn $SEASON 2>&1 | tee -a $LOGF
+    ./"$EXEC" -envf skip -mode $MODE -szn $SEASON 2>&1 | tee -a $LOGF
+    # ./"$EXEC" -envf skip -logf cli -mode $MODE -szn $SEASON 2>&1 | tee -a $LOGF
 else
-    ./"$EXEC" -envf skip -logf cli -mode $MODE 2>&1 | tee -a $LOGF
+    ./"$EXEC" -envf skip 2>&1 | tee -a $LOGF
 fi
 echo -e "++ $(date) | GO ETL CLI APPLICATION RAN SUCCESSFULLY\n" | tee -a $LOGF
 
@@ -76,7 +77,7 @@ fi
 # email log
 if [[ $SEND_EMAIL == 1 ]]; then
   echo "++ $(date) | SENDING EMAIL"
-  ./$EXEC -mode email -attach $LOGF -logf cli | tee -a $LOGF
+  ./$EXEC -mode email -attach $LOGF | tee -a $LOGF
   echo -e "++ $(date) | EMAIL SENT\n"
 else
   echo -e "++ $(date) | SKIPPING EMAIL (--no-email)\n"

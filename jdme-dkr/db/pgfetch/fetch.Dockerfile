@@ -5,11 +5,16 @@ RUN apt-get update && apt-get install -y git \
     && rm -rf /var/lib/apt/lists/*
 
 ARG REPO_URL=https://github.com/jdetok/bball-etl-cli.git
-ARG REPO_REF=mac
+ARG REPO_REF=main
 
-RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /app
+RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /app && ls -al /app
+
+# RUN ls /app
 
 WORKDIR /app
+
+RUN ls -al
+RUN ls -al main
 RUN mkdir ./log
 RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/fetch ./main
 
