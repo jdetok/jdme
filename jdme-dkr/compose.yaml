@@ -33,25 +33,7 @@ services:
     restart: unless-stopped
     volumes:
       - pg-dump:/dump
-      - fetchlog:/app/log
-  # pgfetchnow:
-  #   container_name: pgfetchnow
-  #   depends_on: 
-  #     postgres:
-  #       condition: service_healthy
-  #   image: jdme-pgfetchnow
-  #   build: 
-  #     context: db/.
-  #     dockerfile: pgfetch/fetch_now.Dockerfile
-  #   env_file: ../.env
-  #   networks:
-  #     pgnet:
-  #   restart: "no"
-  #   command: ["sh", "-c", "/app/fetch.sh"]  # ensure script exits when done
-  #   volumes:
-  #     - pg-dump:/dump
-  #     - fetchlog:/app/log
-    
+      - fetchlog:/app/log 
 # MONGO DATABASE
   mongo:
     container_name: mongo
@@ -133,10 +115,18 @@ services:
     networks:
       apinet:
       lognet:
-    restart: always
+    restart: unless-stopped
     volumes:
       - proxylog:/var/log/nginx
       - www:/var/www
+      - cvpublic:/var/hugocv
+
+  nfstst:
+    container_name: nfstst
+    image: alpine
+    volumes:
+      - tst:/ts
+    command: sh -c "ls -la /ts && sleep infinity"
 
 # NETWORKS
 networks:
@@ -157,7 +147,7 @@ volumes:
   pg-data:
     name: pg-data
   pg-dump:
-    name: pg-dump
+    name: pg-dump   
   fetchlog:
     name: fetchlog
   mongo-data:
@@ -181,3 +171,15 @@ volumes:
       type: none
       o: bind
       device: ../www
+  cvpublic: 
+    name: cvpublic
+  cvsrc:
+    name: cvsrc
+
+  tst:
+    driver: local
+    name: tst
+    driver_opts:
+      type: nfs
+      o: addr=100.107.48.54,nolock,soft,rw
+      device: ":/mnt/dekonet/jdme/logs"   
