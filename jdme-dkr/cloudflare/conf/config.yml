@@ -1,0 +1,9 @@
+tunnel: jdme-mac
+credentials-file: /etc/cloudflared/76e32d97-b76e-4a76-9186-bc0573357285.json
+
+ingress:
+  - hostname: dev.jdeko.me
+    service: http://nginx:80
+  - hostname: www.dev.jdeko.me
+    service: http://nginx:80
+  - service: http_status:404

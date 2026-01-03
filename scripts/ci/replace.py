@@ -7,7 +7,8 @@ import sys
 import re
              
 PROD_URL = "https://jdeko.me/"
-LOCL_URL = "http://localhost/"
+LOCL_URL = "https://dev.jdeko.me/"
+# LOCL_URL = "http://localhost/"
 URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
 URLS_FTYP = [".js", ".html", ".css", ".yaml", ".Dockerfile"]
 PROD_CPU = "arm64"

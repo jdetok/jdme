@@ -29,4 +29,4 @@ RUN touch /var/log/nginx/nginx.log
 RUN touch /var/log/nginx/err.log
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=15s --retries=10 \
-  CMD ["curl", "-f", "http://localhost/proxy-health"]
+  CMD ["curl", "-f", "https://dev.jdeko.me/proxy-health"]

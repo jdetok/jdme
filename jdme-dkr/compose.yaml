@@ -115,11 +115,26 @@ services:
     networks:
       apinet:
       lognet:
+      cfnet:
     restart: unless-stopped
     volumes:
       - proxylog:/var/log/nginx
       - www:/var/www
       - cvpublic:/var/hugocv
+
+  cloudflared:
+    container_name: cf
+    build:
+      context: cloudflare/.
+      dockerfile: cf.Dockerfile
+    env_file:
+      - ../.env
+    image: jdme-cloudflared
+    restart: unless-stopped
+    # command: tunnel run jdme
+    command: tunnel --config /etc/cloudflared/config.yml run
+    networks:
+      cfnet:
 
   nfstst:
     container_name: nfstst
@@ -140,6 +155,10 @@ networks:
 
   pgnet:
     name: pgnet
+    driver: bridge
+
+  cfnet:
+    name: cfnet
     driver: bridge
 
 # VOLUMES
