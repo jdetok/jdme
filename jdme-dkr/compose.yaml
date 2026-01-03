@@ -114,14 +114,28 @@ services:
         condition: service_healthy
     ports:
       - "80:80"
-      - "443:443"
+      # - "443:443"
     networks:
       apinet:
       lognet:
+      cfnet:
     restart: always
     volumes:
       - proxylog:/var/log/nginx
 
+  cloudflared:
+    container_name: cf
+    build:
+      context: cloudflare/.
+      dockerfile: cf.Dockerfile
+    env_file:
+      - ../.env
+    image: jdme-cloudflared
+    restart: unless-stopped
+    # command: tunnel run jdme
+    command: tunnel --config /etc/cloudflared/config.yml run
+    networks:
+      cfnet:
 # NETWORKS
 networks:
   apinet: 
@@ -134,6 +148,10 @@ networks:
 
   pgnet:
     name: pgnet
+    driver: bridge
+
+  cfnet:
+    name: cfnet
     driver: bridge
 
 # VOLUMES

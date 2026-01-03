@@ -11,7 +11,7 @@ RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /app
 
 WORKDIR /app
 RUN mkdir ./log
-RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/fetch ./cli
+RUN CGO_ENABLED=0 GOOS=linux go build -o ./bin/fetch ./main
 
 # RUNTIME STAGE
 FROM alpine:latest
