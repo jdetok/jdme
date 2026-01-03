@@ -19,3 +19,4 @@ jdme-dkr/db/dump
 .DS_Store
 jdme-dkr/cloudflare/**/*.json
 jdme-dkr/cloudflare/**/*.pem
+archive/
