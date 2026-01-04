@@ -101,7 +101,7 @@ services:
   nginx:
     container_name: nginx
     build:
-      context: proxy/.
+      context: nginx/.
       dockerfile: nginx.Dockerfile
     image: jdme-nginx
     depends_on:

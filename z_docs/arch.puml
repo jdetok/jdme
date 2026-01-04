@@ -1,0 +1,44 @@
+@startuml
+
+node "Outer Internet" {
+    [Client Browser]
+    ' [Client Browser] - "HTTPS Request"
+}
+
+node "Cloudflare Proxy" {
+    [Client Browser] -right-> [Cloudflare Server] : " https  "
+    cloud {
+        [Cloudflare Server] --> [Cloudflare Tunnel] : "  https  "
+    }
+}
+
+package "jdeko.me server" {
+    node "Docker Engine" {
+        package "containers" {
+            [cloudflared]
+            [Cloudflare Tunnel] <-down-> [cloudflared]: "  https  "
+            [cloudflared] <-down-> [nginx]: "  http :80 "
+            [nginx] <-left-> [api]: "http :8080"
+            [nginx] <-down-> [mongox]: "http :8081"
+            [api] <-down-> [postgres]
+            [api] <-down-> [mongodb]
+            [mongodb] <-right-> [mongox]
+            [pgfetch] <-up-> [postgres]
+        }
+        [cfnet] <.right.> [cloudflared]
+        [cfnet] <.right.> [nginx]
+        [dbnet] <.up.> [postgres]
+        [dbnet] <.up.> [mongodb]
+        [dbnet] <.left.> [pgfetch]
+        [apinet] <.left.> [nginx]
+        [apinet] <.left.> [api]
+        [apinet] <.down.> [mongox]
+        [lognet] <.left.> [mongodb]
+        [lognet] <.left.> [mongox]
+        [lognet] <.left.> [mongox]
+    }
+}
+
+
+
+@enduml
