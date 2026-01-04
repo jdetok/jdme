@@ -3,7 +3,7 @@ FROM postgres:17
 WORKDIR /var/lib/postgresql
 
 # Create dump directory and copy files
-RUN mkdir -p /var/lib/postgresql/dump
+RUN mkdir -p /var/lib/postgresql/dump /dump
 COPY dump/*.sql.gz /var/lib/postgresql/dump/
 
 # sql scripts to create schemas, users, etc
