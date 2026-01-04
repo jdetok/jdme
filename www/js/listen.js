@@ -1,9 +1,9 @@
 const mq = window.matchMedia("(max-width: 1200px)"); 
 const toChange = {
-        home: {
-            lg_txt: "jdeko.me",
-            sm_txt: "home",
-        },
+        // home: {
+        //     lg_txt: "jdeko.me",
+        //     sm_txt: "home",
+        // },
         abt: {
             lg_txt: "about jdeko.me",
             sm_txt: "about",
