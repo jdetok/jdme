@@ -75,4 +75,9 @@
     .infoflex > div {
         max-width: 100%;
     }
+
+    .sch img{
+        max-width: 90%;
+        height: auto;
+    }
 }
