@@ -10,30 +10,41 @@ PROD_URL = "https://jdeko.me/"
 LOCL_URL = "https://dev.jdeko.me/"
 # LOCL_URL = "http://localhost/"
 URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
-URLS_FTYP = [".js", ".html", ".css", ".yaml", ".Dockerfile"]
+URLS_FTYP = [".js", ".html", ".css", ".yaml"]
 PROD_CPU = "arm64"
 LOCL_CPU = "amd64"
 
-RE_URLS = r'https?://(?:localhost|jdeko(?:.me)?):?[0-9]*/?'
+PROD_CFID = "2fa7d121-ba14-4528-b372-a9b508c37797"
+LOCL_CFID = "76e32d97-b76e-4a76-9186-bc0573357285"
+
+PROD_CFHN = "jdeko.me"
+LOCL_CFHN = "dev.jdeko.me"
+
+RE_URLS = r'https?://(?:localhost|(?:dev\.)jdeko(?:\.me)?):?[0-9]*/?'
 RE_PROD_URL = rf'^(\s*PROD_URL\s+=\s+")({RE_URLS})("\s*)$'
 RE_IS_PROD = r"^(\s*IS_PROD\s*=\s*)(true|false)(\s*$)"
 RE_GOARCH = rf"^(.*GOARCH=)({LOCL_CPU}|{PROD_CPU})(.*)$"
 RE_SSL_DKR = r"(^|# )(COPY ssl.*$)"
 RE_SSL_NGX = r"(^\s*listen 80;\s*$\n)([\s\S]*?)(^\s*access.*$)"
+RE_CFID = rf"(?:{PROD_CFID}|{LOCL_CFID})"
+RE_CFHN = rf"(?:(?:dev\.)?jdeko.me)"
 
 def main():
     args = parse_args()
 
     loc = args.local 
             
-    comment_nginx_ssl("jdme-dkr/proxy/nginx.conf", RE_SSL_NGX, loc)
+    # comment_nginx_ssl("jdme-dkr/proxy/nginx.conf", RE_SSL_NGX, loc)
             
     to_replace = [
         ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
         ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
         ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
         ReReplace(loc, "GOARCH", "./jdme-dkr/api.Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
-        ReReplace(loc, "SSL_DKR", "./jdme-dkr/proxy/nginx.Dockerfile", r"# ", r"", 2, 1, RE_SSL_DKR, [], []),
+        # ReReplace(loc, "SSL_DKR", "./jdme-dkr/proxy/nginx.Dockerfile", r"# ", r"", 2, 1, RE_SSL_DKR, [], []),
+        ReReplace(loc, "CLD_FLARE_ID", "./jdme-dkr/cloudflare/conf/config.yml", LOCL_CFID, PROD_CFID, 0, 0, RE_CFID, [], []),
+        ReReplace(loc, "CLD_FLARE_HOST", "./jdme-dkr/cloudflare/conf/config.yml", LOCL_CFHN, PROD_CFHN, 0, 0, RE_CFHN, [], []),
+        ReReplace(loc, "CLD_FLARE_HOST", "./jdme-dkr/proxy/nginx.conf", LOCL_CFHN, PROD_CFHN, 0, 0, RE_CFHN, [], []),
     ]
     
     files_changed = 0

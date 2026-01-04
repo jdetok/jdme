@@ -36,5 +36,5 @@ CMD ["crond", "-f", "-L", "/var/log/cron.log"]
 
 WORKDIR /app
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=5 \
+HEALTHCHECK --interval=15s --timeout=5s --retries=5 \
     CMD pgrep crond >/dev/null || exit 1

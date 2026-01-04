@@ -13,5 +13,5 @@ COPY sql/a_init/. /docker-entrypoint-initdb.d/
 COPY init.sh /docker-entrypoint-initdb.d/d_init.sh
 RUN chmod +x /docker-entrypoint-initdb.d/d_init.sh
 
-HEALTHCHECK --interval=10s --timeout=5s --start-period=20s --retries=5 \
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=5 \
   CMD ["pg_isready", "-h", "localhost", "-U", "postgres"]

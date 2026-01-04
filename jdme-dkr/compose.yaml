@@ -111,7 +111,6 @@ services:
         condition: service_healthy
     ports:
       - "80:80"
-      # - "443:443"
     networks:
       apinet:
       lognet:
@@ -136,12 +135,12 @@ services:
     networks:
       cfnet:
 
-  nfstst:
-    container_name: nfstst
-    image: alpine
-    volumes:
-      - tst:/ts
-    command: sh -c "ls -la /ts && sleep infinity"
+  # nfstst:
+  #   container_name: nfstst
+  #   image: alpine
+  #   volumes:
+  #     - tst:/ts
+  #   command: sh -c "ls -la /ts && sleep infinity"
 
 # NETWORKS
 networks:
@@ -195,10 +194,10 @@ volumes:
   cvsrc:
     name: cvsrc
 
-  tst:
-    driver: local
-    name: tst
-    driver_opts:
-      type: nfs
-      o: addr=100.107.48.54,nolock,soft,rw
-      device: ":/mnt/dekonet/jdme/logs"   
+  # tst:
+  #   driver: local
+  #   name: tst
+  #   driver_opts:
+  #     type: nfs
+  #     o: addr=100.107.48.54,nolock,soft,rw
+  #     device: ":/mnt/dekonet/jdme/logs"   
