@@ -12,14 +12,15 @@
         font-size: 24px;
     }
     
-    .hdr {
+    .menu {
         font-size: 8px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: start;
+        justify-items: center;
+        gap: 1rem;
     }
 
-    .hdr div {
-       align-items: flex-end;
-       font-size: 14px;
-    }
 
     .hidesmall {
         display: none;
