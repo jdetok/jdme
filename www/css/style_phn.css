@@ -1,4 +1,10 @@
-@media (max-width: 600px) {
+@media (max-width: 550px) {
+    .menu {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 800px) {
     iframe {
         width: 95%;
         height: auto;
@@ -11,18 +17,19 @@
     h2 {
         font-size: 24px;
     }
-    
-    .hdr {
-        font-size: 8px;
+
+    .middle,
+    .right {
+        display: none; /* hide original links */
     }
 
-    .hdr div {
-       align-items: flex-end;
-       font-size: 14px;
-    }
-
-    .hidesmall {
-        display: none;
+    .menu {
+        /* font-size: 12px; */
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: start;
+        justify-items: center;
+        gap: 1rem;
     }
 
     .intro {
@@ -50,5 +57,27 @@
 
     ul.pics li figure img {
         width: 100%;
+    }
+
+    .links {
+        max-width: 100%;
+    }
+
+    .pagedesc {
+        max-width: 100%;
+    }
+
+    .infoflex {
+        flex-direction: column;
+        max-width: 100%;
+    }
+
+    .infoflex > div {
+        max-width: 100%;
+    }
+
+    .sch img{
+        max-width: 90%;
+        height: auto;
     }
 }

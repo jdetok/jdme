@@ -4,36 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>jdeko!</title>
+  <title>jdeko.me</title>
   <link rel="icon" type="image/x-icon" href="img/favicon.ico">
-
+  <script src="/js/listen.js"></script>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/style_phn.css">
 </head>
 
-<header class="hdr">
-  <div><a href="https://jdeko.me/about/">about jdeko.me</a></div>
-  <div><a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">
-    jdeko.me source code</a></div>
-  <div><a href="https://jdeko.me/bball/">jdeko.me/bball</a></div>
-  <div><a href="https://jdeko.me/bball/about/">about jdeko.me/bball</a></div>
-  
-  <div><a target="_blank" href="https://github.com/jdetok">
-    jdetok on github</a></div>
-  <div><a href="https://jdeko.me/resume/cv/">my resume</a></div>
-  <div><a target="_blank" href="https://www.linkedin.com/in/justin-dekock-257879185">
-    linkedin</a></div>
+<header class="menu">
+  <div class="left">
+    <a id="resume" href="https://dev.jdeko.me/resume/cv/">professional resume</a>
+    <a id="bball" href="https://dev.jdeko.me/bball">jdeko.me/bball</a>
+    <a id="src" target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a>
+  </div>
+  <div class="middle">
+    <a id="abt" href="https://dev.jdeko.me/about/">about jdeko.me</a>
+    
+  </div>
+  <div class="right">
+    <a id="tech" href="https://dev.jdeko.me/tech">tech stack</a>
+    <a id="github" target="_blank" href="https://github.com/jdetok">jdetok on github</a>
+    <a id="linkedin" target="_blank"href="https://www.linkedin.com/in/justin-dekock-257879185">linkedin</a>
+    
+  </div>
 </header>
 
-<!-- ===================== BODY ======================= -->
 <body>
 <div class="intro">
-  <h1>welcome!</h1>
+  <h1>jdeko.me</h1>
   <h2>
     jdeko.me is a full-stack web development project designed &
-    written by myself (Justin DeKock) and hosted locally on a raspberry pi
+    written by Justin DeKock and hosted locally on a raspberry pi
   </h2>
-  -- <a class="big" href="https://jdeko.me/about/">
+  -- <a class="big" href="https://dev.jdeko.me/about/">
     learn more about the design of this website
   </a> --
 </div><br>
@@ -42,20 +45,33 @@
 <div><h2 class="sechdr">-- programming/system design projects --</h2></div>
 <div class="flexels">
   <div class ="flexel">
-    <h3><a href="https://jdeko.me/bball/" class="transpar">jdeko.me/bball | nba/wnba stats</a></h3>
+    <h3><a href="https://dev.jdeko.me/bball/" class="transpar">jdeko.me/bball | nba/wnba stats</a></h3>
     <div>browse nba/wnba stats from my nba postgres database using the jdeko.me/bball api written in Go </div>
-    <div><a href="https://jdeko.me/bball/about/">learn more about jdeko.me/bball</a></div>
+  </div>
+  <div class ="flexel">
+    <h3><a href="https://github.com/jdetok/gopuml/" class="transpar">nba/wnba stats database/ETL</a></h3>
+    <div>go cli program & postgres databse designed to fetch stats from nba.com and store them for use in the 
+      <a href="https://dev.jdeko.me/bball/">jdeko.me/bball</a> api</div>
+  </div>
+  <div class ="flexel">
+    <h3><a href="https://github.com/jdetok/gopuml/" class="transpar">gopuml</a></h3>
+    <div>program written in Go that reads & parses a Go codebase and generates corresponding PlantUML class diagram scripts</div>
+  </div>
+  <div class ="flexel">
+    <h3><a href="https://dev.jdeko.me/resume/cv/" class="transpar">resume/cv</a></h3>
+    <div>my professional resume build with <a target="_blank" href="https://gohugo.io">Hugo</a> - a static site generator built with Go</div>
+    <div><a href="https://github.com/jdetok/resume/">hugo site source code</a></div>
   </div>
   <!-- <div class="ineldec">|<br>|</div> -->
-  <div class ="flexel"><h3><a href="https://jdeko.me/electro/slu_leds.html" class="transpar">
+  <div class ="flexel"><h3><a href="https://dev.jdeko.me/electro/slu_leds.html" class="transpar">
     slu fleur de lis led circuit</a></h3>
     <div>microcontroller powered led display modeled after Saint Louis University Fleur de Lis logo</div>
-    <a href="https://github.com/jdetok/slu_leds_c" target="_blank">see the source code written in c</a>
+    <a href="https://github.com/jdetok/slu_leds_c" target="_blank">see the KiCAD project/source code written in c++</a>
   </div>
   <!-- <div class="ineldec">|<br>|</div> -->
-  <div class ="flexel"><h3><a href="https://jdeko.me/electro/bronto.html" class="transpar">
-    brontosaurus arduino led circuit</a></h3>
-    <div>led display powered by an arduino & 6 74HC595 shift-registers in the shape of a brontosaurus</div>
+  <div class ="flexel"><h3><a href="https://dev.jdeko.me/electro/bronto.html" class="transpar">
+    brontosaurus led circuit</a></h3>
+    <div>led microcontroller display in the shape of a brontosaurus</div>
     <a href="https://github.com/jdetok/bronto_c" target="_blank">see the source code written in c</a>
   </div>
 </div>
@@ -86,7 +102,17 @@
     </ul>
 </div>
 <div class="decorator">/-|-\</div>
-<!-- CATS -->
+
+  </body>
+
+  <footer class="menu">
+    <div>personal email: <a href="mailto:jdekock17@gmail.com">jdekock17@gmail.com</a></div>
+    <div>created & maintained by Justin DeKock</div>
+    <div>dev email: <a href="mailto:jdeko17@gmail.com">jdeko17@gmail.com</a></div>
+  </footer>
+</html>
+
+<!-- CATS 
 <div class="picsdiv">
   <h3>meet my cats!</h3>
   <ul class="pics">
@@ -111,7 +137,8 @@
   </ul>
 </div>
 <div class="decorator">/-|-\</div>
-<!-- SNAKES -->
+-->
+<!-- SNAKES 
 <div class="picsdiv">
   <h3>and my snakes!</h3>
   <ul class="pics">
@@ -134,12 +161,5 @@
     </ul>
     </div>
   </div>
+-->
   <!-- <div class="decorator">/-|-\</div> -->
-  </body>
-
-  <footer class="hdr">
-    <div>personal email: <a href="mailto:jdekock17@gmail.com">jdekock17@gmail.com</a></div>
-    <div>created & maintained by Justin DeKock</div>
-    <div>dev email: <a href="mailto:jdeko17@gmail.com">jdeko17@gmail.com</a></div>
-  </footer>
-</html>

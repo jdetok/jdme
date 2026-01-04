@@ -27,5 +27,5 @@ COPY --from=fetch /site/public /var/resume
 RUN touch /var/log/nginx/nginx.log
 RUN touch /var/log/nginx/err.log
 
-HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=10 \
+HEALTHCHECK --interval=15s --timeout=5s --start-period=2s --retries=10 \
   CMD ["curl", "-f", "http://localhost/proxy-health"]

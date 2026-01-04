@@ -24,6 +24,9 @@ the site's frontend is written using only pure HTML/CSS/Javascript. all static f
 ![Alt Text](https://jdeko.me/img/jdekome_ex_080825.png "main example")
 ![Alt Text](https://jdeko.me/img/bball_ex_121025.png "/bball example")
 
+# Architecture
+![dgm](/z_docs/arch.png)
+
 # ** CHANGELOG / REVISION HISTORY
 - ## original deployment: early July 2025
 - ## early august 2025

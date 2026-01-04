@@ -101,7 +101,7 @@ services:
   nginx:
     container_name: nginx
     build:
-      context: proxy/.
+      context: nginx/.
       dockerfile: nginx.Dockerfile
     image: jdme-nginx
     depends_on:
@@ -189,6 +189,13 @@ volumes:
       type: none
       o: bind
       device: ../www
+  # ngxconf:
+  #   name: ngxconf
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: /nginx/
   cvpublic: 
     name: cvpublic
   cvsrc:

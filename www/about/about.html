@@ -5,24 +5,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>about jdeko!</title>
+  <title>jdeko.me | about</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/style_phn.css">
-  <link rel="stylesheet" href="/about/css/about.css">
+  <script src="/js/listen.js"></script>
 </head>
 
-<header class="hdr">
-  <div><a href="https://jdeko.me/">jdeko.me</a></div>
-
-  <div><a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">
-      jdeko.me source code</a></div>
-  <div><a href="https://jdeko.me/bball">jdeko.me/bball</a></div>
-  <div><a href="https://jdeko.me/bball/about">about jdeko.me/bball</a></div>
-  <div><a target="_blank" href="https://github.com/jdetok">
-      jdetok on github</a></div>
-  <div><a target="_blank"
-      href="https://www.linkedin.com/in/justin-dekock-257879185">
-      linkedin</a></div>
+<header class="menu">
+  <div class="left">
+    <a id="home" href="https://dev.jdeko.me/">jdeko.me</a>
+    <a id="bball" href="https://dev.jdeko.me/bball">jdeko.me/bball</a>
+    <a id="src" target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a>
+  </div>
+  <div class="middle">
+    
+  </div>
+  <div class="right">
+    <a id="tech" href="https://dev.jdeko.me/tech">tech stack</a>
+    <a id="github" target="_blank" href="https://github.com/jdetok">jdetok on github</a>
+    <a id="resume" href="https://dev.jdeko.me/resume/cv/">professional resume</a>
+  </div>
 </header>
 
 <body>
@@ -43,78 +45,76 @@
     to handle any traffic this site receives
   </div>
   <div class="center">
-    <h3>-- technologies used --</h3>
+    <h3>-- jdeko.me/bball api --</h3>
   </div>
-  <div class="flexels">
-    <div class="flexel">
-      <h2>go programming langauge</h2>
-      <div class="abtp">
-        the jdeko.me backend is written entirely in the go programming language.
-        i mainly chose to write the backend in go to take advantage of the
-        concurrency features that make the standard net/http library so
-        powerful. i paid for
-        all four cpu cores, i want to utilze all four!
-      </div>
-    </div>
-    <div class="flexel">
-      <h2>postgres database</h2>
-      <div>
-        a postgres database serves <a
-          href="https://jdeko.me/bball">jdeko.me/bball</a> - the
-        basketball stats site that uses the jdeko.me api. the data in this
-        database
-        is sourced from nba.com with a command-line-interface i wrote in go - 
-        <a target="_blank" href="https://github.com/jdetok/bball-etl-cli">
-          bball-etl-cli</a>
-      </div>
-      <div>
-        <a href="https://jdeko.me/bball/about">learn more about jdeko.me/bball</a>
-      </div>
-    </div>
-        <div class="flexel">
-      <h2>docker</h2>
-      <div class="abtp">
-        each software element that supports this website has been containerized
-        with
-        <a href="https://en.wikipedia.org/wiki/Docker_(software)">docker</a>,
-        allowing them to all run independently on the same host machine. docker
-        networks provide
-        an additional level of isolation, which allows me to host the apache
-        web-server
-        & postgres database on separate networks. i used <a
-          href="https://docs.docker.com/build/concepts/dockerfile/">
-          dockerfile</a> to create custom docker images and <a
-          href="https://docs.docker.com/compose/">
-          docker compose</a> to enable starting & stopping each environment with
-        a single command
-      </div>
-    </div>
-    <div class="flexel">
-      <h2>apache web server</h2>
-      a containerized <a href="https://httpd.apache.org/">apache web server</a>
-      is used as a
-      <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">
-        reverse-proxy</a> to provide another security layer from the external 
-        internet. this web server declines any invalid requests, forwards any 
-        http request to https, & then forwards valid https requests to the
-        jdeko.me api
-    </div>
-    <div class="flexel">
-      <h2>javascript</h2>
-      javascript powers the frontend of <a
-        href="https://jdeko.me/bball">jdeko.me/bball</a>.
-      all interactions with any of the buttons/selectors/text-boxes on this page
-      are handled
-      with javascript event handlers that call endpoints from my API<br>
-    </div>
-    <div class="flexel">
-      <h2>html/css</h2>
-      all visual elements of this website are written in pure html & css. i've
-      always preferred
-      clean and to-the-point websites, and i miss the more simplistic look of
-      the internet of my youth
-    </div>
-  </div>
+  <div class="secel">
+        <div class="infoflex">
+            <div>
+                <h3>sourcing nba/wnba stats with go</h3>
+                <!-- TODO: under links, side by side etl and postgres blocks -->
+                all data is sourced from
+                <a target="_blank" href="https://www.nba.com/stats">nba.com</a> with the
+                go-etl program referenced above. the cli element of the program allows
+                me
+                to run the etl code in different ways in different scripts. it is used
+                in "build" mode in
+                my database build script <i>(/scripts/bld.sh in the github repo)</i> to
+                fetch & insert data for every nba & wnba regular season/post season game
+                since 1970. it's also run in "daily" mode in a cronjob <i>(runs
+                    /scripts/dly.sh)</i> every day at approximately midnight to fetch &
+                insert data only for the previous day
+                <div class="decorator">/-|-\</div>
+                the go-etl process takes advantage of go's concurrency features to make
+                several http requests to nba.com in quick succession. the package then
+                processes and structures the data to match the postgres database design,
+                chunks the large volume
+                of data into small chunks, and inserts the chunks concurrently
+                <div class="decorator">/-|-\</div>
+                this site was originally powered by a MariaDB database with data sourced
+                from nba.com using the <a target="_blank" href="https://github.com/swar/nba_api">nba_api</a>
+                python package. this system worked well, but i wanted to learn more of
+                the lower-level
+                concepts of http requests abstracted away by this package, so i decided
+                to rewrite the entire etl process, with my own http requests, in Go. the
+                documentation
+                from the nba_api was incredibly helpful in figuring out this
+                process<br><a target="_blank" href="https://github.com/jdetok/py-nba-mdb">
+                    legacy python ETL | py-nba-mdb</a>
+            </div>
+
+            <!-- DATABASE SECTION -->
+
+            <div class="secel">
+                <h3>storing the stats in postgres</h3>
+                all stats on the site are served from a postgres database server running
+                in a docker container. the database was designed following
+                the data normalization principles outlined in
+                <a target="_blank" href="https://en.wikipedia.org/wiki/Third_normal_form">
+                    Codd's third normal form
+                </a>
+                <div class="decorator">/-|-\</div>
+                the database is built by a single shell script - /scripts/bld.sh in the
+                github repo.
+                the script builds & runs the docker container, which is configureed in
+                the Dockerfile & compose.yaml files, executes SQL statements <i>(scripts
+                    from /sql in the github repo)</i>
+                to create all schemas, tables, procedures, etc., uses the go-etl
+                cli to source & insert nba/wnba data since 1970, and runs several
+                stored procedures to process & load the inserted data into their
+                destination tables
+                <div class="decorator">/-|-\</div>
+                the go-etl program inserts data only into the tables in the intake
+                schema. each table in this schema is designed to match the structure of
+                the json response from a specific endpoint on nba.com. this keeps the
+                changes made to the source data minimal before being inserted, which
+                makes errors less likely and the pipeline more maintainable.
+                the jdeko.me/bball api primarily interacts with tables in the database's
+                api schema, which contains tables specifically designed for
+                quickly accessing aggregated player stats. the data in these tables is
+                deleted and reaggregated each night after new data is inserted into the
+                database
+            </div>
+        </div>
 </body>
 
 </html>
