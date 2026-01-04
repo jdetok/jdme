@@ -1,4 +1,4 @@
-const mq = window.matchMedia("(max-width: 760px)"); 
+const mq = window.matchMedia("(max-width: 1200px)"); 
 const toChange = {
         home: {
             lg_txt: "jdeko.me",
@@ -22,7 +22,7 @@ const toChange = {
         },
         tech: {
             lg_txt: "supporting technologies",
-            sm_txt: "tech",
+            sm_txt: "technologies",
         },
         github: {
             lg_txt: "jdetok on github",

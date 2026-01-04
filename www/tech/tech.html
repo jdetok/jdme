@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>jdeko!</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <script src="/js/listen.js"></script>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style_phn.css">
+</head>
+
+<header class="menu">
+    <div class="left">
+        <a id="src" target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a>
+        <a id="bball" href="https://dev.jdeko.me/bball">jdeko.me/bball</a>
+        <a id="abt" href="https://dev.jdeko.me/about/">about jdeko.me</a>
+    </div>
+    <div class="middle">
+        <a id="resume" href="https://dev.jdeko.me/resume/cv/">professional resume</a>
+    </div>
+    <div class="right">
+        <a id="tech" href="https://dev.jdeko.me/tech">tech stack</a>
+        <a id="github" target="_blank" href="https://github.com/jdetok">jdetok on github</a>
+        <a id="linkedin" target="_blank" href="https://www.linkedin.com/in/justin-dekock-257879185">linkedin</a>
+    </div>
+</header>
+
+<body>
+    <!-- INTRO -->
+    <div class="intro">
+        <h1>supporting technology - jdeko.me</h1>
+    </div>
+    <div class="decorator">/-|-\</div>
+    <div class="flexels">
+        <div class="flexel">
+            <h2>docker</h2>
+            <div class="abtp">
+                each software element that supports this website has been containerized
+                with
+                <a href="https://en.wikipedia.org/wiki/Docker_(software)">docker</a>. a single
+                <a href="https://docs.docker.com/compose/"> docker compose</a> file orchestrates the startup and
+                teardown of every container, network, and volume
+            </div>
+        </div>
+        <div class="flexel">
+            <h2>cloudflare tunnel</h2>
+            <div>a
+                <a href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/">cloudflare tunnel</a>
+                is used to securely route https traffic through my local server. a <a href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/private-net/cloudflared/">
+                    cloudflared</a> server is running in a container to route the https requests locally
+            </div>
+        </div>
+        <div class="flexel">
+            <h2>nginx web server</h2>
+            <div>an nginx web server serves static files and 
+                <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">reverse-proxies</a> requests for
+                /bball to the jdeko.me/bball api
+            </div>
+        </div>
+        <div class="flexel">
+            <h2>postgres database</h2>
+            <div>a postgres database serves nba/wnba stats to the <a href="https://dev.jdeko.me/bball">jdeko.me/bball
+                    api</a> -
+                the stats are extracted from the official nba api via a <a target="_blank"
+                    href="https://github.com/jdetok/bball-etl-cli">
+                    command-line-interface tool</a> i wrote in go
+            </div>
+        </div>
+        <div class="flexel">
+            <h2>javascript</h2>
+            javascript powers the frontend of <a href="https://dev.jdeko.me/bball">jdeko.me/bball</a>.
+            all interactions with any of the buttons/selectors/text-boxes on this page
+            are handled
+            with javascript event handlers that call endpoints from my API<br>
+        </div>
+        <div class="flexel">
+            <h2>html/css</h2>
+            all visual elements of this website are written in pure html & css. i've
+            always preferred
+            clean and to-the-point websites, and i miss the more simplistic look of
+            the internet of my youth
+        </div>
+    </div>
+    <div class="sysarch">
+        <h1>systems architecture</h1>
+        the diagram below visualizes how an https request moves through each docker container/network
+        <img src="/img/abt/arch.png">
+    </div>
+    
+</body>
+
+<!-- <footer class="menu">
+    <div>personal email: <a href="mailto:jdekock17@gmail.com">jdekock17@gmail.com</a></div>
+    <div>created & maintained by Justin DeKock</div>
+    <div>dev email: <a href="mailto:jdeko17@gmail.com">jdeko17@gmail.com</a></div>
+</footer> -->
+
+</html>
