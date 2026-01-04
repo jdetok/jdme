@@ -11,9 +11,14 @@
     h2 {
         font-size: 24px;
     }
-    
+
+    .middle,
+    .right {
+        display: none; /* hide original links */
+    }
+
     .menu {
-        font-size: 8px;
+        font-size: 12px;
         display: grid;
         grid-template-columns: 1fr auto 1fr;
         align-items: start;
@@ -21,7 +26,16 @@
         gap: 1rem;
     }
 
-
+    .dropmenu-content {
+        display: none;
+        position: absolute;
+        background-color: #fff;
+        min-width: 200px;
+        box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+        padding: 0.5rem;
+        z-index: 10;
+        flex-direction: column;
+    }
     .hidesmall {
         display: none;
     }
