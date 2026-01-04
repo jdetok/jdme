@@ -1,9 +1,3 @@
-/*
-MIGRATION FROM MARIADB DATABASE SERVER TO POSTGRES DATABASE SERVER 08/06/2025
-ALSO SWITCHED FROM PROJECT-SPECIFIC LOGGER, ERROR HANDLING TO PACKAGES IN
-github.com/jdetok/golib
-*/
-
 package main
 
 import (
@@ -32,7 +26,7 @@ const (
 	PG_OPEN         = 80
 	PG_IDLE         = 30
 	PG_LIFE         = 30
-	QUICKSTART      = false
+	QUICKSTART      = true
 	IS_PROD         = false
 )
 

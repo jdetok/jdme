@@ -20,7 +20,7 @@ LOCL_CFID = "76e32d97-b76e-4a76-9186-bc0573357285"
 PROD_CFHN = "jdeko.me"
 LOCL_CFHN = "dev.jdeko.me"
 
-RE_URLS = r'https?://(?:localhost|(?:dev\.)jdeko(?:\.me)?):?[0-9]*/?'
+RE_URLS = r'https?://(?:localhost|(?:dev\.)?jdeko(?:\.me)?):?[0-9]*/?'
 RE_PROD_URL = rf'^(\s*PROD_URL\s+=\s+")({RE_URLS})("\s*)$'
 RE_IS_PROD = r"^(\s*IS_PROD\s*=\s*)(true|false)(\s*$)"
 RE_GOARCH = rf"^(.*GOARCH=)({LOCL_CPU}|{PROD_CPU})(.*)$"
