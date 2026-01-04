@@ -48,3 +48,9 @@ the site's frontend is written using only pure HTML/CSS/Javascript. all static f
     - ## setup nginx web server/reverse proxy
         - replaced /static with /www
         - static html/css/javascript files are served from nginx rather than from the api
+- ## early january 2025
+    - added cloudflared container to utilize cloudfare tunnels for https
+        - added replacement patterns to replace.py for cloudflare hosts/ids
+    - transitioned to serving static files from nginx rather than from go app
+    - created pgfetch container to run cronjob that updates db with new stats
+    - hardened filesystems
