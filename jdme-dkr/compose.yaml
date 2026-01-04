@@ -189,6 +189,13 @@ volumes:
       type: none
       o: bind
       device: ../www
+  # ngxconf:
+  #   name: ngxconf
+  #   driver: local
+  #   driver_opts:
+  #     type: none
+  #     o: bind
+  #     device: /nginx/
   cvpublic: 
     name: cvpublic
   cvsrc:

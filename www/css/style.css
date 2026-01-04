@@ -1,6 +1,29 @@
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: #000;
+  transform: translateX(-50%);
+}
 
+/* Horizontal center line (X axis) */
+body::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #000;
+  transform: translateY(-50%);
+}
 /*MAIN BODY*/
 body {
+    text-align: center;
+    min-height: 100vh;
     text-align: center;
     background-color: darkslategrey;
     color: white;
@@ -35,6 +58,7 @@ body {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    justify-content: center;
     position: relative;
 }
 
