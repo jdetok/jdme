@@ -1,0 +1,216 @@
+
+/*MAIN BODY*/
+body {
+    text-align: center;
+    background-color: darkslategrey;
+    color: white;
+    font-size: 18px;
+}
+
+.hvr {
+    border: 1px solid black;
+    display: none;
+    margin: 0 auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 5px;
+    width: fit-content;
+    min-height: 20px;
+}
+
+.hlp {
+    display: none;
+    padding: 2px;
+    font-size: 18px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.hidesmall {
+    display: block;
+}
+
+.hdr {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+
+.hdr div {
+    align-items: flex-end;
+    font-size: 18px;
+}
+
+/*HEADING TAGS*/
+h1 {
+    color:blanchedalmond;
+    font-size: 44px;
+}
+
+h2 {
+    color: rgb(219, 169, 123);
+    font-size: 30px;
+}
+
+h3 {
+    color: rgb(214, 198, 175);
+    font-size: 32px;
+    font-weight:normal;
+    margin-bottom: 5px;
+    margin-top: 20px;
+}
+
+h4 {
+    color: rgb(214, 198, 175);
+    text-align: center;
+    font-size: 20px;
+    font-weight:normal;
+}
+
+.sechdr {
+    color: rgb(214, 217, 248);
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* LINK ANCHORS */ 
+a {
+    color: pink;
+}
+
+a.transpar {
+    color: inherit;
+}
+
+a.big {
+    font-size: 22px;
+}
+
+a.med {
+    font-size: 18px;
+}
+
+/*FOR THE SEPARATOR*/
+.decorator {
+    margin: 10px;
+    text-align: center;
+}
+
+.ineldec {
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+/*INTRO BLOCK OF MAIN PAGE*/
+.intro {
+    width: 65%;
+    max-width: 100%;
+    margin: 0 auto;/* centers the div */
+    text-align: center;
+}
+
+/* MAIN CENTER ALIGN CLASS */
+.center {
+    margin: auto;
+    padding: 5px;
+    text-align: center;
+}
+
+.centert {
+    margin-bottom: 0;
+    margin-top: 5px;
+    padding: 2px;
+    /* padding: 5px; */
+    text-align: center;
+    align-items: center;
+}
+
+/* DIV CLASS FOR PROJECT SECTIONS */
+.prjel {
+    margin: auto;
+    margin-top: 0;
+    padding-right: 2px;
+    padding-left: 2px;
+    text-align: center;
+    max-width: 40%;
+}
+
+/* PET PICS */
+.picsdiv { 
+    color:rgb(198, 226, 180);
+    text-align: center;
+	align-items: center;
+}
+
+ul.pics {
+  padding: 0;
+  margin: 0 auto; /* centers the <ul> itself */
+  text-align: center;
+  list-style: none; /* optional, if you want to remove bullets */
+}
+
+ul.pics li {    
+    color:rgb(198, 226, 180);
+    font-size:20px;
+    display:inline-flex;
+    text-align: center;
+	align-items: center;
+}
+
+ul.pics li figure img {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+}
+
+/* USED FOR MUSIC LINKS */
+ul.nobullet {
+    list-style-type: none; 
+    margin: auto;
+    padding: 0;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+footer {
+    text-align: center;
+    font-size: 20px;
+}
+
+.flexels {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: row;
+    gap: 3%;
+}
+
+/* for items to place vertically outside of flexels */
+.emphitem {
+    margin: auto;
+    width: 50%;
+    max-width: 60%;
+    text-align: center;
+    align-items: center;
+}
+
+.flexel {
+    width: 30%;
+    max-width: 100%;
+    padding: .5rem;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    text-align: center;
+}
+
+/* schematic screenshot */
+.sch img{
+    max-width: 60%;
+    height: auto;
+}

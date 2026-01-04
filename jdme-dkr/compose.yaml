@@ -14,7 +14,6 @@ services:
       - "9876:5432"
     restart: unless-stopped
     volumes:
-      - ./db/dump/prod.sql:/docker-entrypoint-initdb.d/prod.sql:ro
       - pg-data:/var/lib/postgresql/data
       - pg-dump:/var/lib/postgresql/dump
 
@@ -34,8 +33,7 @@ services:
     restart: unless-stopped
     volumes:
       - pg-dump:/dump
-      - fetchlog:/app/log
-    
+      - fetchlog:/app/log 
 # MONGO DATABASE
   mongo:
     container_name: mongo
@@ -98,7 +96,6 @@ services:
       - applog:/app/z_log/app
       - applog_dbg:/app/z_log/dbg
       - appdata:/app/persist
-      - app_static:/app/static
 
 # REVERSE PROXY
   nginx:
@@ -114,14 +111,15 @@ services:
         condition: service_healthy
     ports:
       - "80:80"
-      # - "443:443"
     networks:
       apinet:
       lognet:
       cfnet:
-    restart: always
+    restart: unless-stopped
     volumes:
       - proxylog:/var/log/nginx
+      - www:/var/www
+      - cvpublic:/var/hugocv
 
   cloudflared:
     container_name: cf
@@ -136,6 +134,7 @@ services:
     command: tunnel --config /etc/cloudflared/config.yml run
     networks:
       cfnet:
+
 # NETWORKS
 networks:
   apinet: 
@@ -159,7 +158,7 @@ volumes:
   pg-data:
     name: pg-data
   pg-dump:
-    name: pg-dump
+    name: pg-dump   
   fetchlog:
     name: fetchlog
   mongo-data:
@@ -176,3 +175,14 @@ volumes:
     name: app_static
   proxylog:
     name: proxylog
+  www:
+    name: www
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../www
+  cvpublic: 
+    name: cvpublic
+  cvsrc:
+    name: cvsrc

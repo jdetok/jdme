@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 	_ "github.com/lib/pq"
 )
 
@@ -19,7 +20,6 @@ type PostGres struct {
 
 func GetEnvPG() (*PostGres, error) {
 	var pg PostGres
-	// envd.LoadDotEnv()
 
 	envVars := map[string]*string{
 		"PG_HOST": &pg.Host,
@@ -37,6 +37,16 @@ func GetEnvPG() (*PostGres, error) {
 		*v = tmp
 	}
 	return &pg, nil
+}
+
+func NewPG(e *conn.DBEnv) *PostGres {
+	return &PostGres{
+		Host:     e.Host,
+		Port:     e.Port,
+		User:     e.User,
+		Password: e.Pass,
+		Database: e.Database,
+	}
 }
 
 func (pg *PostGres) MakeConnStr() {

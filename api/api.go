@@ -5,37 +5,8 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 )
 
-type Timing struct {
-	CtxTimeout        time.Duration
-	UpdateStoreTick   time.Duration
-	UpdateStoreThresh time.Duration
-	HealthCheckTick   time.Duration
-	HealthCheckThreah time.Duration
-}
-
-// GLOBAL APP STRUCT
-type App struct {
-	T          Timing
-	ENDPOINTS  Endpoints
-	Addr       string
-	DB         pgdb.DB
-	DBConf     pgdb.DBConfig
-	StartTime  time.Time
-	LastUpdate time.Time
-	Started    bool
-	QuickStart bool
-	Store      memd.InMemStore
-	MStore     memd.MapStore
-	Logf       *os.File
-	QLogf      *os.File
-	Lg         *logd.Logd
-}
 type Endpoints map[string]func(http.ResponseWriter, *http.Request)
 
 // create a mux server type & return to be run
@@ -46,12 +17,8 @@ func (app *App) Mount() *http.ServeMux {
 	mux := http.NewServeMux()
 
 	app.ENDPOINTS = Endpoints{
-		"GET /about":                        app.HndlAbt,
 		"GET /health":                       app.HndlHealth,
 		"GET /dbhealth":                     app.HndlDBHealth,
-		"GET /bronto":                       app.HndlBronto,
-		"GET /bball":                        app.HndlBBall,
-		"GET /bball/about":                  app.HndlBBallAbt,
 		"GET /bball/seasons":                app.HndlSeasons,
 		"GET /bball/teams":                  app.HndlTeams,
 		"GET /bball/player":                 app.HndlPlayer,
@@ -59,10 +26,6 @@ func (app *App) Mount() *http.ServeMux {
 		"GET /bball/league/scoring-leaders": app.HndlTopLgPlayers,
 		"GET /bball/teamrecs":               app.HndlTeamRecords,
 		"GET /bball/v2/players":             app.HndlPlayerV2,
-		"/docs/":                            app.ServeDocs,
-		"/js/":                              app.JSNostore,
-		"/css/":                             app.CSSNostore,
-		"/":                                 app.HndlRoot,
 	}
 
 	for pattern, handler := range app.ENDPOINTS {

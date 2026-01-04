@@ -7,6 +7,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 )
 
 type DBConfig struct {
@@ -35,20 +36,13 @@ type DB interface {
 	SetConnMaxLifetime(d time.Duration)
 }
 
-// CONNECTION TO POSTGRES SERVER: MIGRATED TO POSTGRES FROM MARIADB 08/06/2025
-// configs must be setup in .env file at project root
-func PostgresConn(conf *DBConfig) (DB, error) {
-	pg, err := GetEnvPG()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get env for db: %v", err)
-	}
+func NewPGConn(e *conn.DBEnv, conf *DBConfig) (DB, error) {
+	pg := NewPG(e)
 	pg.MakeConnStr()
 	db, err := pg.Conn()
 	if err != nil {
-		msg := "error connecting to postgres"
-		return nil, fmt.Errorf("%s\n%w", msg, err)
+		return nil, fmt.Errorf("error connecting to postgres\n%v", err)
 	}
-
 	if conf == nil {
 		return db, nil
 	}

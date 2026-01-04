@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>about jdeko.me/bball</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style_phn.css">
+  <link rel="stylesheet" href="/about/css/about.css">
+  <link rel="stylesheet" href="/about/css/about_phn.css">
+</head>
+<!-- HEADER -->
+<header class="hdr">
+  <div><a href="https://dev.jdeko.me/bball">jdeko.me/bball</a></div>
+  <div><a href="https://dev.jdeko.me/">jdeko.me</a></div>
+  <div><a href="https://dev.jdeko.me/about">about jdeko.me</a></div>
+  <div><a target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">
+      jdeko.me source code</a></div>
+  <div><a target="_blank" href="https://github.com/jdetok">
+      jdetok on github</a></div>
+  <div><a target="_blank"
+      href="https://www.linkedin.com/in/justin-dekock-257879185">
+      linkedin</a></div>
+</header>
+
+<body>
+  <!-- INTRO -->
+  <div class="intro">
+    <h1 style="margin-bottom: 0px">about jdeko.me/bball</h1>
+    <b>created & maintained by Justin DeKock</b>
+  </div>
+  <div class="decorator">/-|-\</div>
+  <div class="pagedesc">
+    jdeko.me/bball is a site i created to meld my love for the nba/wnba with
+    my desire to design, build & maintain information systems. learn more about
+    the systems i designed to support this site below
+  </div>
+  <div class="decorator">/-|-\</div>
+
+  <!-- ETL PROCESSES -->
+  <div class="secel">
+    <h3>systems designed to source, store, & display official nba/wnba data</h3>
+    <!-- GITHUB LINKS -->
+    <div class="links"><!-- ETL GO PACKAGE -->
+      <div class="linkname">go-etl (<i>extract-transform-load</i>)</div>
+      <div class="linkdesc">command-line-interface (CLI) program written in go
+        (<i>formerly Golang</i>) to fetch nba/wnba stats from nba.com, structure
+        the data, & insert it into a postgres database
+      </div>
+      <div class="linkurl">
+        <a target="_blank" href="https://github.com/jdetok/bball-etl-cli">
+          github.com/jdetok/bball-etl-cli</a>
+      </div>
+      <div class="linkname">go-api (<i>application-programming-interface</i>)
+      </div>
+      <div class="linkdesc">api written in go (<i>formerly Golang</i>) to
+        interact with postgres database & present stats on jdeko.me/bball
+      </div>
+      <div class="linkurl"><a target="_blank"
+          href="https://github.com/jdetok/go-api-jdeko.me">
+          github.com/jdetok/go-api-jdeko.me</a>
+      </div>
+
+    </div>
+    <div class="infoflex">
+      <div>
+        <h3>sourcing nba/wnba stats with go</h3>
+        <!-- TODO: under links, side by side etl and postgres blocks -->
+        all data is sourced from
+        <a target="_blank" href="https://www.nba.com/stats">nba.com</a> with the
+        go-etl program referenced above. the cli element of the program allows
+        me
+        to run the etl code in different ways in different scripts. it is used
+        in "build" mode in
+        my database build script <i>(/scripts/bld.sh in the github repo)</i> to
+        fetch & insert data for every nba & wnba regular season/post season game
+        since 1970. it's also run in "daily" mode in a cronjob <i>(runs
+          /scripts/dly.sh)</i> every day at approximately midnight to fetch &
+        insert data only for the previous day
+        <div class="decorator">/-|-\</div>
+        the go-etl process takes advantage of go's concurrency features to make
+        several http requests to nba.com in quick succession. the package then
+        processes and structures the data to match the postgres database design,
+        chunks the large volume
+        of data into small chunks, and inserts the chunks concurrently
+        <div class="decorator">/-|-\</div>
+        this site was originally powered by a MariaDB database with data sourced
+        from nba.com using the <a target="_blank"
+          href="https://github.com/swar/nba_api">nba_api</a>
+        python package. this system worked well, but i wanted to learn more of
+        the lower-level
+        concepts of http requests abstracted away by this package, so i decided
+        to rewrite the entire etl process, with my own http requests, in Go. the
+        documentation
+        from the nba_api was incredibly helpful in figuring out this
+        process<br><a target="_blank"
+          href="https://github.com/jdetok/py-nba-mdb">
+          legacy python ETL | py-nba-mdb</a>
+      </div>
+
+      <!-- DATABASE SECTION -->
+
+      <div class="secel">
+        <h3>storing the stats in postgres</h3>
+        all stats on the site are served from a postgres database server running
+        in a docker container. the database was designed following
+        the data normalization principles outlined in
+        <a target="_blank"
+          href="https://en.wikipedia.org/wiki/Third_normal_form">
+          Codd's third normal form
+        </a>
+        <div class="decorator">/-|-\</div>
+        the database is built by a single shell script - /scripts/bld.sh in the
+        github repo.
+        the script builds & runs the docker container, which is configureed in
+        the Dockerfile & compose.yaml files, executes SQL statements <i>(scripts
+          from /sql in the github repo)</i>
+        to create all schemas, tables, procedures, etc., uses the go-etl
+        cli to source & insert nba/wnba data since 1970, and runs several
+        stored procedures to process & load the inserted data into their
+        destination tables
+        <div class="decorator">/-|-\</div>
+        the go-etl program inserts data only into the tables in the intake
+        schema. each table in this schema is designed to match the structure of
+        the json response from a specific endpoint on nba.com. this keeps the
+        changes made to the source data minimal before being inserted, which
+        makes errors less likely and the pipeline more maintainable.
+        the jdeko.me/bball api primarily interacts with tables in the database's
+        api schema, which contains tables specifically designed for
+        quickly accessing aggregated player stats. the data in these tables is
+        deleted and reaggregated each night after new data is inserted into the
+        database
+      </div>
+    </div>
+  </div>
+</body>
+<!-- END -->
+
+</html>

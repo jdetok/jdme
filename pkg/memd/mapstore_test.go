@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/joho/godotenv"
@@ -33,7 +34,7 @@ func TestMapPlayersCC(t *testing.T) {
 		t.Error(err)
 	}
 
-	db, err := pgdb.PostgresConn(&pgdb.DBConfig{})
+	db, err := pgdb.NewPGConn(&conn.DBEnv{}, &pgdb.DBConfig{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -71,7 +72,7 @@ func TestMapSznTeams(t *testing.T) {
 		t.Error(err)
 	}
 
-	db, err := pgdb.PostgresConn(&pgdb.DBConfig{})
+	db, err := pgdb.NewPGConn(&conn.DBEnv{}, &pgdb.DBConfig{})
 	if err != nil {
 		t.Error(err)
 	}

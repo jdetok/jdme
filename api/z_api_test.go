@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
 	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
 	"github.com/jdetok/go-api-jdeko.me/pkg/resp"
@@ -60,7 +61,7 @@ func TestQueryTopLgPlayers(t *testing.T) {
 	if err := godotenv.Load("../.env"); err != nil {
 		t.Error(err)
 	}
-	db, err := pgdb.PostgresConn(&pgdb.DBConfig{})
+	db, err := pgdb.NewPGConn(&conn.DBEnv{}, &pgdb.DBConfig{})
 	if err != nil {
 		t.Error(err)
 	}
@@ -83,7 +84,7 @@ func StartupTest(t *testing.T) pgdb.DB {
 		t.Fatal(fmt.Errorf("%s\n%v", msg, err))
 	}
 
-	db, err := pgdb.PostgresConn(&pgdb.DBConfig{})
+	db, err := pgdb.NewPGConn(&conn.DBEnv{}, &pgdb.DBConfig{})
 	if err != nil {
 		msg := "failed connecting to postgres"
 		t.Fatal(fmt.Errorf("%s\n%v", msg, err))

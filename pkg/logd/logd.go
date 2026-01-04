@@ -10,6 +10,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
 	"github.com/jdetok/go-api-jdeko.me/pkg/mgo"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -69,7 +70,7 @@ func NewHTTPLog(r *http.Request) *HTTPLog {
 	}
 }
 
-func SetupLoggers(loudLogfName, dbgLogfName, mgoDBName, mgoCollName string) (*Logd, error) {
+func SetupLoggers(e *conn.DBEnv, loudLogfName, dbgLogfName, mgoDBName, mgoCollName string) (*Logd, error) {
 	lf, err := SetupLogdF(loudLogfName)
 	if err != nil {
 		return nil, fmt.Errorf("error setting up main log file at %s: %v", loudLogfName, err)
@@ -80,7 +81,7 @@ func SetupLoggers(loudLogfName, dbgLogfName, mgoDBName, mgoCollName string) (*Lo
 	}
 
 	l := NewLogd(io.MultiWriter(os.Stdout, lf), df)
-	ml, err := mgo.NewMongoLogger("log", "http")
+	ml, err := mgo.NewMongoLogger(e, "log", "http")
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to mongo: %v", err)
 	}
