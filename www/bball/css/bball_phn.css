@@ -1,16 +1,22 @@
-@media (max-width: 600px) {
+@media (max-width: 1050px) {
     .static_grid {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(5, auto);
         grid-template-areas:
             "rhdr"
             "ttl"
+            "btn"
             "chdr"
             "t"
             "l"
             "r"
             "m";
         justify-items: center;
+    }
+
+    #jumptosearch {
+        display: block;
+        grid-area: btn;
     }
     
     .lhdr {

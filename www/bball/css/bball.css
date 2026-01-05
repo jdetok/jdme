@@ -108,6 +108,10 @@ select {
     gap: 1rem;
 }
 
+#jumptosearch {
+    display: none;
+}
+
 /* MAIN TITLE TEXT */
 #site_title {
     grid-area: ttl;
@@ -126,6 +130,10 @@ select {
     width: 80%;
     max-width: 80%;
     justify-self: center;
+}
+
+.top_sect_tbls {
+    width: 100%;
 }
 
 .lg_tbls {

@@ -17,6 +17,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     await clearSearch();
     await holdPlayerBtn();
 });
+
+const jumpbtn = document.getElementById("jumptosearch");
+jumpbtn.addEventListener("click", async() => {
+    const res = document.getElementById("ui");
+    if (res) {
+        res.scrollIntoView({behavior: "smooth", block: "start"});
+    }
+});
+
+window.addEventListener("resize", async () => {
+    const numPl = window.innerWidth <= 700 ? 5 : 10;
+    await makeScoringLeaders(numPl);
+});
 // TODO: separate UI setup and table builds
 export async function buildOnLoadElements() {
     // empty search bar on load
@@ -27,7 +40,7 @@ export async function buildOnLoadElements() {
     await buildTeamRecsTbl(trjs, 'team_recs_tbl');
 
     // scoring leaders (number of players table based on screen width)
-    await makeScoringLeaders(numScoringLeaders());
+    await makeScoringLeaders(window.innerWidth <= 700 ? 5 : 10);
 
     // get recent games data, build player dash
     let js = await getRecentGamesData();
@@ -48,16 +61,6 @@ export async function buildOnLoadElements() {
     // DEFAULT VALUES: clear all checkboxes, select "Both" lg radio button
     await ui.clearCheckBoxes(checkBoxes);
     document.getElementById('all_lgs').checked = 1;
-}
-
-export function numScoringLeaders() {
-    if (window.innerWidth <= 700) {
-        return 3;
-    } else if (window.innerWidth <= 1500){
-        return 5;
-    } else {
-        return 10;
-    }
 }
 
 // place border around elements
