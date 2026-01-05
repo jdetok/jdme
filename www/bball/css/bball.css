@@ -82,6 +82,9 @@ select {
       margin: 0 auto;
 
 }
+#mobilebtns {
+    display: none;
+}
 
 /* .static_grid > * {
     border: 3px solid red;
@@ -108,9 +111,9 @@ select {
     gap: 1rem;
 }
 
-#jumptosearch {
+/* #jumptosearch {
     display: none;
-}
+} */
 
 /* MAIN TITLE TEXT */
 #site_title {

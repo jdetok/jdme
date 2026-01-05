@@ -14,8 +14,14 @@
         justify-items: center;
     }
 
-    #jumptosearch {
+    /* #jumptosearch {
         display: block;
+        grid-area: btn;
+    } */
+
+    #mobilebtns {
+        display: flex;
+        flex-direction: row;
         grid-area: btn;
     }
     

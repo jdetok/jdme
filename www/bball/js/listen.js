@@ -16,10 +16,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     await searchPlayer();
     await clearSearch();
     await holdPlayerBtn();
+    // await async function () {
+    //     const resp = document.getElementById("player_title");
+    // if (resp) {
+    //     resp.scrollIntoView({behavior: "smooth", block: "start"});
+    // }}();
 });
 
-const jumpbtn = document.getElementById("jumptosearch");
-jumpbtn.addEventListener("click", async() => {
+const jump_search_btn = document.getElementById("jumptoresp");
+jump_search_btn.addEventListener("click", async() => {
+    const res = document.getElementById("player_title");
+    if (res) {
+        res.scrollIntoView({behavior: "smooth", block: "start"});
+    }
+});
+
+const jump_plr_btn = document.getElementById("jumptosearch");
+jump_plr_btn.addEventListener("click", async() => {
     const res = document.getElementById("ui");
     if (res) {
         res.scrollIntoView({behavior: "smooth", block: "start"});
