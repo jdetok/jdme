@@ -82,10 +82,13 @@ select {
       margin: 0 auto;
 
 }
+#seemorelessbtns {
+    display: none;
+}
 
-/* .static_grid > * {
-    border: 3px solid red;
-} */
+#mobilebtns {
+    display: none;
+}
 
 /* HEADER ELEMENTS */
 /* left side hugs left */
@@ -108,6 +111,10 @@ select {
     gap: 1rem;
 }
 
+/* #jumptosearch {
+    display: none;
+} */
+
 /* MAIN TITLE TEXT */
 #site_title {
     grid-area: ttl;
@@ -128,9 +135,14 @@ select {
     justify-self: center;
 }
 
+.top_sect_tbls {
+    width: 100%;
+}
+
 .lg_tbls {
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 #top_players {
@@ -143,7 +155,6 @@ select {
 }
 
 .tstbl {
-    width: 95%;
     margin: 0 auto;
     margin-top: 20px;
     border-radius: 5px;
@@ -167,9 +178,7 @@ select {
     display: grid;
     margin: 0 auto;
     height: fit-content;
-    width: fit-content;
     padding: 10px;
-    max-width: fit-content;
     align-self: end;
     gap: 10px;
 }
