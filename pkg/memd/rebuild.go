@@ -26,7 +26,7 @@ func (s *InMemStore) Rebuild(db pgdb.DB) error {
 	if err != nil {
 		return fmt.Errorf("failed updating team records: %v", err)
 	}
-	s.TopLgPlayers, err = QueryTopLgPlayers(db, &s.CurrentSzns, "50")
+	s.TopLgPlayers, err = QueryTopLgPlayers(db, &s.CurrentSzns, "100")
 	if err != nil {
 		return fmt.Errorf("failed updating league top players struct: %v", err)
 	}
