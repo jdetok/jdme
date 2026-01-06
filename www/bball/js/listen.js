@@ -7,7 +7,7 @@ import { getTeamRecords, buildTeamRecsTbl } from "./teamrecs.js";
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
     getRecentGamesData, clearSearchBar } from "./player_search.js"
 
-export const base = "https://dev.jdeko.me/bball";
+export const base = "https://jdeko.me/bball";
 export const checkBoxes = ['post', 'reg', 'nbaTm', 'wnbaTm'];
 
 let NUMPL = window.innerWidth <= 700 ? 5 : 10;

@@ -1,9 +1,9 @@
 tunnel: jdme
-credentials-file: /etc/cloudflared/76e32d97-b76e-4a76-9186-bc0573357285.json
+credentials-file: /etc/cloudflared/2fa7d121-ba14-4528-b372-a9b508c37797.json
 
 ingress:
-  - hostname: dev.jdeko.me
+  - hostname: jdeko.me
     service: http://nginx:80
-  - hostname: www.dev.jdeko.me
+  - hostname: www.jdeko.me
     service: http://nginx:80
   - service: http_status:404
