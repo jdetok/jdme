@@ -1,7 +1,7 @@
 @media (max-width: 1050px) {
     .static_grid {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(5, auto);
+        grid-template-rows: repeat(6, auto);
         grid-template-areas:
             "rhdr"
             "ttl"
@@ -10,6 +10,7 @@
             "t"
             "l"
             "r"
+            "seemore"
             "m";
         justify-items: center;
     }
@@ -24,7 +25,19 @@
         flex-direction: row;
         grid-area: btn;
     }
-    
+
+    #seemorelessbtns {
+        display: flex;
+        flex-direction: row;
+        grid-area: seemore;
+    }
+
+    /* #seemoreplayers {
+        display: flex;
+        flex-direction: row;
+        justify-self: center;
+        grid-area: seemore;
+    } */
     .lhdr {
         display: none;
     }

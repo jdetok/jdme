@@ -10,19 +10,18 @@ import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
 export const base = "https://dev.jdeko.me/bball";
 export const checkBoxes = ['post', 'reg', 'nbaTm', 'wnbaTm'];
 
+let NUMPL = window.innerWidth <= 700 ? 5 : 10;
+
+// onload content
 document.addEventListener('DOMContentLoaded', async () => {
     await buildOnLoadElements();
     await randPlayerBtn();
     await searchPlayer();
     await clearSearch();
     await holdPlayerBtn();
-    // await async function () {
-    //     const resp = document.getElementById("player_title");
-    // if (resp) {
-    //     resp.scrollIntoView({behavior: "smooth", block: "start"});
-    // }}();
 });
 
+// mobile button: jump to current player
 const jump_search_btn = document.getElementById("jumptoresp");
 jump_search_btn.addEventListener("click", async() => {
     const res = document.getElementById("player_title");
@@ -31,6 +30,7 @@ jump_search_btn.addEventListener("click", async() => {
     }
 });
 
+// mobile button: jump to player search section
 const jump_plr_btn = document.getElementById("jumptosearch");
 jump_plr_btn.addEventListener("click", async() => {
     const res = document.getElementById("ui");
@@ -39,11 +39,36 @@ jump_plr_btn.addEventListener("click", async() => {
     }
 });
 
+// mobile button: see more top players
+const seemore_btn = document.getElementById("seemoreplayers");
+seemore_btn.addEventListener("click", async() => {
+    if (!NUMPL) {
+        NUMPL = window.innerWidth <= 700 ? 5 : 10;
+    };
+    NUMPL += 5;
+    await makeScoringLeaders(NUMPL);
+});
+
+// mobile button: see more top players
+const seeless_btn = document.getElementById("seelessplayers");
+seeless_btn.addEventListener("click", async() => {
+    NUMPL = window.innerWidth <= 700 ? 5 : 10;;
+    await makeScoringLeaders(NUMPL);
+});
+
+// change number of scoring leaders when window is resized
 window.addEventListener("resize", async () => {
     const numPl = window.innerWidth <= 700 ? 5 : 10;
+    if (!NUMPL) {
+        NUMPL = numPl;
+    }
+    if (numPl != NUMPL) {
+        NUMPL = numPl;
+    }
     await makeScoringLeaders(numPl);
 });
-// TODO: separate UI setup and table builds
+
+// all elements to build on load
 export async function buildOnLoadElements() {
     // empty search bar on load
     await clearSearchBar();

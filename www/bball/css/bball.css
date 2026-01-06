@@ -82,13 +82,13 @@ select {
       margin: 0 auto;
 
 }
-#mobilebtns {
+#seemorelessbtns {
     display: none;
 }
 
-/* .static_grid > * {
-    border: 3px solid red;
-} */
+#mobilebtns {
+    display: none;
+}
 
 /* HEADER ELEMENTS */
 /* left side hugs left */
@@ -142,6 +142,7 @@ select {
 .lg_tbls {
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 #top_players {
@@ -154,7 +155,6 @@ select {
 }
 
 .tstbl {
-    width: 95%;
     margin: 0 auto;
     margin-top: 20px;
     border-radius: 5px;
@@ -178,9 +178,7 @@ select {
     display: grid;
     margin: 0 auto;
     height: fit-content;
-    width: fit-content;
     padding: 10px;
-    max-width: fit-content;
     align-self: end;
     gap: 10px;
 }
