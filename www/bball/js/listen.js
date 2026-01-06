@@ -56,17 +56,31 @@ seeless_btn.addEventListener("click", async() => {
     await makeScoringLeaders(NUMPL);
 });
 
-// change number of scoring leaders when window is resized
-window.addEventListener("resize", async () => {
-    const numPl = window.innerWidth <= 700 ? 5 : 10;
-    if (!NUMPL) {
+const mq = window.matchMedia("(max-width: 700px)");
+
+async function numPlByScreenWidth(e) {
+    const numPl = e.matches ? 5 : 10;
+    if (numPl !== NUMPL) {
         NUMPL = numPl;
+        await makeScoringLeaders(numPl);
     }
-    if (numPl != NUMPL) {
-        NUMPL = numPl;
-    }
-    await makeScoringLeaders(numPl);
-});
+}
+
+// initial run
+numPlByScreenWidth(mq);
+
+// breakpoint changes only
+mq.addEventListener("change", numPlByScreenWidth);
+
+// // change number of scoring leaders when window is resized
+// window.addEventListener("resize", async () => {
+//     const numPl = window.innerWidth <= 700 ? 5 : 10;
+    
+//     if (numPl !== NUMPL) {
+//         NUMPL = numPl;
+//     }
+//     await makeScoringLeaders(numPl);
+// });
 
 // all elements to build on load
 export async function buildOnLoadElements() {
