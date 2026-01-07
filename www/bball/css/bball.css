@@ -21,7 +21,9 @@ body::after {
   top: 50%;
   height: 1px;
 } */
-
+button {
+    height: fit-content;
+}
 /* GLOBAL TABLE */
 table {
     color: rgb(236, 237, 255);
@@ -71,19 +73,27 @@ select {
 /* GRID FOR ALL ELEMENTS BEFORE RESPONSE */
 .static_grid {
     display: grid;
+    place-items: start;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(3, auto);
+    grid-template-rows: repeat(4, auto);
     grid-template-areas:
     'lhdr chdr rhdr'
     'l ttl r'
-    't m r';
+    't m r'
+    '. . r'
+    /* '. . seemore' */
+    ;
     gap: 10px;
     padding: 5px;
       margin: 0 auto;
 
 }
 #seemorelessbtns {
-    display: none;
+    /* display: flex; */
+    /* flex-direction: row; */
+    grid-area: seemore;
+    /* justify-content: center;; */
+    /* width: 100% */
 }
 
 #mobilebtns {
@@ -135,7 +145,23 @@ select {
     justify-self: center;
 }
 
+.tablewithbtns {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    width: 100%;
+}
+
+.btnshoriz {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%
+}
+
 .top_sect_tbls {
+    display: flex;
+    flex-direction: column;
     width: 100%;
 }
 
