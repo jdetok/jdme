@@ -138,7 +138,7 @@ export async function playerBtnListener(player) {
             await buildPlayerDash(js.player[0], 0);
         }
         // if screen is small scroll into it
-        if (window.innerWidth <= 700) {
+        if (window.innerWidth <= 1050) {
             let res = document.getElementById("ui");
             if (res) {
                 res.scrollIntoView({behavior: "smooth", block: "start"});

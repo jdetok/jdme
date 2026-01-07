@@ -2,8 +2,8 @@
 // import { loadSznOptions, selHvr, setupExclusiveCheckboxes, clearCheckBoxes } from "./ui.js"
 import * as ui from "./ui.js"
 import { makeScoringLeaders } from "./lg_ldg_scorers.js"
-import { buildRGTopScorersTbl } from "./rg_ldg_scorers.js";
-import { getTeamRecords, buildTeamRecsTbl } from "./teamrecs.js";
+import { makeRGTopScorersTbl } from "./rg_ldg_scorers.js";
+import { makeTeamRecsTable } from "./teamrecs.js";
 import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
     getRecentGamesData, clearSearchBar } from "./player_search.js"
 
@@ -74,21 +74,22 @@ mq.addEventListener("change", numPlByScreenWidth);
 
 // all elements to build on load
 export async function buildOnLoadElements() {
+    const rows_on_load = window.innerWidth <= 700 ? 5 : 10
     // empty search bar on load
     await clearSearchBar();
-    
-    // load team records table
-    let trjs = await getTeamRecords();
-    await buildTeamRecsTbl(trjs, 'team_recs_tbl');
+
+    await makeTeamRecsTable(rows_on_load);
 
     // scoring leaders (number of players table based on screen width)
-    await makeScoringLeaders(window.innerWidth <= 700 ? 5 : 10);
+    await makeScoringLeaders(rows_on_load);
 
     // get recent games data, build player dash
     console.log("fetching recent games data");
     let js = await getRecentGamesData();
     await buildLoadDash(js);
-    await buildRGTopScorersTbl(js, 'top_players');
+
+    await makeRGTopScorersTbl(js, rows_on_load);
+    // await buildRGTopScorersTbl(js, 'top_players');
 
     // setup season/team checkboxes
     await ui.setupExclusiveCheckboxes('post', 'reg');
