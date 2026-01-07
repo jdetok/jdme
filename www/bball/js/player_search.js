@@ -3,13 +3,11 @@ import { checkBoxGroupValue, lgRadioBtns, clearCheckBoxes } from "./ui.js";
 import { buildPlayerDash } from "./player_dash.js";
 import { getPlayerStatsV2 } from "./player_dash_v2.js";
 
-/*
-get the top scorer from each game from the most recent night where games occured
-(usually dated yesterday, but when no games occur it'll get the most recent day
-where games did occur). called on page load, it creates a table with all these
-scorers and immediately grabs and loads the player dash for the top overall 
-scorer. use season id 88888 in getP to get most recent season
-*/
+// get the top scorer from each game from the most recent night where games occured
+// (usually dated yesterday, but when no games occur it'll get the most recent day
+// where games did occur). called on page load, it creates a table with all these
+// scorers and immediately grabs and loads the player dash for the top overall 
+// scorer. use season id 88888 in getP to get most recent season
 export async function getRecentGamesData() {
     const r = await fetch(`${base}/games/recent`);
     if (!r.ok) {
@@ -105,12 +103,9 @@ export async function randPlayerBtn() {
     });
 }
 
-/* 
-adds a button listener to each individual player button in the leading scorers
-tables. have to create a button, do btn.AddEventListener, and call this function
-within that listener. will insert the player's name in the search bar and call 
-getP
-*/
+// adds a button listener to each individual player button in the leading scorers
+// tables. have to create a button, do btn.AddEventListener, and call this function
+// within that listener. will insert the player's name in the search bar and call getP
 export async function playerBtnListener(player) {
     let searchB = document.getElementById('pSearch');
     await clearCheckBoxes(checkBoxes);

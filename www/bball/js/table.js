@@ -48,9 +48,6 @@ export async function rowHdrTable(data, caption, rowHdrLabel, pElName) {
     // use keys from the first data[keys] as column headers - made, attempt, pct 
     const cHdrs = Object.keys(data[rHdrs[0]]);
     
-    // console.log(`ROW HEADERS: ${rHdrs}`);
-    // console.log(`COLUMN HEADERS: ${cHdrs}`);
-
     // use cols, create & append caption
     pEl.textContent = ''; 
     await tblCaption(tbl, caption);

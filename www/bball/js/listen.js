@@ -106,13 +106,3 @@ export async function buildOnLoadElements() {
     await ui.clearCheckBoxes(checkBoxes);
     document.getElementById('all_lgs').checked = 1;
 }
-
-// place border around elements
-async function border(selector, border) {
-  const els = document.querySelectorAll(selector);
-  if (!els.length) return;
-
-  els.forEach(el => { 
-    el.style.border = border;
-  });
-}

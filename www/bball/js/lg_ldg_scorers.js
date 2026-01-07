@@ -1,4 +1,3 @@
-import { tblCaption } from "./table.js"
 import { base } from "./listen.js"
 import { playerBtnListener } from "./player_search.js"
 import { table5f } from "./dynamic_table.js"; 
@@ -20,45 +19,11 @@ export async function makeScoringLeaders(numPl) {
     )
 }
 
-// build table with top numPl leading scorers in the nba and wnba for their current
-// respective seasons 
-export async function buildLeadingScorersTbl(data, elName, numPl) {
-    const tbl = document.getElementById('nba_tstbl');
-    tbl.textContent = '';
-
-    const thead = document.createElement('thead');
-    const rankH = document.createElement('td');
-    const nbaH = document.createElement('td');
-    const ptsH = document.createElement('td');
-    const wnbaH = document.createElement('td');
-    const wptsH = document.createElement('td');
-
-    const capMsg = `Scoring Leaders | NBA/WNBA Top ${numPl}`;
-    tblCaption(tbl, capMsg);
-
-    rankH.textContent = 'rank';
-    nbaH.textContent = `nba | ${data.nba[0].season}`;
-    ptsH.textContent = 'points';
-    wnbaH.textContent = `wnba | ${(data.wnba[0].season).substring(0, 4)}`;
-    wptsH.textContent = 'points';
-
-    thead.appendChild(rankH);
-    thead.appendChild(nbaH);
-    thead.appendChild(ptsH);
-    thead.appendChild(wnbaH);
-    thead.appendChild(wptsH);
-    tbl.appendChild(thead);
-    
-    for (let i = 0; i < numPl; i++) {
-        await lgTopScorerRow(tbl, data, i);
-    }
-}
-
 // add a row to the league top scorers table. called within a loop
 // adds nba player with button, their points, wnba player with button, their points
 export async function lgTopScorerRow(tbl, data, i) {
     let r = document.createElement('tr');
-
+    
     let rank = document.createElement('td');
     let pName = document.createElement('td');
     let pts = document.createElement('td');

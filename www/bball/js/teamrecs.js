@@ -1,4 +1,3 @@
-import { tblCaption } from "./table.js"
 import { base } from "./listen.js"
 import { table5f } from "./dynamic_table.js";
 
