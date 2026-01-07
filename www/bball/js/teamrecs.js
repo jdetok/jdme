@@ -60,7 +60,7 @@ export async function buildTeamRecsTbl(data, elName) {
     for (let i = 0; i < teams_to_display; i++) {
         await teamRecsRow(tbl, data, i);
     }
-    tblcont.appendChild(tbl);
+    // tblcont.appendChild(tbl);
 }
 
 /* 

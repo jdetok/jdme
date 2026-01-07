@@ -6,7 +6,7 @@ creates a table with the top scorer from each game from the recent night. each
 player's name is a button that will search the player when clicked
 */
 export async function buildRGTopScorersTbl(data, elName) {
-    const tblcont = document.getElementById(elName);
+    // const tblcont = document.getElementById(elName);
     const tbl = document.getElementById('tstbl');
     const thead = document.createElement('thead');
     const nameH = document.createElement('td');
@@ -35,8 +35,6 @@ export async function buildRGTopScorersTbl(data, elName) {
     for (let i = 0; i < numR; i++) {
         await rgTopScorerRow(tbl, data.top_scorers[i], data);
     }
-    // append the table element to the container (passed elName)
-    tblcont.appendChild(tbl);
 }
 
 /*

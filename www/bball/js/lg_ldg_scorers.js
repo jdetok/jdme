@@ -18,8 +18,8 @@ build table with top numPl leading scorers in the nba and wnba for their current
 respective seasons 
 */
 export async function buildLeadingScorersTbl(data, elName, numPl) {
-    const tblcont = document.getElementById(elName);
 
+    // const tblcont = document.getElementById(elName);
     const tbl = document.getElementById('nba_tstbl');
     tbl.textContent = '';
 
@@ -30,7 +30,7 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     const wnbaH = document.createElement('td');
     const wptsH = document.createElement('td');
 
-    const capMsg = `Scoring Leaders | Current NBA/WNBA Top ${numPl}`;
+    const capMsg = `Scoring Leaders | NBA/WNBA Top ${numPl}`;
     tblCaption(tbl, capMsg);
 
     rankH.textContent = 'rank';
@@ -49,7 +49,6 @@ export async function buildLeadingScorersTbl(data, elName, numPl) {
     for (let i = 0; i < numPl; i++) {
         await lgTopScorerRow(tbl, data, i);
     }
-    tblcont.appendChild(tbl);
 }
 
 /* 

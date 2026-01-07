@@ -72,16 +72,6 @@ numPlByScreenWidth(mq);
 // breakpoint changes only
 mq.addEventListener("change", numPlByScreenWidth);
 
-// // change number of scoring leaders when window is resized
-// window.addEventListener("resize", async () => {
-//     const numPl = window.innerWidth <= 700 ? 5 : 10;
-    
-//     if (numPl !== NUMPL) {
-//         NUMPL = numPl;
-//     }
-//     await makeScoringLeaders(numPl);
-// });
-
 // all elements to build on load
 export async function buildOnLoadElements() {
     // empty search bar on load
@@ -95,6 +85,7 @@ export async function buildOnLoadElements() {
     await makeScoringLeaders(window.innerWidth <= 700 ? 5 : 10);
 
     // get recent games data, build player dash
+    console.log("fetching recent games data");
     let js = await getRecentGamesData();
     await buildLoadDash(js);
     await buildRGTopScorersTbl(js, 'top_players');
