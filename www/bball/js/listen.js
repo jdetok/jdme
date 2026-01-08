@@ -14,6 +14,7 @@ let NUMPL = window.innerWidth <= 700 ? 5 : 10;
 
 // onload content
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('%c loading page...', 'color: green; font-weight: bold;')
     await buildOnLoadElements();
     await randPlayerBtn();
     await searchPlayer();
@@ -74,6 +75,7 @@ mq.addEventListener("change", numPlByScreenWidth);
 
 // all elements to build on load
 export async function buildOnLoadElements() {
+    console.trace(`%c building page load elements...`, 'color: aqua; font-weight: bold;')
     const rows_on_load = window.innerWidth <= 700 ? 5 : 10
     // empty search bar on load
     await clearSearchBar();

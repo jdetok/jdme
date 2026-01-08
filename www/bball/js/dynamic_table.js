@@ -2,6 +2,8 @@
 
 // build full table
 export async function table5f(data, element_id, title, fields_hdrs, rows_to_display, rowfunc) {
+    console.trace(`%c building table from object: ${data}`, 'color: green; font-weight: bold;')
+
     const tbl = document.getElementById(element_id);
     tbl.textContent = "";
     

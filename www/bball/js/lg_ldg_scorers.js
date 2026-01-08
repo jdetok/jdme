@@ -1,13 +1,16 @@
 import { base } from "./listen.js"
 import { playerBtnListener } from "./player_search.js"
 import { table5f } from "./dynamic_table.js"; 
+import { bytes_in_resp } from "./util.js";
 
 // build top x players table
 export async function makeScoringLeaders(numPl) {
-    const r = await fetch(`${base}/league/scoring-leaders?num=${numPl}`);
+    const url = `${base}/league/scoring-leaders?num=${numPl}`;
+    const r = await fetch(url);
     if (!r.ok) {
-        throw new Error(`${r.status}: error calling /league/scoring-leaders`)
+        console.error(` error calling ${url}`);
     }
+    console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, 'color: green; font-weight: bold;')
     const data = await r.json();
     console.log(data);
     // await buildLeadingScorersTbl(data, 'top_lg_players', numPl);
@@ -23,7 +26,7 @@ export async function makeScoringLeaders(numPl) {
 // adds nba player with button, their points, wnba player with button, their points
 export async function lgTopScorerRow(tbl, data, i) {
     let r = document.createElement('tr');
-    
+
     let rank = document.createElement('td');
     let pName = document.createElement('td');
     let pts = document.createElement('td');

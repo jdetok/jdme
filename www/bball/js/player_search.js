@@ -1,7 +1,6 @@
 import { base, checkBoxes } from "./listen.js"
 import { checkBoxGroupValue, lgRadioBtns, clearCheckBoxes } from "./ui.js";
-import { buildPlayerDash } from "./player_dash.js";
-import { getPlayerStatsV2 } from "./player_dash_v2.js";
+import { buildPlayerDash, getPlayerStatsV2 } from "./player_dash.js";
 
 // get the top scorer from each game from the most recent night where games occured
 // (usually dated yesterday, but when no games occur it'll get the most recent day
@@ -84,7 +83,6 @@ export async function randPlayerBtn() {
         event.preventDefault();
 
         const lg = await lgRadioBtns();
-        console.log(`league in randPlayerBtn: ${lg}`);
         // check season boxes & get appropriate season id, search with random as player
         const season = await checkBoxGroupValue(
             {box: 'post', slct: 'ps_slct'}, 
@@ -94,7 +92,7 @@ export async function randPlayerBtn() {
             {box: 'nbaTm', slct: 'tm_slct'}, 
             {box: 'wnbaTm', slct: 'wTm_slct'}, 
             0);
-        console.log(`searching random player for season ${season}`);
+        console.trace(`%c searching random player | league: ${lg} | season ${season}`, 'color: aqua');
         let js = await getPlayerStatsV2(base, 'random', season, team, lg);
         if (js) {
             await buildPlayerDash(js.player[0], 0);
@@ -123,12 +121,9 @@ export async function playerBtnListener(player) {
 
         const lg = await lgRadioBtns();
 
-        console.log(`player: ${player} | tm: ${team} | szn: ${season}`);
-
         // search & clear player search bar
         let js = await getPlayerStatsV2(base, player, season, team, lg);
         if (js) {
-            console.log(js);
             await setPHold(js.player[0].player_meta.player);
             await buildPlayerDash(js.player[0], 0);
         }
