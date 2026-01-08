@@ -40,10 +40,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function mediaQueryMenuSizes(e) {
+    console.trace(`setting page headers...`);
     const matches = e.matches ?? mq.matches; 
 
     for (const [elName, val] of Object.entries(toChange)) {
-        console.log(`changing ${elName}...`);
         const el = document.getElementById(elName);
         if (!el) continue;
         el.textContent = matches ? val.sm_txt : val.lg_txt;

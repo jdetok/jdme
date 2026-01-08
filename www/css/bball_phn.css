@@ -1,0 +1,71 @@
+@media (max-width: 1050px) {
+    .static_grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(6, auto);
+        grid-template-areas:
+            "rhdr"
+            "ttl"
+            "btn"
+            "chdr"
+            "t"
+            "l"
+            "r"
+            "seemore"
+            "m";
+        justify-items: center;
+    }
+
+    /* #jumptosearch {
+        display: block;
+        grid-area: btn;
+    } */
+
+    #mobilebtns {
+        display: flex;
+        flex-direction: row;
+        grid-area: btn;
+    }
+
+    #seemorelessbtns {
+        display: flex;
+        flex-direction: row;
+        grid-area: seemore;
+    }
+
+    /* #seemoreplayers {
+        display: flex;
+        flex-direction: row;
+        justify-self: center;
+        grid-area: seemore;
+    } */
+    .lhdr {
+        display: none;
+    }
+
+    .chdr {
+        grid-area: chdr;
+    }
+
+    .rhdr {
+        grid-area: rhdr;
+        justify-self: center;
+    }
+
+    .response {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        max-width: 100%;
+    }
+    
+    .resptitle {
+        font-size: 30px;
+    }
+
+    .respsect h2 {
+        font-size: 26px;
+    }
+
+    .resprow {
+        flex-direction: column;
+    }
+}
