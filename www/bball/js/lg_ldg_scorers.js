@@ -1,7 +1,7 @@
 import { base } from "./listen.js"
-import { playerBtnListener } from "./player_search.js"
+import { playerBtnListener } from "./ui.js"
 import { table5f } from "./dynamic_table.js"; 
-import { bytes_in_resp } from "./util.js";
+import { bytes_in_resp, FUSC_BOLD } from "./util.js";
 
 // build top x players table
 export async function makeScoringLeaders(numPl) {
@@ -10,7 +10,7 @@ export async function makeScoringLeaders(numPl) {
     if (!r.ok) {
         console.error(` error calling ${url}`);
     }
-    console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, 'color: green; font-weight: bold;')
+    console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, FUSC_BOLD)
     const data = await r.json();
     console.log(data);
     // await buildLeadingScorersTbl(data, 'top_lg_players', numPl);

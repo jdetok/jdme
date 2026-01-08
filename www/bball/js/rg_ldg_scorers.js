@@ -1,4 +1,4 @@
-import { playerBtnListener } from "./player_search.js"
+import { playerBtnListener } from "./ui.js"
 import { table5f } from "./dynamic_table.js"; 
 
 export async function makeRGTopScorersTbl(data, numPl) {

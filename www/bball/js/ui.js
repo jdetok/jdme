@@ -1,4 +1,87 @@
-import { base } from "./listen.js";
+import { base, checkBoxEls } from "./listen.js";
+import { getPlayerStatsV2, buildPlayerDash } from "./player_dash.js";
+export async function setPHold(player) {
+    document.getElementById('pHold').value = player;
+}
+
+// get a random player from the API and getPlayerStats
+export async function randPlayerBtn() {
+    // listen for random player button press
+    const btn = document.getElementById('randP');
+    btn.addEventListener('click', async (event) => {        
+        event.preventDefault();
+
+        const lg = await lgRadioBtns();
+        // check season boxes & get appropriate season id, search with random as player
+        const season = await checkBoxGroupValue(
+            {box: 'post', slct: 'ps_slct'}, 
+            {box: 'reg', slct: 'rs_slct'}, 
+            88888);
+        const team = await checkBoxGroupValue(
+            {box: 'nbaTm', slct: 'tm_slct'}, 
+            {box: 'wnbaTm', slct: 'wTm_slct'}, 
+            0);
+        console.trace(`%c searching random player | league: ${lg} | season ${season}`, 'color: aqua');
+        let js = await getPlayerStatsV2(base, 'random', season, team, lg);
+        if (js) {
+            await buildPlayerDash(js.player[0], 0);
+            await setPHold(js.player[0].player_meta.player);
+        }
+    });
+}
+
+// adds a button listener to each individual player button in the leading scorers
+// tables. have to create a button, do btn.AddEventListener, and call this function
+// within that listener. will insert the player's name in the search bar and call getP
+export async function playerBtnListener(player) {
+    let searchB = document.getElementById('pSearch');
+    await clearCheckBoxes(checkBoxEls);
+    if (searchB) {
+        searchB.value = player;
+        const season = await checkBoxGroupValue(
+            {box: 'post', slct: 'ps_slct'}, 
+            {box: 'reg', slct: 'rs_slct'}, 
+            88888);
+
+        const team = await checkBoxGroupValue(
+            {box: 'nbaTm', slct: 'tm_slct'}, 
+            {box: 'wnbaTm', slct: 'wTm_slct'}, 0);
+
+
+        const lg = await lgRadioBtns();
+
+        // search & clear player search bar
+        let js = await getPlayerStatsV2(base, player, season, team, lg);
+        if (js) {
+            await setPHold(js.player[0].player_meta.player);
+            await buildPlayerDash(js.player[0], 0);
+        }
+        // if screen is small scroll into it
+        if (window.innerWidth <= 1050) {
+            let res = document.getElementById("ui");
+            if (res) {
+                res.scrollIntoView({behavior: "smooth", block: "start"});
+            }
+        }
+    }
+}
+
+// clear search box
+export async function clearSearch() {
+    const btn = document.getElementById('clearS');
+    btn.addEventListener('click', async (event) => {
+        event.preventDefault();
+        let pSearch = document.getElementById('pSearch');
+        pSearch.value = '';
+        pSearch.focus();
+    });
+}
+
+
+export async function clearSearchBar() {
+    let pSearch = document.getElementById('pSearch');
+    pSearch.value = '';
+}
 
 export async function lgRadioBtns() {
     const selected = document.querySelector('input[name="leagues"]:checked');
@@ -8,6 +91,19 @@ export async function lgRadioBtns() {
     } else {
         return 'all';
     }
+}
+
+// read pHold invisible val to add on-screen player's name to search bar
+export async function holdPlayerBtn() {
+    // listen for hold player button press
+    const btn = document.getElementById('holdP');
+    btn.addEventListener('click', async (event) => {
+        event.preventDefault();
+
+        // get player name held in pHold value, fill player search bar with it
+        let player = document.getElementById('pHold').value;
+        document.getElementById('pSearch').value = player;
+    })
 }
 
 // return season or 88888 if no sseason box checked

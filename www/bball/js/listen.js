@@ -4,11 +4,12 @@ import * as ui from "./ui.js"
 import { makeScoringLeaders } from "./lg_ldg_scorers.js"
 import { makeRGTopScorersTbl } from "./rg_ldg_scorers.js";
 import { makeTeamRecsTable } from "./teamrecs.js";
-import { randPlayerBtn, searchPlayer, holdPlayerBtn, clearSearch, buildLoadDash,
-    getRecentGamesData, clearSearchBar } from "./player_search.js"
+import { searchPlayer, buildLoadDash,
+    getRecentGamesData } from "./player_search.js"
+import { AQUA_BOLD, AQUA } from "./util.js";
 
 export const base = "https://dev.jdeko.me/bball";
-export const checkBoxes = ['post', 'reg', 'nbaTm', 'wnbaTm'];
+export const checkBoxEls = ['post', 'reg', 'nbaTm', 'wnbaTm'];
 
 let NUMPL = window.innerWidth <= 700 ? 5 : 10;
 
@@ -16,10 +17,10 @@ let NUMPL = window.innerWidth <= 700 ? 5 : 10;
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('%c loading page...', 'color: green; font-weight: bold;')
     await buildOnLoadElements();
-    await randPlayerBtn();
     await searchPlayer();
-    await clearSearch();
-    await holdPlayerBtn();
+    await ui.randPlayerBtn();
+    await ui.clearSearch();
+    await ui.holdPlayerBtn();
 });
 
 // mobile button: jump to current player
@@ -75,10 +76,10 @@ mq.addEventListener("change", numPlByScreenWidth);
 
 // all elements to build on load
 export async function buildOnLoadElements() {
-    console.trace(`%c building page load elements...`, 'color: aqua; font-weight: bold;')
+    console.trace(`%c building page load elements for page width ${window.innerWidth}`, AQUA_BOLD)
     const rows_on_load = window.innerWidth <= 700 ? 5 : 10
     // empty search bar on load
-    await clearSearchBar();
+    await ui.clearSearchBar();
 
     await makeTeamRecsTable(rows_on_load);
 
@@ -86,8 +87,10 @@ export async function buildOnLoadElements() {
     await makeScoringLeaders(rows_on_load);
 
     // get recent games data, build player dash
-    console.log("fetching recent games data");
+
+    
     let js = await getRecentGamesData();
+    console.trace(`%c fetched games data for ${js.recent_games[0].game_date}`, AQUA)
     await buildLoadDash(js);
 
     await makeRGTopScorersTbl(js, rows_on_load);
@@ -98,6 +101,7 @@ export async function buildOnLoadElements() {
     await ui.setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
 
     // get seasons/teams from api & load options for the selects
+    console.trace(`%c loading team/season selectors data...`, AQUA)
     await ui.loadSznOptions();
     await ui.loadTeamOptions();
 
@@ -105,6 +109,6 @@ export async function buildOnLoadElements() {
     await ui.lgRadioBtns();
 
     // DEFAULT VALUES: clear all checkboxes, select "Both" lg radio button
-    await ui.clearCheckBoxes(checkBoxes);
+    await ui.clearCheckBoxes(checkBoxEls);
     document.getElementById('all_lgs').checked = 1;
 }

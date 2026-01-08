@@ -1,5 +1,5 @@
 import { base } from "./listen.js"
-import { bytes_in_resp } from "./util.js";
+import { bytes_in_resp, GRN_BOLD } from "./util.js";
 import { table5f } from "./dynamic_table.js";
 
 // build top x players table
@@ -10,7 +10,7 @@ export async function getTeamRecords() {
         if (!r.ok) {
             console.error(`failed to get data from ${url}`);
         }
-        console.trace(`%c request status ${r.status}: ${await bytes_in_resp(r)} bytes received from ${url}}`, 'color: green; font-weight: bold;')
+        console.trace(`%c request status ${r.status}: ${await bytes_in_resp(r)} bytes received from ${url}}`, GRN_BOLD)
         const data = await r.json();
         return data;
     } catch(err) {
