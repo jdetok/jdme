@@ -1,5 +1,5 @@
-import { base } from "./listen.js"
-import { checkBoxGroupValue, lgRadioBtns } from "./ui.js";
+import { base, bytes_in_resp, MSG_BOLD, YLW_BOLD } from "./util.js"
+import { checkBoxGroupValue, lgRadioBtns, setPHold } from "./ui.js";
 import { buildPlayerDash, getPlayerStatsV2 } from "./player_dash.js";
 
 // get the top scorer from each game from the most recent night where games occured
@@ -8,10 +8,12 @@ import { buildPlayerDash, getPlayerStatsV2 } from "./player_dash.js";
 // scorers and immediately grabs and loads the player dash for the top overall 
 // scorer. use season id 88888 in getP to get most recent season
 export async function getRecentGamesData() {
-    const r = await fetch(`${base}/games/recent`);
+    const url = `${base}/games/recent`;
+    const r = await fetch(url);
     if (!r.ok) {
-        throw new Error(`${r.status}: error calling /games/recent`);
+        console.error(`%cerror fetching ${url}`, YLW_BOLD);
     }
+    console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD)
     const data = await r.json();
     if (data) {
         return data
@@ -38,7 +40,6 @@ export async function searchPlayer() {
         let player = input.value.trim();
 
         const lg = await lgRadioBtns();
-        console.log(`league in searchPlayer: ${lg}`);
         
         // if search pressed without anything in search box, searches current player
         if (player === '') {
@@ -58,16 +59,13 @@ export async function searchPlayer() {
             {box: 'wnbaTm', slct: 'wTm_slct'}, 
             0);
 
+        console.trace(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
         // build response player dash section
         let js = await getPlayerStatsV2(base, player, season, team, lg);
         if (js) {
             await setPHold(js.player[0].player_meta.player);
             await buildPlayerDash(js.player[0], 0);
         }
-
-        // TODO: maybe fill error string visible to user at this point?
-        // clear player search box
-        // input.value = ''; // clear input box after searching
     }) 
 }
 

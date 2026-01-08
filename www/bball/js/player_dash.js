@@ -1,5 +1,5 @@
 import * as table from "./table.js"
-import { bytes_in_resp } from "./util.js";
+import { bytes_in_resp, MSG } from "./util.js";
 
 // ts indicates 'top scorer' - used when called on page refresh to get recent game
 export async function getPlayerStatsV2(base, player, season, team, lg) { // add season & team
@@ -19,7 +19,7 @@ export async function getPlayerStatsV2(base, player, season, team, lg) { // add 
         if (!r.ok) {
             throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
         }
-        console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, 'color: green; font-weight: bold;')
+        console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG)
 
         const js = await r.json()
         if (js) {

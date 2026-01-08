@@ -1,15 +1,9 @@
 // script to load in HTML -- all listener functions are called here 
 // import { loadSznOptions, selHvr, setupExclusiveCheckboxes, clearCheckBoxes } from "./ui.js"
 import * as ui from "./ui.js"
-import { makeScoringLeaders } from "./lg_ldg_scorers.js"
-import { makeRGTopScorersTbl } from "./rg_ldg_scorers.js";
-import { makeTeamRecsTable } from "./teamrecs.js";
-import { searchPlayer, buildLoadDash,
-    getRecentGamesData } from "./player_search.js"
-import { AQUA_BOLD, AQUA } from "./util.js";
-
-export const base = "https://dev.jdeko.me/bball";
-export const checkBoxEls = ['post', 'reg', 'nbaTm', 'wnbaTm'];
+import { makeScoringLeaders, makeRGTopScorersTbl, makeTeamRecsTable } from "./tables_onload.js"
+import { searchPlayer, buildLoadDash, getRecentGamesData } from "./player_search.js"
+import { checkBoxEls, AQUA_BOLD, AQUA } from "./util.js";
 
 let NUMPL = window.innerWidth <= 700 ? 5 : 10;
 
@@ -23,23 +17,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     await ui.holdPlayerBtn();
 });
 
-// mobile button: jump to current player
-const jump_search_btn = document.getElementById("jumptoresp");
-jump_search_btn.addEventListener("click", async() => {
-    const res = document.getElementById("player_title");
-    if (res) {
-        res.scrollIntoView({behavior: "smooth", block: "start"});
+export async function setup_jump_btns() {
+    const btns = [{el: "jumptoresp", jumpTo: "player_title"}, {el: "jumptosearch", jumpTo: "ui"}]
+    for (const btn of btns) {
+        const btnEl = document.getElementById(btn.el);
+        if (btnEl) {
+            btnEl.addEventListener('click', async() => {
+                const jmpEl = document.getElementById(btn.jumpTo);
+                if (jmpEl) {
+                    jmpEl.scrollIntoView({behavior: "smooth", block: "start"});
+                }
+            })
+        }    
     }
-});
-
-// mobile button: jump to player search section
-const jump_plr_btn = document.getElementById("jumptosearch");
-jump_plr_btn.addEventListener("click", async() => {
-    const res = document.getElementById("ui");
-    if (res) {
-        res.scrollIntoView({behavior: "smooth", block: "start"});
-    }
-});
+}
 
 // mobile button: see more top players
 const seemore_btn = document.getElementById("seemoreplayers");
@@ -58,7 +49,6 @@ seeless_btn.addEventListener("click", async() => {
     await makeScoringLeaders(NUMPL);
 });
 
-const mq = window.matchMedia("(max-width: 700px)");
 
 async function numPlByScreenWidth(e) {
     const numPl = e.matches ? 5 : 10;
@@ -69,6 +59,7 @@ async function numPlByScreenWidth(e) {
 }
 
 // initial run
+const mq = window.matchMedia("(max-width: 700px)");
 numPlByScreenWidth(mq);
 
 // breakpoint changes only
@@ -81,6 +72,7 @@ export async function buildOnLoadElements() {
     // empty search bar on load
     await ui.clearSearchBar();
 
+    await setup_jump_btns();
     await makeTeamRecsTable(rows_on_load);
 
     // scoring leaders (number of players table based on screen width)
