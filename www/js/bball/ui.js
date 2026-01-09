@@ -38,7 +38,7 @@ export async function playerBtnListener(player) {
     let searchB = document.getElementById('pSearch');
     await clearCheckBoxes(checkBoxEls);
     if (searchB) {
-        searchB.value = player;
+        // searchB.value = player;
         const season = await checkBoxGroupValue(
             {box: 'post', slct: 'ps_slct'}, 
             {box: 'reg', slct: 'rs_slct'}, 

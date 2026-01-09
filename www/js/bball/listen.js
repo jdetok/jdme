@@ -1,19 +1,22 @@
 // script to load in HTML -- all listener functions are called here 
 // import { loadSznOptions, selHvr, setupExclusiveCheckboxes, clearCheckBoxes } from "./ui.js"
 import * as ui from "./ui.js"
+import { clearSearch } from "./btns.js";
 import { makeScoringLeaders, makeRGTopScorersTbl, makeTeamRecsTable } from "./tables_onload.js"
 import { searchPlayer, buildLoadDash, getRecentGamesData } from "./player_search.js"
-import { checkBoxEls, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "./util.js";
-
+import { checkBoxEls, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
+import { LoadContent } from "./listeners.js"
 let NUMPL = window.innerWidth <= 700 ? 5 : 10;
+
+await LoadContent();
 
 // onload content
 document.addEventListener('DOMContentLoaded', async () => {
-    await foldedLog('%c loading page...', MSG)
+    foldedLog('%c loading page...', MSG)
     await buildOnLoadElements();
     await searchPlayer();
     await ui.randPlayerBtn();
-    await ui.clearSearch();
+    clearSearch();
     await ui.holdPlayerBtn();
     console.log(`height: ${window.innerHeight}`);
 });
@@ -89,7 +92,7 @@ async function listenForWindowSize(data, width) {
 
 // all elements to build on load
 export async function buildOnLoadElements() {
-    await foldedLog(`%c building page load elements for page width ${window.innerWidth}`, MSG);
+    foldedLog(`%c building page load elements for page width ${window.innerWidth}`, MSG);
     const rows_on_load = window.innerWidth <= 700 ? 5 : 10;
 
     await ui.clearSearchBar();
@@ -99,23 +102,21 @@ export async function buildOnLoadElements() {
     
     try {
         let js = await getRecentGamesData();
-        await foldedLog(`%c fetched games data for ${js.recent_games[0].game_date}`, MSG);
+        foldedLog(`%c fetched games data for ${js.recent_games[0].game_date}`, MSG);
         // await makeRGTopScorersTbl(js, rows_on_load);
         await listenForWindowSize(js, 850);
         await expandListBtns(js);
         await buildLoadDash(js);
     } catch(err) {
-        await foldedLog(`%cerror fetching recent games data: ${err}`, RED_BOLD);
+        foldedLog(`%cerror fetching recent games data: ${err}`, RED_BOLD);
     }
     
-    
-
     // setup season/team checkboxes
     await ui.setupExclusiveCheckboxes('post', 'reg');
     await ui.setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
 
     // get seasons/teams from api & load options for the selects
-    await foldedLog(`%c loading team/season selectors data...`, MSG)
+    foldedLog(`%c loading team/season selectors data...`, MSG)
     await ui.loadSznOptions();
     await ui.loadTeamOptions();
 
@@ -125,5 +126,5 @@ export async function buildOnLoadElements() {
     // DEFAULT VALUES: clear all checkboxes, select "Both" lg radio button
     await ui.clearCheckBoxes(checkBoxEls);
     document.getElementById('all_lgs').checked = 1;
-    await foldedLog(`%cpage load compelete`, MSG_BOLD);
+    foldedLog(`%cpage load compelete`, MSG_BOLD);
 }
