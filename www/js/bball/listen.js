@@ -35,9 +35,9 @@ export async function setup_jump_btns() {
 // mobile button: see more top players
 const seemore_btn = document.getElementById("seemoreplayers");
 seemore_btn.addEventListener("click", async() => {
-    if (!NUMPL) {
-        NUMPL = window.innerWidth <= 700 ? 5 : 10;
-    };
+    // if (!NUMPL) {
+    //     NUMPL = window.innerWidth <= 700 ? 5 : 10;
+    // };
     NUMPL += 5;
     await makeScoringLeaders(NUMPL);
 });
@@ -54,9 +54,9 @@ async function numPlByScreenWidth(e, data) {
     const numPl = e.matches ? 5 : 10;
     if (numPl !== NUMPL) {
         NUMPL = numPl;
-        await makeScoringLeaders(numPl);
-        await makeRGTopScorersTbl(data, numPl);
     }
+    await makeScoringLeaders(numPl);
+    await makeRGTopScorersTbl(data, numPl);
 }
 
 async function listenForWindowSize(data, width) {
@@ -68,7 +68,7 @@ async function listenForWindowSize(data, width) {
 // all elements to build on load
 export async function buildOnLoadElements() {
     await foldedLog(`%c building page load elements for page width ${window.innerWidth}`, MSG);
-    const rows_on_load = window.innerWidth <= 700 ? 5 : 10
+    const rows_on_load = window.innerWidth <= 700 ? 5 : 10;
 
     await ui.clearSearchBar();
     await setup_jump_btns();
@@ -79,7 +79,7 @@ export async function buildOnLoadElements() {
         let js = await getRecentGamesData();
         await foldedLog(`%c fetched games data for ${js.recent_games[0].game_date}`, MSG);
         await makeRGTopScorersTbl(js, rows_on_load);
-        await listenForWindowSize(js, 100);
+        await listenForWindowSize(js, 850);
         await buildLoadDash(js);
     } catch(err) {
         await foldedLog(`%cerror fetching recent games data: ${err}`, RED_BOLD);
