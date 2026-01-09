@@ -1,4 +1,4 @@
-import { base, bytes_in_resp, MSG_BOLD, YLW_BOLD } from "./util.js"
+import { base, bytes_in_resp, foldedLog, MSG_BOLD, YLW_BOLD } from "./util.js"
 import { checkBoxGroupValue, lgRadioBtns, setPHold } from "./ui.js";
 import { buildPlayerDash, getPlayerStatsV2 } from "./player_dash.js";
 
@@ -13,7 +13,12 @@ export async function getRecentGamesData() {
     if (!r.ok) {
         console.error(`%cerror fetching ${url}`, YLW_BOLD);
     }
-    console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD)
+    await foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
+    // console.groupCollapsed(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
+    // console.trace();
+    // console.groupEnd();
+    // console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD)
+
     const data = await r.json();
     if (data) {
         return data
@@ -59,7 +64,8 @@ export async function searchPlayer() {
             {box: 'wnbaTm', slct: 'wTm_slct'}, 
             0);
 
-        console.trace(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
+        await foldedLog(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
+        // console.trace();
         // build response player dash section
         let js = await getPlayerStatsV2(base, player, season, team, lg);
         if (js) {

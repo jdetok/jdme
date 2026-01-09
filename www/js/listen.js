@@ -1,4 +1,6 @@
-const mq = window.matchMedia("(max-width: 1200px)"); 
+import { foldedLog, MSG } from "./bball/util.js";
+
+const mq = window.matchMedia("(max-width: 1350px)"); 
 const toChange = {
         // home: {
         //     lg_txt: "jdeko.me",
@@ -35,12 +37,15 @@ const toChange = {
     };
 
 document.addEventListener('DOMContentLoaded', async () => {
-    mediaQueryMenuSizes(mq);
-    mq.addEventListener("change", mediaQueryMenuSizes);
+    await mediaQueryMenuSizes(mq);
+    mq.addEventListener("change",  async (e) => {
+        await mediaQueryMenuSizes(e);
+    });
 });
 
-function mediaQueryMenuSizes(e) {
-    console.trace(`setting page headers...`);
+async function mediaQueryMenuSizes(e) {
+    await foldedLog(`%csetting page headers...`, MSG)
+    // console.trace(`setting page headers...`);
     const matches = e.matches ?? mq.matches; 
 
     for (const [elName, val] of Object.entries(toChange)) {

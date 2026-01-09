@@ -3,13 +3,13 @@
 import * as ui from "./ui.js"
 import { makeScoringLeaders, makeRGTopScorersTbl, makeTeamRecsTable } from "./tables_onload.js"
 import { searchPlayer, buildLoadDash, getRecentGamesData } from "./player_search.js"
-import { checkBoxEls, AQUA_BOLD, AQUA } from "./util.js";
+import { checkBoxEls, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "./util.js";
 
 let NUMPL = window.innerWidth <= 700 ? 5 : 10;
 
 // onload content
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('%c loading page...', 'color: green; font-weight: bold;')
+    await foldedLog('%c loading page...', MSG)
     await buildOnLoadElements();
     await searchPlayer();
     await ui.randPlayerBtn();
@@ -50,50 +50,49 @@ seeless_btn.addEventListener("click", async() => {
 });
 
 
-async function numPlByScreenWidth(e) {
+async function numPlByScreenWidth(e, data) {
     const numPl = e.matches ? 5 : 10;
     if (numPl !== NUMPL) {
         NUMPL = numPl;
         await makeScoringLeaders(numPl);
+        await makeRGTopScorersTbl(data, numPl);
     }
 }
 
-// initial run
-const mq = window.matchMedia("(max-width: 700px)");
-numPlByScreenWidth(mq);
-
-// breakpoint changes only
-mq.addEventListener("change", numPlByScreenWidth);
+async function listenForWindowSize(data, width) {
+    const mq = window.matchMedia(`(max-width: ${width}px)`);
+    await numPlByScreenWidth(mq, data);
+    mq.addEventListener("change", async (e) => await numPlByScreenWidth(e, data));
+}
 
 // all elements to build on load
 export async function buildOnLoadElements() {
-    console.trace(`%c building page load elements for page width ${window.innerWidth}`, AQUA_BOLD)
+    await foldedLog(`%c building page load elements for page width ${window.innerWidth}`, MSG);
     const rows_on_load = window.innerWidth <= 700 ? 5 : 10
-    // empty search bar on load
-    await ui.clearSearchBar();
 
+    await ui.clearSearchBar();
     await setup_jump_btns();
     await makeTeamRecsTable(rows_on_load);
-
-    // scoring leaders (number of players table based on screen width)
     await makeScoringLeaders(rows_on_load);
-
-    // get recent games data, build player dash
-
     
-    let js = await getRecentGamesData();
-    console.trace(`%c fetched games data for ${js.recent_games[0].game_date}`, AQUA)
-    await buildLoadDash(js);
-
-    await makeRGTopScorersTbl(js, rows_on_load);
-    // await buildRGTopScorersTbl(js, 'top_players');
+    try {
+        let js = await getRecentGamesData();
+        await foldedLog(`%c fetched games data for ${js.recent_games[0].game_date}`, MSG);
+        await makeRGTopScorersTbl(js, rows_on_load);
+        await listenForWindowSize(js, 100);
+        await buildLoadDash(js);
+    } catch(err) {
+        await foldedLog(`%cerror fetching recent games data: ${err}`, RED_BOLD);
+    }
+    
+    
 
     // setup season/team checkboxes
     await ui.setupExclusiveCheckboxes('post', 'reg');
     await ui.setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
 
     // get seasons/teams from api & load options for the selects
-    console.trace(`%c loading team/season selectors data...`, AQUA)
+    await foldedLog(`%c loading team/season selectors data...`, MSG)
     await ui.loadSznOptions();
     await ui.loadTeamOptions();
 
@@ -103,4 +102,5 @@ export async function buildOnLoadElements() {
     // DEFAULT VALUES: clear all checkboxes, select "Both" lg radio button
     await ui.clearCheckBoxes(checkBoxEls);
     document.getElementById('all_lgs').checked = 1;
+    await foldedLog(`%cpage load compelete`, MSG_BOLD);
 }

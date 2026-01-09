@@ -1,5 +1,5 @@
 import * as table from "./table.js"
-import { bytes_in_resp, FUSC, MSG } from "./util.js";
+import { bytes_in_resp, foldedLog, MSG } from "./util.js";
 
 // html elements to fill
 const PLAYER_DASH_ELS = {
@@ -19,8 +19,9 @@ const PLAYER_DASH_ELS = {
 
 // accept player dash data, build tables/fetch images and display on screen
 export async function buildPlayerDash(data, ts, el = PLAYER_DASH_ELS) {
-    console.trace(data);
-    console.trace(`%cts: ${ts ? ts : 'ts var empty'}`, FUSC);
+    // console.trace(data);
+    // console.trace(`%cts: ${ts ? ts : 'ts var empty'}`, FUSC);
+    await foldedLog(`%cts: ${ts ? `fetching top scorer from ${ts.recent_games[0].game_date}` : 'no ts var, normal fetch'}`, MSG);
     await appendImg(data.player_meta.headshot_url, el.img.player);
     await appendImg(data.player_meta.team_logo_url, el.img.team);
 
@@ -54,7 +55,7 @@ export async function getPlayerStatsV2(base, player, season, team, lg) { // add 
         if (!r.ok) {
             throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
         }
-        console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG)
+        await foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG)
 
         const js = await r.json()
         if (js) {

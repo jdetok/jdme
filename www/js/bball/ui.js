@@ -1,4 +1,4 @@
-import { base, checkBoxEls } from "./util.js";
+import { base, checkBoxEls, foldedLog, MSG } from "./util.js";
 import { getPlayerStatsV2, buildPlayerDash } from "./player_dash.js";
 export async function setPHold(player) {
     document.getElementById('pHold').value = player;
@@ -21,7 +21,7 @@ export async function randPlayerBtn() {
             {box: 'nbaTm', slct: 'tm_slct'}, 
             {box: 'wnbaTm', slct: 'wTm_slct'}, 
             0);
-        console.trace(`%c searching random player | league: ${lg} | season ${season}`, 'color: aqua');
+        await foldedLog(`%c searching random player | league: ${lg} | season ${season}`, MSG);
         let js = await getPlayerStatsV2(base, 'random', season, team, lg);
         if (js) {
             await buildPlayerDash(js.player[0], 0);

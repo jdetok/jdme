@@ -1,4 +1,4 @@
-@media (max-width: 1050px) {
+@media (max-width: 1350px) {
     .static_grid {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(6, auto);
@@ -15,11 +15,6 @@
         justify-items: center;
     }
 
-    /* #jumptosearch {
-        display: block;
-        grid-area: btn;
-    } */
-
     #mobilebtns {
         display: flex;
         flex-direction: row;
@@ -32,12 +27,6 @@
         grid-area: seemore;
     }
 
-    /* #seemoreplayers {
-        display: flex;
-        flex-direction: row;
-        justify-self: center;
-        grid-area: seemore;
-    } */
     .lhdr {
         display: none;
     }

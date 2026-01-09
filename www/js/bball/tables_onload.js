@@ -1,6 +1,6 @@
 import { playerBtnListener } from "./ui.js"
 import { table5f } from "./dynamic_table.js"; 
-import { base, bytes_in_resp, FUSC_BOLD, GRN_BOLD } from "./util.js";
+import { base, bytes_in_resp, foldedLog, MSG } from "./util.js";
 
 
 // RECENT GAMES TOP SCORERS TABLE FUNCS
@@ -52,9 +52,9 @@ export async function makeScoringLeaders(numPl) {
     if (!r.ok) {
         console.error(` error calling ${url}`);
     }
-    console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, FUSC_BOLD)
+    await foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG)
     const data = await r.json();
-    console.log(data);
+    // console.log(data);
     // await buildLeadingScorersTbl(data, 'top_lg_players', numPl);
     await table5f(data, 'nba_tstbl', 
         `Scoring Leaders | NBA/WNBA Top ${numPl}`, 
@@ -112,7 +112,7 @@ export async function getTeamRecords() {
         if (!r.ok) {
             console.error(`failed to get data from ${url}`);
         }
-        console.trace(`%c request status ${r.status}: ${await bytes_in_resp(r)} bytes received from ${url}}`, GRN_BOLD)
+        await foldedLog(`%c request status ${r.status}: ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG)
         const data = await r.json();
         return data;
     } catch(err) {
