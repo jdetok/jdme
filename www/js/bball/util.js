@@ -28,3 +28,12 @@ export async function foldedLog(...args) {
     console.trace();
     console.groupEnd();
 }
+
+export async function scrollIntoBySize(wpx, hpx, el) {
+    if (window.innerWidth <= wpx || window.innerHeight <= hpx) {
+        let res = document.getElementById(el);
+        if (res) {
+            res.scrollIntoView({behavior: "smooth", block: "start"});
+        }
+    }
+}

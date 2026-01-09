@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await ui.randPlayerBtn();
     await ui.clearSearch();
     await ui.holdPlayerBtn();
+    console.log(`height: ${window.innerHeight}`);
 });
 
 export async function setup_jump_btns() {

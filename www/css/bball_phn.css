@@ -5,7 +5,7 @@
         grid-template-areas:
             "rhdr"
             "ttl"
-            "btn"
+            "jumpbtns"
             "chdr"
             "t"
             "l"
@@ -18,7 +18,7 @@
     #mobilebtns {
         display: flex;
         flex-direction: row;
-        grid-area: btn;
+        grid-area: jumpbtns;
     }
 
     #seemorelessbtns {

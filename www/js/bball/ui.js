@@ -1,4 +1,4 @@
-import { base, checkBoxEls, foldedLog, MSG } from "./util.js";
+import { base, checkBoxEls, foldedLog, MSG, scrollIntoBySize } from "./util.js";
 import { getPlayerStatsV2, buildPlayerDash } from "./player_dash.js";
 export async function setPHold(player) {
     document.getElementById('pHold').value = player;
@@ -26,6 +26,7 @@ export async function randPlayerBtn() {
         if (js) {
             await buildPlayerDash(js.player[0], 0);
             await setPHold(js.player[0].player_meta.player);
+            await scrollIntoBySize(1350, 900, "player_title");
         }
     });
 }
@@ -56,13 +57,7 @@ export async function playerBtnListener(player) {
             await setPHold(js.player[0].player_meta.player);
             await buildPlayerDash(js.player[0], 0);
         }
-        // if screen is small scroll into it
-        if (window.innerWidth <= 1050) {
-            let res = document.getElementById("ui");
-            if (res) {
-                res.scrollIntoView({behavior: "smooth", block: "start"});
-            }
-        }
+        await scrollIntoBySize(1350, 900, "player_title");
     }
 }
 
