@@ -1,0 +1,24 @@
+{
+  "name": "go-api-jdeko.me",
+  "version": "1.0.0",
+  "description": "- ## written & maintained by Justin DeKock      jdeko17@gmail.com | [jdetok on github](https://github.com/jdetok)     ### visit the site:      - [jdeko.me home page](https://jdeko.me)     - [nba/wnba stats page](https://jdeko.me/bball)     - [main about page](https://jdeko.me/about)     - [nba/wnba stats about page](https://jdeko.me/bball/about)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdetok/go-api-jdeko.me.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jdetok/go-api-jdeko.me/issues"
+  },
+  "homepage": "https://github.com/jdetok/go-api-jdeko.me#readme",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

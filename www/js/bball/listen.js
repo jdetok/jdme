@@ -33,22 +33,43 @@ export async function setup_jump_btns() {
     }
 }
 
-// mobile button: see more top players
-const seemore_btn = document.getElementById("seemoreplayers");
-seemore_btn.addEventListener("click", async() => {
-    // if (!NUMPL) {
-    //     NUMPL = window.innerWidth <= 700 ? 5 : 10;
-    // };
-    NUMPL += 5;
-    await makeScoringLeaders(NUMPL);
-});
+async function expandListBtns(data, btns = [
+    {elId: "seemoreplayers", run: increase, build: makeScoringLeaders}, 
+    {elId: "seelessplayers", run: decrease, build: makeScoringLeaders},
+    {elId: "seemoreRGplayers", run: increase, build: makeRGTopScorersTbl}, 
+    {elId: "seelessRGplayers", run: decrease, build: makeRGTopScorersTbl},
+]) {
+    for (let btnObj of btns) {
+        const btn = document.getElementById(btnObj.elId);
+        if (btn) {
+            btn.addEventListener('click', async() => {
+                let newNum = await btnObj.run(NUMPL, 5);
+                console.log(`%c${newNum}`, RED_BOLD)
+                if (btnObj.build === makeScoringLeaders) {
+                    await makeScoringLeaders(newNum);
+                }
+                if (btnObj.build === makeRGTopScorersTbl) {
+                    await makeRGTopScorersTbl(data, newNum);
+                }
+            });
+        }
+    }
+}
+
+async function increase(num, by) {
+    return num += by;
+}
+
+async function decrease(num, by) {
+    return num -= by;
+}
 
 // mobile button: see more top players
-const seeless_btn = document.getElementById("seelessplayers");
-seeless_btn.addEventListener("click", async() => {
-    NUMPL = window.innerWidth <= 700 ? 5 : 10;;
-    await makeScoringLeaders(NUMPL);
-});
+// const seeless_btn = document.getElementById("seelessplayers");
+// seeless_btn.addEventListener("click", async() => {
+//     NUMPL = window.innerWidth <= 700 ? 5 : 10;;
+//     await makeScoringLeaders(NUMPL);
+// });
 
 
 async function numPlByScreenWidth(e, data) {
@@ -79,8 +100,9 @@ export async function buildOnLoadElements() {
     try {
         let js = await getRecentGamesData();
         await foldedLog(`%c fetched games data for ${js.recent_games[0].game_date}`, MSG);
-        await makeRGTopScorersTbl(js, rows_on_load);
+        // await makeRGTopScorersTbl(js, rows_on_load);
         await listenForWindowSize(js, 850);
+        await expandListBtns(js);
         await buildLoadDash(js);
     } catch(err) {
         await foldedLog(`%cerror fetching recent games data: ${err}`, RED_BOLD);
