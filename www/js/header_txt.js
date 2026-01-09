@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 async function mediaQueryMenuSizes(e) {
-    await foldedLog(`%csetting page headers...`, MSG);
+    foldedLog(`%csetting page headers...`, MSG);
     const matches = e.matches ?? mq.matches;
     for (const [elName, val] of Object.entries(toChange)) {
         const el = document.getElementById(elName);
@@ -46,3 +46,4 @@ async function mediaQueryMenuSizes(e) {
         el.textContent = matches ? val.sm_txt : val.lg_txt;
     }
 }
+//# sourceMappingURL=header_txt.js.map

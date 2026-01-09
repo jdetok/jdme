@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function mediaQueryMenuSizes(e: MediaQueryListEvent | MediaQueryList): Promise<void> {
-    await foldedLog(`%csetting page headers...`, MSG)
+    foldedLog(`%csetting page headers...`, MSG);
     const matches = e.matches ?? mq.matches; 
 
     for (const [elName, val] of Object.entries(toChange)) {

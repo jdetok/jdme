@@ -9,13 +9,13 @@ export async function bytes_in_resp(r: Response): Promise<number> {
     return buf.byteLength;
 }
 
-export async function foldedLog(...args: any[]): Promise<void> {
+export function foldedLog(...args: any[]): void {
     console.groupCollapsed(...args);
     console.trace();
     console.groupEnd();
 }
 
-export async function scrollIntoBySize(wpx: number, hpx: number, el: string): Promise<void> {
+export function scrollIntoBySize(wpx: number, hpx: number, el: string): void {
     if (window.innerWidth <= wpx || window.innerHeight <= hpx) {
         let res = document.getElementById(el);
         if (res) {

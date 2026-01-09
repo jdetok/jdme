@@ -16,7 +16,10 @@
     "checkJs": false,
 
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "inlineSourceMap": false
   },
   "include": ["ts/src/**/*"]
 }

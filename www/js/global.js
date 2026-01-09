@@ -6,12 +6,12 @@ export async function bytes_in_resp(r) {
     const buf = await r.clone().arrayBuffer();
     return buf.byteLength;
 }
-export async function foldedLog(...args) {
+export function foldedLog(...args) {
     console.groupCollapsed(...args);
     console.trace();
     console.groupEnd();
 }
-export async function scrollIntoBySize(wpx, hpx, el) {
+export function scrollIntoBySize(wpx, hpx, el) {
     if (window.innerWidth <= wpx || window.innerHeight <= hpx) {
         let res = document.getElementById(el);
         if (res) {
@@ -19,3 +19,4 @@ export async function scrollIntoBySize(wpx, hpx, el) {
         }
     }
 }
+//# sourceMappingURL=global.js.map
