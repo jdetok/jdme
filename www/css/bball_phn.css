@@ -1,11 +1,11 @@
-@media (max-width: 1050px) {
+@media (max-width: 1350px) {
     .static_grid {
         grid-template-columns: 1fr;
         grid-template-rows: repeat(6, auto);
         grid-template-areas:
             "rhdr"
             "ttl"
-            "btn"
+            "jumpbtns"
             "chdr"
             "t"
             "l"
@@ -15,15 +15,10 @@
         justify-items: center;
     }
 
-    /* #jumptosearch {
-        display: block;
-        grid-area: btn;
-    } */
-
     #mobilebtns {
         display: flex;
         flex-direction: row;
-        grid-area: btn;
+        grid-area: jumpbtns;
     }
 
     #seemorelessbtns {
@@ -32,12 +27,6 @@
         grid-area: seemore;
     }
 
-    /* #seemoreplayers {
-        display: flex;
-        flex-direction: row;
-        justify-self: center;
-        grid-area: seemore;
-    } */
     .lhdr {
         display: none;
     }
