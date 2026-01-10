@@ -136,13 +136,6 @@ services:
     networks:
       cfnet:
 
-  # nfstst:
-  #   container_name: nfstst
-  #   image: alpine
-  #   volumes:
-  #     - tst:/ts
-  #   command: sh -c "ls -la /ts && sleep infinity"
-
 # NETWORKS
 networks:
   apinet: 
@@ -190,22 +183,7 @@ volumes:
       type: none
       o: bind
       device: ../www
-  # ngxconf:
-  #   name: ngxconf
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: /nginx/
   cvpublic: 
     name: cvpublic
   cvsrc:
     name: cvsrc
-
-  # tst:
-  #   driver: local
-  #   name: tst
-  #   driver_opts:
-  #     type: nfs
-  #     o: addr=100.107.48.54,nolock,soft,rw
-  #     device: ":/mnt/dekonet/jdme/logs"   
