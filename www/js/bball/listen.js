@@ -5,10 +5,9 @@ import { clearSearch } from "./btns.js";
 import { makeScoringLeaders, makeRGTopScorersTbl, makeTeamRecsTable } from "./tables_onload.js"
 import { searchPlayer, buildLoadDash, getRecentGamesData } from "./player_search.js"
 import { checkBoxEls, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
-import { LoadContent } from "./listeners.js"
 let NUMPL = window.innerWidth <= 700 ? 5 : 10;
 
-await LoadContent();
+// await LoadContent();
 
 // onload content
 document.addEventListener('DOMContentLoaded', async () => {

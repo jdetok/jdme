@@ -1,6 +1,7 @@
 // REPLACES /www/js/bball/util.js
 export const base = "https://dev.jdeko.me/bball";
 export const checkBoxEls = ['post', 'reg', 'nbaTm', 'wnbaTm'];
+export const mediaQueryBreak = 850;
 export const MSG = `color: mediumseagreen;`;
 export const MSG_BOLD = `color: mediumseagreen; font-weight: bold;`;
 export const RED_BOLD = 'color: red; font-weight: bold;';

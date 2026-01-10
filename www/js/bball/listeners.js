@@ -1,8 +1,8 @@
 import { clearSearchBtn, clearSearch, lgRadioBtns, setPHold } from "./btns.js";
-import { base, checkBoxEls, scrollIntoBySize, MSG, foldedLog, MSG_BOLD } from "../global.js";
+import { base, mediaQueryBreak, checkBoxEls, scrollIntoBySize, MSG, foldedLog, MSG_BOLD } from "../global.js";
 import { checkBoxGroupValue, clearCheckBoxes, setupExclusiveCheckboxes } from "./checkbox.js";
 import { fetchPlayer, buildPlayerDash, buildLoadDash } from "./player.js";
-import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
+import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbl.js";
 import { loadSznOptions, loadTeamOptions } from "./selectors.js";
 let NUMROWS = window.innerWidth <= 700 ? 5 : 10;
 export async function LoadContent() {
@@ -10,7 +10,7 @@ export async function LoadContent() {
         foldedLog(`%cloading content for page {${window.innerWidth}px x ${window.innerHeight}px}...`, MSG_BOLD);
         clearSearch();
         await buildOnLoadElements();
-        await listenForWindowSize(NUMROWS);
+        await listenForWindowSize(mediaQueryBreak);
         await clearSearchBtn();
         await searchPlayer();
         await randPlayerBtn();
