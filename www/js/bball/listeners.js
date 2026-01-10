@@ -56,7 +56,7 @@ export async function playerBtnListener(player) {
             await setPHold(js.player[0].player_meta.player);
             await buildPlayerDash(js.player[0], 0);
         }
-        scrollIntoBySize(1350, 900, "player_title");
+        scrollIntoBySize(1350, 1250, "player_title");
     }
 }
 export async function holdPlayerBtn() {
