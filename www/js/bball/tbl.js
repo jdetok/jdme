@@ -6,19 +6,19 @@ export class Tbl {
     elId;
     title;
     rowCount;
-    url;
-    columns;
     data;
-    constructor(elId, title, rowCount, url, columns) {
+    columns;
+    // private data!: T;
+    constructor(elId, title, rowCount, data, columns) {
         this.elId = elId;
         this.title = title;
         this.rowCount = rowCount;
-        this.url = url;
+        this.data = data;
         this.columns = columns;
     }
-    async init() {
-        const r = await fetch(this.url);
-        this.data = await r.json();
+    init() {
+        // const r = await fetch(this.url);
+        // this.data = await r.json();
         this.build();
     }
     build() {
@@ -78,12 +78,12 @@ export async function makeRgTopScorersTbl(numRows) {
     const data = await r.json();
     foldedLog(`attempting to build RgTopScorers table...`);
     console.log(data);
-    new Tbl('tstbl', `Top ${Math.min(numRows, data.top_scorers.length)} Scorers | ${data.recent_games[0].game_date}`, numRows, datasrc, [
+    const rows = Math.min(numRows, data.top_scorers.length);
+    new Tbl('tstbl', `Top ${rows} Scorers | ${data.recent_games[0].game_date}`, rows, data, [
         {
             header: 'rank',
             value: (_, i) => String(i + 1),
-        },
-        {
+        }, {
             header: 'name | team',
             value: (d, i) => {
                 const { player, game } = getRGRow(d, i);
@@ -92,25 +92,19 @@ export async function makeRgTopScorersTbl(numRows) {
             button: {
                 onClick: async (v) => playerBtnListener(v.split(" | ")[0]),
             },
-        },
-        {
+        }, {
             header: 'matchup',
             value: (d, i) => {
                 const { game } = getRGRow(d, i);
                 return game.matchup;
             },
-        },
-        {
+        }, {
             header: 'wl | score',
             value: (d, i) => {
                 const { game } = getRGRow(d, i);
                 return `${game.wl} | ${game.points}-${game.opp_points}`;
             },
-            button: {
-                onClick: async (v) => playerBtnListener(v.split(" | ")[0]),
-            },
-        },
-        {
+        }, {
             header: 'points',
             value: (d, i) => String(d.top_scorers[i].points),
         },
@@ -121,7 +115,7 @@ export async function makeLgTopScorersTbl(numRows) {
     let datasrc = `${base}/league/scoring-leaders?num=${numRows}`;
     let r = await fetch(datasrc);
     const data = await r.json();
-    new Tbl('nba_tstbl', `Scoring Leaders | NBA/WNBA Top ${numRows}`, numRows, datasrc, [
+    new Tbl('nba_tstbl', `Scoring Leaders | NBA/WNBA Top ${numRows}`, numRows, data, [
         {
             header: "rank",
             value: (_, i) => String(i + 1),
@@ -154,7 +148,8 @@ export async function makeTeamRecordsTbl(numRows) {
     let datasrc = `${base}/teamrecs`;
     let r = await fetch(datasrc);
     const data = await r.json();
-    new Tbl("trtbl", "NBA/WNBA Regular Season Team Records", numRows, datasrc, [
+    const rows = Math.min(numRows, data.nba_team_records.length, data.wnba_team_records.length);
+    new Tbl("trtbl", "NBA/WNBA Regular Season Team Records", rows, data, [
         { header: "rank", value: (_, i) => String(i + 1) },
         {
             header: `nba | ${data.nba_team_records[0].season}`,

@@ -1,5 +1,5 @@
 import { clearSearchBtn, clearSearch, lgRadioBtns, setPHold } from "./btns.js";
-import { base, mediaQueryBreak, checkBoxEls, scrollIntoBySize, MSG, foldedLog, MSG_BOLD } from "../global.js";
+import { base, mediaQueryBreak, checkBoxEls, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
 import { checkBoxGroupValue, clearCheckBoxes, setupExclusiveCheckboxes } from "./checkbox.js";
 import { fetchPlayer, buildPlayerDash, buildLoadDash } from "./player.js";
 import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbl.js";
@@ -26,23 +26,25 @@ export async function LoadContent(): Promise<void> {
 export async function buildOnLoadElements() {
     foldedLog(`%c building page load elements for page width ${window.innerWidth}`, MSG);
     const rows_on_load = window.innerWidth <= 700 ? 5 : 10;
-    await makeLgTopScorersTbl(rows_on_load);
-    await makeRgTopScorersTbl(rows_on_load);
-    await makeTeamRecordsTbl(rows_on_load);
-    await setup_jump_btns();
-    await expandListBtns();
+    try {
+        await makeLgTopScorersTbl(rows_on_load);
+        await makeRgTopScorersTbl(rows_on_load);
+        await makeTeamRecordsTbl(rows_on_load);
+        await setup_jump_btns();
+        await expandListBtns();
 
-    await setupExclusiveCheckboxes('post', 'reg');
-    await setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
+        await setupExclusiveCheckboxes('post', 'reg');
+        await setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
 
-    // get seasons/teams from api & load options for the selects
-    foldedLog(`%c loading team/season selectors data...`, MSG)
-    await loadSznOptions();
-    await loadTeamOptions();
+        // get seasons/teams from api & load options for the selects
+        foldedLog(`%c loading team/season selectors data...`, MSG)
+        await loadSznOptions();
+        await loadTeamOptions();
 
-    await lgRadioBtns();
+        await lgRadioBtns();
 
-    await buildLoadDash();
+        await buildLoadDash();
+    } catch (err) {foldedLog(`%cerror building on load elements: ${err}`, RED_BOLD)}
 }
 
 // adds a button listener to each individual player button in the leading scorers
