@@ -1,6 +1,5 @@
 // replaces /www/js/bball/dynamic_table.js
 // dynamic replacement for lg_ldg_scorers.js, rg_ldg_scorer.js, reamrecs.js
-import { foldedLog, MSG } from "../global.js";
 class Tbl {
     constructor(elName, ttl, rows, hdrs, searchFor = null, url) {
         this.el = null;
@@ -68,19 +67,20 @@ class Tbl {
             let row = document.createElement('tr');
             for (let hdr of this.hdrs) {
                 let cell = document.createElement('td');
+                const val = hdr.val(this.data[i], i);
                 if (hdr.btnFn) {
                     let btn = document.createElement('button');
-                    btn.textContent = hdr.vals[i];
                     btn.type = 'button';
+                    btn.textContent = val;
                     if (this.searchFor) {
                         btn.addEventListener('click', async () => {
-                            await hdr.btnFn(this.searchFor ?? hdr.vals[i]);
+                            await hdr.btnFn(this.searchFor ?? val);
                         });
                     }
                     cell.appendChild(btn);
                 }
                 else {
-                    cell.textContent = hdr.vals[i];
+                    cell.textContent = val;
                 }
                 row.appendChild(cell);
             }
@@ -89,67 +89,5 @@ class Tbl {
         return rows;
     }
 }
-export async function buildTbl(ttl) {
-    const tbl = new Tbl(ttl, [
-        new fld()
-    ]);
-}
-// build full table
-export async function buildTableWithHdr(data, element_id, title, fields, rows_to_display, rowfunc) {
-    foldedLog(`%cbuilding table from object with keys: ${Object.keys(data)}...`, MSG);
-    const tbl = document.getElementById(element_id);
-    if (!tbl)
-        throw new Error(`no table element found with element ${element_id}`);
-    tbl.textContent = "";
-    let capt = getTblCaption(title);
-    if (!capt) {
-        throw new Error(`failed making table caption from passed title {${title}}`);
-    }
-    tbl.appendChild(capt);
-    let hdr = getTblHdrRow(fields);
-    if (!hdr) {
-        throw new Error(`failed making header row passed fields: {${console.table(fields)}}`);
-    }
-    tbl.appendChild(hdr);
-    // build each row
-    for (let i = 0; i < rows_to_display; i++) {
-        if (rowfunc) {
-            await rowfunc(tbl, data, i);
-        }
-        else {
-            let row = getTblDataRow();
-        }
-    }
-}
-function getTblCaption(title) {
-    let capt = document.createElement('caption');
-    if (!capt)
-        return null;
-    capt.textContent = title;
-    return capt;
-}
-function getTblHdrRow(fields) {
-    let thead = document.createElement('thead');
-    for (let fld of fields) {
-        let el = document.createElement('td');
-        if (!el)
-            return null;
-        el.textContent = fld;
-        thead.appendChild(el);
-    }
-    return thead;
-}
-function getTblDataRow(idx, cells) {
-    let row = document.createElement('tr');
-    if (!row)
-        return null;
-    for (let cell of cells) {
-        let el = document.createElement('td');
-        if (!el)
-            return null;
-        el.textContent = cell.data;
-        row.appendChild(el);
-    }
-    return row;
-}
-//# sourceMappingURL=bld_tbl.js.map
+export {};
+//# sourceMappingURL=tbl.js.map

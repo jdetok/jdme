@@ -13,3 +13,17 @@ export function clearSearch(): void {
         pSearch.focus();
     });
 }
+
+export async function setPHold(player: string) {
+    const ph = document.getElementById('pHold') as HTMLInputElement;
+    ph.value = player;
+}
+
+export async function lgRadioBtns() {
+    const selected = document.querySelector('input[name="leagues"]:checked') as HTMLInputElement;
+    if (selected) {
+        return selected.value;
+    } else {
+        return 'all';
+    }
+}
