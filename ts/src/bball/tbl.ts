@@ -3,7 +3,7 @@
 
 import { foldedLog, MSG } from "../global.js";
 
-type CellValue<T> = (data: T, idx: number) => string;
+type CellValue<T> = (data: T | any, idx: number) => string;
 
 type Column<T> = {
     header: string;

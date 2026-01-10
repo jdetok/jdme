@@ -13,4 +13,17 @@ export function clearSearch() {
         pSearch.focus();
     });
 }
+export async function setPHold(player) {
+    const ph = document.getElementById('pHold');
+    ph.value = player;
+}
+export async function lgRadioBtns() {
+    const selected = document.querySelector('input[name="leagues"]:checked');
+    if (selected) {
+        return selected.value;
+    }
+    else {
+        return 'all';
+    }
+}
 //# sourceMappingURL=btns.js.map

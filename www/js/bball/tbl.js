@@ -1,93 +1,61 @@
 // replaces /www/js/bball/dynamic_table.js
 // dynamic replacement for lg_ldg_scorers.js, rg_ldg_scorer.js, reamrecs.js
-class Tbl {
-    constructor(elName, ttl, rows, hdrs, searchFor = null, url) {
-        this.el = null;
-        this.data = [];
-        this.btnFunc = null;
-        this.elName = elName;
-        this.title = ttl;
-        this.rowNum = rows;
-        this.hdrs = hdrs;
-        this.searchFor = searchFor;
+export class Tbl {
+    constructor(elId, title, rowCount, url, columns) {
+        this.elId = elId;
+        this.title = title;
+        this.rowCount = rowCount;
         this.url = url;
-        this.getData();
+        this.columns = columns;
+    }
+    async init() {
+        const r = await fetch(this.url);
+        this.data = await r.json();
         this.build();
     }
-    async getData() {
-        try {
-            const r = await fetch(this.url);
-            let js = await r.json();
-            this.data = js;
-        }
-        catch (ex) {
-            throw new Error(`failed getting data from ${this.url}: ${ex}`);
-        }
-    }
     build() {
-        let tbl = document.getElementById(this.elName);
-        if (!tbl)
-            throw new Error(`failed to find table element with id: ${this.elName}:`);
-        let tblCapt = this.makeTitle();
-        if (!tblCapt)
-            throw new Error(`failed creating caption: ${this.title}`);
-        tbl.appendChild(tblCapt);
-        let hdrRow = this.makeHdrRow();
-        if (!hdrRow)
-            throw new Error(`failed to create header row: ${this.hdrs}`);
-        tbl.appendChild(hdrRow);
-        let rows = this.makeRows();
-        if (!rows)
-            throw new Error(`failed to make data rows`);
-        for (let row of rows) {
-            tbl.appendChild(row);
+        let tbl = document.getElementById(this.elId);
+        tbl.innerHTML = '';
+        tbl.appendChild(this.makeTitle());
+        tbl.appendChild(this.makeHdrRow());
+        for (let i = 0; i < this.rowCount; i++) {
+            tbl.appendChild(this.makeRow(i));
         }
     }
     makeTitle() {
         let capt = document.createElement('caption');
-        if (!capt)
-            return null;
         capt.textContent = this.title;
         return capt;
     }
     makeHdrRow() {
-        let thead = document.createElement('thead');
-        for (let hdr of this.hdrs) {
-            let el = document.createElement('td');
-            if (!el)
-                return null;
-            el.textContent = hdr.txt;
-            thead.appendChild(el);
+        const thead = document.createElement('thead');
+        const tr = document.createElement('tr');
+        for (const col of this.columns) {
+            const td = document.createElement('td');
+            td.textContent = col.header;
+            tr.appendChild(td);
         }
+        thead.appendChild(tr);
         return thead;
     }
-    makeRows() {
-        let rows = [];
-        for (let i = 0; i < this.rowNum; i++) {
-            let row = document.createElement('tr');
-            for (let hdr of this.hdrs) {
-                let cell = document.createElement('td');
-                const val = hdr.val(this.data[i], i);
-                if (hdr.btnFn) {
-                    let btn = document.createElement('button');
-                    btn.type = 'button';
-                    btn.textContent = val;
-                    if (this.searchFor) {
-                        btn.addEventListener('click', async () => {
-                            await hdr.btnFn(this.searchFor ?? val);
-                        });
-                    }
-                    cell.appendChild(btn);
-                }
-                else {
-                    cell.textContent = val;
-                }
-                row.appendChild(cell);
+    makeRow(idx) {
+        const tr = document.createElement("tr");
+        this.columns.forEach(col => {
+            const td = document.createElement('td');
+            const val = col.value(this.data, idx);
+            if (col.button) {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.textContent = val;
+                btn.onclick = () => col.button.onClick(val, this.data, idx);
+                td.appendChild(btn);
             }
-            rows.push(row);
-        }
-        return rows;
+            else {
+                td.textContent = val;
+            }
+            tr.appendChild(td);
+        });
+        return tr;
     }
 }
-export {};
 //# sourceMappingURL=tbl.js.map
