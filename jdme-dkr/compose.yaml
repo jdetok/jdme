@@ -97,12 +97,13 @@ services:
       - applog_dbg:/app/z_log/dbg
       - appdata:/app/persist
 
+
 # REVERSE PROXY
   nginx:
     container_name: nginx
     build:
-      context: nginx/.
-      dockerfile: nginx.Dockerfile
+      context: ..
+      dockerfile: jdme-dkr/nginx/nginx.Dockerfile
     image: jdme-nginx
     depends_on:
       api:

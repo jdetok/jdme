@@ -4,7 +4,8 @@
   "description": "- ## written & maintained by Justin DeKock      jdeko17@gmail.com | [jdetok on github](https://github.com/jdetok)     ### visit the site:      - [jdeko.me home page](https://jdeko.me)     - [nba/wnba stats page](https://jdeko.me/bball)     - [main about page](https://jdeko.me/about)     - [nba/wnba stats about page](https://jdeko.me/bball/about)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
