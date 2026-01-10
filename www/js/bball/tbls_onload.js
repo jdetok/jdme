@@ -40,7 +40,7 @@ export async function makeLgTopScorersTbl(numRows) {
     ]).init();
 }
 export async function makeRgTopScorersTbl(numRows) {
-    let datasrc = `${base}/league/scoring-leaders?num=${numRows}`;
+    let datasrc = `${base}/games/recent`;
     let r = await fetch(datasrc);
     const data = await r.json();
     new Tbl('tstbl', `Top ${numRows} Scorers | ${data.recent_games[0].game_date}`, numRows, datasrc, [

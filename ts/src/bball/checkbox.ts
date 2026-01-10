@@ -5,9 +5,7 @@ export async function checkBoxGroupValue(lgrp, rgrp, dflt) {
     if (l) return l;
     if (r) return r;
     
-    // 88888 for season, 0 for team
     return dflt;
-    // return `2${new Date().getFullYear()}`;
 }
 
 export async function checkBoxes(box: string, sel: string) {
@@ -27,4 +25,19 @@ export async function clearCheckBoxes(boxes: string[]) {
         if (!b) throw new Error(`couldn't find input element with id ${boxes[i]}`);
         b.checked = false;
     }
+}
+
+// make post + reg checkboxes exclusive (but allow neither checked)
+export async function setupExclusiveCheckboxes(leftbox, rightbox) {
+    let lbox = document.getElementById(leftbox) as HTMLInputElement;
+    let rbox = document.getElementById(rightbox) as HTMLInputElement;
+    if (!lbox || !rbox) throw new Error(`couldn't get ${lbox} or ${rbox}`);
+    function handleCheck(e) {
+        if (e.target.checked) {
+            if (e.target === lbox) rbox.checked = false;
+            if (e.target === rbox) lbox.checked = false;
+        }
+    }
+    lbox.addEventListener("change", handleCheck);
+    rbox.addEventListener("change", handleCheck);
 }

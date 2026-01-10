@@ -1,6 +1,12 @@
 // replaces /www/js/bball/dynamic_table.js
 // dynamic replacement for lg_ldg_scorers.js, rg_ldg_scorer.js, reamrecs.js
 export class Tbl {
+    elId;
+    title;
+    rowCount;
+    url;
+    columns;
+    data;
     constructor(elId, title, rowCount, url, columns) {
         this.elId = elId;
         this.title = title;

@@ -1,4 +1,5 @@
-import { bytes_in_resp, MSG, foldedLog } from "../global.js";
+import { base, bytes_in_resp, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
+import { lgRadioBtns } from "./btns.js";
 import { tblColHdrs, tblRowColHdrs } from "./tbls_resp.js";
 // html elements to fill
 const PLAYER_DASH_ELS = {
@@ -15,7 +16,29 @@ const PLAYER_DASH_ELS = {
         avg_shooting: 'avg-shooting',
     },
 };
-export async function fetchPlayer(base, player, season, team, lg, errEl) {
+// get the top scorer from each game from the most recent night where games occured
+// (usually dated yesterday, but when no games occur it'll get the most recent day
+// where games did occur). called on page load, it creates a table with all these
+// scorers and immediately grabs and loads the player dash for the top overall 
+// scorer. use season id 88888 in getP to get most recent season
+export async function getRecentGamesData() {
+    const url = `${base}/games/recent`;
+    const r = await fetch(url);
+    if (!r.ok) {
+        console.error(`%cerror fetching ${url}`, RED_BOLD);
+    }
+    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
+    return await r.json();
+}
+export async function buildLoadDash() {
+    const data = await getRecentGamesData();
+    const top_scorer = data.top_scorers[0].player_id;
+    const lg = await lgRadioBtns();
+    let js = await fetchPlayer(base, top_scorer, 88888, 0, lg);
+    await buildPlayerDash(js.player[0], data);
+}
+export async function fetchPlayer(base, player, season, team, lg) {
+    const errEl = 'sErr';
     const errmsg = document.getElementById(errEl); // sErr is elId
     if (!errmsg)
         throw new Error(`%ccould not find error string element at ${errEl}`);

@@ -1,17 +1,21 @@
 // replace some of /www/js/bball/ui.js
 // import { base, checkBoxEls, foldedLog, MSG, scrollIntoBySize } from "../global.js";
 
-
-export function clearSearch(): void {
+export async function clearSearchBtn(): Promise<void> {
     const btn = document.getElementById('clearS');
     if (!btn) return;
     btn.addEventListener('click', (event) => {
         event.preventDefault();
-        let pSearch = document.getElementById('pSearch');
-        if (!pSearch) return;
-        pSearch.textContent = '';
-        pSearch.focus();
+        clearSearch(true);
     });
+}
+
+export function clearSearch(focus=false): void {
+    const elId = 'pSearch';
+    const pSearch = document.getElementById(elId) as HTMLInputElement;
+    if (!pSearch) throw new Error(`couldn't get search bar element at ${elId}`);
+    pSearch.value = '';
+    if (focus) pSearch.focus();
 }
 
 export async function setPHold(player: string) {

@@ -10,7 +10,6 @@ const getRGRow = (d: any, i: number) => {
     return { player, game };
 };
 
-
 export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
     let datasrc = `${base}/league/scoring-leaders?num=${numRows}`;
     let r = await fetch(datasrc);
@@ -50,7 +49,7 @@ export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
 }
 
 export async function makeRgTopScorersTbl(numRows: number): Promise<void> {
-    let datasrc = `${base}/league/scoring-leaders?num=${numRows}`;
+    let datasrc = `${base}/games/recent`;
     let r = await fetch(datasrc);
     const data = await r.json();
     new Tbl(

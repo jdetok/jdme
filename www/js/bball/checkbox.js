@@ -27,4 +27,21 @@ export async function clearCheckBoxes(boxes) {
         b.checked = false;
     }
 }
+// make post + reg checkboxes exclusive (but allow neither checked)
+export async function setupExclusiveCheckboxes(leftbox, rightbox) {
+    let lbox = document.getElementById(leftbox);
+    let rbox = document.getElementById(rightbox);
+    if (!lbox || !rbox)
+        throw new Error(`couldn't get ${lbox} or ${rbox}`);
+    function handleCheck(e) {
+        if (e.target.checked) {
+            if (e.target === lbox)
+                rbox.checked = false;
+            if (e.target === rbox)
+                lbox.checked = false;
+        }
+    }
+    lbox.addEventListener("change", handleCheck);
+    rbox.addEventListener("change", handleCheck);
+}
 //# sourceMappingURL=checkbox.js.map

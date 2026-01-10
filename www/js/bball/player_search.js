@@ -14,10 +14,6 @@ export async function getRecentGamesData() {
         console.error(`%cerror fetching ${url}`, YLW_BOLD);
     }
     await foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
-    // console.groupCollapsed(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
-    // console.trace();
-    // console.groupEnd();
-    // console.trace(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD)
 
     const data = await r.json();
     if (data) {
