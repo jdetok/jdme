@@ -5,9 +5,7 @@ export async function checkBoxGroupValue(lgrp, rgrp, dflt) {
         return l;
     if (r)
         return r;
-    // 88888 for season, 0 for team
     return dflt;
-    // return `2${new Date().getFullYear()}`;
 }
 export async function checkBoxes(box, sel) {
     const b = document.getElementById(box);

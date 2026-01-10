@@ -1,5 +1,5 @@
 import { Tbl } from "./tbl.js"
-import { base } from "../global.js";
+import { base, foldedLog } from "../global.js";
 import { playerBtnListener } from "./listeners.js";
 
 const getRGRow = (d: any, i: number) => {
@@ -52,9 +52,11 @@ export async function makeRgTopScorersTbl(numRows: number): Promise<void> {
     let datasrc = `${base}/games/recent`;
     let r = await fetch(datasrc);
     const data = await r.json();
+    foldedLog(`attempting to build RgTopScorers table...`);
+    console.log(data);
     new Tbl(
         'tstbl', 
-        `Top ${numRows} Scorers | ${data.recent_games[0].game_date}`,
+        `Top ${Math.min(numRows, data.top_scorers.length)} Scorers | ${data.recent_games[0].game_date}`,
         numRows, datasrc, [
             {
                 header: 'rank',
@@ -93,7 +95,7 @@ export async function makeRgTopScorersTbl(numRows: number): Promise<void> {
                 value: (d, i) => String(d.top_scorers[i].points),
             },
         ]
-    )
+    ).init();
 }
 
 export async function makeTeamRecordsTbl(numRows: number): Promise<void> {

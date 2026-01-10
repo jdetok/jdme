@@ -76,8 +76,6 @@ export async function fetchPlayer(base, player, season, team, lg) {
 }
 // accept player dash data, build tables/fetch images and display on screen
 export async function buildPlayerDash(data, ts, el = PLAYER_DASH_ELS) {
-    // console.trace(data);
-    // console.trace(`%cts: ${ts ? ts : 'ts var empty'}`, FUSC);
     foldedLog(`%cts: ${ts ? `fetching top scorer from ${ts.recent_games[0].game_date}` : 'no ts var, normal fetch'}`, MSG);
     await appendImg(data.player_meta.headshot_url, el.img.player);
     await appendImg(data.player_meta.team_logo_url, el.img.team);
