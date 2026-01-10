@@ -10,7 +10,6 @@
             "t"
             "l"
             "r"
-            "seemore"
             "m";
         justify-items: center;
     }
@@ -24,7 +23,6 @@
     #seemorelessbtns {
         display: flex;
         flex-direction: row;
-        grid-area: seemore;
     }
 
     .lhdr {

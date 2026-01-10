@@ -11,21 +11,22 @@
   <link rel="stylesheet" href="/css/style_phn.css">
   <link rel="stylesheet" href="/css/bball.css">
   <link rel="stylesheet" href="/css/bball_phn.css">
-  <script type="module" src="/js/listen.js"></script>
-  <script type="module" src="/js/bball/listen.js" defer></script>
+  <script type="module" src="/js/header_txt.js"></script>
+  <!-- <script type="module" src="/js/bball/listen.js" defer></script> -->
+  <script type="module" src="/js/bball/bball.js" defer></script>
 </head>
 
 <header class="menu">
     <div class="left">
-      <a id="home" href="https://jdeko.me/">jdeko.me</a>  
-      <a id="abt" href="https://jdeko.me/about/">about jdeko.me</a>  
+      <a id="home" href="https://dev.jdeko.me/">jdeko.me</a>  
+      <a id="abt" href="https://dev.jdeko.me/about/">about jdeko.me</a>  
         
     </div>
     <div class="middle">
       <a id="src" target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a>
     </div>
     <div class="right">
-        <a id="tech" href="https://jdeko.me/tech">tech stack</a>
+        <a id="tech" href="https://dev.jdeko.me/tech">tech stack</a>
         <a id="github" target="_blank" href="https://github.com/jdetok">jdetok on github</a>
     </div>
 </header>
@@ -41,6 +42,10 @@
     <!-- TOP SCORERS FROM RECENTS GAMES TABLE -->
     <div class="top_sect_tbls" id="top_players">
       <table class="tstbl" id="tstbl"></table>
+      <div class="btnshoriz" id="seemorelessRGbtns">
+        <button id="seemoreRGplayers">see more top scorers</button>
+        <button id="seelessRGplayers">see less top scorers</button>
+      </div>
     </div>
     <!-- TEAM RECORDS TABLE -->
     <div class="top_sect_tbls" id="team_recs_tbl">
@@ -53,10 +58,10 @@
 
     <!-- MAIN UI ELEMENTS -->
     <form id="ui">
-      <div class="helpbox">
+      <!-- <div class="helpbox">
         press the corresponding season checkbox to filter by season 
         defaults to current regular season if left unchecked
-      </div>
+      </div> -->
       <!-- SEASON SELECTORS -->
       <div class="uirowouter"> 
         <!-- POST SEASONS -->

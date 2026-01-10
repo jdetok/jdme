@@ -77,10 +77,10 @@ select {
     grid-template-rows: repeat(4, auto);
     grid-template-areas:
     'lhdr chdr rhdr'
-    'l ttl r'
-    'l jumpbtns r'
-    'l t r'
-    'l m r'
+    't ttl r'
+    't jumpbtns r'
+    't l r'
+    't m r'
     '. m r'
     '. . r'
     ;

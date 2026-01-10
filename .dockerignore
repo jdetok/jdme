@@ -1,4 +1,4 @@
-jdme-dkr/
+# jdme-dkr/
 scripts/
 z_docs/
 z_logs/
@@ -10,7 +10,7 @@ tmp/
 .github/
 wiki/
 static/
-www/
+# www/
 .git/
 .gitignore
 .dockerignore

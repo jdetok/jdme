@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+
+    "verbatimModuleSyntax": false,
+
+    "rootDir": "ts/src",
+    "outDir": "www/js",
+
+    "strict": true,
+    "noImplicitAny": false,
+
+    "allowJs": true,
+    "checkJs": false,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "inlineSources": true,
+    "inlineSourceMap": false
+  },
+  "include": ["ts/src/**/*"]
+}

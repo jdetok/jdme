@@ -97,12 +97,13 @@ services:
       - applog_dbg:/app/z_log/dbg
       - appdata:/app/persist
 
+
 # REVERSE PROXY
   nginx:
     container_name: nginx
     build:
-      context: nginx/.
-      dockerfile: nginx.Dockerfile
+      context: ..
+      dockerfile: jdme-dkr/nginx/nginx.Dockerfile
     image: jdme-nginx
     depends_on:
       api:
@@ -134,13 +135,6 @@ services:
     command: tunnel --config /etc/cloudflared/config.yml run
     networks:
       cfnet:
-
-  # nfstst:
-  #   container_name: nfstst
-  #   image: alpine
-  #   volumes:
-  #     - tst:/ts
-  #   command: sh -c "ls -la /ts && sleep infinity"
 
 # NETWORKS
 networks:
@@ -189,22 +183,7 @@ volumes:
       type: none
       o: bind
       device: ../www
-  # ngxconf:
-  #   name: ngxconf
-  #   driver: local
-  #   driver_opts:
-  #     type: none
-  #     o: bind
-  #     device: /nginx/
   cvpublic: 
     name: cvpublic
   cvsrc:
     name: cvsrc
-
-  # tst:
-  #   driver: local
-  #   name: tst
-  #   driver_opts:
-  #     type: nfs
-  #     o: addr=100.107.48.54,nolock,soft,rw
-  #     device: ":/mnt/dekonet/jdme/logs"   
