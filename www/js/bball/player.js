@@ -1,5 +1,5 @@
-import { base, bytes_in_resp, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
-import { lgRadioBtns } from "./btns.js";
+import { base, bytes_in_resp, scrollIntoBySize, checkBoxEls, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
+import { lgRadioBtns, clearCheckBoxes, setPHold, getInputVals } from "./inputs.js";
 import { tblColHdrs, tblRowColHdrs } from "./tbls_resp.js";
 // html elements to fill
 const PLAYER_DASH_ELS = {
@@ -16,6 +16,59 @@ const PLAYER_DASH_ELS = {
         avg_shooting: 'avg-shooting',
     },
 };
+export async function handleRandomPlayer(event) {
+    event.preventDefault();
+    const { lg, season, team } = await getInputVals();
+    foldedLog(`%c searching random player | league: ${lg} | season ${season}`, MSG);
+    let js = await fetchPlayer(base, 'random', season, team, lg);
+    if (js) {
+        await buildPlayerDash(js.player[0], 0);
+        await setPHold(js.player[0].player_meta.player);
+        scrollIntoBySize(1350, 900, "player_title");
+    }
+}
+// adds a button listener to each individual player button in the leading scorers
+// tables. have to create a button, do btn.AddEventListener, and call this function
+// within that listener. will insert the player's name in the search bar and call getP
+export async function playerBtnListener(player, elId = 'pSearch') {
+    let searchB = document.getElementById(elId);
+    if (!searchB)
+        throw new Error(`can't find element at ${elId}`);
+    await clearCheckBoxes(checkBoxEls);
+    const { lg, season, team } = await getInputVals();
+    // search & clear player search bar
+    let js = await fetchPlayer(base, player, season, team, lg);
+    if (js) {
+        await setPHold(js.player[0].player_meta.player);
+        await buildPlayerDash(js.player[0], 0);
+    }
+    scrollIntoBySize(1350, 1250, "player_title");
+}
+export async function handlePlayerSearch(event) {
+    event.preventDefault();
+    // get value of player search box
+    const searchElId = 'pSearch';
+    const input = document.getElementById(searchElId);
+    if (!input)
+        throw new Error(`couldn't get element at Id ${searchElId}`);
+    const { lg, season, team } = await getInputVals();
+    let player = input.value.trim();
+    // if search pressed without anything in search box, searches current player
+    if (player === '') {
+        const pHoldElId = 'pHold';
+        const pHoldEl = document.getElementById(pHoldElId);
+        player = pHoldEl.value;
+    }
+    foldedLog(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
+    // build response player dash section
+    let js = await fetchPlayer(base, player, season, team, lg);
+    if (js) {
+        await setPHold(js.player[0].player_meta.player);
+        await buildPlayerDash(js.player[0], 0);
+    }
+}
+export async function handlePlayerBtn(event) {
+}
 // get the top scorer from each game from the most recent night where games occured
 // (usually dated yesterday, but when no games occur it'll get the most recent day
 // where games did occur). called on page load, it creates a table with all these

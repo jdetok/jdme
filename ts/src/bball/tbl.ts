@@ -1,8 +1,8 @@
 // replaces /www/js/bball/dynamic_table.js
 // dynamic replacement for lg_ldg_scorers.js, rg_ldg_scorer.js, reamrecs.js
 
-import { playerBtnListener } from "./listeners.js";
-import { base, foldedLog, MSG } from "../global.js";
+import { playerBtnListener } from "./player.js";
+import { base, foldedLog } from "../global.js";
 
 type CellValue<T> = (data: T | any, idx: number) => string;
 

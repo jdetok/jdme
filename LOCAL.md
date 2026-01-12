@@ -6,7 +6,7 @@
 - tree command , -I flag to ignore files/dirs
     - **FIRST, LOAD THIS ENV VAR:**
     - `
-export EXCTR='*.sql|z_*|*.md|sql|wiki|*.png'
+export EXCTR='*.sql|z_*|*.md|sql|wiki|*.png|node*'
     `
         - `
 tree -I $EXCTR
