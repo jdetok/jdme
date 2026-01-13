@@ -1,4 +1,4 @@
-import { Tbl } from "./tbl";
+import { Tbl } from "./tbl.js";
 import { searchPlayer } from "./player.js";
 import { base, foldedLog } from "../global.js";
 const getRGRow = (d, i) => {

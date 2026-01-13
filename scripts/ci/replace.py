@@ -10,7 +10,7 @@ PROD_URL = "https://jdeko.me/"
 LOCL_URL = "https://dev.jdeko.me/"
 # LOCL_URL = "http://localhost/"
 URLS_EXCL = [".git", "wiki", "log", "z_log", "puml", "bin"]
-URLS_FTYP = [".js", ".html", ".css", ".yaml"]
+URLS_FTYP = [".js", ".ts", ".html", ".css", ".yaml"]
 PROD_CPU = "arm64"
 LOCL_CPU = "amd64"
 
