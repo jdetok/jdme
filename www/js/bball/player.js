@@ -16,6 +16,23 @@ const PLAYER_DASH_ELS = {
         avg_shooting: 'avg-shooting',
     },
 };
+// get the top scorer from each game from the most recent night where games occured
+// (usually dated yesterday, but when no games occur it'll get the most recent day
+// where games did occur). called on page load, it creates a table with all these
+// scorers and immediately grabs and loads the player dash for the top overall 
+// scorer. use season id 88888 in getP to get most recent season
+export async function getRecentGamesData() {
+    const url = `${base}/games/recent`;
+    const r = await fetch(url);
+    if (!r.ok) {
+        console.error(`%cerror fetching ${url}`, RED_BOLD);
+    }
+    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
+    return await r.json();
+}
+export async function buildOnLoadDash() {
+    await searchPlayer('onload');
+}
 export async function searchPlayer(pst = 'submit', playerOverride) {
     const searchElId = 'pSearch';
     const input = document.getElementById(searchElId);
@@ -65,23 +82,6 @@ export async function searchPlayer(pst = 'submit', playerOverride) {
         if (pst !== 'onload')
             scrollIntoBySize(1350, 1250, "player_title");
     }
-}
-// get the top scorer from each game from the most recent night where games occured
-// (usually dated yesterday, but when no games occur it'll get the most recent day
-// where games did occur). called on page load, it creates a table with all these
-// scorers and immediately grabs and loads the player dash for the top overall 
-// scorer. use season id 88888 in getP to get most recent season
-export async function getRecentGamesData() {
-    const url = `${base}/games/recent`;
-    const r = await fetch(url);
-    if (!r.ok) {
-        console.error(`%cerror fetching ${url}`, RED_BOLD);
-    }
-    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
-    return await r.json();
-}
-export async function buildLoadDash() {
-    await searchPlayer('onload');
 }
 export async function fetchPlayer(base, player, season, team, lg) {
     const errEl = 'sErr';
