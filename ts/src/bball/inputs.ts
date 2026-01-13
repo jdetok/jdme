@@ -1,5 +1,5 @@
 import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbl.js";
-import { base } from "../global.js";
+import { base, RED_BOLD } from "../global.js";
 
 const WINDOWSIZE = 700;
 let exBtnsInitComplete = false;
@@ -152,6 +152,10 @@ export async function holdPlayerBtn(elId = 'holdP') {
         const hold = document.getElementById(holdElId) as HTMLInputElement;
         if (!hold) throw new Error(`couldn't get input element at ${holdElId}`);
         let player = hold.value;
+        if (player === '') {
+            console.error(`%chold button pressed, empty string in ${holdElId}`, RED_BOLD);
+            return;
+        }
 
         const searchElId = 'pSearch';
         let search = document.getElementById(searchElId) as HTMLInputElement;

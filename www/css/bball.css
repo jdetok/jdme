@@ -131,8 +131,46 @@ select {
     padding: 10px;
     align-self: end;
     gap: 10px;
+    grid-template-areas: 
+    'select_szns'
+    'select_teams'
+    'lg_radio_btns'
+    'player_in'
+    'clear' 'hold'
+    'random' 
+    ;
 }
 
+#select_szns {
+    grid-area: select_szns;
+}
+#select_teams {
+    grid-area: select_teams;
+}
+#lg_radio_btns {
+    grid-area: lg_radio_btns;
+}
+#searchplayer {
+    grid-area: player_in;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 0 auto;
+    width: fit-content;
+    /* /* max-width: 100%; */
+}
+/* #search {
+    grid-area: search
+} */
+#clearS {
+    grid-area: clear;
+}
+#holdP {
+    grid-area: hold;
+}
+#randP {
+    grid-area: random;
+}
 .uirowouter {
     display: flex;
     flex-direction: row;
@@ -156,14 +194,7 @@ select {
     max-width: 100%;
 }
 
-#search_group {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin: 0 auto;
-    width: fit-content;
-    max-width: 100%;
-}
+
 
 /* RESPONSE CLASSES */
 /* meant to be outermost of response */

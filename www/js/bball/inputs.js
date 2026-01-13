@@ -2,6 +2,7 @@ import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./
 import { base } from "../global.js";
 const WINDOWSIZE = 700;
 let exBtnsInitComplete = false;
+// counter class for number of rows displayed per table
 class rowNum {
     val;
     min;
@@ -27,6 +28,7 @@ class rowNum {
     };
 }
 ;
+// tracks row counters for both top scorer tables
 export class rowsState {
     lgRowNum;
     rgRowNum;
@@ -133,9 +135,7 @@ export async function clearSearchBtn() {
     });
 }
 // BUTTONS SECTION
-export async function holdPlayerBtn() {
-    // listen for hold player button press
-    const elId = 'holdP';
+export async function holdPlayerBtn(elId = 'holdP') {
     const btn = document.getElementById(elId);
     if (!btn)
         throw new Error(`couldn't get button element at ${elId}`);
@@ -147,6 +147,10 @@ export async function holdPlayerBtn() {
         if (!hold)
             throw new Error(`couldn't get input element at ${holdElId}`);
         let player = hold.value;
+        if (player === '') {
+            console.error(`%chold button pressed, empty string in ${holdElId}`);
+            return;
+        }
         const searchElId = 'pSearch';
         let search = document.getElementById(searchElId);
         search.value = player;
@@ -190,7 +194,6 @@ export async function lgRadioBtns() {
 }
 export async function getInputVals() {
     const lg = await lgRadioBtns();
-    // check season boxes & get appropriate season id, search with random as player
     const season = await checkBoxGroupValue({ box: 'post', slct: 'ps_slct' }, { box: 'reg', slct: 'rs_slct' }, 88888);
     const team = await checkBoxGroupValue({ box: 'nbaTm', slct: 'tm_slct' }, { box: 'wnbaTm', slct: 'wTm_slct' }, 0);
     return { lg, season, team };

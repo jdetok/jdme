@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -64,7 +63,7 @@
     <!-- UI FORM WITH SELECTORS/INPUTS -->
     <form id="ui">
       <!-- SEASON SELECTORS -->
-      <div class="uirowouter"> 
+      <div class="uirowouter" id="select_szns"> 
         <div class="uiopt" id="psdiv">
           <label for="post">post-seasons:</label>
           <div class="uiel"> 
@@ -81,7 +80,7 @@
         </div>
       </div>
       <!-- TEAM SELECTORS -->
-      <div class="uirowouter"> 
+      <div class="uirowouter" id="select_teams"> 
         <div class="uiopt" id="teams"> 
           <label for="nbaTm">nba teams:</label>
           <div class="uiel"> 
@@ -98,7 +97,7 @@
         </div>
       </div> 
       <!-- LEAGUE RADIO BUTTONS (NBA | WNBA | BOTH) -->
-      <div id="lg_radio"> 
+      <div id="lg_radio_btns"> 
         <input type="radio" id="nba" name="leagues" value="nba" />
         <label for="nba">NBA</label>
         <input type="radio" id="wnba" name="leagues" value="wnba" />
@@ -107,22 +106,20 @@
         <label for="all_lgs">Both</label>
       </div>
       <!-- CLUSTER OF PLAYER INPUT BOX, SEARCH BUTTONS -->
-      <div id="search_group">
+      <div id="searchplayer">
         <div class="err" id="sErr"></div>
         <input type="text" style="display:none;" id="pHold">
-        <div class="uiel">
-          <input type="text" id="pSearch" placeholder="Search for a player">
-          <button type="submit" id="search">search player</button>
-        </div>
-        <!-- SEARCH PLAYER BUTTON | HOLD PLAYER BUTTON -->
-        <div class="uiel">
-          <button type="button" id="clearS">clear search</button>          
-          <button type="button" id="holdP">hold current player</button>
-        </div>
-        <!-- RANDOM PLAYER BUTTON -->
-        <div class="uiel">
-          <button type="button" id="randP">search for a random player</button>
-        </div>
+        <input type="text" id="pSearch" placeholder="Search for a player">
+        <button type="submit" id="search">search player</button>
+      </div>
+      <!-- SEARCH PLAYER BUTTON | HOLD PLAYER BUTTON -->
+      <div class="uiel">
+        <button type="button" id="clearS">clear search</button>          
+        <button type="button" id="holdP">hold current player</button>
+      </div>
+      <!-- RANDOM PLAYER BUTTON -->
+      <div class="uiel">
+        <button type="button" id="randP">search for a random player</button>
       </div>
     </form>
   </div>
