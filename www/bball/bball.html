@@ -34,6 +34,9 @@
 <!-- TOP HALF OF SITE (BEFORE RESPONSE SECTION) -->
   
   <div class="static_grid">
+    <div id="site_title">
+      jdeko.me/bball<br>nba/wnba statistics
+    </div>
     <div class="btnshoriz" id="mobilebtns">
       <button id="jumptoresp">jump to current player</button>
       <button id="jumptosearch">jump to player search</button>
@@ -50,20 +53,18 @@
     <div class="tablewithbtns" id="team_recs_tbl">
       <table class="ranktbl" id="trtbl"></table>
     </div>
-    <!-- SITE TITLE -->
-    <div id="site_title">
-      jdeko.me/bball<br>nba/wnba statistics
+    <!-- LEAGUE/SEASON LEADING SCORERS TABLE -->
+    <div class="tablewithbtns" id="top_lg_players">
+      <table class="ranktbl" id="nba_tstbl"></table>
+      <div class="btnshoriz" id="seemorelessbtns">
+        <button id="seemoreplayers">see more top scorers</button>
+        <button id="seelessplayers">see less top scorers</button>
+      </div>
     </div>
-
-    <!-- MAIN UI ELEMENTS -->
+    <!-- UI FORM WITH SELECTORS/INPUTS -->
     <form id="ui">
-      <!-- <div class="helpbox">
-        press the corresponding season checkbox to filter by season 
-        defaults to current regular season if left unchecked
-      </div> -->
       <!-- SEASON SELECTORS -->
       <div class="uirowouter"> 
-        <!-- POST SEASONS -->
         <div class="uiopt" id="psdiv">
           <label for="post">post-seasons:</label>
           <div class="uiel"> 
@@ -71,7 +72,6 @@
             <input type="checkbox" id="post">
           </div>
         </div>
-        <!-- REGULAR SEASONS -->
         <div class="uiopt" id="rsdiv">
           <label for="reg">regular seasons:</label>
           <div class="uiel">
@@ -80,13 +80,8 @@
           </div>
         </div>
       </div>
-      <!-- <div class="helpbox">
-        team filter will return player's career stats with selected team 
-        if team checkbox is checked
-      </div>  -->
       <!-- TEAM SELECTORS -->
       <div class="uirowouter"> 
-        <!-- NBA TEAMS -->
         <div class="uiopt" id="teams"> 
           <label for="nbaTm">nba teams:</label>
           <div class="uiel"> 
@@ -94,7 +89,6 @@
             <input type="checkbox" id="nbaTm">
           </div>
         </div>
-        <!-- WNBA TEAMS -->
         <div class="uiopt" id="wTeams"> 
           <label for="wnbaTm">wnba teams:</label>
           <div class="uiel">
@@ -131,21 +125,12 @@
         </div>
       </div>
     </form>
-    <!-- LEADING SCORERS TABLE -->
-    <div class="tablewithbtns" id="top_lg_players">
-      <table class="ranktbl" id="nba_tstbl"></table>
-      <div class="btnshoriz" id="seemorelessbtns">
-        <button id="seemoreplayers">see more top scorers</button>
-        <button id="seelessplayers">see less top scorers</button>
-      </div>
-    </div>
   </div>
 
   <!-- RESPONSE -->
   <div class="response">
-    <!-- RESPONSE PLAYER/TEAM LABEL -->
     <div class="resptitle" id="player_title"></div>
-    <!-- RESPONSE SECTION 1 (LEFT HALF) -->
+    <!-- PLAYER/TEAM IMAGES FROM RESPONSE -->
     <div class="respsect">
       <div id="player_szn"></div>
       <div class="respimgs" id="imgs">
@@ -153,15 +138,13 @@
         <div id="pl_img"></div>
       </div>
     </div>
-    <!-- RESPONSE SECTION 2 (RIGHT HALF) -->
-    <!-- <div class="respsect" id="stats"> -->
-      <div class="resptbls" id="stats">
-        <div class="resptbl" id="box"></div>
-        <div class="resptbl" id="avg-box"></div>
-        <div class="resptbl" id="shooting"></div>
-        <div class="resptbl" id="avg-shooting"></div>
-      </div>
-    <!-- </div> -->
+    <!-- STATS TABLES FROM RESPONSE  -->
+    <div class="resptbls" id="stats">
+      <div class="resptbl" id="box"></div>
+      <div class="resptbl" id="avg-box"></div>
+      <div class="resptbl" id="shooting"></div>
+      <div class="resptbl" id="avg-shooting"></div>
+    </div>
   </div>
   <!-- DISCLAIMER AT BOTTOM -->
   <div class="btm">
