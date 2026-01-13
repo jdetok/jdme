@@ -1,4 +1,87 @@
 import { searchPlayer } from "./player.js";
+import { clearSearch } from "./inputs.js";
+import { RED_BOLD } from "../global.js";
+import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
+
+const WINDOWSIZE = 700;
+let exBtnsInitComplete = false;
+
+// counter class for number of rows displayed per table
+class rowNum {
+    constructor(private val: number, private min = 2) {};
+    get value(): number {
+        return this.val;
+    }
+    increase = (by = 5): number => {
+        this.val += by;
+        return this.val;
+    }
+
+    decrease = (by = 5): number => {
+        this.val = Math.max(this.min, this.val - by);
+        return this.val;
+    }
+
+    reset = (to: number): number => {
+        this.val = Math.max(this.min, to);
+        return this.val;
+    }
+};
+
+// tracks row counters for both top scorer tables
+export class rowsState {
+    lgRowNum: rowNum;
+    rgRowNum: rowNum;
+    startRows: number;
+    constructor(winSize: number = WINDOWSIZE) {
+        this.startRows = window.innerWidth <= winSize ? 5 : 10;
+        this.lgRowNum = new rowNum(this.startRows);
+        this.rgRowNum = new rowNum(this.startRows);
+        this.listenForResize();
+    };
+    resetRows(winSize: number = WINDOWSIZE): number {
+        const rows = window.innerWidth <= winSize ? 5 : 10;
+        this.lgRowNum.reset(rows);
+        this.rgRowNum.reset(rows);
+        return rows;
+    }
+    listenForResize() { // change row nums and rebuild tables when window size changes
+        const mq = window.matchMedia(`(max-width: ${WINDOWSIZE}px)`);
+        mq.addEventListener('change', async () => {
+            const newRows = this.resetRows();
+            await Promise.all([
+                makeTeamRecordsTbl(newRows),
+                makeLgTopScorersTbl(this.lgRowNum.value),
+                makeRgTopScorersTbl(this.rgRowNum.value)
+            ])
+        })
+    }
+};
+
+export type expandableTbl = {
+    elId: string, 
+    rows: rowNum, 
+    pm: '+' | '-',
+    build: (numRows: number) => Promise<void>
+}
+export async function expandedListBtns(rs: rowsState, btns: expandableTbl[] = [
+    {elId: "seemoreplayers", rows: rs.lgRowNum, pm: '+', build: makeLgTopScorersTbl}, 
+    {elId: "seelessplayers", rows: rs.lgRowNum, pm: '-', build: makeLgTopScorersTbl},
+    {elId: "seemoreRGplayers", rows: rs.rgRowNum, pm: '+', build: makeRgTopScorersTbl}, 
+    {elId: "seelessRGplayers", rows: rs.rgRowNum, pm: '-', build: makeRgTopScorersTbl},
+]) {
+    if (exBtnsInitComplete) return;
+    exBtnsInitComplete = true;
+    for (let btnObj of btns) {
+        const btn = document.getElementById(btnObj.elId);
+        if (!btn) continue;
+        btn.addEventListener('click', async() => {
+            const newNum = btnObj.pm === '+' ? btnObj.rows.increase() : btnObj.rows.decrease();
+            await btnObj.build(newNum);
+        });
+        
+    }
+}
 
 export async function submitPlayerSearch(elId = 'ui') {
     const frm = document.getElementById(elId) as HTMLFormElement;
@@ -17,4 +100,68 @@ export async function randPlayerBtn(elId = 'randP') {
         e.preventDefault();
         await searchPlayer('random');
     });
+}
+
+// make post + reg checkboxes exclusive (but allow neither checked)
+export async function setupExclusiveCheckboxes(leftbox: string, rightbox: string) {
+    let lbox = document.getElementById(leftbox) as HTMLInputElement;
+    let rbox = document.getElementById(rightbox) as HTMLInputElement;
+    if (!lbox || !rbox) throw new Error(`couldn't get ${lbox} or ${rbox}`);
+    function handleCheck(e: Event) {
+        const target = e.target as HTMLInputElement;
+        if (!target) throw new Error(`can't find ${e.type}`);
+        if (target.checked) { 
+            if (e.target === lbox) rbox.checked = false;
+            if (e.target === rbox) lbox.checked = false;
+        }
+    }
+    lbox.addEventListener("change", handleCheck);
+    rbox.addEventListener("change", handleCheck);
+}
+
+export async function clearSearchBtn(): Promise<void> {
+    const btn = document.getElementById('clearS');
+    if (!btn) return;
+    btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        clearSearch(true);
+    });
+}
+
+
+// BUTTONS SECTION
+export async function holdPlayerBtn(elId = 'holdP') {
+    const btn = document.getElementById(elId);
+    if (!btn) throw new Error(`couldn't get button element at ${elId}`);
+    btn.addEventListener('click', async (event) => {
+        event.preventDefault();
+        // get player name held in pHold value, fill player search bar with it
+        const holdElId = 'pHold';
+        const hold = document.getElementById(holdElId) as HTMLInputElement;
+        if (!hold) throw new Error(`couldn't get input element at ${holdElId}`);
+        let player = hold.value;
+        if (player === '') {
+            console.error(`%chold button pressed, empty string in ${holdElId}`, RED_BOLD);
+            return;
+        }
+
+        const searchElId = 'pSearch';
+        let search = document.getElementById(searchElId) as HTMLInputElement;
+        search.value = player;
+    })
+}
+
+export async function setup_jump_btns() {
+    const btns = [{el: "jumptoresp", jumpTo: "player_title"}, {el: "jumptosearch", jumpTo: "ui"}]
+    for (const btn of btns) {
+        const btnEl = document.getElementById(btn.el);
+        if (btnEl) {
+            btnEl.addEventListener('click', async() => {
+                const jmpEl = document.getElementById(btn.jumpTo);
+                if (jmpEl) {
+                    jmpEl.scrollIntoView({behavior: "smooth", block: "start"});
+                }
+            })
+        }    
+    }
 }
