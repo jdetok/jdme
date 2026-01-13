@@ -7,6 +7,7 @@ import { rowsState, setupExclusiveCheckboxes, clearSearchBtn, clearSearch, lgRad
 await LoadContent();
 // ENTRYPOINT DEFINITION
 export async function LoadContent() {
+    // create state class to track number of rows displayed per table
     let ROWSTATE = new rowsState();
     document.addEventListener('DOMContentLoaded', async () => {
         foldedLog(`%cloading content for page {${window.innerWidth}px x ${window.innerHeight}px}...`, MSG_BOLD);

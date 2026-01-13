@@ -1,6 +1,6 @@
 // replaces /www/js/bball/dynamic_table.js
 // dynamic replacement for lg_ldg_scorers.js, rg_ldg_scorer.js, reamrecs.js
-import { playerBtnListener } from "./player.js";
+import { searchPlayer } from "./player.js";
 import { base, foldedLog } from "../global.js";
 export class Tbl {
     elId;
@@ -90,7 +90,7 @@ export async function makeRgTopScorersTbl(numRows) {
                 return `${player.player} | ${game.team}`;
             },
             button: {
-                onClick: async (v) => playerBtnListener(v.split(" | ")[0]),
+                onClick: async (v) => searchPlayer('button', v.split(" | ")[0]),
             },
         }, {
             header: 'matchup',
@@ -124,7 +124,7 @@ export async function makeLgTopScorersTbl(numRows) {
             header: `nba | ${data.nba[0].season}`,
             value: (d, i) => `${d.nba[i].player}`,
             button: {
-                onClick: async (v) => playerBtnListener(v.split(" | ")[0]),
+                onClick: async (v) => searchPlayer('button', v.split(" | ")[0]),
             }
         },
         {
@@ -135,7 +135,7 @@ export async function makeLgTopScorersTbl(numRows) {
             header: `wnba | ${data.wnba[0].season}`,
             value: (d, i) => `${d.wnba[i].player} | ${d.wnba[i].team}`,
             button: {
-                onClick: async (v) => playerBtnListener(v.split(" | ")[0]),
+                onClick: async (v) => searchPlayer('button', v.split(" | ")[0]),
             },
         },
         {

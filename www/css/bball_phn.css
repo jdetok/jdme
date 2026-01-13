@@ -25,19 +25,6 @@
         flex-direction: row;
     }
 
-    .lhdr {
-        display: none;
-    }
-
-    .chdr {
-        grid-area: chdr;
-    }
-
-    .rhdr {
-        grid-area: rhdr;
-        justify-self: center;
-    }
-
     .response {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto auto;
