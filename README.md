@@ -21,8 +21,8 @@ a custom-designed postgres database stores the nba/wnba data returned by the API
 
 # Frontend (HTML/CSS/JavaScript)
 the site's frontend is written using only pure HTML/CSS/Javascript. all static files are served from /static by the handlers in /api/static.go. /static/bball are the current production files that serve jdeko.me/bball
-![Alt Text](https://jdeko.me/img/jdekome_ex_080825.png "main example")
-![Alt Text](https://jdeko.me/img/bball_ex_121025.png "/bball example")
+![Alt Text](https://jdeko.me/img/jdekome_ex_011326.png "main example")
+![Alt Text](https://jdeko.me/img/bball_ex_011326.png "/bball example")
 
 # Architecture
 ![dgm](/z_docs/arch.png)
@@ -51,9 +51,11 @@ the site's frontend is written using only pure HTML/CSS/Javascript. all static f
     - ## setup nginx web server/reverse proxy
         - replaced /static with /www
         - static html/css/javascript files are served from nginx rather than from the api
-- ## early january 2025
+- ## early january 2026
     - added cloudflared container to utilize cloudfare tunnels for https
         - added replacement patterns to replace.py for cloudflare hosts/ids
     - transitioned to serving static files from nginx rather than from go app
     - created pgfetch container to run cronjob that updates db with new stats
     - hardened filesystems
+- ## mid january 2026
+    - frontend refactor to typescript 90% complete, work still to be done on adding types to response tables
