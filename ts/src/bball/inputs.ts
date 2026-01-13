@@ -4,6 +4,7 @@ import { base } from "../global.js";
 const WINDOWSIZE = 700;
 let exBtnsInitComplete = false;
 
+// counter class for number of rows displayed per table
 class rowNum {
     constructor(private val: number, private min = 2) {};
     get value(): number {
@@ -25,6 +26,7 @@ class rowNum {
     }
 };
 
+// tracks row counters for both top scorer tables
 export class rowsState {
     lgRowNum: rowNum;
     rgRowNum: rowNum;
@@ -41,7 +43,7 @@ export class rowsState {
         this.rgRowNum.reset(rows);
         return rows;
     }
-    listenForResize() {
+    listenForResize() { // change row nums and rebuild tables when window size changes
         const mq = window.matchMedia(`(max-width: ${WINDOWSIZE}px)`);
         mq.addEventListener('change', async () => {
             const newRows = this.resetRows();
@@ -60,7 +62,6 @@ export type expandableTbl = {
     pm: '+' | '-',
     build: (numRows: number) => Promise<void>
 }
-
 export async function expandedListBtns(rs: rowsState, btns: expandableTbl[] = [
     {elId: "seemoreplayers", rows: rs.lgRowNum, pm: '+', build: makeLgTopScorersTbl}, 
     {elId: "seelessplayers", rows: rs.lgRowNum, pm: '-', build: makeLgTopScorersTbl},

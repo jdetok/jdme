@@ -1,30 +1,66 @@
-/* FULL SCREEN CROSSAIR POSITIONING */
-/* body::before,
-body::after {
-  content: "";
-  position: fixed;
-  background: rgba(0, 0, 0, 0.449);
-  z-index: 9999;
-  pointer-events: none;
+/* GRID FOR ALL ELEMENTS BEFORE RESPONSE */
+.static_grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, auto);
+    grid-template-areas:
+    'lhdr chdr rhdr'
+    't ttl r'
+    't jumpbtns r'
+    't l r'
+    't m r'
+    '. m r'
+    '. . r'
+    ;
+    gap: 10px;
+    padding: 5px;
+    margin: 0 auto;
+
 }
 
-body::before {
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
+/* ERROR MESSAGE */
+.err {
+    display: none;
 }
 
-body::after {
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-} */
+/* MAIN TITLE TEXT */
+#site_title {
+    grid-area: ttl;
+    font-size: 54px;
+    font-weight: bold;
+    color:blanchedalmond;
+    margin: 0 auto;
+}
+
+/* for div containing a table and buttons that control it */
+.tablewithbtns {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    width: 100%;
+}
+
+/* GROUP OF BUTTONS */
+.btnshoriz {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%
+}
+
+#seemorelessbtns {
+    grid-area: seemore;
+}
+
+#mobilebtns {
+    grid-area: jumpbtns;
+}
+
 button {
     height: fit-content;
 }
-/* GLOBAL TABLE */
+
+/* TABLE STYLING */
 table {
     color: rgb(236, 237, 255);
     border: 3px solid black;
@@ -48,7 +84,6 @@ caption {
     margin-bottom: 1px;
 }
 
-/* BUTTONS WITHIN A TABLE */
 table button {
     border: none;
     color: rgba(211, 224, 241, 0.779);
@@ -59,114 +94,11 @@ table button {
     height: 100%;
     box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.449);
 }
-/* MAKE SELECTS APPEAR CENTERED IN THE UI DIV */
-select {
-    width: 100%;
-    max-width: 100%;
-}
 
-/* ERROR MESSAGE */
-.err {
-    display: none;
-}
-
-/* GRID FOR ALL ELEMENTS BEFORE RESPONSE */
-.static_grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(4, auto);
-    grid-template-areas:
-    'lhdr chdr rhdr'
-    't ttl r'
-    't jumpbtns r'
-    't l r'
-    't m r'
-    '. m r'
-    '. . r'
-    ;
-    gap: 10px;
-    padding: 5px;
+.ranktbl {
     margin: 0 auto;
-
-}
-#seemorelessbtns {
-    grid-area: seemore;
-}
-
-#mobilebtns {
-    align-items: center;
-    grid-area: jumpbtns;
-}
-
-/* HEADER ELEMENTS */
-/* left side hugs left */
-.lhdr {
-    grid-area: lhdr;
-    justify-self: start;
-    display: flex;
-    gap: 1rem;
-}
-/* middle perfectly centered */
-.chdr {
-    grid-area: chdr;
-    justify-self: center;
-}
-/* right side hugs right */
-.rhdr {
-    grid-area: rhdr;
-    justify-self: end;
-    display: flex;
-    gap: 1rem;
-}
-
-/* #jumptosearch {
-    display: none;
-} */
-
-/* MAIN TITLE TEXT */
-#site_title {
-    grid-area: ttl;
-    font-size: 54px;
-    font-weight: bold;
-    color:blanchedalmond;
-    margin: 0 auto;
-}
-/* INFORMATIVE TEXT BOX */
-.helpbox {
-    font-style: italic;
-    border: 1.5px dashed black;
-    border-radius:10px;
-    color:rgba(245, 243, 239, 0.846);
-    padding: 5px;
-    width: 80%;
-    max-width: 80%;
-    justify-self: center;
-}
-
-.tablewithbtns {
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
-    width: 100%;
-}
-
-.btnshoriz {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    width: 100%
-}
-
-.top_sect_tbls {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.lg_tbls {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
+    margin-top: 20px;
+    border-radius: 5px;
 }
 
 #top_players {
@@ -178,21 +110,15 @@ select {
     grid-area: r;
 }
 
-.tstbl {
-    margin: 0 auto;
-    margin-top: 20px;
-    border-radius: 5px;
-}
-
-#lgts_title {
-    margin: 0 auto;
-    font-size: 24px;
-    color: white;
-}
-
 #team_recs_tbl {
     grid-area: t;
 }
+
+select {
+    width: 100%;
+    max-width: 100%;
+}
+
 
 /* UI SECTION - MAIN SELECTORS, CHECKBOXES, BUTTONS, SEARCH BOX, ETC */
 #ui {
@@ -238,6 +164,7 @@ select {
     width: fit-content;
     max-width: 100%;
 }
+
 /* RESPONSE CLASSES */
 /* meant to be outermost of response */
 .response {

@@ -11,6 +11,7 @@ await LoadContent();
 
 // ENTRYPOINT DEFINITION
 export async function LoadContent(): Promise<void> {
+    // create state class to track number of rows displayed per table
     let ROWSTATE = new rowsState();
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -36,7 +37,7 @@ export async function LoadContent(): Promise<void> {
 }
 
 // create top numrows tables, load player dash for top scrorer from most recent day of games
-export async function buildOnLoadElements(rs: rowsState) {
+export async function buildOnLoadElements(rs: rowsState): Promise<void> {
     try {
         await makeLgTopScorersTbl(rs.lgRowNum.value);
         await makeRgTopScorersTbl(rs.rgRowNum.value);
