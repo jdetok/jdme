@@ -35,49 +35,46 @@
         <h1>supporting technology - jdeko.me</h1>
     </div>
     <div class="decorator">/-|-\</div>
-    <div class="flexels">
-        <div class="flexel">
+    <div class="div_grid">
+        <div class="abtp">
             <h2>docker</h2>
-            <div class="abtp">
-                each software element that supports this website has been containerized
-                with
-                <a href="https://en.wikipedia.org/wiki/Docker_(software)">docker</a>. a single
-                <a href="https://docs.docker.com/compose/"> docker compose</a> file orchestrates the startup and
-                teardown of every container, network, and volume
-            </div>
+            each software element that supports this website has been containerized
+            with
+            <a href="https://en.wikipedia.org/wiki/Docker_(software)">docker</a>. a single
+            <a href="https://docs.docker.com/compose/"> docker compose</a> file orchestrates the startup and
+            teardown of every container, network, and volume
         </div>
-        <div class="flexel">
+        <div>
             <h2>cloudflare tunnel</h2>
-            <div>a
-                <a href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/">cloudflare tunnel</a>
-                is used to securely route https traffic through my local server. a <a href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/private-net/cloudflared/">
-                    cloudflared</a> server is running in a container to route the https requests locally
-            </div>
+            a <a href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/">cloudflare
+                tunnel</a>
+            is used to securely route https traffic through my local server. a
+            <a
+                href="https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/private-net/cloudflared/">
+                cloudflared</a> server is running in a container to route the https requests locally
         </div>
-        <div class="flexel">
+        <div>
             <h2>nginx web server</h2>
-            <div>an nginx web server serves static files and 
-                <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">reverse-proxies</a> requests for
-                /bball to the jdeko.me/bball api
-            </div>
+            an nginx web server serves static files and
+            <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/">reverse-proxies</a> requests for
+            /bball to the jdeko.me/bball api
+
         </div>
-        <div class="flexel">
+        <div>
             <h2>postgres database</h2>
-            <div>a postgres database serves nba/wnba stats to the <a href="https://dev.jdeko.me/bball">jdeko.me/bball
-                    api</a> -
-                the stats are extracted from the official nba api via a <a target="_blank"
-                    href="https://github.com/jdetok/bball-etl-cli">
-                    command-line-interface tool</a> i wrote in go
-            </div>
+            a postgres database serves nba/wnba stats to the <a href="https://dev.jdeko.me/bball">jdeko.me/bball
+                api</a> -
+            the stats are extracted from the official nba api via a <a target="_blank"
+                href="https://github.com/jdetok/bball-etl-cli">
+                command-line-interface tool</a> i wrote in go
         </div>
-        <div class="flexel">
-            <h2>javascript</h2>
-            javascript powers the frontend of <a href="https://dev.jdeko.me/bball">jdeko.me/bball</a>.
+        <div>
+            <h2>javascript/typescript</h2>
+            javascript transpiled from typescript powers the frontend of <a href="https://dev.jdeko.me/bball">jdeko.me/bball</a>.
             all interactions with any of the buttons/selectors/text-boxes on this page
-            are handled
-            with javascript event handlers that call endpoints from my API<br>
+            are handled by javascript event handlers that call endpoints from my API<br>
         </div>
-        <div class="flexel">
+        <div>
             <h2>html/css</h2>
             all visual elements of this website are written in pure html & css. i've
             always preferred
@@ -90,7 +87,7 @@
         the diagram below visualizes how an https request moves through each docker container/network
         <img src="/img/abt/arch.png">
     </div>
-    
+
 </body>
 
 <!-- <footer class="menu">

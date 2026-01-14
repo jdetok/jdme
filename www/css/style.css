@@ -22,12 +22,14 @@ body::after {
 
 /* global body */
 body {
-    text-align: center;
-    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
     text-align: center;
     background-color: darkslategrey;
     color: white;
     font-size: 18px;
+    max-width: fit-content;
 }
 
 /* header menu items */
@@ -131,7 +133,7 @@ a.med {
     text-align: center;
 }
 
-/*INTRO BLOCK OF MAIN PAGE*/
+/* INTRO BLOCK OF MAIN PAGE */
 .intro {
     width: 65%;
     max-width: 100%;
@@ -141,6 +143,35 @@ a.med {
 
 .intro h1 {
     margin-bottom: 0;
+}
+
+/* used for index projects section, technologies */
+.div_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.8rem;
+    margin: 0 auto;
+}
+
+.div_grid > div {
+    padding: .5rem;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    text-align: center;
+}
+/* used for music links */
+.small_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.8rem;
+    margin: 0 auto;
+}
+
+.small_grid > div {
+    padding: 0.5rem;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    text-align: center;
 }
 
 /* PET PICS */
@@ -186,14 +217,6 @@ footer {
     font-size: 20px;
 }
 
-.flexels {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    flex-direction: row;
-    gap: 1%;
-}
-
 /* for items to place vertically outside of flexels */
 .emphitem {
     margin: auto;
@@ -202,16 +225,6 @@ footer {
     text-align: center;
     align-items: center;
 }
-
-.flexel {
-    width: 30%;
-    max-width: 100%;
-    padding: .5rem;
-    border-right: 1px solid black;
-    border-left: 1px solid black;
-    text-align: center;
-}
-
 /* schematic screenshot */
 .sch img{
     max-width: 60%;

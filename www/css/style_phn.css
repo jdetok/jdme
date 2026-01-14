@@ -4,7 +4,13 @@
     }
 }
 
-@media (max-width: 1350px) {
+@media (max-width: 1300px) {
+    .div_grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 850px) {
     iframe {
         width: 95%;
         height: auto;
@@ -20,33 +26,16 @@
 
     .middle,
     .right {
-        display: none; /* hide original links */
-    }
-
-    .menu {
-        /* font-size: 12px; */
-        display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        align-items: start;
-        justify-items: center;
-        gap: 1rem;
+        display: none;
     }
 
     .intro {
         width: 95%
     }
-    
-    .flexels {
-    flex-direction: column; 
-    align-items: center;
-    display: flex;
-
-    }
-
-    .flexel,
-    .emphitem {
-        width: 95%;
-        max-width: 100%;
+ 
+    .div_grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
     }
 
     ul.pics li {
@@ -70,10 +59,6 @@
     .tbox_grid {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
-        max-width: 100%;
-    }
-
-    .infoflex > div {
         max-width: 100%;
     }
 
