@@ -88,11 +88,24 @@ h4 {
     font-weight:normal;
 }
 
+.textblk {
+    color: rgb(217, 217, 217);
+    font-size: 28px;
+}
+
 .sechdr {
     color: rgb(214, 217, 248);
     text-align: center;
     margin-top: 0;
     margin-bottom: 0;
+}
+
+.sectionttl {
+    font-size: 36px;
+    margin: 0 auto;
+    text-decoration: underline;
+    margin-bottom: 1rem;
+    width: fit-content;
 }
 
 /* LINK ANCHORS */ 
@@ -124,6 +137,10 @@ a.med {
     max-width: 100%;
     margin: 0 auto;/* centers the div */
     text-align: center;
+}
+
+.intro h1 {
+    margin-bottom: 0;
 }
 
 /* PET PICS */
