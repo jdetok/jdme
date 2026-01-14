@@ -69,6 +69,7 @@ async function mediaQueryMenuSizes(e: MediaQueryListEvent | MediaQueryList): Pro
         foldedLog(`%cftr el not found`, RED_BOLD);
         return;
     }
+    ftr.innerHTML = ''; 
     for (const val of Object.values(ftrsToChange)) {
         const d = document.createElement('div');
         d.innerHTML = matches ? val.sm_txt : val.lg_txt;
