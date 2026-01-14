@@ -1,3 +1,4 @@
+/* crosshairs for dev */
 body::before {
   content: "";
   position: absolute;
@@ -8,8 +9,6 @@ body::before {
   background: #00000000;
   transform: translateX(-50%);
 }
-
-/* Horizontal center line (X axis) */
 body::after {
   content: "";
   position: absolute;
@@ -20,7 +19,8 @@ body::after {
   background: #00000000;
   transform: translateY(-50%);
 }
-/*MAIN BODY*/
+
+/* global body */
 body {
     text-align: center;
     min-height: 100vh;
@@ -30,39 +30,7 @@ body {
     font-size: 18px;
 }
 
-.hvr {
-    border: 1px solid black;
-    display: none;
-    margin: 0 auto;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    padding: 5px;
-    width: fit-content;
-    min-height: 20px;
-}
-
-.hlp {
-    display: none;
-    padding: 2px;
-    font-size: 18px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-
-.hidesmall {
-    display: block;
-}
-
-.dropbtn {
-  display: none; /* hidden on large screens */
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-
-
+/* header menu items */
 .menu {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -94,9 +62,9 @@ body {
     align-items: center;
 }
 
-/*HEADING TAGS*/
+/* global h1-4 */
 h1 {
-    color:blanchedalmond;
+    color:rgb(226, 201, 165);
     font-size: 44px;
 }
 
@@ -144,16 +112,10 @@ a.med {
     font-size: 18px;
 }
 
-/*FOR THE SEPARATOR*/
+/* ASCII decorator */
 .decorator {
     margin: 10px;
     text-align: center;
-}
-
-.ineldec {
-    text-align: center;
-    margin-top: auto;
-    margin-bottom: auto;
 }
 
 /*INTRO BLOCK OF MAIN PAGE*/
@@ -162,32 +124,6 @@ a.med {
     max-width: 100%;
     margin: 0 auto;/* centers the div */
     text-align: center;
-}
-
-/* MAIN CENTER ALIGN CLASS */
-.center {
-    margin: auto;
-    padding: 5px;
-    text-align: center;
-}
-
-.centert {
-    margin-bottom: 0;
-    margin-top: 5px;
-    padding: 2px;
-    /* padding: 5px; */
-    text-align: center;
-    align-items: center;
-}
-
-/* DIV CLASS FOR PROJECT SECTIONS */
-.prjel {
-    margin: auto;
-    margin-top: 0;
-    padding-right: 2px;
-    padding-left: 2px;
-    text-align: center;
-    max-width: 40%;
 }
 
 /* PET PICS */
@@ -268,79 +204,27 @@ footer {
 .pagedesc {
     color: rgb(168, 189, 224);
     margin: 0 auto;
-    /* margin-top: 10px; */
     font-size: 24px;
     font-weight: bold;
     max-width: 70%;
 }
 
-/*repo section*/
-.links {
-    /* border: 3px solid rgba(0, 0, 0, 0.61); */
+/* text blocks */
+.tbox_grid {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
-    padding: 5px;
     margin: 0 auto;
-    width: 90%;
-}
-
-.links > div {
-    /* border: 1px dashed rgb(238, 168, 168); */
-    border: 1px dashed rgba(8, 7, 6, 0.899);
-    padding: 10px;
-    max-width: 100%;
-}
-
-/* grid columns - hide different classes to expand for smaller screens */
-.linkname {
-    grid-column: 1;
-}
-
-.linkdesc {
-    grid-column: 2;
-}
-
-.linkurl {
-    grid-column: 3;
-}
-/* FLEX SIDE BY SIDE FOR INFO SECTIONS */
-
-.infoflex {
-    /* border: 1px solid black; */
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin: 0 auto;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
     max-width: 90%;
+    gap: 1rem;
 }
 
-.infoflex > div {
-    margin: 0 auto;
-    /* border: 1px dashed rgb(238, 168, 168); */
-    max-width: 45%;
-}
-
-/*
-about element that has a header, short description, and a button to expose a longer description
-*/
-.mainel {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.mainel img {
-    display: none;
-}
-
-.secel {
-    margin: 0 auto;
-    align-items: center;
-    /* width: 60%; */
-}
-
-.mainel .secel > div {
-    margin: 10px;
+.tbox_grid > div {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    max-width: 98%;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
 }
 
 .sysarch {

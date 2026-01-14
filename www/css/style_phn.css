@@ -11,7 +11,7 @@
     }
 
     h1 {
-        font-size: 28px;
+        font-size: 30px;
     }
 
     h2 {
@@ -67,8 +67,9 @@
         max-width: 100%;
     }
 
-    .infoflex {
-        flex-direction: column;
+    .tbox_grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
         max-width: 100%;
     }
 
