@@ -24,6 +24,9 @@
         font-size: 24px;
     }
 
+    .menu, #ftr {
+        font-size: 12px;
+    }
     .middle,
     .right {
         display: none;
