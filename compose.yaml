@@ -135,6 +135,8 @@ services:
     command: tunnel --config /etc/cloudflared/config.yml run
     networks:
       cfnet:
+    volumes:
+      - ./dkr/cloudflare/conf:/etc/cloudflared
 
 # NETWORKS
 networks:

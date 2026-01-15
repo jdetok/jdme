@@ -1,5 +1,5 @@
 tunnel: jdme
-credentials-file: /etc/cloudflared/2fa7d121-ba14-4528-b372-a9b508c37797.json
+credentials-file: /etc/cloudflared/8673c5e6-55c3-457d-9c03-1d84e6127d55.json
 
 ingress:
   - hostname: jdeko.me

@@ -14,7 +14,7 @@ URLS_FTYP = [".js", ".ts", ".html", ".css", ".yaml"]
 PROD_CPU = "arm64"
 LOCL_CPU = "amd64"
 
-PROD_CFID = "2fa7d121-ba14-4528-b372-a9b508c37797"
+PROD_CFID = "8673c5e6-55c3-457d-9c03-1d84e6127d55"
 LOCL_CFID = "76e32d97-b76e-4a76-9186-bc0573357285"
 
 PROD_CFHN = "jdeko.me"
@@ -34,17 +34,17 @@ def main():
 
     loc = args.local 
             
-    # comment_nginx_ssl("jdme-dkr/proxy/nginx.conf", RE_SSL_NGX, loc)
+    # comment_nginx_ssl("dkr/proxy/nginx.conf", RE_SSL_NGX, loc)
             
     to_replace = [
         ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
         ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
         ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
         ReReplace(loc, "GOARCH", "./api.Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
-        # ReReplace(loc, "SSL_DKR", "./jdme-dkr/proxy/nginx.Dockerfile", r"# ", r"", 2, 1, RE_SSL_DKR, [], []),
-        ReReplace(loc, "CLD_FLARE_ID", "./jdme-dkr/cloudflare/conf/config.yml", LOCL_CFID, PROD_CFID, 0, 0, RE_CFID, [], []),
-        ReReplace(loc, "CLD_FLARE_HOST", "./jdme-dkr/cloudflare/conf/config.yml", LOCL_CFHN, PROD_CFHN, 0, 0, RE_CFHN, [], []),
-        ReReplace(loc, "CLD_FLARE_HOST", "./jdme-dkr/proxy/nginx.conf", LOCL_CFHN, PROD_CFHN, 0, 0, RE_CFHN, [], []),
+        # ReReplace(loc, "SSL_DKR", "./dkr/proxy/nginx.Dockerfile", r"# ", r"", 2, 1, RE_SSL_DKR, [], []),
+        ReReplace(loc, "CLD_FLARE_ID", "./dkr/cloudflare/conf/config.yml", LOCL_CFID, PROD_CFID, 0, 0, RE_CFID, [], []),
+        ReReplace(loc, "CLD_FLARE_HOST", "./dkr/cloudflare/conf/config.yml", LOCL_CFHN, PROD_CFHN, 0, 0, RE_CFHN, [], []),
+        ReReplace(loc, "CLD_FLARE_HOST", "./dkr/nginx/nginx.conf", LOCL_CFHN, PROD_CFHN, 0, 0, RE_CFHN, [], []),
     ]
     
     files_changed = 0
