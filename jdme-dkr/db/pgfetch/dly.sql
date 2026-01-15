@@ -1,1 +1,0 @@
-call sp_nightly_call();

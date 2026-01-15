@@ -13,11 +13,12 @@ wiki/public/
 proxy/ssl/
 proxy/*.conf
 persist_data/
-jdme-dkr/nginx/ssl/
-jdme-dkr/nginx/.htpasswd
-jdme-dkr/db/dump
+dkr/nginx/ssl/
+dkr/nginx/.htpasswd
+dkr/db/dump
 .DS_Store
 b_users.sql
-jdme-dkr/cloudflare/**/*.json
-jdme-dkr/cloudflare/**/*.pem
+dkr/cloudflare/**/*.json
+dkr/cloudflare/**/*.pem
 archive/
+node_modules/
