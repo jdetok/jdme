@@ -27,7 +27,7 @@ const (
 	PG_IDLE         = 30
 	PG_LIFE         = 30
 	QUICKSTART      = true
-	IS_PROD         = true
+	IS_PROD         = false
 )
 
 func main() {
