@@ -129,6 +129,19 @@ a.med {
 }
 
 /* used for index projects section, technologies */
+.img_grid {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    grid-template-rows: 1fr;
+    gap: 0.8rem;
+    margin: 0 auto;
+}
+.img_grid > * {
+    padding: .5rem;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    text-align: center;
+}
 .div_grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -136,12 +149,13 @@ a.med {
     margin: 0 auto;
 }
 
-.div_grid > div {
+.div_grid > * {
     padding: .5rem;
     border-right: 1px solid black;
     border-left: 1px solid black;
     text-align: center;
 }
+
 /* used for music links */
 .small_grid {
     display: grid;
@@ -156,30 +170,8 @@ a.med {
     border-left: 1px solid black;
     text-align: center;
 }
-
-/* PET PICS */
-.picsdiv { 
-    color:rgb(198, 226, 180);
-    text-align: center;
-	align-items: center;
-}
-
-ul.pics {
-  padding: 0;
-  margin: 0 auto; /* centers the <ul> itself */
-  text-align: center;
-  list-style: none; /* optional, if you want to remove bullets */
-}
-
-ul.pics li {    
-    color:rgb(198, 226, 180);
-    font-size:20px;
-    display:inline-flex;
-    text-align: center;
-	align-items: center;
-}
-
-ul.pics li figure img {
+/* pets pics */
+figure img {
     max-width: 400px;
     width: 100%;
     height: auto;

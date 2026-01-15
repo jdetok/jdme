@@ -27,7 +27,7 @@ RUN touch /var/log/nginx/err.log
 RUN mkdir -p /etc/nginx /var/www
 
 # main nginx config
-COPY jdme-dkr/nginx/nginx.conf /etc/nginx/nginx.conf
+# COPY jdme-dkr/nginx/nginx.conf /etc/nginx/nginx.conf
 
 # auth for private pages
 COPY jdme-dkr/nginx/.htpasswd /etc/nginx/.htpasswd

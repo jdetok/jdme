@@ -24,8 +24,6 @@
         font-size: 24px;
     }
 
-
-
     #hdr, #ftr {
         font-size: 12px;
     }
@@ -34,7 +32,7 @@
         width: 95%
     }
  
-    .div_grid {
+    .img_grid, .div_grid {
         grid-template-columns: 1fr;
         grid-template-rows: auto;
     }
