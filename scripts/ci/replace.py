@@ -40,7 +40,7 @@ def main():
         ReReplace(loc, "URLS", ".", LOCL_URL, PROD_URL, 0, 0, RE_URLS, URLS_FTYP, URLS_EXCL),
         ReReplace(loc, "PROD_URL", "./main/main.go", PROD_URL, PROD_URL, 3, 2, RE_PROD_URL, [], []),
         ReReplace(loc, "IS_PROD", "./main/main.go", "false", "true", 3, 2, RE_IS_PROD, [], []),
-        ReReplace(loc, "GOARCH", "./jdme-dkr/api.Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
+        ReReplace(loc, "GOARCH", "./api.Dockerfile", LOCL_CPU, PROD_CPU, 3, 2, RE_GOARCH, [], []),
         # ReReplace(loc, "SSL_DKR", "./jdme-dkr/proxy/nginx.Dockerfile", r"# ", r"", 2, 1, RE_SSL_DKR, [], []),
         ReReplace(loc, "CLD_FLARE_ID", "./jdme-dkr/cloudflare/conf/config.yml", LOCL_CFID, PROD_CFID, 0, 0, RE_CFID, [], []),
         ReReplace(loc, "CLD_FLARE_HOST", "./jdme-dkr/cloudflare/conf/config.yml", LOCL_CFHN, PROD_CFHN, 0, 0, RE_CFHN, [], []),
