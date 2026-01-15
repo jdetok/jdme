@@ -59,3 +59,6 @@ the site's frontend is written using only pure HTML/CSS/Javascript. all static f
     - hardened filesystems
 - ## mid january 2026
     - frontend refactor to typescript 90% complete, work still to be done on adding types to response tables
+    - moved docker compose and api.Dockerfile to project root
+    - changed repo name from go-api-jdeko.me to jdme
+    - changed docker directory from jdme-dkr to dkr

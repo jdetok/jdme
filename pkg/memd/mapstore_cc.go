@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/clnd"
+	"github.com/jdetok/jdme/pkg/logd"
+	"github.com/jdetok/jdme/pkg/pgdb"
 	"golang.org/x/sync/errgroup"
 )
 

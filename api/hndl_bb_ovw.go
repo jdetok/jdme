@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
+	"github.com/jdetok/jdme/pkg/memd"
 )
 
 // recent games, team records, top players, etc

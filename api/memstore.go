@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/errd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
+	"github.com/jdetok/jdme/pkg/errd"
+	"github.com/jdetok/jdme/pkg/memd"
 	"golang.org/x/sync/errgroup"
 )
 

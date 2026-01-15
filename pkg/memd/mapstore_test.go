@@ -7,9 +7,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
-	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/conn"
+	"github.com/jdetok/jdme/pkg/logd"
+	"github.com/jdetok/jdme/pkg/pgdb"
 	"github.com/joho/godotenv"
 )
 

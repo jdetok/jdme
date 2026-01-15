@@ -1,4 +1,4 @@
-module github.com/jdetok/go-api-jdeko.me
+module github.com/jdetok/jdme
 
 go 1.25.1
 

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/resp"
+	"github.com/jdetok/jdme/pkg/resp"
 )
 
 // /seasons handler

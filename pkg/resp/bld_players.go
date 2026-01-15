@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/memd"
+	"github.com/jdetok/jdme/pkg/pgdb"
 )
 
 // primary database query function for the /players endpoint. queries the api

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
+	"github.com/jdetok/jdme/pkg/conn"
 )
 
 type DBConfig struct {

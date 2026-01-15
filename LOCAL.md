@@ -61,7 +61,7 @@ tree -I $EXCTR | pbcopy
     - ssh into pi for work on main branch
 - ### checkout repo: 
     -  `
-    git clone https://github.com/jdetok/go-api-jdeko.me.git
+    git clone https://github.com/jdetok/jdme.git
     `
     - `
     git checkout mac
