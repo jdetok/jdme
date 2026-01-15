@@ -25,7 +25,12 @@ class rowNum {
         return this.val;
     };
     reset = (to) => {
-        this.val = Math.max(this.min, to);
+        if (to) {
+            this.val = Math.max(this.min, to);
+        }
+        else {
+            this.val = window.innerWidth <= WINDOWSIZE ? 5 : 10;
+        }
         return this.val;
     };
 }
@@ -64,8 +69,10 @@ export class rowsState {
 export async function expandedListBtns(rs, btns = [
     { elId: "seemoreplayers", rows: rs.lgRowNum, pm: '+', build: makeLgTopScorersTbl },
     { elId: "seelessplayers", rows: rs.lgRowNum, pm: '-', build: makeLgTopScorersTbl },
+    { elId: "resetplayers", rows: rs.lgRowNum, pm: 'rst', build: makeLgTopScorersTbl },
     { elId: "seemoreRGplayers", rows: rs.rgRowNum, pm: '+', build: makeRgTopScorersTbl },
     { elId: "seelessRGplayers", rows: rs.rgRowNum, pm: '-', build: makeRgTopScorersTbl },
+    { elId: "resetRGplayers", rows: rs.rgRowNum, pm: 'rst', build: makeRgTopScorersTbl },
 ]) {
     if (exBtnsInitComplete)
         return;
@@ -75,7 +82,19 @@ export async function expandedListBtns(rs, btns = [
         if (!btn)
             continue;
         btn.addEventListener('click', async () => {
-            const newNum = btnObj.pm === '+' ? btnObj.rows.increase() : btnObj.rows.decrease();
+            let newNum;
+            switch (btnObj.pm) {
+                case '+':
+                    newNum = btnObj.rows.increase();
+                    break;
+                case '-':
+                    newNum = btnObj.rows.decrease();
+                    break;
+                case 'rst':
+                    newNum = btnObj.rows.reset();
+                    break;
+            }
+            // const newNum = btnObj.pm === '+' ? btnObj.rows.increase() : btnObj.rows.decrease();
             await btnObj.build(newNum);
         });
     }
