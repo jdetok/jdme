@@ -8,114 +8,93 @@
   <title>jdeko.me | about</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="/css/style_phn.css">
-  <!-- <script src="/js/listen.js"></script> -->
-  <script type="module" src="/js/header_txt.js"></script>
+  <script type="module" src="/js/hdr_ftr.js"></script>
 </head>
 
-<header class="menu">
-  <div class="left">
-    <a id="home" href="https://jdeko.me/">jdeko.me</a>
-    <a id="bball" href="https://jdeko.me/bball">jdeko.me/bball</a>
-    <a id="src" target="_blank" href="https://github.com/jdetok/go-api-jdeko.me">jdeko.me source code</a>
-  </div>
-  <div class="middle">
-    
-  </div>
-  <div class="right">
-    <a id="tech" href="https://jdeko.me/tech">tech stack</a>
-    <a id="github" target="_blank" href="https://github.com/jdetok">jdetok on github</a>
-    <a id="resume" href="https://jdeko.me/resume/cv/">professional resume</a>
-  </div>
-</header>
+<header id="hdr"></header>
 
 <body>
   <div class="intro">
-    <h1 style="margin-bottom: 0px">about jdeko.me</h1>
+    <h1>about jdeko.me</h1>
     <b>created & maintained by Justin DeKock</b><br>
   </div>
+  
   <div class="decorator">/-|-\</div>
 
-  <div class="pagedesc">
-    jdeko.me is almost entirely self hosted - every aspect of this website (with
-    the exception of ssl encryption, which is provided by cloudflare) is served
-    from a <a href="https://en.wikipedia.org/wiki/Raspberry_Pi" class="transpar"
-      target="_blank">raspberry pi 5</a> single-board-computer in my home
-    office!
-    this particular
-    raspberry pi 5</a> has a 4-core CPU & 16GB of RAM, which is more than enough
+  <div class="pagedesc">jdeko.me is almost entirely self hosted - 
+    a cloudflare tunnel routes HTTPS traffic from the outside internet to a 
+    <a href="https://en.wikipedia.org/wiki/Raspberry_Pi" class="transpar"target="_blank">
+    raspberry pi 5</a> single-board-computer in my home office! my nginx docker container 
+    then routes HTTP requests to my nba/wnba stats api container or directly serves static files
+    back to the client's browser. this raspberry pi has a 4-core CPU & 16GB of RAM, which is more than enough
     to handle any traffic this site receives
   </div>
-  <div class="center">
-    <h3>-- jdeko.me/bball api --</h3>
+  
+  <h1>nba/wnba stats api</h1>
+  
+  <div class="tbox_grid">
+    <div>
+      <h3>sourcing nba/wnba stats with go</h3>
+      <!-- TODO: under links, side by side etl and postgres blocks -->
+      all data is sourced from
+      <a target="_blank" href="https://www.nba.com/stats">nba.com</a> with the
+      go-etl program referenced above. the cli element of the program allows
+      me
+      to run the etl code in different ways in different scripts. it is used
+      in "build" mode in
+      my database build script <i>(/scripts/bld.sh in the github repo)</i> to
+      fetch & insert data for every nba & wnba regular season/post season game
+      since 1970. it's also run in "daily" mode in a cronjob <i>(runs
+          /scripts/dly.sh)</i> every day at approximately midnight to fetch &
+      insert data only for the previous day
+      <div class="decorator">/-|-\</div>
+      the go-etl process takes advantage of go's concurrency features to make
+      several http requests to nba.com in quick succession. the package then
+      processes and structures the data to match the postgres database design,
+      chunks the large volume
+      of data into small chunks, and inserts the chunks concurrently
+      <div class="decorator">/-|-\</div>
+      this site was originally powered by a MariaDB database with data sourced
+      from nba.com using the <a target="_blank" href="https://github.com/swar/nba_api">nba_api</a>
+      python package. this system worked well, but i wanted to learn more of
+      the lower-level
+      concepts of http requests abstracted away by this package, so i decided
+      to rewrite the entire etl process, with my own http requests, in Go. the
+      documentation
+      from the nba_api was incredibly helpful in figuring out this
+      process<br><a target="_blank" href="https://github.com/jdetok/py-nba-mdb">
+          legacy python ETL | py-nba-mdb</a>
+    </div>
+
+    <!-- DATABASE SECTION -->
+
+    <div>
+      <h3>storing the stats in postgres</h3>
+      all stats on the site are served from a postgres database server running
+      in a docker container. the database was designed following
+      the data normalization principles outlined in
+      <a target="_blank" href="https://en.wikipedia.org/wiki/Third_normal_form">
+          Codd's third normal form
+      </a>
+      <div class="decorator">/-|-\</div>
+      the database is built by a single shell script that builds & runs the docker container, 
+      which is configureed in the Dockerfile & compose.yaml files, executes SQL statements
+      to create all schemas, tables, procedures, etc., uses the go-etl cli to source & insert 
+      nba/wnba data since 1970, and runs several stored procedures to process & load the 
+      inserted data into their destination tables
+      <div class="decorator">/-|-\</div>
+      the go-etl program inserts data only into the tables in the intake
+      schema. each table in this schema is designed to match the structure of
+      the json response from a specific endpoint on nba.com. this keeps the
+      changes made to the source data minimal before being inserted, which
+      makes errors less likely and the pipeline more maintainable.
+      the jdeko.me/bball api primarily interacts with tables in the database's
+      api schema, which contains tables specifically designed for
+      quickly accessing aggregated player stats. the data in these tables is
+      deleted and reaggregated each night after new data is inserted into the
+      database
+    </div>
   </div>
-  <div class="secel">
-        <div class="infoflex">
-            <div>
-                <h3>sourcing nba/wnba stats with go</h3>
-                <!-- TODO: under links, side by side etl and postgres blocks -->
-                all data is sourced from
-                <a target="_blank" href="https://www.nba.com/stats">nba.com</a> with the
-                go-etl program referenced above. the cli element of the program allows
-                me
-                to run the etl code in different ways in different scripts. it is used
-                in "build" mode in
-                my database build script <i>(/scripts/bld.sh in the github repo)</i> to
-                fetch & insert data for every nba & wnba regular season/post season game
-                since 1970. it's also run in "daily" mode in a cronjob <i>(runs
-                    /scripts/dly.sh)</i> every day at approximately midnight to fetch &
-                insert data only for the previous day
-                <div class="decorator">/-|-\</div>
-                the go-etl process takes advantage of go's concurrency features to make
-                several http requests to nba.com in quick succession. the package then
-                processes and structures the data to match the postgres database design,
-                chunks the large volume
-                of data into small chunks, and inserts the chunks concurrently
-                <div class="decorator">/-|-\</div>
-                this site was originally powered by a MariaDB database with data sourced
-                from nba.com using the <a target="_blank" href="https://github.com/swar/nba_api">nba_api</a>
-                python package. this system worked well, but i wanted to learn more of
-                the lower-level
-                concepts of http requests abstracted away by this package, so i decided
-                to rewrite the entire etl process, with my own http requests, in Go. the
-                documentation
-                from the nba_api was incredibly helpful in figuring out this
-                process<br><a target="_blank" href="https://github.com/jdetok/py-nba-mdb">
-                    legacy python ETL | py-nba-mdb</a>
-            </div>
-
-            <!-- DATABASE SECTION -->
-
-            <div class="secel">
-                <h3>storing the stats in postgres</h3>
-                all stats on the site are served from a postgres database server running
-                in a docker container. the database was designed following
-                the data normalization principles outlined in
-                <a target="_blank" href="https://en.wikipedia.org/wiki/Third_normal_form">
-                    Codd's third normal form
-                </a>
-                <div class="decorator">/-|-\</div>
-                the database is built by a single shell script - /scripts/bld.sh in the
-                github repo.
-                the script builds & runs the docker container, which is configureed in
-                the Dockerfile & compose.yaml files, executes SQL statements <i>(scripts
-                    from /sql in the github repo)</i>
-                to create all schemas, tables, procedures, etc., uses the go-etl
-                cli to source & insert nba/wnba data since 1970, and runs several
-                stored procedures to process & load the inserted data into their
-                destination tables
-                <div class="decorator">/-|-\</div>
-                the go-etl program inserts data only into the tables in the intake
-                schema. each table in this schema is designed to match the structure of
-                the json response from a specific endpoint on nba.com. this keeps the
-                changes made to the source data minimal before being inserted, which
-                makes errors less likely and the pipeline more maintainable.
-                the jdeko.me/bball api primarily interacts with tables in the database's
-                api schema, which contains tables specifically designed for
-                quickly accessing aggregated player stats. the data in these tables is
-                deleted and reaggregated each night after new data is inserted into the
-                database
-            </div>
-        </div>
 </body>
-
+<footer id="ftr"></footer>
 </html>

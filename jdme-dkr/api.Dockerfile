@@ -7,7 +7,11 @@ COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY . .
+COPY .env .env
+COPY ./api ./api
+COPY ./pkg ./pkg
+COPY ./main ./main
+COPY ./persist ./persist
 
 # arm64 for prod (pi) amd64 for mac 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o bin/api ./main

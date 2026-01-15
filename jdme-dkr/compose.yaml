@@ -121,6 +121,7 @@ services:
       - proxylog:/var/log/nginx
       - www:/var/www
       - cvpublic:/var/hugocv
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 
   cloudflared:
     container_name: cf
