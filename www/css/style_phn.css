@@ -24,14 +24,12 @@
         font-size: 24px;
     }
 
-    .menu, #ftr {
+
+
+    #hdr, #ftr {
         font-size: 12px;
     }
-    .middle,
-    .right {
-        display: none;
-    }
-
+    
     .intro {
         width: 95%
     }
