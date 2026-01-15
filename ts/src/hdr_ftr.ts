@@ -77,14 +77,14 @@ type hdrftr = {
 const headers = {
     home: {
         path: "/",
-        link: `${homeurl}/`,
+        link: `${homeurl}`,
         blank: false,
         lg_txt: "jdeko.me",
         sm_txt: "jdeko.me",
     },
     abt: {
         path: "/about/",
-        link: `${homeurl}/about/`,
+        link: `${homeurl}about/`,
         blank: false,
         lg_txt: "about jdeko.me",
         sm_txt: "about",
@@ -98,14 +98,14 @@ const headers = {
     },
     bball: {
         path: "/bball/",
-        link: `${homeurl}/bball/`,
+        link: `${homeurl}bball/`,
         blank: false,
         lg_txt: "nba/wnba stats api",
         sm_txt: "stats api",
     },
     tech: {
         path: "/tech/",
-        link: "https://dev.jdeko.me/tech",
+        link: `${homeurl}tech/`,
         blank: false,
         lg_txt: "supporting technologies",
         sm_txt: "technologies",
@@ -119,7 +119,7 @@ const headers = {
     },
     resume: {
         path: "/resume/cv/",
-        link: `${homeurl}/resume/cv/`,
+        link: `${homeurl}resume/cv/`,
         blank: false,
         lg_txt: "professional resume",
         sm_txt: "resume",
@@ -136,7 +136,7 @@ const headers = {
 const footers = {
     home: {
         path: "/",
-        link: `${homeurl}/`,
+        link: `${homeurl}`,
         blank: false,
         lg_txt: "jdeko.me",
         sm_txt: "jdeko.me",
