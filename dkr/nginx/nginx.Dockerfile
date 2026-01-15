@@ -30,7 +30,7 @@ RUN npm run build
 FROM nginx:stable-alpine
 
 # # auth for private pages
-COPY jdme-dkr/nginx/.htpasswd /etc/nginx/.htpasswd
+COPY dkr/nginx/.htpasswd /etc/nginx/.htpasswd
 RUN chmod 644 /etc/nginx/.htpasswd
 
 RUN apk add --no-cache curl \
