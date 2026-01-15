@@ -2,16 +2,14 @@ FROM golang:1.25
 
 WORKDIR /app
 
-# RUN go install github.com/air-verse/air@latest
 COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY .env .env
-COPY ./api ./api
-COPY ./pkg ./pkg
-COPY ./main ./main
 COPY ./persist ./persist
+COPY ./pkg ./pkg
+COPY ./api ./api
+COPY ./main ./main
 
 # arm64 for prod (pi) amd64 for mac 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bin/api ./main
