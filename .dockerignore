@@ -1,4 +1,6 @@
 # jdme-dkr/
+*.Dockerfile
+*compose.yaml*
 scripts/
 z_docs/
 z_logs/

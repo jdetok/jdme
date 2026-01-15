@@ -4,10 +4,10 @@ services:
     container_name: pgbball
     image: jdme-pg
     build: 
-      context: db/.
+      context: jdme-dkr/db/.
       dockerfile: pg.Dockerfile
     env_file: 
-      - ../.env
+      - .env
     networks:
       pgnet:
     ports:
@@ -25,9 +25,9 @@ services:
         condition: service_healthy
     image: jdme-pgfetch
     build: 
-      context: db/.
+      context: jdme-dkr/db/.
       dockerfile: pgfetch/fetch.Dockerfile
-    env_file: ../.env
+    env_file: .env
     networks:
       pgnet:
     restart: unless-stopped
@@ -39,10 +39,10 @@ services:
     container_name: mongo
     image: jdme-mongo
     build:
-      context: mongo/.
+      context: jdme-dkr/mongo/.
       dockerfile: mongo.Dockerfile
     env_file:
-      - ../.env
+      - .env
     networks:
       lognet:
     ports:
@@ -60,10 +60,10 @@ services:
         condition: service_healthy
     image: jdme-mongox
     build:
-      context: mongo/.
+      context: jdme-dkr/mongo/.
       dockerfile: mongox.Dockerfile
     env_file:
-      - ../.env
+      - .env
     networks:
       lognet:
       apinet:
@@ -81,10 +81,10 @@ services:
         condition: service_healthy
     image: jdme-api
     build:
-      context: ..
-      dockerfile: jdme-dkr/api.Dockerfile
+      context: .
+      dockerfile: api.Dockerfile
     env_file:
-      - ../.env
+      - .env
     networks:
       apinet:
       lognet: 
@@ -102,7 +102,7 @@ services:
   nginx:
     container_name: nginx
     build:
-      context: ..
+      context: .
       dockerfile: jdme-dkr/nginx/nginx.Dockerfile
     image: jdme-nginx
     depends_on:
@@ -121,18 +121,17 @@ services:
       - proxylog:/var/log/nginx
       - www:/var/www
       - cvpublic:/var/hugocv
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./jdme-dkr/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 
   cloudflared:
     container_name: cf
     build:
-      context: cloudflare/.
+      context: jdme-dkr/cloudflare/.
       dockerfile: cf.Dockerfile
     env_file:
-      - ../.env
+      - .env
     image: jdme-cloudflared
     restart: unless-stopped
-    # command: tunnel run jdme
     command: tunnel --config /etc/cloudflared/config.yml run
     networks:
       cfnet:
@@ -183,7 +182,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ../www
+      device: ./www
   cvpublic: 
     name: cvpublic
   cvsrc:
