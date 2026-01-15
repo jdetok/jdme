@@ -88,11 +88,7 @@ const headers = {
     },
     tech: {
         path: "/tech/",
-<<<<<<< HEAD
-        link: "https://jdeko.me/tech",
-=======
         link: `${homeurl}tech/`,
->>>>>>> 1e9c84df68a06a125fbcec39d39ac18cb0cf5322
         blank: false,
         lg_txt: "supporting technologies",
         sm_txt: "technologies",
