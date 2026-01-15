@@ -22,8 +22,12 @@ class rowNum {
         return this.val;
     }
 
-    reset = (to: number): number => {
-        this.val = Math.max(this.min, to);
+    reset = (to?: number): number => {
+        if (to) {
+            this.val = Math.max(this.min, to);
+        } else {
+            this.val = window.innerWidth <= WINDOWSIZE ? 5 : 10;
+        }
         return this.val;
     }
 };
@@ -61,14 +65,16 @@ export class rowsState {
 export type expandableTbl = {
     elId: string, 
     rows: rowNum, 
-    pm: '+' | '-',
+    pm: '+' | '-' | 'rst',
     build: (numRows: number) => Promise<void>
 }
 export async function expandedListBtns(rs: rowsState, btns: expandableTbl[] = [
     {elId: "seemoreplayers", rows: rs.lgRowNum, pm: '+', build: makeLgTopScorersTbl}, 
     {elId: "seelessplayers", rows: rs.lgRowNum, pm: '-', build: makeLgTopScorersTbl},
+    {elId: "resetplayers", rows: rs.lgRowNum, pm: 'rst', build: makeLgTopScorersTbl},
     {elId: "seemoreRGplayers", rows: rs.rgRowNum, pm: '+', build: makeRgTopScorersTbl}, 
     {elId: "seelessRGplayers", rows: rs.rgRowNum, pm: '-', build: makeRgTopScorersTbl},
+    {elId: "resetRGplayers", rows: rs.rgRowNum, pm: 'rst', build: makeRgTopScorersTbl},
 ]) {
     if (exBtnsInitComplete) return;
     exBtnsInitComplete = true;
@@ -76,7 +82,18 @@ export async function expandedListBtns(rs: rowsState, btns: expandableTbl[] = [
         const btn = document.getElementById(btnObj.elId);
         if (!btn) continue;
         btn.addEventListener('click', async() => {
-            const newNum = btnObj.pm === '+' ? btnObj.rows.increase() : btnObj.rows.decrease();
+            let newNum: number;
+            switch (btnObj.pm) {
+                case '+':
+                    newNum = btnObj.rows.increase();
+                    break;
+                case '-':
+                    newNum = btnObj.rows.decrease();
+                    break;
+                case 'rst':
+                    newNum = btnObj.rows.reset();
+                    break;
+            }
             await btnObj.build(newNum);
         });
         
