@@ -1,4 +1,4 @@
-import { foldedLog, homeurl, MSG, RED_BOLD } from "./global.js";
+import { foldedLog, homeurl, MSG, RED_BOLD, toTop } from "./global.js";
 const CHANGE_AT_WIDTH = 1350;
 const media_query = window.matchMedia(`(max-width: ${CHANGE_AT_WIDTH}px)`);
 document.addEventListener('DOMContentLoaded', async () => {
@@ -45,11 +45,26 @@ async function mediaQueryMenuSizes(e) {
     let ftrs_to_append = [];
     for (const val of ftr_vals) {
         const label_txt = matches ? val.sm_txt : val.lg_txt;
-        const el_txt = (val.link ?
-            `<a href="${val.link}"${val.blank ? ' target="_blank"' : ''}>${label_txt}</a>`
-            : label_txt);
         const d = document.createElement('div');
-        d.innerHTML = el_txt;
+        if (val.link === "top") {
+            const btn = document.createElement('button');
+            btn.textContent = label_txt ?? '';
+            btn.addEventListener('click', () => {
+                toTop();
+            });
+            d.appendChild(btn);
+        }
+        else if (val.link) {
+            const a = document.createElement('a');
+            a.href = val.link;
+            if (val.blank)
+                a.target = "_blank";
+            a.textContent = label_txt ?? '';
+            d.appendChild(a);
+        }
+        else {
+            d.textContent = label_txt ?? '';
+        }
         ftrs_to_append.push(d);
     }
     ftr.style.gridTemplateColumns = `repeat(${ftrs_to_append.length}, 1fr)`;
@@ -143,6 +158,13 @@ const footers = {
         blank: true,
         lg_txt: 'jdeko.me source code',
         sm_txt: 'source code',
+    },
+    top: {
+        path: false,
+        link: "top",
+        blank: true,
+        lg_txt: 'top of this page',
+        sm_txt: 'top of page',
     },
 };
 //# sourceMappingURL=hdr_ftr.js.map

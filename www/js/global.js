@@ -23,4 +23,10 @@ export function scrollIntoBySize(wpx, hpx, el) {
         }
     }
 }
+export function toTop() {
+    const hdr = document.getElementById('hdr');
+    if (hdr) {
+        hdr.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+}
 //# sourceMappingURL=global.js.map

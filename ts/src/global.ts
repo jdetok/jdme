@@ -29,3 +29,10 @@ export function scrollIntoBySize(wpx: number, hpx: number, el: string): void {
         }
     }
 }
+
+export function toTop(): void {
+    const hdr = document.getElementById('hdr');
+    if (hdr) {
+        hdr.scrollIntoView({behavior: "smooth", block: "start"});
+    }
+}

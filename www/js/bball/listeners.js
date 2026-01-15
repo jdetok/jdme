@@ -94,7 +94,6 @@ export async function expandedListBtns(rs, btns = [
                     newNum = btnObj.rows.reset();
                     break;
             }
-            // const newNum = btnObj.pm === '+' ? btnObj.rows.increase() : btnObj.rows.decrease();
             await btnObj.build(newNum);
         });
     }
