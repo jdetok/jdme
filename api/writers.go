@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/resp"
+	"github.com/jdetok/jdme/pkg/resp"
 )
 
 func (app *App) WriteJson(w http.ResponseWriter, jr resp.JsonResp) {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
+	"github.com/jdetok/jdme/pkg/conn"
 )
 
 type Env struct {

@@ -3,7 +3,7 @@ package memd
 import (
 	"fmt"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/pgdb"
 )
 
 // update players, seasons, and teams in memory structs slices

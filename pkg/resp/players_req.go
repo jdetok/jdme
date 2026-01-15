@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/errd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
+	"github.com/jdetok/jdme/pkg/clnd"
+	"github.com/jdetok/jdme/pkg/errd"
+	"github.com/jdetok/jdme/pkg/memd"
 )
 
 // read player from query string and clean the value (remove accents, lowercase)

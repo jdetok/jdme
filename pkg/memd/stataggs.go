@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/pgdb"
 )
 
 type TeamRecords struct {

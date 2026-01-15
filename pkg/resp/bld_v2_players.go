@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/memd"
+	"github.com/jdetok/jdme/pkg/pgdb"
 )
 
 // after verifying player exists, query db for their stats

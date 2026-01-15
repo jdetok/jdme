@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/errd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/logd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/errd"
+	"github.com/jdetok/jdme/pkg/logd"
+	"github.com/jdetok/jdme/pkg/pgdb"
 )
 
 // INITIAL MAP SETUP: must create empty maps before attempting to insert keys

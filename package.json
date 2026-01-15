@@ -9,16 +9,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jdetok/go-api-jdeko.me.git"
+    "url": "git+https://github.com/jdetok/jdme.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/jdetok/go-api-jdeko.me/issues"
+    "url": "https://github.com/jdetok/jdme/issues"
   },
-  "homepage": "https://github.com/jdetok/go-api-jdeko.me#readme",
+  "homepage": "https://github.com/jdetok/jdme#readme",
   "devDependencies": {
     "typescript": "^5.9.3"
   }

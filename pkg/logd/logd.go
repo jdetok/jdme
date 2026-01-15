@@ -10,8 +10,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
-	"github.com/jdetok/go-api-jdeko.me/pkg/mgo"
+	"github.com/jdetok/jdme/pkg/conn"
+	"github.com/jdetok/jdme/pkg/mgo"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 

@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
-	"github.com/jdetok/go-api-jdeko.me/pkg/memd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
-	"github.com/jdetok/go-api-jdeko.me/pkg/resp"
+	"github.com/jdetok/jdme/pkg/conn"
+	"github.com/jdetok/jdme/pkg/memd"
+	"github.com/jdetok/jdme/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/resp"
 	"github.com/joho/godotenv"
 )
 

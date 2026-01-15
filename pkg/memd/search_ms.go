@@ -5,7 +5,7 @@ import (
 	"math/rand/v2"
 	"strconv"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/errd"
+	"github.com/jdetok/jdme/pkg/errd"
 )
 
 func (sm *StMaps) GetPlrLg(plrId uint64) (int, error) {

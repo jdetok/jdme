@@ -3,8 +3,8 @@ package memd
 import (
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/clnd"
-	"github.com/jdetok/go-api-jdeko.me/pkg/pgdb"
+	"github.com/jdetok/jdme/pkg/clnd"
+	"github.com/jdetok/jdme/pkg/pgdb"
 )
 
 type InMemStore struct {

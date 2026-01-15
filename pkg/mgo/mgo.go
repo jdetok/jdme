@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/conn"
+	"github.com/jdetok/jdme/pkg/conn"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"

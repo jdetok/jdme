@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/jdetok/go-api-jdeko.me/pkg/resp"
+	"github.com/jdetok/jdme/pkg/resp"
 )
 
 // /v2/players handler

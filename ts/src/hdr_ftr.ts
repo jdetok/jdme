@@ -91,7 +91,7 @@ const headers = {
     },
     src: {
         path: false,
-        link: "https://github.com/jdetok/go-api-jdeko.me",
+        link: "https://github.com/jdetok/jdme",
         blank: true,
         lg_txt: "jdeko.me source code",
         sm_txt: "source code",
