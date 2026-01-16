@@ -1,13 +1,12 @@
-@media (min-width: 2000px) {
+/* @media (min-width: 2200px) {
     .static_grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         grid-template-rows: min-content;
         grid-template-areas:
-            't ttl l r'
-            't m l r'
-            't . . r'
-            'resp resp resp r'
-            '. . . r'
+            't ttl r'
+            'l m r'
+            'l . r'
+            'resp resp resp'
             ;
         justify-items: center;
     }
@@ -15,7 +14,7 @@
     #mobilebtns {
         display: none;
     }   
-}
+} */
 @media (max-width: 1440px) {
     .static_grid {
         grid-template-columns: 1fr;

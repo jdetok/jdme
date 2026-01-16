@@ -7,6 +7,7 @@ export const checkBoxEls = ['post', 'reg', 'nbaTm', 'wnbaTm'] as string[];
 export const mediaQueryBreak = 850;
 
 export const MSG = `color: mediumseagreen;`
+export const SBL = `color: skyblue;`
 export const MSG_BOLD = `color: mediumseagreen; font-weight: bold;`
 export const RED_BOLD = 'color: red; font-weight: bold;'
 

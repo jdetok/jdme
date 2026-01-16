@@ -1,6 +1,6 @@
 import { searchPlayer } from "./player.js";
 import { clearSearch } from "./inputs.js";
-import { RED_BOLD } from "../global.js";
+import { MSG, SBL, RED_BOLD, foldedLog } from "../global.js";
 import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
 const WINDOWSIZE = 700;
 const BIGWINDOW = 2000;
@@ -9,30 +9,53 @@ let exBtnsInitComplete = false;
 // counter class for number of rows displayed per table
 class rowNum {
     val;
-    min;
-    constructor(val, min = 2) {
+    minR;
+    maxR;
+    constructor(val, minR = 1, maxR = 100) {
         this.val = val;
-        this.min = min;
+        this.minR = minR;
+        this.maxR = maxR;
     }
     ;
     get value() {
         return this.val;
     }
+    snap(val) {
+        if (val <= 1)
+            return 1;
+        return Math.ceil(val / 5) * 5;
+    }
     increase = (by = 5) => {
-        this.val += by;
+        const now = this.val;
+        this.val = this.snap(Math.min(this.maxR, this.val + by));
+        foldedLog(`%cincrease from ${now} to ${this.val}`, SBL);
         return this.val;
     };
     decrease = (by = 5) => {
-        this.val = Math.max(this.min, this.val - by);
+        const now = this.val;
+        this.val = this.snap(Math.max(this.minR, this.val - by));
+        foldedLog(`%cdecrease from ${now} to ${this.val}`, SBL);
         return this.val;
     };
     reset = (to) => {
+        const now = this.val;
         if (to) {
-            this.val = Math.max(this.min, to);
+            this.val = Math.max(this.minR, to);
         }
         else {
             this.val = window.innerWidth <= WINDOWSIZE ? 5 : 10;
         }
+        foldedLog(`%creset from ${now} to ${this.val}`, SBL);
+        return this.val;
+    };
+    max = () => {
+        foldedLog(`%cmax rows requested: current ${this.val} to ${this.maxR}`, SBL);
+        this.val = this.maxR;
+        return this.val;
+    };
+    min = () => {
+        foldedLog(`%cmin rows requested: current ${this.val} to ${this.minR}`, SBL);
+        this.val = this.minR;
         return this.val;
     };
 }
@@ -44,7 +67,9 @@ export class rowsState {
     rgRowNum;
     trRowNum;
     startRows;
+    // max: number;
     constructor(winSize = WINDOWSIZE, bigWinSize = BIGWINDOW) {
+        // this.max = max;
         this.startRows = window.innerWidth <= winSize ? 5 : 10;
         if (window.innerWidth >= bigWinSize) {
             this.lgRowNum = new rowNum(this.lgRowLarge);
@@ -62,6 +87,7 @@ export class rowsState {
         this.rgRowNum.reset(rows);
         this.trRowNum.reset(rows);
         if (window.innerWidth >= bigWinSize) {
+            foldedLog(`%cresetting rows for big screen: ${this.lgRowLarge}`, MSG);
             this.lgRowNum.reset(this.lgRowLarge);
         }
         else {
@@ -98,12 +124,24 @@ export async function makeExpandTblBtns(rs, tblBtns = [
         if (!d)
             continue;
         let to_append = [];
-        for (const obj of [{ op: '+', lbl: 'see more' }, { op: '-', lbl: 'see less' }, { op: 'rst', lbl: 'reset' }]) {
+        for (const obj of [
+            { op: 'all', lbl: 'see all' },
+            { op: '+', lbl: 'see more' },
+            { op: '-', lbl: 'see less' },
+            { op: 'rst', lbl: 'reset' },
+            { op: 'min', lbl: 'minimize' }
+        ]) {
             let newNum;
             const btn = document.createElement('button');
             btn.textContent = obj.lbl;
             btn.addEventListener('click', async () => {
                 switch (obj.op) {
+                    case 'all':
+                        newNum = etb.rows.max();
+                        break;
+                    case 'min':
+                        newNum = etb.rows.min();
+                        break;
                     case '+':
                         newNum = etb.rows.increase();
                         break;
@@ -118,6 +156,8 @@ export async function makeExpandTblBtns(rs, tblBtns = [
                             newNum = etb.rows.reset();
                         }
                         break;
+                    default:
+                        throw new Error(`invalid case: ${obj.op} | ${obj.lbl}`);
                 }
                 await etb.build(newNum);
             });

@@ -4,6 +4,7 @@ export const homeurl = "https://dev.jdeko.me/";
 export const checkBoxEls = ['post', 'reg', 'nbaTm', 'wnbaTm'];
 export const mediaQueryBreak = 850;
 export const MSG = `color: mediumseagreen;`;
+export const SBL = `color: skyblue;`;
 export const MSG_BOLD = `color: mediumseagreen; font-weight: bold;`;
 export const RED_BOLD = 'color: red; font-weight: bold;';
 export async function bytes_in_resp(r) {

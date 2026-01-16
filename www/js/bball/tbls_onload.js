@@ -50,7 +50,8 @@ export async function makeLgTopScorersTbl(numRows) {
     let datasrc = `${base}/league/scoring-leaders?num=${numRows}`;
     let r = await fetch(datasrc);
     const data = await r.json();
-    new Tbl('nba_tstbl', `Scoring Leaders | NBA/WNBA Top ${numRows}`, numRows, data, [
+    const rows = Math.min(numRows, data.nba.length);
+    new Tbl('nba_tstbl', `Scoring Leaders | NBA/WNBA Top ${rows}`, rows, data, [
         {
             header: "rank",
             value: (_, i) => String(i + 1),

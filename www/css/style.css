@@ -27,6 +27,7 @@ body {
     background-color: darkslategrey;
     color: white;
     font-size: 18px;
+    width: 100%;
 }
 
 /* header and footers - grid-template-columns set in js */
