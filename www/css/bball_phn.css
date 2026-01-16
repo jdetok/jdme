@@ -1,3 +1,21 @@
+@media (min-width: 2000px) {
+    .static_grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: min-content;
+        grid-template-areas:
+            't ttl l r'
+            't m l r'
+            't . . r'
+            'resp resp resp r'
+            '. . . r'
+            ;
+        justify-items: center;
+    }
+
+    #mobilebtns {
+        display: none;
+    }   
+}
 @media (max-width: 1440px) {
     .static_grid {
         grid-template-columns: 1fr;

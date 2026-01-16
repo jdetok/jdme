@@ -1,9 +1,12 @@
+
 import { searchPlayer } from "./player.js";
 import { clearSearch } from "./inputs.js";
 import { RED_BOLD } from "../global.js";
 import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
 
 const WINDOWSIZE = 700;
+const BIGWINDOW = 2000;
+const LARGEROWS = 25;
 let exBtnsInitComplete = false;
 
 // counter class for number of rows displayed per table
@@ -35,32 +38,97 @@ class rowNum {
 // tracks row counters for both top scorer tables
 export class rowsState {
     lgRowNum: rowNum;
+    lgRowLarge: number = LARGEROWS;
     rgRowNum: rowNum;
+    trRowNum: rowNum;
     startRows: number;
-    constructor(winSize: number = WINDOWSIZE) {
+    constructor(winSize: number = WINDOWSIZE, bigWinSize: number = BIGWINDOW) {
         this.startRows = window.innerWidth <= winSize ? 5 : 10;
-        this.lgRowNum = new rowNum(this.startRows);
+        if (window.innerWidth >= bigWinSize) { 
+            this.lgRowNum = new rowNum(this.lgRowLarge);
+        } else {
+            this.lgRowNum = new rowNum(this.startRows);
+        }
+        this.trRowNum = new rowNum(this.startRows);
         this.rgRowNum = new rowNum(this.startRows);
         this.listenForResize();
     };
-    resetRows(winSize: number = WINDOWSIZE): number {
-        const rows = window.innerWidth <= winSize ? 5 : 10;
-        this.lgRowNum.reset(rows);
+    resetRows(winSize: number = WINDOWSIZE, bigWinSize: number = BIGWINDOW): number {
+        let rows: number = window.innerWidth <= winSize ? 5 : 10;
         this.rgRowNum.reset(rows);
+        this.trRowNum.reset(rows);
+        if (window.innerWidth >= bigWinSize) {
+            this.lgRowNum.reset(this.lgRowLarge);
+        } else {
+            this.lgRowNum.reset(rows);
+        }
         return rows;
     }
-    listenForResize() { // change row nums and rebuild tables when window size changes
-        const mq = window.matchMedia(`(max-width: ${WINDOWSIZE}px)`);
-        mq.addEventListener('change', async () => {
-            const newRows = this.resetRows();
-            await Promise.all([
-                makeTeamRecordsTbl(newRows),
-                makeLgTopScorersTbl(this.lgRowNum.value),
-                makeRgTopScorersTbl(this.rgRowNum.value)
-            ])
-        })
+    listenForResize(winSize: number = WINDOWSIZE, bigWinSize: number = BIGWINDOW) { // change row nums and rebuild tables when window size changes
+        const small_mq = window.matchMedia(`(max-width: ${winSize}px)`);
+        const large_mq = window.matchMedia(`(min-width: ${bigWinSize}px)`);
+        small_mq.addEventListener('change', async () => { await this.handleMediaQueries(); });
+        large_mq.addEventListener('change', async () => { await this.handleMediaQueries(); });
+    }
+    async handleMediaQueries() {
+        const newRows = this.resetRows();
+        await Promise.all([
+            makeTeamRecordsTbl(this.trRowNum.value),
+            makeLgTopScorersTbl(this.lgRowNum.value),
+            makeRgTopScorersTbl(this.rgRowNum.value)
+        ])
     }
 };
+
+export type expandTblBtns = {
+    elId: string, 
+    rows: rowNum, 
+    build: (numRows: number) => Promise<void>
+}
+
+export async function makeExpandTblBtns(rs: rowsState, tblBtns: expandTblBtns[] = [
+    {elId: "seemorelessLGbtns", rows: rs.lgRowNum, build: makeLgTopScorersTbl},
+    {elId: "seemorelessRGbtns", rows: rs.rgRowNum, build: makeRgTopScorersTbl},
+    {elId: "seemorelessTRbtns", rows: rs.trRowNum, build: makeTeamRecordsTbl},
+]) {
+    if (exBtnsInitComplete) return;
+    exBtnsInitComplete = true;
+    for (let etb of tblBtns) {
+        const d = document.getElementById(etb.elId);
+        if (!d) continue;
+        
+        let to_append: HTMLButtonElement[] = [];
+        for (const obj of [{ op: '+', lbl: 'see more' }, {op:  '-', lbl:  'see less' }, { op: 'rst', lbl: 'reset'}]) {
+            let newNum: number;
+            
+            const btn = document.createElement('button');
+            btn.textContent = obj.lbl;
+            btn.addEventListener('click', async () => {
+                switch (obj.op) {
+                    case '+':
+                        newNum = etb.rows.increase();
+                        break;
+                    case '-':
+                        newNum = etb.rows.decrease();
+                        break;
+                    case 'rst':
+                        if (etb.elId === 'seemorelessLGbtns' && window.innerWidth >= BIGWINDOW) {
+                            newNum = etb.rows.reset(LARGEROWS);
+                        } else {
+                            newNum = etb.rows.reset();
+                        }
+                        break;
+                }
+                await etb.build(newNum);
+            });
+            to_append.push(btn);
+        }
+        for (const b of to_append) {
+            d.appendChild(b);
+        }
+        
+    }
+}
 
 export type expandableTbl = {
     elId: string, 
