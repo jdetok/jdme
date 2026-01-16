@@ -167,7 +167,7 @@ async function respPlayerInfo(data, elId) {
     d.append(u);
     cont.append(d);
 }
-async function appendImg(url, elId) {
+export async function appendImg(url, elId) {
     const pEl = document.getElementById(elId);
     if (!pEl)
         throw new Error(`couldnt' get response title element at ${elId}`);

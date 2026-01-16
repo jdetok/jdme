@@ -3,13 +3,11 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto;
-    /* grid-template-rows: repeat(7, auto); */
     grid-template-areas:
     '. ttl .'
     't m r'
     't jumpbtns r'
-    /* 't ttl r' */
-    /* '. m r' */
+    't lg_imgs r'
     'l . r'
     '. . r'
     'resp resp resp'
@@ -19,15 +17,10 @@
     margin: 0 auto;
 
 }
-/* 
-'t ttl r'
-    't jumpbtns r'
-    't l r'
-    't m r'
-    '. m r'
-    '. . r'
-    'resp resp resp'
-*/
+
+#lg_imgs {
+    grid-area: lg_imgs;
+}
 /* ERROR MESSAGE */
 .err {
     display: none;
