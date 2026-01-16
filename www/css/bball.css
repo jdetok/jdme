@@ -12,6 +12,7 @@
     't m r'
     '. m r'
     '. . r'
+    'resp resp resp'
     ;
     gap: 10px;
     padding: 5px;
@@ -158,11 +159,8 @@ select {
     justify-content: center;
     margin: 0 auto;
     width: fit-content;
-    /* /* max-width: 100%; */
 }
-/* #search {
-    grid-area: search
-} */
+
 #clearS {
     grid-area: clear;
 }
@@ -195,11 +193,9 @@ select {
     max-width: 100%;
 }
 
-
-
 /* RESPONSE CLASSES */
-/* meant to be outermost of response */
 .response {
+    grid-area: resp;
     display: grid;
     grid-template-rows: auto auto;
     grid-template-columns: 1fr 1fr;
