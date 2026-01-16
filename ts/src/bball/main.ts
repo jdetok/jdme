@@ -19,7 +19,6 @@ async function LoadContent(): Promise<void> {
         clearSearch();
         await lgRadioBtns();
         await setup_jump_btns();
-        // await expandedListBtns(ROWSTATE);
         await makeExpandTblBtns(ROWSTATE);
         await setupExclusiveCheckboxes('post', 'reg');
         await setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
