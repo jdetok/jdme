@@ -1,18 +1,29 @@
 import { Tbl } from "./tbl.js";
 import { searchPlayer } from "./player.js";
-import { base, foldedLog } from "../global.js";
+import { base, fetchJSON, foldedLog, RED_BOLD, SBL, MSG } from "../global.js";
 const getRGRow = (d, i) => {
     const player = d.top_scorers[i];
     const game = d.recent_games.find((g) => g.player_id === player.player_id);
     return { player, game };
 };
+export async function getRGData() {
+    return await fetchJSON(`${base}/games/recent`);
+}
 // top scorers from most recent day of games
-export async function makeRgTopScorersTbl(numRows) {
-    let datasrc = `${base}/games/recent`;
-    let r = await fetch(datasrc);
-    const data = await r.json();
-    foldedLog(`attempting to build RgTopScorers table...`);
-    console.log(data);
+// data called on content load and passed through here to have max number of entries for row state
+export async function makeRgTopScorersTbl(numRows, data_in) {
+    foldedLog(`%cattempting to build RgTopScorers table...`, SBL);
+    let data;
+    if (!data_in) {
+        data = await getRGData();
+    }
+    else {
+        data = data_in;
+    }
+    if (!data?.top_scorers?.length || !data?.recent_games?.length) {
+        foldedLog("%cRGData missing or malformed, skipping table build", RED_BOLD);
+        return;
+    }
     const rows = Math.min(numRows, data.top_scorers.length);
     new Tbl('tstbl', `Top ${rows} Scorers | ${data.recent_games[0].game_date}`, rows, data, [
         {
@@ -44,12 +55,15 @@ export async function makeRgTopScorersTbl(numRows) {
             value: (d, i) => String(d.top_scorers[i].points),
         },
     ]).init();
+    foldedLog(`%cRgTopScorers table built successfully`, MSG);
+}
+export async function getLGData(numRows) {
+    return await fetchJSON(`${base}/league/scoring-leaders?num=${numRows}`);
 }
 // top scorers in the current season
 export async function makeLgTopScorersTbl(numRows) {
-    let datasrc = `${base}/league/scoring-leaders?num=${numRows}`;
-    let r = await fetch(datasrc);
-    const data = await r.json();
+    foldedLog(`%cattempting to build LgTopScorers table...`, SBL);
+    const data = await getLGData(numRows);
     const rows = Math.min(numRows, data.nba.length);
     new Tbl('nba_tstbl', `Scoring Leaders | NBA/WNBA Top ${rows}`, rows, data, [
         {
@@ -79,11 +93,14 @@ export async function makeLgTopScorersTbl(numRows) {
             value: (d, i) => String(d.wnba[i].points),
         },
     ]).init();
+    foldedLog(`%cLgTopScorers table built successfully`, MSG);
+}
+export async function getTRData() {
+    return await fetchJSON(`${base}/teamrecs`);
 }
 export async function makeTeamRecordsTbl(numRows) {
-    let datasrc = `${base}/teamrecs`;
-    let r = await fetch(datasrc);
-    const data = await r.json();
+    foldedLog(`%cattempting to build TeamRecs table...`, SBL);
+    const data = await getTRData();
     const rows = Math.min(numRows, data.nba_team_records.length);
     new Tbl("trtbl", "NBA/WNBA Regular Season Team Records", rows, data, [
         { header: "rank", value: (_, i) => String(i + 1) },
@@ -112,5 +129,6 @@ export async function makeTeamRecordsTbl(numRows) {
             },
         },
     ]).init();
+    foldedLog(`%cTeamRecs table built successfully`, MSG);
 }
 //# sourceMappingURL=tbls_onload.js.map
