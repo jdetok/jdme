@@ -163,7 +163,14 @@ async function respPlayerTitle(data, elId, ts) {
         rTitle.textContent = data.caption;
     }
 }
-
+/* #lg_imgs {
+    grid-area: lg_imgs;
+    height: min-content;
+}
+#lg_imgs > div {
+    height: min-content;
+    height: min-content;
+} */
 async function respPlayerInfo(data, elId) {
     const cont = document.getElementById(elId);
     if (!cont) throw new Error(`couldnt' get response title element at ${elId}`);

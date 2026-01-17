@@ -5,14 +5,16 @@
     grid-template-rows: auto;
     grid-template-areas:
     '. ttl .'
+    't lg_imgs r'
+    't d r'
     't m r'
     't jumpbtns r'
-    't lg_imgs r'
     'l . r'
     '. . r'
     'resp resp resp'
     ;
     gap: 10px;
+    width: fit-content;
     padding: 5px;
     margin: 0 auto;
 
@@ -20,6 +22,17 @@
 
 #lg_imgs {
     grid-area: lg_imgs;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px;
+    height: min-content;
+    margin: 0 auto;
+    justify-content: center;
+    padding: 10px;
+}
+#lg_imgs > div {
+    height: min-content;
+    width: fit-content;
 }
 /* ERROR MESSAGE */
 .err {
@@ -42,6 +55,10 @@
     flex-direction: column;
     gap: .5rem;
     width: 100%;
+}
+
+#disclaimer {
+    grid-area: d;
 }
 
 /* GROUP OF BUTTONS */
@@ -263,6 +280,6 @@ select {
 
 .btm {
     margin-top:35px;
-    font-size: 16px;
+    /* font-size: 16px; */
     color: rgb(236, 237, 255);
 }

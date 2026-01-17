@@ -3,6 +3,7 @@ import { searchPlayer } from "./player.js";
 import { clearSearch } from "./inputs.js";
 import { MSG, SBL, RED_BOLD, foldedLog } from "../global.js";
 import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
+import { makeLogoImgs } from "./img.js";
 
 const WINDOWSIZE = 700;
 const BIGWINDOW = 2000;
@@ -63,7 +64,6 @@ export class rowsState {
     rgRowNum: rowNum;
     trRowNum: rowNum;
     startRows: number;
-    // max: number;
     constructor(winSize: number = WINDOWSIZE, bigWinSize: number = BIGWINDOW) {
         // this.max = max;
         this.startRows = window.innerWidth <= winSize ? 5 : 10;
@@ -95,8 +95,9 @@ export class rowsState {
         large_mq.addEventListener('change', async () => { await this.handleMediaQueries(); });
     }
     async handleMediaQueries() {
-        const newRows = this.resetRows();
+        this.resetRows();
         await Promise.all([
+            makeLogoImgs(),
             makeTeamRecordsTbl(this.trRowNum.value),
             makeLgTopScorersTbl(this.lgRowNum.value),
             makeRgTopScorersTbl(this.rgRowNum.value)

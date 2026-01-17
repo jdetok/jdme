@@ -4,15 +4,17 @@
 
         grid-template-rows: auto;
         grid-template-areas:
-            "rhdr"
-            "ttl"
-            "jumpbtns"
-            "chdr"
-            "t"
-            "l"
-            "r"
-            "m"
-            "resp";
+            'rhdr'
+            'ttl'
+            'lg_imgs'
+            'd'
+            'jumpbtns'
+            'chdr'
+            't'
+            'l'
+            'r'
+            'm'
+            'resp';
         justify-items: center;
     }
 
@@ -44,4 +46,15 @@
     .resprow {
         flex-direction: column;
     }
+
+    /* body {
+        font-size: 14px;
+    } */
+    
 }
+
+/* @media (max-width: 800px) {
+    body {
+        font-size: 12px;
+    }
+} */
