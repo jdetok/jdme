@@ -154,7 +154,7 @@ const footers = {
     },
     src: {
         path: false,
-        link: "https://www.linkedin.com/in/justin-dekock-257879185",
+        link: "https://github.com/jdetok/jdme",
         blank: true,
         lg_txt: 'jdeko.me source code',
         sm_txt: 'source code',

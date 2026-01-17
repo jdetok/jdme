@@ -2,7 +2,8 @@ import { buildOnLoadDash } from "./player.js";
 import { foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
 import { clearSearch, lgRadioBtns, loadSznOptions, loadTeamOptions, } from "./inputs.js";
 import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
-import { submitPlayerSearch, randPlayerBtn, holdPlayerBtn, setup_jump_btns, setupExclusiveCheckboxes, clearSearchBtn, expandedListBtns, rowsState } from "./listeners.js";
+import { submitPlayerSearch, randPlayerBtn, holdPlayerBtn, setup_jump_btns, setupExclusiveCheckboxes, clearSearchBtn, rowsState, makeExpandTblBtns } from "./listeners.js";
+import { makeLogoImgs } from "./img.js";
 // CALL ENTRYPOINT
 await LoadContent();
 // ENTRYPOINT DEFINITION
@@ -15,11 +16,12 @@ async function LoadContent() {
         clearSearch();
         await lgRadioBtns();
         await setup_jump_btns();
-        await expandedListBtns(ROWSTATE);
+        await makeExpandTblBtns(ROWSTATE);
         await setupExclusiveCheckboxes('post', 'reg');
         await setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
         await loadSznOptions();
         await loadTeamOptions();
+        await makeLogoImgs();
         // build tables and recent top scorer dash on initial load
         try {
             await makeLgTopScorersTbl(ROWSTATE.lgRowNum.value);

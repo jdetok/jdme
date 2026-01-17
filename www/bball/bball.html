@@ -17,11 +17,16 @@
 <header id="hdr"></header>
 
 <!-- TOP HALF OF SITE (BEFORE RESPONSE SECTION) -->
-  
+<body>
   <div class="static_grid">
     <div id="site_title">
       jdeko.me/bball<br>nba/wnba statistics
     </div>
+    <div class="respimgs" id="lg_imgs">
+      <div id="nba_img"></div>
+      <div id="wnba_img"></div>
+    </div>
+    <div id="disclaimer"><i>no affiliation with the nba/wnba - this site is for educational purposes only</i></div>
     <div class="btnshoriz" id="mobilebtns">
       <button id="jumptoresp">jump to current player</button>
       <button id="jumptosearch">jump to player search</button>
@@ -29,24 +34,17 @@
     <!-- TOP SCORERS FROM RECENTS GAMES TABLE -->
     <div class="tablewithbtns" id="top_players">
       <table class="ranktbl" id="tstbl"></table>
-      <div class="btnshoriz" id="seemorelessRGbtns">
-        <button id="seemoreRGplayers">see more top scorers</button>
-        <button id="seelessRGplayers">see less top scorers</button>
-        <button id="resetRGplayers">reset</button>
-      </div>
+      <div class="btnshoriz" id="seemorelessRGbtns"></div>
     </div>
     <!-- TEAM RECORDS TABLE -->
     <div class="tablewithbtns" id="team_recs_tbl">
       <table class="ranktbl" id="trtbl"></table>
+      <div class="btnshoriz" id="seemorelessTRbtns"></div>
     </div>
     <!-- LEAGUE/SEASON LEADING SCORERS TABLE -->
     <div class="tablewithbtns" id="top_lg_players">
       <table class="ranktbl" id="nba_tstbl"></table>
-      <div class="btnshoriz" id="seemorelessbtns">
-        <button id="seemoreplayers">see more top scorers</button>
-        <button id="seelessplayers">see less top scorers</button>
-        <button id="resetplayers">reset</button>
-      </div>
+      <div class="btnshoriz" id="seemorelessLGbtns"></div>
     </div>
     <!-- UI FORM WITH SELECTORS/INPUTS -->
     <form id="ui">
@@ -110,27 +108,26 @@
         <button type="button" id="randP">search for a random player</button>
       </div>
     </form>
-  </div>
-
   <!-- RESPONSE -->
-  <div class="response">
-    <div class="resptitle" id="player_title"></div>
-    <!-- PLAYER/TEAM IMAGES FROM RESPONSE -->
-    <div class="respsect">
-      <div id="player_szn"></div>
-      <div class="respimgs" id="imgs">
-        <div id="tm_img"></div>
-        <div id="pl_img"></div>
+    <div class="response">
+      <div class="resptitle" id="player_title"></div>
+      <!-- PLAYER/TEAM IMAGES FROM RESPONSE -->
+      <div class="respsect">
+        <div id="player_szn"></div>
+        <div class="respimgs" id="imgs">
+          <div id="tm_img"></div>
+          <div id="pl_img"></div>
+        </div>
+      </div>
+      <!-- STATS TABLES FROM RESPONSE  -->
+      <div class="resptbls" id="stats">
+        <div class="resptbl" id="box"></div>
+        <div class="resptbl" id="avg-box"></div>
+        <div class="resptbl" id="shooting"></div>
+        <div class="resptbl" id="avg-shooting"></div>
       </div>
     </div>
-    <!-- STATS TABLES FROM RESPONSE  -->
-    <div class="resptbls" id="stats">
-      <div class="resptbl" id="box"></div>
-      <div class="resptbl" id="avg-box"></div>
-      <div class="resptbl" id="shooting"></div>
-      <div class="resptbl" id="avg-shooting"></div>
-    </div>
-  </div>
+  </div> 
   <!-- DISCLAIMER AT BOTTOM -->
   <div class="btm">
     <i>there may be small inconsitencies with statistics at nba.com -- 
