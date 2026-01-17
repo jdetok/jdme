@@ -2,11 +2,12 @@
 .static_grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto;
+    grid-template-rows: min-content;
     grid-template-areas:
     '. ttl .'
-    't lg_imgs r'
     't d r'
+    't lg_imgs r'
+    't . r'
     't m r'
     't jumpbtns r'
     'l . r'

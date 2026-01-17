@@ -1,10 +1,10 @@
+// data is passed as the type T 
 export class Tbl {
     elId;
     title;
     rowCount;
     data;
     columns;
-    // private data!: T;
     constructor(elId, title, rowCount, data, columns) {
         this.elId = elId;
         this.title = title;
@@ -13,8 +13,6 @@ export class Tbl {
         this.columns = columns;
     }
     init() {
-        // const r = await fetch(this.url);
-        // this.data = await r.json();
         this.build();
     }
     build() {

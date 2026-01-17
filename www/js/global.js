@@ -30,4 +30,8 @@ export function toTop() {
         hdr.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 }
+export async function fetchJSON(url) {
+    const r = await fetch(url);
+    return await r.json();
+}
 //# sourceMappingURL=global.js.map

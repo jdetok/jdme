@@ -8,9 +8,8 @@ type Column<T> = {
     };
 };
 
+// data is passed as the type T 
 export class Tbl<T> {
-    // private data!: T;
-
     constructor(
         private elId: string,
         private title: string,
@@ -20,8 +19,6 @@ export class Tbl<T> {
     ) {}
 
     init(): void {
-        // const r = await fetch(this.url);
-        // this.data = await r.json();
         this.build();
     }
 

@@ -1,5 +1,6 @@
 import { base, bytes_in_resp, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
 import { setPHold, getInputVals } from "./inputs.js";
+import { RGData } from "./tbls_onload.js";
 import { tblColHdrs, tblRowColHdrs } from "./tbls_resp.js";
 // html elements to fill
 const PLAYER_DASH_ELS = {
@@ -32,22 +33,21 @@ export async function getRecentGamesData(): Promise<any> {
     return await r.json();
 }
 
-export async function buildOnLoadDash() {
-    await searchPlayer('onload');
+export async function buildOnLoadDash(rgData: RGData) {
+    await searchPlayer('onload', null, rgData);
 }
 
 type PlayerSearchType = 'onload' | 'random' | 'submit' | 'button';
-export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverride?: string): Promise<void> {
+export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverride: string | null = null, rgData?: RGData): Promise<void> {
     const searchElId = 'pSearch';
     const input = document.getElementById(searchElId) as HTMLInputElement;
     if (!input) throw new Error(`couldn't get element at Id ${searchElId}`);
     let player = '';
     const { lg, season, team } = await getInputVals();
-    let recent_data: any | 0;
     switch (pst) {
         case 'onload':
-            recent_data = await getRecentGamesData();
-            player = recent_data.top_scorers[0].player_id;
+            if (!rgData) throw new Error(`%cmust pass recent game data for onload mode`) 
+            player = rgData.top_scorers[0].player;
             foldedLog(`%cfetched onload player ${player} | league: ${lg} | season ${season}`, MSG);
             break;
         case 'submit': 
@@ -59,12 +59,8 @@ export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverr
             break;
         case 'button':
             foldedLog(`%cfetching player ${player} from button | league: ${lg} | season ${season}`, MSG);
-            if (!playerOverride) {
-                console.error(`%cplayerOverride must be passed if called with pst='button'`, RED_BOLD);
-                return;
-            } else {
-                player = playerOverride;
-            }
+            if (!playerOverride) throw new Error(`cplayerOverride must be passed if called with pst='button'`);
+            player = playerOverride;
             break;        
         default: 
             foldedLog(`%coption passed as pst "${pst} not valid`, RED_BOLD);
@@ -77,6 +73,9 @@ export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverr
     }
 
     foldedLog(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
+
+    const recent_data = rgData ?? 0;
+
     // build response player dash section
     let js = await fetchPlayer(base, player, season, team, lg);
     if (js) {

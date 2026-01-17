@@ -1,7 +1,7 @@
 
 import { Tbl } from "./tbl.js";
 import { searchPlayer } from "./player.js";
-import { base, foldedLog } from "../global.js";
+import { base, fetchJSON, foldedLog, RED_BOLD, SBL, MSG } from "../global.js";
 
 const getRGRow = (d: any, i: number) => {
     const player = d.top_scorers[i];
@@ -11,14 +11,54 @@ const getRGRow = (d: any, i: number) => {
     return { player, game };
 };
 
+export type recentGameTopScorer = {
+    player_id: number,
+    team_id: number,
+    player: string,
+    league: "NBA" | "WNBA",
+    points: number, 
+    assists: number, 
+    rebounds: number,
+};
+
+export type recentGame = {
+    game_id: number,
+    team_id: number,
+    player_id: number,
+    player: string,
+    league: "NBA" | "WNBA",
+    team: string,
+    team_name: string,
+    game_date: string,
+    matchup: string,
+    wl: string,
+    points: number,
+    opp_points: number,
+};
+
+export type RGData = {
+    top_scorers: recentGameTopScorer[],
+    recent_games: recentGame[],
+}
+
+export async function getRGData(): Promise<RGData> {
+    return await fetchJSON(`${base}/games/recent`);
+}
 
 // top scorers from most recent day of games
-export async function makeRgTopScorersTbl(numRows: number): Promise<void> {
-    let datasrc = `${base}/games/recent`;
-    let r = await fetch(datasrc);
-    const data = await r.json();
-    foldedLog(`attempting to build RgTopScorers table...`);
-    console.log(data);
+// data called on content load and passed through here to have max number of entries for row state
+export async function makeRgTopScorersTbl(numRows: number, data_in?: RGData): Promise<void> {
+    foldedLog(`%cattempting to build RgTopScorers table...`, SBL);
+    let data: RGData;
+    if (!data_in) {
+        data = await getRGData();
+    } else {
+        data = data_in;
+    }
+    if (!data?.top_scorers?.length || !data?.recent_games?.length) {
+        foldedLog("%cRGData missing or malformed, skipping table build", RED_BOLD);
+        return;
+    }
     const rows = Math.min(
         numRows,
         data.top_scorers.length,
@@ -58,13 +98,30 @@ export async function makeRgTopScorersTbl(numRows: number): Promise<void> {
             },
         ]
     ).init();
+    foldedLog(`%cRgTopScorers table built successfully`, MSG);
+}
+
+export type scoringLeader = {
+    player_id: number,
+    player: string,
+    season: string,
+    team: string,
+    point: number,
+};
+
+export type LGData = {
+    nba: scoringLeader[];
+    wnba: scoringLeader[];
+}
+
+export async function getLGData(numRows: number): Promise<LGData> {
+    return await fetchJSON(`${base}/league/scoring-leaders?num=${numRows}`);
 }
 
 // top scorers in the current season
 export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
-    let datasrc = `${base}/league/scoring-leaders?num=${numRows}`;
-    let r = await fetch(datasrc);
-    const data = await r.json();
+    foldedLog(`%cattempting to build LgTopScorers table...`, SBL);
+    const data = await getLGData(numRows);
     const rows = Math.min(
         numRows,
         data.nba.length,
@@ -101,18 +158,38 @@ export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
             },
         ]
     ).init();
+    foldedLog(`%cLgTopScorers table built successfully`, MSG);
 }
 
-export async function makeTeamRecordsTbl(numRows: number): Promise<void> {
-    let datasrc = `${base}/teamrecs`;
-    let r = await fetch(datasrc);
-    const data = await r.json();
+export type TeamRec = {
+    league: "NBA" | "WNBA",
+    season_id: number,
+    season: string,
+    season_desc: string,
+    team_id: number,
+    team: string,
+    team_long: string,
+    wins: number,
+    losses: number,
+};
 
+export type TRData = {
+    nba_team_records: TeamRec[];
+    wnba_team_records: TeamRec[];
+};
+
+export async function getTRData(): Promise<TRData> {
+    return await fetchJSON(`${base}/teamrecs`);
+}
+
+
+export async function makeTeamRecordsTbl(numRows: number): Promise<void> {
+    foldedLog(`%cattempting to build TeamRecs table...`, SBL);
+    const data = await getTRData();
 
     const rows = Math.min(
         numRows,
         data.nba_team_records.length,
-        // data.wnba_team_records.length
     );
 
     new Tbl(
@@ -144,4 +221,5 @@ export async function makeTeamRecordsTbl(numRows: number): Promise<void> {
         },
     ],
     ).init();
+    foldedLog(`%cTeamRecs table built successfully`, MSG);
 }
