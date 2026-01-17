@@ -65,10 +65,14 @@ export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
     let datasrc = `${base}/league/scoring-leaders?num=${numRows}`;
     let r = await fetch(datasrc);
     const data = await r.json();
+    const rows = Math.min(
+        numRows,
+        data.nba.length,
+    );
     new Tbl(
         'nba_tstbl', 
-        `Scoring Leaders | NBA/WNBA Top ${numRows}`,
-        numRows, data, [
+        `Scoring Leaders | NBA/WNBA Top ${rows}`,
+        rows, data, [
             {
                 header: "rank", 
                 value: (_, i) => String(i + 1),
@@ -108,7 +112,7 @@ export async function makeTeamRecordsTbl(numRows: number): Promise<void> {
     const rows = Math.min(
         numRows,
         data.nba_team_records.length,
-        data.wnba_team_records.length
+        // data.wnba_team_records.length
     );
 
     new Tbl(
@@ -125,12 +129,18 @@ export async function makeTeamRecordsTbl(numRows: number): Promise<void> {
             value: (d, i) => `${d.nba_team_records[i].wins}-${d.nba_team_records[i].losses}`,
         },
         {
-            header: `wnba | ${data.wnba_team_records[0].season}`,
-            value: (d, i) => d.wnba_team_records[i].team_long,
+            header: `wnba | ${data.wnba_team_records[0].season ?? '-'}`,
+            value: (d, i) => {
+                if (i >= d.wnba_team_records.length) return '-';
+                return d.wnba_team_records[i].team_long ?? '-';
+            },
         },
         {
             header: "record",
-            value: (d, i) => `${d.wnba_team_records[i].wins}-${d.wnba_team_records[i].losses}`,
+            value: (d, i) => {
+                if (i >= d.wnba_team_records.length) return '-';
+                return `${d.wnba_team_records[i].wins ?? ''}-${d.wnba_team_records[i].losses ?? ''}`;
+            },
         },
     ],
     ).init();

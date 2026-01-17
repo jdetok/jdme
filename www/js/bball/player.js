@@ -151,6 +151,14 @@ async function respPlayerTitle(data, elId, ts) {
         rTitle.textContent = data.caption;
     }
 }
+/* #lg_imgs {
+    grid-area: lg_imgs;
+    height: min-content;
+}
+#lg_imgs > div {
+    height: min-content;
+    height: min-content;
+} */
 async function respPlayerInfo(data, elId) {
     const cont = document.getElementById(elId);
     if (!cont)
@@ -167,7 +175,7 @@ async function respPlayerInfo(data, elId) {
     d.append(u);
     cont.append(d);
 }
-async function appendImg(url, elId) {
+export async function appendImg(url, elId) {
     const pEl = document.getElementById(elId);
     if (!pEl)
         throw new Error(`couldnt' get response title element at ${elId}`);

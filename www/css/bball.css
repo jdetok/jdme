@@ -3,22 +3,37 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto;
-    /* grid-template-rows: repeat(7, auto); */
     grid-template-areas:
-    'lhdr chdr rhdr'
-    't ttl r'
-    't jumpbtns r'
-    't l r'
+    '. ttl .'
+    't lg_imgs r'
+    't d r'
     't m r'
-    '. m r'
+    't jumpbtns r'
+    'l . r'
     '. . r'
+    'resp resp resp'
     ;
     gap: 10px;
+    width: fit-content;
     padding: 5px;
     margin: 0 auto;
 
 }
 
+#lg_imgs {
+    grid-area: lg_imgs;
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 10px;
+    height: min-content;
+    margin: 0 auto;
+    justify-content: center;
+    padding: 10px;
+}
+#lg_imgs > div {
+    height: min-content;
+    width: fit-content;
+}
 /* ERROR MESSAGE */
 .err {
     display: none;
@@ -31,6 +46,7 @@
     font-weight: bold;
     color:blanchedalmond;
     margin: 0 auto;
+    height: min-content;
 }
 
 /* for div containing a table and buttons that control it */
@@ -39,6 +55,10 @@
     flex-direction: column;
     gap: .5rem;
     width: 100%;
+}
+
+#disclaimer {
+    grid-area: d;
 }
 
 /* GROUP OF BUTTONS */
@@ -158,11 +178,8 @@ select {
     justify-content: center;
     margin: 0 auto;
     width: fit-content;
-    /* /* max-width: 100%; */
 }
-/* #search {
-    grid-area: search
-} */
+
 #clearS {
     grid-area: clear;
 }
@@ -195,11 +212,9 @@ select {
     max-width: 100%;
 }
 
-
-
 /* RESPONSE CLASSES */
-/* meant to be outermost of response */
 .response {
+    grid-area: resp;
     display: grid;
     grid-template-rows: auto auto;
     grid-template-columns: 1fr 1fr;
@@ -265,6 +280,6 @@ select {
 
 .btm {
     margin-top:35px;
-    font-size: 16px;
+    /* font-size: 16px; */
     color: rgb(236, 237, 255);
 }
