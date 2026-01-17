@@ -29,7 +29,7 @@ async function LoadContent() {
             await makeLgTopScorersTbl(ROWSTATE.lgRowNum.value);
             await makeRgTopScorersTbl(ROWSTATE.rgRowNum.value, recent_game_data);
             await makeTeamRecordsTbl(ROWSTATE.startRows);
-            await buildOnLoadDash();
+            await buildOnLoadDash(recent_game_data);
         }
         catch (err) {
             foldedLog(`%cerror building on load elements: ${err}`, RED_BOLD);

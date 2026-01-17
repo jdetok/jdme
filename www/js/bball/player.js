@@ -30,21 +30,21 @@ export async function getRecentGamesData() {
     foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
     return await r.json();
 }
-export async function buildOnLoadDash() {
-    await searchPlayer('onload');
+export async function buildOnLoadDash(rgData) {
+    await searchPlayer('onload', null, rgData);
 }
-export async function searchPlayer(pst = 'submit', playerOverride) {
+export async function searchPlayer(pst = 'submit', playerOverride = null, rgData) {
     const searchElId = 'pSearch';
     const input = document.getElementById(searchElId);
     if (!input)
         throw new Error(`couldn't get element at Id ${searchElId}`);
     let player = '';
     const { lg, season, team } = await getInputVals();
-    let recent_data;
     switch (pst) {
         case 'onload':
-            recent_data = await getRecentGamesData();
-            player = recent_data.top_scorers[0].player_id;
+            if (!rgData)
+                throw new Error(`%cmust pass recent game data for onload mode`);
+            player = rgData.top_scorers[0].player;
             foldedLog(`%cfetched onload player ${player} | league: ${lg} | season ${season}`, MSG);
             break;
         case 'submit':
@@ -56,13 +56,9 @@ export async function searchPlayer(pst = 'submit', playerOverride) {
             break;
         case 'button':
             foldedLog(`%cfetching player ${player} from button | league: ${lg} | season ${season}`, MSG);
-            if (!playerOverride) {
-                console.error(`%cplayerOverride must be passed if called with pst='button'`, RED_BOLD);
-                return;
-            }
-            else {
-                player = playerOverride;
-            }
+            if (!playerOverride)
+                throw new Error(`cplayerOverride must be passed if called with pst='button'`);
+            player = playerOverride;
             break;
         default:
             foldedLog(`%coption passed as pst "${pst} not valid`, RED_BOLD);
@@ -74,6 +70,7 @@ export async function searchPlayer(pst = 'submit', playerOverride) {
         player = pHoldEl.value;
     }
     foldedLog(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
+    const recent_data = rgData ?? 0;
     // build response player dash section
     let js = await fetchPlayer(base, player, season, team, lg);
     if (js) {

@@ -33,12 +33,12 @@ export async function getRecentGamesData(): Promise<any> {
     return await r.json();
 }
 
-export async function buildOnLoadDash() {
-    await searchPlayer('onload');
+export async function buildOnLoadDash(rgData: RGData) {
+    await searchPlayer('onload', null, rgData);
 }
 
 type PlayerSearchType = 'onload' | 'random' | 'submit' | 'button';
-export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverride?: string, rgData?: RGData): Promise<void> {
+export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverride: string | null = null, rgData?: RGData): Promise<void> {
     const searchElId = 'pSearch';
     const input = document.getElementById(searchElId) as HTMLInputElement;
     if (!input) throw new Error(`couldn't get element at Id ${searchElId}`);
