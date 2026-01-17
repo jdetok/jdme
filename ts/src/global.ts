@@ -37,3 +37,8 @@ export function toTop(): void {
         hdr.scrollIntoView({behavior: "smooth", block: "start"});
     }
 }
+
+export async function fetchJSON(url: string): Promise<any> {
+    const r = await fetch(url);
+    return await r.json()
+}
