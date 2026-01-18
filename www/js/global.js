@@ -32,6 +32,7 @@ export function toTop() {
 }
 export async function fetchJSON(url) {
     const r = await fetch(url);
+    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
     return await r.json();
 }
 //# sourceMappingURL=global.js.map

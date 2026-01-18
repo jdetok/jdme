@@ -18,12 +18,81 @@ const PLAYER_DASH_ELS = {
     },
 };
 
+export type shotTypeStats = {
+    made: number,
+    attempted: number,
+    percentage: string,
+}
+
+export type shootingStats = {
+    "field goals": shotTypeStats,
+    "three pointers": shotTypeStats,
+    "free throws": shotTypeStats,
+}
+
+export type boxStats = {
+    points: number,
+    assists: number,
+    rebounds: number,
+    steals: number,
+    blocks: number,
+}
+
+export type playerMeta = {
+    player_id: number,
+    team_id: number,
+    league: string,
+    season_id: number,
+    player: string,
+    team: string,
+    team_name: string,
+    season: string,
+    caption: string,
+    caption_short: string,
+    cap_box_tot: string,
+    cap_box_avg: string,
+    cap_shtg_tot: string,
+    cap_shtg_avg: string,
+    headshot_url: string,
+    team_logo_url: string,
+};
+
+export type statsGroup = {
+    box_stats: boxStats,
+    shooting: shootingStats,
+}
+
+export type playerPlaytime = {
+    games_played: number,
+    minutes: number,
+    minutes_pg: number,
+}
+
+export type PlayerResp = {
+    player_meta: playerMeta,
+    playtime: playerPlaytime,
+    totals: statsGroup,
+    per_game: statsGroup,
+}
+
+export type requestMeta = {
+    request: string,
+    requestedUrl: string,
+    errorsOccured: number,
+};
+
+export type PlayersResp = {
+    request_meta: requestMeta,
+    player: PlayerResp[],
+    error_string?: string,
+};
+
 // get the top scorer from each game from the most recent night where games occured
 // (usually dated yesterday, but when no games occur it'll get the most recent day
 // where games did occur). called on page load, it creates a table with all these
 // scorers and immediately grabs and loads the player dash for the top overall 
 // scorer. use season id 88888 in getP to get most recent season
-export async function getRecentGamesData(): Promise<any> {
+export async function getRecentGamesData(): Promise<RGData> {
     const url = `${base}/games/recent`;
     const r = await fetch(url);
     if (!r.ok) {
@@ -77,18 +146,18 @@ export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverr
     const recent_data = rgData ?? 0;
 
     // build response player dash section
-    let js = await fetchPlayer(base, player, season, team, lg);
-    if (js) {
-        await setPHold(js.player[0].player_meta.player);
-        await buildPlayerDash(js.player[0], recent_data);
-        if (pst !== 'onload') scrollIntoBySize(1350, 1250, "player_title");
-    }
+    const data = await fetchPlayer(base, player, season, team, lg);
+    if (!data) throw new Error(`failed to get data for player ${player} | season ${season} | team ${team}`); 
+    console.log(data);
+    await setPHold(data.player[0].player_meta.player);
+    await buildPlayerDash(data.player[0], recent_data);
+    if (pst !== 'onload') scrollIntoBySize(1350, 1250, "player_title");
 }
 
 
 export async function fetchPlayer(base: string, player: any, 
     season: any, team: any, lg: string,
-) { // add season & team
+): Promise<PlayersResp> { // add season & team
     const errEl = 'sErr';
     const errmsg = document.getElementById(errEl); // sErr is elId
     if (!errmsg) throw new Error(`%ccould not find error string element at ${errEl}`)
@@ -102,29 +171,17 @@ export async function fetchPlayer(base: string, player: any,
 
     const req = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
     // attempt to fetch from /player endpoint with encoded params
-    try {
-        const r = await fetch(req);
-        if (!r.ok) {
-            throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
-        }
-        foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG)
 
-        const js = await r.json()
-        if (js) {
-            if (js.error_string) {
-                errmsg.textContent = js.error_string;
-                errmsg.style.display = "block";
-                return;
-            } else {
-                return js;
-            }
-        }
-    } catch(err) {
+    const r = await fetch(req);
+    if (!r.ok) {
         errmsg.textContent = `can't find ${player}`;
         errmsg.style.display = "block";
-        console.error(`an error occured attempting to fetch ${player}\n${err}`);
-        
+        console.error(`an error occured attempting to fetch ${player}\n`);
+        throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
     }
+    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG)
+
+    return await r.json() as Promise<PlayersResp>;
 }
 
 // accept player dash data, build tables/fetch images and display on screen

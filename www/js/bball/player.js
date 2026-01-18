@@ -72,13 +72,14 @@ export async function searchPlayer(pst = 'submit', playerOverride = null, rgData
     foldedLog(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
     const recent_data = rgData ?? 0;
     // build response player dash section
-    let js = await fetchPlayer(base, player, season, team, lg);
-    if (js) {
-        await setPHold(js.player[0].player_meta.player);
-        await buildPlayerDash(js.player[0], recent_data);
-        if (pst !== 'onload')
-            scrollIntoBySize(1350, 1250, "player_title");
-    }
+    const data = await fetchPlayer(base, player, season, team, lg);
+    if (!data)
+        throw new Error(`failed to get data for player ${player} | season ${season} | team ${team}`);
+    console.log(data);
+    await setPHold(data.player[0].player_meta.player);
+    await buildPlayerDash(data.player[0], recent_data);
+    if (pst !== 'onload')
+        scrollIntoBySize(1350, 1250, "player_title");
 }
 export async function fetchPlayer(base, player, season, team, lg) {
     const errEl = 'sErr';
@@ -93,29 +94,23 @@ export async function fetchPlayer(base, player, season, team, lg) {
     const p = encodeURIComponent(player).toLowerCase();
     const req = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
     // attempt to fetch from /player endpoint with encoded params
-    try {
-        const r = await fetch(req);
-        if (!r.ok) {
-            throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
-        }
-        foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG);
-        const js = await r.json();
-        if (js) {
-            if (js.error_string) {
-                errmsg.textContent = js.error_string;
-                errmsg.style.display = "block";
-                return;
-            }
-            else {
-                return js;
-            }
-        }
-    }
-    catch (err) {
+    const r = await fetch(req);
+    if (!r.ok) {
         errmsg.textContent = `can't find ${player}`;
         errmsg.style.display = "block";
-        console.error(`an error occured attempting to fetch ${player}\n${err}`);
+        console.error(`an error occured attempting to fetch ${player}\n`);
+        throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
     }
+    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG);
+    return await r.json();
+    // if (js) {
+    //     if (js.error_string) {
+    //         errmsg.textContent = js.error_string;
+    //         errmsg.style.display = "block";
+    //     } else {
+    //         return js;
+    //     }
+    // }
 }
 // accept player dash data, build tables/fetch images and display on screen
 export async function buildPlayerDash(data, ts, el = PLAYER_DASH_ELS) {

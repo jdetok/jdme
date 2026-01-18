@@ -4,13 +4,13 @@
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: min-content;
     grid-template-areas:
-    '. ttl .'
-    't d r'
-    't lg_imgs r'
+    'l ttl r'
+    'l d r'
+    'l lg_imgs r'
     't . r'
-    't m r'
     't jumpbtns r'
-    'l . r'
+    't m r'
+    't . r'
     '. . r'
     'resp resp resp'
     ;

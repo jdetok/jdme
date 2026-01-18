@@ -40,5 +40,6 @@ export function toTop(): void {
 
 export async function fetchJSON(url: string): Promise<any> {
     const r = await fetch(url);
+    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
     return await r.json()
 }
