@@ -19,3 +19,4 @@ logs
 *.log
 node_modules
 www/js
+ts/tests
