@@ -1,9 +1,7 @@
 import { foldedLog, homeurl, MSG, RED_BOLD, toTop } from "./global.js";
 
 const CHANGE_AT_WIDTH = 1350;
-
 const media_query = window.matchMedia(`(max-width: ${CHANGE_AT_WIDTH}px)`); 
-
 document.addEventListener('DOMContentLoaded', async () => {
     await mediaQueryMenuSizes(media_query);
     media_query.addEventListener("change",  async (e: MediaQueryListEvent) => {
@@ -11,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-async function mediaQueryMenuSizes(e: MediaQueryListEvent | MediaQueryList): Promise<void> {
+export async function mediaQueryMenuSizes(e: MediaQueryListEvent | MediaQueryList): Promise<void> {
     foldedLog(`%csetting page headers for ${window.location.pathname}...`, MSG);
     const matches = e.matches ?? media_query.matches; 
 

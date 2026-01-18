@@ -5,6 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest run",
+    "test:dom": "vitest run --environment jsdom",
     "build": "tsc"
   },
   "repository": {
@@ -20,6 +23,9 @@
   },
   "homepage": "https://github.com/jdetok/jdme#readme",
   "devDependencies": {
-    "typescript": "^5.9.3"
+    "@testing-library/dom": "^10.4.1",
+    "jsdom": "^27.4.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.17"
   }
 }
