@@ -1,4 +1,4 @@
-import { base } from "../global.js";
+import { base, fetchJSON } from "../global.js";
 
 export type checkGroup = {box: string, slct: string};
 export async function checkBoxGroupValue(
@@ -101,17 +101,27 @@ async function buildSznSelects(data) {
     }
 }
 
+export type Team = {
+    league: string,
+    team_id: string,
+    team: string,
+    team_long: string,
+};
+
+export type Teams = Team[];
+
+export async function getTeams(): Promise<Teams> {
+    return await fetchJSON(`${base}/teams`);
+}
+
 // call seaons endpoint for the opts
 export async function loadTeamOptions() {
-    const url = base + '/teams';
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`HTTP Error from ${url}`);
-    const data = await r.json();
+    const data = await getTeams();
     await buildTeamSelects(data);
 }
 
 // accept seasons in data object and make an option for each
-async function buildTeamSelects(data) {
+async function buildTeamSelects(data: Teams) {
     const nba = document.getElementById('tm_slct');
     const wnba = document.getElementById('wTm_slct');
     for (let t of data) {
