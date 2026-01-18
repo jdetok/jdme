@@ -107,7 +107,9 @@ export async function buildOnLoadDash(rgData: RGData) {
 }
 
 type PlayerSearchType = 'onload' | 'random' | 'submit' | 'button';
-export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverride: string | null = null, rgData?: RGData): Promise<void> {
+export async function searchPlayer(pst: PlayerSearchType = 'submit',
+    playerOverride: string | null = null, rgData?: RGData
+): Promise<void> {
     const searchElId = 'pSearch';
     const input = document.getElementById(searchElId) as HTMLInputElement;
     if (!input) throw new Error(`couldn't get element at Id ${searchElId}`);
@@ -143,7 +145,7 @@ export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverr
 
     foldedLog(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
 
-    const recent_data = rgData ?? 0;
+    const recent_data = rgData ?? null;
 
     // build response player dash section
     const data = await fetchPlayer(base, player, season, team, lg);
@@ -155,8 +157,8 @@ export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverr
 }
 
 
-export async function fetchPlayer(base: string, player: any, 
-    season: any, team: any, lg: string,
+export async function fetchPlayer(base: string, player: string | number, 
+    season: string | number, team: string | number, lg: string,
 ): Promise<PlayersResp> { // add season & team
     const errEl = 'sErr';
     const errmsg = document.getElementById(errEl); // sErr is elId
@@ -184,8 +186,10 @@ export async function fetchPlayer(base: string, player: any,
     return await r.json() as Promise<PlayersResp>;
 }
 
+export type TopScorer = RGData | null;
+
 // accept player dash data, build tables/fetch images and display on screen
-export async function buildPlayerDash(data, ts, el = PLAYER_DASH_ELS) {
+export async function buildPlayerDash(data: PlayerResp, ts: TopScorer, el = PLAYER_DASH_ELS) {
     foldedLog(`%cts: ${ts ? `fetching top scorer from ${ts.recent_games[0].game_date}` : 'no ts var, normal fetch'}`, MSG);
     await appendImg(data.player_meta.headshot_url, el.img.player);
     await appendImg(data.player_meta.team_logo_url, el.img.team);
@@ -204,7 +208,7 @@ export async function buildPlayerDash(data, ts, el = PLAYER_DASH_ELS) {
 
 // ts is always nothing, except when buildPlayerDash is called on page load with recent games data
 // in that case, ts exists and should be the object returned from /games/recent
-async function respPlayerTitle(data, elId, ts) {
+async function respPlayerTitle(data: playerMeta, elId: string, ts: TopScorer) {
     const rTitle = document.getElementById(elId);
 
     if (!rTitle) throw new Error(`couldnt' get response title element at ${elId}`);
@@ -219,15 +223,8 @@ async function respPlayerTitle(data, elId, ts) {
         rTitle.textContent = data.caption;
     }
 }
-/* #lg_imgs {
-    grid-area: lg_imgs;
-    height: min-content;
-}
-#lg_imgs > div {
-    height: min-content;
-    height: min-content;
-} */
-async function respPlayerInfo(data, elId) {
+
+async function respPlayerInfo(data: PlayerResp, elId: string) {
     const cont = document.getElementById(elId);
     if (!cont) throw new Error(`couldnt' get response title element at ${elId}`);
     cont.textContent = '';
@@ -243,7 +240,7 @@ async function respPlayerInfo(data, elId) {
     cont.append(d);
 }
 
-export async function appendImg(url, elId) {
+export async function appendImg(url: string, elId: string) {
     const pEl = document.getElementById(elId);
     if (!pEl) throw new Error(`couldnt' get response title element at ${elId}`);
     const img = document.createElement('img');

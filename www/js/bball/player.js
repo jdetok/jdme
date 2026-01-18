@@ -70,7 +70,7 @@ export async function searchPlayer(pst = 'submit', playerOverride = null, rgData
         player = pHoldEl.value;
     }
     foldedLog(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
-    const recent_data = rgData ?? 0;
+    const recent_data = rgData ?? null;
     // build response player dash section
     const data = await fetchPlayer(base, player, season, team, lg);
     if (!data)
@@ -103,14 +103,6 @@ export async function fetchPlayer(base, player, season, team, lg) {
     }
     foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG);
     return await r.json();
-    // if (js) {
-    //     if (js.error_string) {
-    //         errmsg.textContent = js.error_string;
-    //         errmsg.style.display = "block";
-    //     } else {
-    //         return js;
-    //     }
-    // }
 }
 // accept player dash data, build tables/fetch images and display on screen
 export async function buildPlayerDash(data, ts, el = PLAYER_DASH_ELS) {
@@ -143,14 +135,6 @@ async function respPlayerTitle(data, elId, ts) {
         rTitle.textContent = data.caption;
     }
 }
-/* #lg_imgs {
-    grid-area: lg_imgs;
-    height: min-content;
-}
-#lg_imgs > div {
-    height: min-content;
-    height: min-content;
-} */
 async function respPlayerInfo(data, elId) {
     const cont = document.getElementById(elId);
     if (!cont)
