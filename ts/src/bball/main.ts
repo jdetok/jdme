@@ -1,5 +1,5 @@
 import { buildOnLoadDash } from "./player.js";
-import { foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
+import { foldedLog, foldedErr, MSG_BOLD, RED_BOLD } from "../global.js";
 import { clearSearch, lgRadioBtns, loadSznOptions, loadTeamOptions,  } from "./inputs.js";
 import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl, getRGData } from "./tbls_onload.js";
 import { rowsState, makeExpandTblBtns } from "./rowstate.js"

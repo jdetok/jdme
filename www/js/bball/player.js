@@ -1,4 +1,4 @@
-import { base, bytes_in_resp, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
+import { base, bytes_in_resp, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD, logResp } from "../global.js";
 import { setPHold, getInputVals } from "./inputs.js";
 import { tblColHdrs, tblRowColHdrs } from "./tbls_resp.js";
 // html elements to fill
@@ -81,8 +81,7 @@ export async function searchPlayer(pst = 'submit', playerOverride = null, rgData
     if (pst !== 'onload')
         scrollIntoBySize(1350, 1250, "player_title");
 }
-export async function fetchPlayer(base, player, season, team, lg) {
-    const errEl = 'sErr';
+export async function fetchPlayer(base, player, season, team, lg, errEl = 'sErr') {
     const errmsg = document.getElementById(errEl); // sErr is elId
     if (!errmsg)
         throw new Error(`%ccould not find error string element at ${errEl}`);
@@ -92,16 +91,23 @@ export async function fetchPlayer(base, player, season, team, lg) {
     // encode passed args to be ready for query string
     const s = encodeURIComponent(season);
     const p = encodeURIComponent(player).toLowerCase();
-    const req = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
+    const url = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
     // attempt to fetch from /player endpoint with encoded params
-    const r = await fetch(req);
-    if (!r.ok) {
-        errmsg.textContent = `can't find ${player}`;
-        errmsg.style.display = "block";
-        console.error(`an error occured attempting to fetch ${player}\n`);
-        throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
+    let r;
+    try {
+        r = await fetch(url);
+        if (!r.ok) {
+            errmsg.textContent = `can't find ${player}`;
+            errmsg.style.display = "block";
+            console.error(`an error occured attempting to fetch ${player}\n`);
+            throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
+        }
     }
-    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG);
+    catch (e) {
+        throw new Error(`fetch player error: ${e}`);
+    }
+    // foldedLog(`%c${await bytes_in_resp(r)} bytes received from ${url}}`, MSG)
+    await logResp(url, r);
     return await r.json();
 }
 // accept player dash data, build tables/fetch images and display on screen

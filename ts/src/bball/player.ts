@@ -1,4 +1,4 @@
-import { base, bytes_in_resp, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
+import { base, bytes_in_resp, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD, foldedErr, logResp } from "../global.js";
 import { setPHold, getInputVals } from "./inputs.js";
 import { RGData } from "./tbls_onload.js";
 import { tblColHdrs, tblRowColHdrs } from "./tbls_resp.js";
@@ -158,31 +158,35 @@ export async function searchPlayer(pst: PlayerSearchType = 'submit',
 
 
 export async function fetchPlayer(base: string, player: string | number, 
-    season: string | number, team: string | number, lg: string,
+    season: string | number, team: string | number, lg: string, errEl = 'sErr'
 ): Promise<PlayersResp> { // add season & team
-    const errEl = 'sErr';
     const errmsg = document.getElementById(errEl); // sErr is elId
-    if (!errmsg) throw new Error(`%ccould not find error string element at ${errEl}`)
+    if (!errmsg) throw new Error(`%ccould not find error string element at ${errEl}`);
     if (errmsg.style.display === "block") {
         errmsg.style.display = 'none';
     }
 
     // encode passed args to be ready for query string
-    const s = encodeURIComponent(season)
+    const s = encodeURIComponent(season);
     const p = encodeURIComponent(player).toLowerCase();
 
-    const req = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
+    const url = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
     // attempt to fetch from /player endpoint with encoded params
 
-    const r = await fetch(req);
-    if (!r.ok) {
-        errmsg.textContent = `can't find ${player}`;
-        errmsg.style.display = "block";
-        console.error(`an error occured attempting to fetch ${player}\n`);
-        throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
+    let r: Response;
+    try {
+        r = await fetch(url);
+        if (!r.ok) {
+            errmsg.textContent = `can't find ${player}`;
+            errmsg.style.display = "block";
+            console.error(`an error occured attempting to fetch ${player}\n`);
+            throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
+        }
+    } catch (e) {
+        throw new Error(`fetch player error: ${e}`);
     }
-    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG)
-
+    // foldedLog(`%c${await bytes_in_resp(r)} bytes received from ${url}}`, MSG)
+    await logResp(url, r);
     return await r.json() as Promise<PlayersResp>;
 }
 

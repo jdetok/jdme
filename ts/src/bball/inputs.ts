@@ -1,11 +1,10 @@
 import { base, fetchJSON } from "../global.js";
 
 export type checkGroup = {box: string, slct: string};
-export async function checkBoxGroupValue(
-    lgrp: checkGroup, rgrp: checkGroup, dflt: number | string
+export async function checkBoxGroupValue(lgrp: checkGroup, rgrp: checkGroup, dflt: number | string
 ): Promise<string> {
-    const l = await checkBoxes(lgrp.box, lgrp.slct);
-    const r = await checkBoxes(rgrp.box, rgrp.slct);
+    const l = await checkBoxes(lgrp);
+    const r = await checkBoxes(rgrp);
 
     if (l) return l;
     if (r) return r;
@@ -13,11 +12,11 @@ export async function checkBoxGroupValue(
     return String(dflt);
 }
 
-export async function checkBoxes(box: string, sel: string) {
-    const b = document.getElementById(box) as HTMLInputElement;
-    const s = document.getElementById(sel) as HTMLInputElement;
+export async function checkBoxes(cg: checkGroup) {
+    const b = document.getElementById(cg.box) as HTMLInputElement;
+    const s = document.getElementById(cg.slct) as HTMLInputElement;
     if (!b || !s) {
-        throw new Error(`couldn't get element with id ${box} or ${sel}`);
+        throw new Error(`couldn't get element with id ${cg.box} or ${cg.slct}`);
     }
     if (b.checked) {
         return s.value
@@ -32,8 +31,7 @@ export async function clearCheckBoxes(boxes: string[]) {
     }
 }
 
-export function clearSearch(focus=false): void {
-    const elId = 'pSearch';
+export function clearSearch(focus=false, elId = 'pSearch'): void {
     const pSearch = document.getElementById(elId) as HTMLInputElement;
     if (!pSearch) throw new Error(`couldn't get search bar element at ${elId}`);
     pSearch.value = '';
