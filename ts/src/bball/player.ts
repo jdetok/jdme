@@ -1,4 +1,4 @@
-import { base, bytes_in_resp, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD } from "../global.js";
+import { base, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD, foldedErr, logResp } from "../global.js";
 import { setPHold, getInputVals } from "./inputs.js";
 import { RGData } from "./tbls_onload.js";
 import { tblColHdrs, tblRowColHdrs } from "./tbls_resp.js";
@@ -18,27 +18,87 @@ const PLAYER_DASH_ELS = {
     },
 };
 
-// get the top scorer from each game from the most recent night where games occured
-// (usually dated yesterday, but when no games occur it'll get the most recent day
-// where games did occur). called on page load, it creates a table with all these
-// scorers and immediately grabs and loads the player dash for the top overall 
-// scorer. use season id 88888 in getP to get most recent season
-export async function getRecentGamesData(): Promise<any> {
-    const url = `${base}/games/recent`;
-    const r = await fetch(url);
-    if (!r.ok) {
-        console.error(`%cerror fetching ${url}`, RED_BOLD);
-    }
-    foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${url}}`, MSG_BOLD);
-    return await r.json();
+export type shotTypeStats = {
+    made: number,
+    attempted: number,
+    percentage: string,
 }
 
+export type shootingStats = {
+    "field goals": shotTypeStats,
+    "three pointers": shotTypeStats,
+    "free throws": shotTypeStats,
+}
+
+export type boxStats = {
+    points: number,
+    assists: number,
+    rebounds: number,
+    steals: number,
+    blocks: number,
+}
+
+export type playerMeta = {
+    player_id: number,
+    team_id: number,
+    league: string,
+    season_id: number,
+    player: string,
+    team: string,
+    team_name: string,
+    season: string,
+    caption: string,
+    caption_short: string,
+    cap_box_tot: string,
+    cap_box_avg: string,
+    cap_shtg_tot: string,
+    cap_shtg_avg: string,
+    headshot_url: string,
+    team_logo_url: string,
+};
+
+export type statsGroup = {
+    box_stats: boxStats,
+    shooting: shootingStats,
+}
+
+export type playerPlaytime = {
+    games_played: number,
+    minutes: number,
+    minutes_pg: number,
+}
+
+export type PlayerResp = {
+    player_meta: playerMeta,
+    playtime: playerPlaytime,
+    totals: statsGroup,
+    per_game: statsGroup,
+}
+
+export type requestMeta = {
+    request: string,
+    requestedUrl: string,
+    errorsOccured: number,
+};
+
+export type PlayersResp = {
+    request_meta: requestMeta,
+    player: PlayerResp[],
+    error_string?: string,
+};
+
 export async function buildOnLoadDash(rgData: RGData) {
-    await searchPlayer('onload', null, rgData);
+    try {
+        await searchPlayer('onload', null, rgData);
+    } catch (e) {
+        throw new Error(`error building onload dash: ${e}`);
+    }
 }
 
 type PlayerSearchType = 'onload' | 'random' | 'submit' | 'button';
-export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverride: string | null = null, rgData?: RGData): Promise<void> {
+export async function searchPlayer(pst: PlayerSearchType = 'submit',
+    playerOverride: string | null = null, rgData?: RGData
+): Promise<void> {
     const searchElId = 'pSearch';
     const input = document.getElementById(searchElId) as HTMLInputElement;
     if (!input) throw new Error(`couldn't get element at Id ${searchElId}`);
@@ -74,80 +134,78 @@ export async function searchPlayer(pst: PlayerSearchType = 'submit', playerOverr
 
     foldedLog(`%csearching for player ${player} | season ${season} | team ${team} | league ${lg}`, MSG_BOLD);
 
-    const recent_data = rgData ?? 0;
+    const recent_data = rgData ?? null;
 
     // build response player dash section
-    let js = await fetchPlayer(base, player, season, team, lg);
-    if (js) {
-        await setPHold(js.player[0].player_meta.player);
-        await buildPlayerDash(js.player[0], recent_data);
-        if (pst !== 'onload') scrollIntoBySize(1350, 1250, "player_title");
+    try {
+        const data = await fetchPlayer(base, player, season, team, lg);
+        if (!data) throw new Error(`failed to get data for player ${player} | season ${season} | team ${team}`);
+        await setPHold(data.player[0].player_meta.player);
+        await buildPlayerDash(data.player[0], recent_data);
+    } catch (e) {
+        throw new Error(`error fetching data or building dash: ${e}`);
     }
+    if (pst !== 'onload') scrollIntoBySize(1350, 1250, "player_title");
 }
 
-
-export async function fetchPlayer(base: string, player: any, 
-    season: any, team: any, lg: string,
-) { // add season & team
-    const errEl = 'sErr';
-    const errmsg = document.getElementById(errEl); // sErr is elId
-    if (!errmsg) throw new Error(`%ccould not find error string element at ${errEl}`)
+export async function fetchPlayer(base: string, player: string | number, 
+    season: string | number, team: string | number, lg: string, errEl = 'sErr'
+): Promise<PlayersResp> {
+    const errmsg = document.getElementById(errEl);
+    if (!errmsg) throw new Error(`%ccould not find error string element at ${errEl}`);
     if (errmsg.style.display === "block") {
         errmsg.style.display = 'none';
     }
 
-    // encode passed args to be ready for query string
-    const s = encodeURIComponent(season)
+    const s = encodeURIComponent(season);
     const p = encodeURIComponent(player).toLowerCase();
-
-    const req = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
-    // attempt to fetch from /player endpoint with encoded params
+    const url = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
+    let r: Response;
+    
     try {
-        const r = await fetch(req);
+        r = await fetch(url);
         if (!r.ok) {
+            errmsg.textContent = `can't find ${player}`;
+            errmsg.style.display = "block";
+            console.error(`an error occured attempting to fetch ${player}\n`);
             throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
         }
-        foldedLog(`%c ${await bytes_in_resp(r)} bytes received from ${req}}`, MSG)
-
-        const js = await r.json()
-        if (js) {
-            if (js.error_string) {
-                errmsg.textContent = js.error_string;
-                errmsg.style.display = "block";
-                return;
-            } else {
-                return js;
-            }
-        }
-    } catch(err) {
-        errmsg.textContent = `can't find ${player}`;
-        errmsg.style.display = "block";
-        console.error(`an error occured attempting to fetch ${player}\n${err}`);
-        
+    } catch (e) {
+        throw new Error(`fetch player error: ${e}`);
     }
+    // foldedLog(`%c${await bytes_in_resp(r)} bytes received from ${url}}`, MSG)
+    await logResp(url, r);
+    return await r.json() as Promise<PlayersResp>;
 }
 
+export type TopScorer = RGData | null;
+
 // accept player dash data, build tables/fetch images and display on screen
-export async function buildPlayerDash(data, ts, el = PLAYER_DASH_ELS) {
-    foldedLog(`%cts: ${ts ? `fetching top scorer from ${ts.recent_games[0].game_date}` : 'no ts var, normal fetch'}`, MSG);
-    await appendImg(data.player_meta.headshot_url, el.img.player);
-    await appendImg(data.player_meta.team_logo_url, el.img.team);
+export async function buildPlayerDash(data: PlayerResp, ts: TopScorer, el = PLAYER_DASH_ELS): Promise<void> {
+    try {
+        await appendImg(data.player_meta.headshot_url, el.img.player);
+        await appendImg(data.player_meta.team_logo_url, el.img.team);
 
-    await respPlayerTitle(data.player_meta, el.title, ts);
-    await respPlayerInfo(data, el.season);
+        await respPlayerTitle(data.player_meta, el.title, ts);
+        await respPlayerInfo(data, el.season);
 
-    // box stat tables
-    await tblColHdrs(data.totals.box_stats, data.player_meta.cap_box_tot, el.tables.total_boxstats);
-    await tblColHdrs(data.per_game.box_stats, data.player_meta.cap_box_avg, el.tables.avg_boxstats);
+        // box stat tables
+        await tblColHdrs(data.totals.box_stats, data.player_meta.cap_box_tot, el.tables.total_boxstats);
+        await tblColHdrs(data.per_game.box_stats, data.player_meta.cap_box_avg, el.tables.avg_boxstats);
 
-    // shooting stats tables
-    await tblRowColHdrs(data.totals.shooting, data.player_meta.cap_shtg_tot, 'shot type', el.tables.shooting);
-    await tblRowColHdrs(data.per_game.shooting, data.player_meta.cap_shtg_avg, 'shot type', el.tables.avg_shooting);
+        // shooting stats tables
+        await tblRowColHdrs(data.totals.shooting, data.player_meta.cap_shtg_tot, 'shot type', el.tables.shooting);
+        await tblRowColHdrs(data.per_game.shooting, data.player_meta.cap_shtg_avg, 'shot type', el.tables.avg_shooting);
+    } catch (e) {
+        foldedErr(`error building ${ts ? 'top scorer' : ''} player dash for ${data.player_meta.player}: ${e}`);
+        return;
+    }
+    foldedLog(`%cbuilt ${ts ? 'top scorer' : ''} player dash for ${data.player_meta.player}`, MSG);
 }
 
 // ts is always nothing, except when buildPlayerDash is called on page load with recent games data
 // in that case, ts exists and should be the object returned from /games/recent
-async function respPlayerTitle(data, elId, ts) {
+async function respPlayerTitle(data: playerMeta, elId: string, ts: TopScorer) {
     const rTitle = document.getElementById(elId);
 
     if (!rTitle) throw new Error(`couldnt' get response title element at ${elId}`);
@@ -162,15 +220,8 @@ async function respPlayerTitle(data, elId, ts) {
         rTitle.textContent = data.caption;
     }
 }
-/* #lg_imgs {
-    grid-area: lg_imgs;
-    height: min-content;
-}
-#lg_imgs > div {
-    height: min-content;
-    height: min-content;
-} */
-async function respPlayerInfo(data, elId) {
+
+async function respPlayerInfo(data: PlayerResp, elId: string) {
     const cont = document.getElementById(elId);
     if (!cont) throw new Error(`couldnt' get response title element at ${elId}`);
     cont.textContent = '';
@@ -181,12 +232,12 @@ async function respPlayerInfo(data, elId) {
     u.textContent = `${data.playtime.games_played} Games Played | 
         ${data.playtime.minutes} Minutes | 
         ${data.playtime.minutes_pg} Minutes/Game`;
-    d.append(s);
-    d.append(u);
-    cont.append(d);
+    d.appendChild(s);
+    d.appendChild(u);
+    cont.appendChild(d);
 }
 
-export async function appendImg(url, elId) {
+export async function appendImg(url: string, elId: string) {
     const pEl = document.getElementById(elId);
     if (!pEl) throw new Error(`couldnt' get response title element at ${elId}`);
     const img = document.createElement('img');

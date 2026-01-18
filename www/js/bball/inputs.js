@@ -1,18 +1,18 @@
-import { base } from "../global.js";
+import { base, fetchJSON } from "../global.js";
 export async function checkBoxGroupValue(lgrp, rgrp, dflt) {
-    const l = await checkBoxes(lgrp.box, lgrp.slct);
-    const r = await checkBoxes(rgrp.box, rgrp.slct);
+    const l = await checkBoxes(lgrp);
+    const r = await checkBoxes(rgrp);
     if (l)
         return l;
     if (r)
         return r;
     return String(dflt);
 }
-export async function checkBoxes(box, sel) {
-    const b = document.getElementById(box);
-    const s = document.getElementById(sel);
+export async function checkBoxes(cg) {
+    const b = document.getElementById(cg.box);
+    const s = document.getElementById(cg.slct);
     if (!b || !s) {
-        throw new Error(`couldn't get element with id ${box} or ${sel}`);
+        throw new Error(`couldn't get element with id ${cg.box} or ${cg.slct}`);
     }
     if (b.checked) {
         return s.value;
@@ -26,8 +26,7 @@ export async function clearCheckBoxes(boxes) {
         b.checked = false;
     }
 }
-export function clearSearch(focus = false) {
-    const elId = 'pSearch';
+export function clearSearch(focus = false, elId = 'pSearch') {
     const pSearch = document.getElementById(elId);
     if (!pSearch)
         throw new Error(`couldn't get search bar element at ${elId}`);
@@ -63,13 +62,12 @@ async function makeOption(slct, txt, val) {
     opt.style.width = '100%';
     slct.appendChild(opt);
 }
+export async function getSeasons() {
+    return await fetchJSON(`${base}/seasons`);
+}
 // call seaons endpoint for the opts
 export async function loadSznOptions() {
-    const url = base + '/seasons';
-    const r = await fetch(url);
-    if (!r.ok)
-        throw new Error(`HTTP Error from ${url}`);
-    const data = await r.json();
+    const data = await getSeasons();
     await buildSznSelects(data);
 }
 // accept seasons in data object and make an option for each
@@ -85,13 +83,12 @@ async function buildSznSelects(data) {
         }
     }
 }
+export async function getTeams() {
+    return await fetchJSON(`${base}/teams`);
+}
 // call seaons endpoint for the opts
 export async function loadTeamOptions() {
-    const url = base + '/teams';
-    const r = await fetch(url);
-    if (!r.ok)
-        throw new Error(`HTTP Error from ${url}`);
-    const data = await r.json();
+    const data = await getTeams();
     await buildTeamSelects(data);
 }
 // accept seasons in data object and make an option for each

@@ -1,11 +1,10 @@
-import { base } from "../global.js";
+import { base, fetchJSON } from "../global.js";
 
 export type checkGroup = {box: string, slct: string};
-export async function checkBoxGroupValue(
-    lgrp: checkGroup, rgrp: checkGroup, dflt: number | string
+export async function checkBoxGroupValue(lgrp: checkGroup, rgrp: checkGroup, dflt: number | string
 ): Promise<string> {
-    const l = await checkBoxes(lgrp.box, lgrp.slct);
-    const r = await checkBoxes(rgrp.box, rgrp.slct);
+    const l = await checkBoxes(lgrp);
+    const r = await checkBoxes(rgrp);
 
     if (l) return l;
     if (r) return r;
@@ -13,11 +12,11 @@ export async function checkBoxGroupValue(
     return String(dflt);
 }
 
-export async function checkBoxes(box: string, sel: string) {
-    const b = document.getElementById(box) as HTMLInputElement;
-    const s = document.getElementById(sel) as HTMLInputElement;
+export async function checkBoxes(cg: checkGroup) {
+    const b = document.getElementById(cg.box) as HTMLInputElement;
+    const s = document.getElementById(cg.slct) as HTMLInputElement;
     if (!b || !s) {
-        throw new Error(`couldn't get element with id ${box} or ${sel}`);
+        throw new Error(`couldn't get element with id ${cg.box} or ${cg.slct}`);
     }
     if (b.checked) {
         return s.value
@@ -32,8 +31,7 @@ export async function clearCheckBoxes(boxes: string[]) {
     }
 }
 
-export function clearSearch(focus=false): void {
-    const elId = 'pSearch';
+export function clearSearch(focus=false, elId = 'pSearch'): void {
     const pSearch = document.getElementById(elId) as HTMLInputElement;
     if (!pSearch) throw new Error(`couldn't get search bar element at ${elId}`);
     pSearch.value = '';
@@ -70,7 +68,7 @@ export async function getInputVals() {
 
 // SELECTORS
 // append options to select
-async function makeOption(slct, txt, val) {
+async function makeOption(slct: HTMLSelectElement, txt: string, val: string) {
     let opt = document.createElement('option');
     opt.textContent = txt;
     opt.value = val;
@@ -78,20 +76,28 @@ async function makeOption(slct, txt, val) {
     slct.appendChild(opt);
 }
 
+export type Season = {
+    season_id: string,
+    season: string,
+    wseason: string,
+};
+
+export type Seasons = Season[];
+
+export async function getSeasons(): Promise<Seasons> {
+    return await fetchJSON(`${base}/seasons`);
+}
+
 // call seaons endpoint for the opts
 export async function loadSznOptions() {
-    const url = base + '/seasons';
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`HTTP Error from ${url}`);
-     
-    const data = await r.json();
+    const data = await getSeasons();
     await buildSznSelects(data);
 }
 
 // accept seasons in data object and make an option for each
-async function buildSznSelects(data) {
-    const rs = document.getElementById('rs_slct');
-    const ps = document.getElementById('ps_slct');
+async function buildSznSelects(data: Seasons) {
+    const rs = document.getElementById('rs_slct') as HTMLSelectElement;
+    const ps = document.getElementById('ps_slct') as HTMLSelectElement;
     for (let s of data) {
         if (s.season_id.substring(0, 1) === '4') {
             await makeOption(ps, s.season, s.season_id);
@@ -101,19 +107,29 @@ async function buildSznSelects(data) {
     }
 }
 
+export type Team = {
+    league: string,
+    team_id: string,
+    team: string,
+    team_long: string,
+};
+
+export type Teams = Team[];
+
+export async function getTeams(): Promise<Teams> {
+    return await fetchJSON(`${base}/teams`);
+}
+
 // call seaons endpoint for the opts
 export async function loadTeamOptions() {
-    const url = base + '/teams';
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`HTTP Error from ${url}`);
-    const data = await r.json();
+    const data = await getTeams();
     await buildTeamSelects(data);
 }
 
 // accept seasons in data object and make an option for each
-async function buildTeamSelects(data) {
-    const nba = document.getElementById('tm_slct');
-    const wnba = document.getElementById('wTm_slct');
+async function buildTeamSelects(data: Teams) {
+    const nba = document.getElementById('tm_slct') as HTMLSelectElement;
+    const wnba = document.getElementById('wTm_slct') as HTMLSelectElement;
     for (let t of data) {
         let txt = `${t.team} | ${t.team_long}`
         if (t.league === 'NBA') {
