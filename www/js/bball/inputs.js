@@ -1,4 +1,4 @@
-import { base } from "../global.js";
+import { base, fetchJSON } from "../global.js";
 export async function checkBoxGroupValue(lgrp, rgrp, dflt) {
     const l = await checkBoxes(lgrp.box, lgrp.slct);
     const r = await checkBoxes(rgrp.box, rgrp.slct);
@@ -63,13 +63,12 @@ async function makeOption(slct, txt, val) {
     opt.style.width = '100%';
     slct.appendChild(opt);
 }
+export async function getSeasons() {
+    return await fetchJSON(`${base}/seasons`);
+}
 // call seaons endpoint for the opts
 export async function loadSznOptions() {
-    const url = base + '/seasons';
-    const r = await fetch(url);
-    if (!r.ok)
-        throw new Error(`HTTP Error from ${url}`);
-    const data = await r.json();
+    const data = await getSeasons();
     await buildSznSelects(data);
 }
 // accept seasons in data object and make an option for each
@@ -85,13 +84,12 @@ async function buildSznSelects(data) {
         }
     }
 }
+export async function getTeams() {
+    return await fetchJSON(`${base}/teams`);
+}
 // call seaons endpoint for the opts
 export async function loadTeamOptions() {
-    const url = base + '/teams';
-    const r = await fetch(url);
-    if (!r.ok)
-        throw new Error(`HTTP Error from ${url}`);
-    const data = await r.json();
+    const data = await getTeams();
     await buildTeamSelects(data);
 }
 // accept seasons in data object and make an option for each

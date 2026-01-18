@@ -78,18 +78,26 @@ async function makeOption(slct, txt, val) {
     slct.appendChild(opt);
 }
 
+export type Season = {
+    season_id: string,
+    season: string,
+    wseason: string,
+};
+
+export type Seasons = Season[];
+
+export async function getSeasons(): Promise<Seasons> {
+    return await fetchJSON(`${base}/seasons`);
+}
+
 // call seaons endpoint for the opts
 export async function loadSznOptions() {
-    const url = base + '/seasons';
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`HTTP Error from ${url}`);
-     
-    const data = await r.json();
+    const data = await getSeasons();
     await buildSznSelects(data);
 }
 
 // accept seasons in data object and make an option for each
-async function buildSznSelects(data) {
+async function buildSznSelects(data: Seasons) {
     const rs = document.getElementById('rs_slct');
     const ps = document.getElementById('ps_slct');
     for (let s of data) {
