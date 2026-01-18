@@ -8,7 +8,6 @@ export async function tblColHdrs(data, caption, elId) {
     const tr = document.createElement('tr');
     // get keys of json object and set as cols
     const cols = Object.keys(data);
-    // console.log(`cols: ${cols}`);
     pEl.textContent = ''; // clear parent element
     await tblCaption(tbl, caption); // create & append caption
     // append the header and data for each column
