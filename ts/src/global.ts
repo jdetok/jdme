@@ -16,29 +16,58 @@ export async function bytes_in_resp(r: Response): Promise<number> {
     return buf.byteLength;
 }
 
+export function foldedErr(...args: any[]): void {
+    console.groupCollapsed(`%c** ERROR **`, RED_BOLD);
+    if (args.length == 1) {
+        if (args[0].substring(0, 2) !== '%c') {
+            args[0] = `%c${args[0]}`;
+        }
+        args.push(RED_BOLD);
+    }
+    console.error(...args);
+    console.groupEnd();
+}
+
 export function foldedLog(...args: any[]): void {
     console.groupCollapsed(...args);
     console.trace();
     console.groupEnd();
 }
 
+export async function logResp(url: string, r: Response) {
+    console.groupCollapsed(`%crequesting ${url}...`, SBL);
+    console.trace();
+    console.log(`%c${await bytes_in_resp(r)} bytes received from ${url}}`, MSG);
+    console.groupEnd();
+}
+
 export function scrollIntoBySize(wpx: number, hpx: number, el: string): void {
     if (window.innerWidth <= wpx || window.innerHeight <= hpx) {
-        let res = document.getElementById(el);
-        if (res) {
-            res.scrollIntoView({behavior: "smooth", block: "start"});
+        const res = document.getElementById(el);
+        if (!res) {
+            foldedErr(`couldnt' find elementent with id=${el}`); return;
         }
+        res.scrollIntoView({behavior: "smooth", block: "start"});
     }
 }
 
-export function toTop(): void {
-    const hdr = document.getElementById('hdr');
-    if (hdr) {
-        hdr.scrollIntoView({behavior: "smooth", block: "start"});
+export function toTop(el = 'hdr'): void {
+    const hdr = document.getElementById(el);
+    if (!hdr) {
+        foldedErr(`couldnt' find elementent with id=${el}`); return;
     }
+    hdr.scrollIntoView({behavior: "smooth", block: "start"});
 }
 
 export async function fetchJSON(url: string): Promise<any> {
-    const r = await fetch(url);
+    let r: Response;
+    try {
+        r = await fetch(url);
+    } catch (e) {
+        foldedErr(`fetch error for ${url}: ${e}`);
+        return;
+    }
+    
+    await logResp(url, r);
     return await r.json()
 }

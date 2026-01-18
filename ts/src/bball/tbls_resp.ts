@@ -1,4 +1,4 @@
-export async function tblColHdrs(data, caption, elId) {
+export async function tblColHdrs(data: Object, caption: string, elId: string) {
     // parent element
     const pEl = document.getElementById(elId);
     if (!pEl) throw new Error(`couldn't find respone table element at ${elId}`);
@@ -6,10 +6,9 @@ export async function tblColHdrs(data, caption, elId) {
     const tbl = document.createElement('table');
     const thead = document.createElement('thead');
     const tr = document.createElement('tr');
-
     // get keys of json object and set as cols
     const cols = Object.keys(data);
-    // console.log(`cols: ${cols}`);
+
     pEl.textContent = '' // clear parent element
     await tblCaption(tbl, caption); // create & append caption
 
@@ -27,7 +26,7 @@ export async function tblColHdrs(data, caption, elId) {
     pEl.appendChild(tbl);
 }
 
-async function tblCaption(tbl, caption) {
+async function tblCaption(tbl: HTMLTableElement, caption: string) {
     const capt = document.createElement('caption');
     capt.innerHTML = caption;
     tbl.appendChild(capt);
@@ -35,7 +34,7 @@ async function tblCaption(tbl, caption) {
 
 // FIRST CELL OF EACH ROW IS A HEADER
 // primarily used with shooting stats tables
-export async function tblRowColHdrs(data, caption, rowHdrLabel, elId) {
+export async function tblRowColHdrs(data: Object, caption: string, rowHdrLabel: string, elId: string) {
     const pEl = document.getElementById(elId);
     if (!pEl) throw new Error(`couldn't find respone table element at ${elId}`);
 
