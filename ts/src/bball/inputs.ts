@@ -70,7 +70,7 @@ export async function getInputVals() {
 
 // SELECTORS
 // append options to select
-async function makeOption(slct, txt, val) {
+async function makeOption(slct: HTMLSelectElement, txt: string, val: string) {
     let opt = document.createElement('option');
     opt.textContent = txt;
     opt.value = val;
@@ -98,8 +98,8 @@ export async function loadSznOptions() {
 
 // accept seasons in data object and make an option for each
 async function buildSznSelects(data: Seasons) {
-    const rs = document.getElementById('rs_slct');
-    const ps = document.getElementById('ps_slct');
+    const rs = document.getElementById('rs_slct') as HTMLSelectElement;
+    const ps = document.getElementById('ps_slct') as HTMLSelectElement;
     for (let s of data) {
         if (s.season_id.substring(0, 1) === '4') {
             await makeOption(ps, s.season, s.season_id);
@@ -130,8 +130,8 @@ export async function loadTeamOptions() {
 
 // accept seasons in data object and make an option for each
 async function buildTeamSelects(data: Teams) {
-    const nba = document.getElementById('tm_slct');
-    const wnba = document.getElementById('wTm_slct');
+    const nba = document.getElementById('tm_slct') as HTMLSelectElement;
+    const wnba = document.getElementById('wTm_slct') as HTMLSelectElement;
     for (let t of data) {
         let txt = `${t.team} | ${t.team_long}`
         if (t.league === 'NBA') {
