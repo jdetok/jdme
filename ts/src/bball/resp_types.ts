@@ -1,5 +1,24 @@
+// /seasons
+export type Season = {
+    season_id: string,
+    season: string,
+    wseason: string,
+};
+
+export type Seasons = Season[];
+
+// /teams
+type Team = {
+    league: string,
+    team_id: string,
+    team: string,
+    team_long: string,
+};
+
+export type Teams = Team[];
+
 // /games/recent
-export type recentGameTopScorer = {
+type recentGameTopScorer = {
     player_id: number,
     team_id: number,
     player: string,
@@ -9,7 +28,7 @@ export type recentGameTopScorer = {
     rebounds: number,
 };
 
-export type recentGame = {
+type recentGame = {
     game_id: number,
     team_id: number,
     player_id: number,
@@ -30,7 +49,7 @@ export type RGData = {
 }
 
 // /league/scoring-leaders
-export type scoringLeader = {
+type scoringLeader = {
     player_id: number,
     player: string,
     season: string,
@@ -44,7 +63,7 @@ export type LGData = {
 }
 
 // /teamrecs
-export type TeamRec = {
+type TeamRec = {
     league: "NBA" | "WNBA",
     season_id: number,
     season: string,
@@ -66,19 +85,19 @@ export type TRData = {
 // THIS IS THE ENDPOINT THAT BUILDS PLAYER DASH
 export type TopScorer = RGData | null;
 
-export type shotTypeStats = {
+type shotTypeStats = {
     made: number,
     attempted: number,
     percentage: string,
 }
 
-export type shootingStats = {
+type shootingStats = {
     "field goals": shotTypeStats,
     "three pointers": shotTypeStats,
     "free throws": shotTypeStats,
 }
 
-export type boxStats = {
+type boxStats = {
     points: number,
     assists: number,
     rebounds: number,
@@ -105,12 +124,12 @@ export type playerMeta = {
     team_logo_url: string,
 };
 
-export type statsGroup = {
+type statsGroup = {
     box_stats: boxStats,
     shooting: shootingStats,
 }
 
-export type playerPlaytime = {
+type playerPlaytime = {
     games_played: number,
     minutes: number,
     minutes_pg: number,
@@ -123,7 +142,7 @@ export type PlayerResp = {
     per_game: statsGroup,
 }
 
-export type requestMeta = {
+type requestMeta = {
     request: string,
     requestedUrl: string,
     errorsOccured: number,

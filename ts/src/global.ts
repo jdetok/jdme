@@ -1,5 +1,3 @@
-// REPLACES /www/js/bball/util.js
-
 export const base = "https://dev.jdeko.me/bball";
 export const homeurl = "https://dev.jdeko.me/";
 export const checkBoxEls = ['post', 'reg', 'nbaTm', 'wnbaTm'] as string[];
@@ -15,6 +13,8 @@ export const MSG = `color: mediumseagreen;`
 export const SBL = `color: skyblue;`
 export const MSG_BOLD = `color: mediumseagreen; font-weight: bold;`
 export const RED_BOLD = 'color: red; font-weight: bold;'
+
+export const wsize = (): string => { return `W:${window.innerWidth}px X H:${window.innerHeight}px` }
 
 export async function bytes_in_resp(r: Response): Promise<number> {
     const buf = await r.clone().arrayBuffer();
@@ -40,7 +40,7 @@ export function foldedLog(...args: any[]): void {
 }
 
 export async function logResp(url: string, r: Response) {
-    console.groupCollapsed(`%crequesting ${url}...`, SBL);
+    console.groupCollapsed(`%crequesting '${url}'...`, SBL);
     console.trace();
     console.log(`%c${await bytes_in_resp(r)} bytes received from ${url}}`, MSG);
     console.groupEnd();

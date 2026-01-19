@@ -1,4 +1,4 @@
-import { base, MSG, foldedLog, MSG_BOLD, logResp } from "../global.js";
+import { base, MSG, foldedLog, MSG_BOLD, fetchJSON } from "../global.js";
 import { getInputVals, inputVals } from "./inputs.js";
 import { RGData, PlayersResp } from "./resp_types.js";
 
@@ -82,20 +82,6 @@ async function fetchPlayer(base: string, player: string | number,
     const s = encodeURIComponent(season);
     const p = encodeURIComponent(player).toLowerCase();
     const url = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
-    let r: Response;
-    
-    try {
-        r = await fetch(url);
-        if (!r.ok) {
-            errmsg.textContent = `can't find ${player}`;
-            errmsg.style.display = "block";
-            console.error(`an error occured attempting to fetch ${player}\n`);
-            throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
-        }
-    } catch (e) {
-        throw new Error(`fetch player error: ${e}`);
-    }
-    // foldedLog(`%c${await bytes_in_resp(r)} bytes received from ${url}}`, MSG)
-    await logResp(url, r);
-    return await r.json() as Promise<PlayersResp>;
+
+    return await fetchJSON(url);
 }

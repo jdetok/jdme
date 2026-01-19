@@ -1,5 +1,5 @@
 import { getRGData, initEventListeners, buildOnLoadContent, initUIElements } from "./onload.js";
-import { foldedLog, foldedErr, MSG_BOLD, SBL } from "../global.js";
+import { foldedLog, foldedErr, MSG_BOLD, SBL, wsize } from "../global.js";
 import { RGData } from "./resp_types.js";
 import { rowsState } from "./rowstate.js"
 
@@ -10,8 +10,7 @@ await LoadContent();
 async function LoadContent(): Promise<void> {
     foldedLog(`%cbuilding UI once DOM content loads...`, SBL);
     document.addEventListener('DOMContentLoaded', async () => {
-        const wsize = `W:${window.innerWidth}px X H:${window.innerHeight}px`;
-        foldedLog(`%cDOM loaded for ${wsize} page... `, SBL);
+        foldedLog(`%cDOM loaded for ${wsize()} page... `, SBL);
         
         let recentGameData: RGData;
         let tblRowState: rowsState;
@@ -26,21 +25,18 @@ async function LoadContent(): Promise<void> {
             return;
         }
         
-        foldedLog(`%csetting up UI elements...`, SBL);
         try {
             await initUIElements(tblRowState);
         } catch (e) {
             foldedErr(`error setting up page elements: ${e}`);
         }
-
-        foldedLog(`%cbuilding tables with games data through ${gameDate}...`, SBL);
+        
         try {
             await buildOnLoadContent(tblRowState, recentGameData);
         } catch (e) {
             foldedErr(`error building on load elements: ${e}`);
         }
 
-        foldedLog(`%csetting up button listeners...`, SBL);
         try {
             await initEventListeners();
         } catch (e) {

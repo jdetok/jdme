@@ -1,4 +1,4 @@
-import { base, MSG, foldedLog, MSG_BOLD, logResp } from "../global.js";
+import { base, MSG, foldedLog, MSG_BOLD, fetchJSON } from "../global.js";
 import { getInputVals } from "./inputs.js";
 export async function searchPlayer(pst = 'submit', playerOverride, rgData, searchEl = 'pSearch', holdEl = 'pHold') {
     const input = document.getElementById(searchEl);
@@ -72,21 +72,6 @@ async function fetchPlayer(base, player, season, team, lg, errEl = 'sErr') {
     const s = encodeURIComponent(season);
     const p = encodeURIComponent(player).toLowerCase();
     const url = `${base}/v2/players?player=${p}&season=${s}&team=${team}&league=${lg}`;
-    let r;
-    try {
-        r = await fetch(url);
-        if (!r.ok) {
-            errmsg.textContent = `can't find ${player}`;
-            errmsg.style.display = "block";
-            console.error(`an error occured attempting to fetch ${player}\n`);
-            throw new Error(`HTTP Error (${r.status}) attempting to fetch ${player}`);
-        }
-    }
-    catch (e) {
-        throw new Error(`fetch player error: ${e}`);
-    }
-    // foldedLog(`%c${await bytes_in_resp(r)} bytes received from ${url}}`, MSG)
-    await logResp(url, r);
-    return await r.json();
+    return await fetchJSON(url);
 }
 //# sourceMappingURL=player_search.js.map

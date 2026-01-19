@@ -28,7 +28,7 @@ export async function fetchAndBuildPlayerDash(pst: PlayerSearchType = 'submit',
         foldedErr(`error building player with player search type ${pst}`);
         return;
     }
-    if (pst !== 'onload') scrollIntoBySize(1350, 1250, "player_title");
+    if (pst !== 'onload') scrollIntoBySize(1350, 1250, 'resp_ttl');
 }
 
 // accept player dash data, build tables/fetch images and display on screen

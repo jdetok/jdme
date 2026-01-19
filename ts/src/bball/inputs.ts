@@ -1,6 +1,8 @@
 import { base, fetchJSON } from "../global.js";
+import { Seasons, Teams } from "./resp_types.js"
 
-export type checkGroup = {box: string, slct: string};
+export type checkGroup = { box: string, slct: string };
+
 export async function checkBoxGroupValue(lgrp: checkGroup, rgrp: checkGroup, dflt: number | string
 ): Promise<string> {
     const l = await checkBoxes(lgrp);
@@ -82,14 +84,6 @@ async function makeOption(slct: HTMLSelectElement, txt: string, val: string) {
     slct.appendChild(opt);
 }
 
-export type Season = {
-    season_id: string,
-    season: string,
-    wseason: string,
-};
-
-export type Seasons = Season[];
-
 export async function getSeasons(): Promise<Seasons> {
     return await fetchJSON(`${base}/seasons`);
 }
@@ -113,14 +107,6 @@ async function buildSznSelects(data: Seasons) {
     }
 }
 
-export type Team = {
-    league: string,
-    team_id: string,
-    team: string,
-    team_long: string,
-};
-
-export type Teams = Team[];
 
 export async function getTeams(): Promise<Teams> {
     return await fetchJSON(`${base}/teams`);

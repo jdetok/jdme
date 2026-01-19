@@ -1,6 +1,5 @@
-// import { RED_BOLD, foldedLog } from "../global.js";
 import { NBA_WNBA_LOGO_IMGS, fillImageDiv, normalizeImgHeights } from "./elements.js";
-import { base, fetchJSON, foldedLog, SBL, MSG, BIGWINDOW, LARGEROWS } from "../global.js";
+import { base, fetchJSON, foldedLog, SBL, MSG, BIGWINDOW, LARGEROWS, wsize } from "../global.js";
 import { Tbl } from "./tbl.js";
 import { RGData, LGData, TRData } from "./resp_types.js";
 import { fetchAndBuildPlayerDash } from "./player_dash.js";
@@ -11,6 +10,7 @@ import { listenForInput, setup_jump_btns, setupExclusiveCheckboxes } from "./lis
 let exBtnsInitComplete = false;
 
 export async function initUIElements(rs: rowsState): Promise<void> {
+    foldedLog(`%csetting up UI elements...`, SBL);
     try {
         clearSearch();
         await lgRadioBtns();
@@ -26,6 +26,7 @@ export async function initUIElements(rs: rowsState): Promise<void> {
 }
 
 export async function initEventListeners(): Promise<void> {
+    foldedLog(`%csetting up event listeners...`, SBL);
     try {
         return await listenForInput();
     } catch (e) {
@@ -34,6 +35,7 @@ export async function initEventListeners(): Promise<void> {
 }
 
 export async function buildOnLoadContent(rs: rowsState, rg: RGData): Promise<void> {
+    foldedLog(`%cbuilding tables with games data through ${rg.recent_games[0].game_date}...`, SBL);
     try {
         await makeLogoImgs();
         await makeLgTopScorersTbl(rs.lgRowNum.value);
@@ -50,13 +52,16 @@ async function makeLogoImgs() {
     await normalizeImgHeights(imgs);
 }
 
+// used for reloads on resize
 export async function rebuildContent(tr_rows: number, lg_rows: number, rg_rows: number, rgData?: RGData): Promise<any> {
+    // const wsize = `W:${window.innerWidth}px X H:${window.innerHeight}px`;
+    foldedLog(`%cmedia query listener called for page size ${wsize()}... `, SBL);
     return await Promise.all([
         makeLogoImgs(),
         makeTeamRecordsTbl(tr_rows),
         makeLgTopScorersTbl(lg_rows),
         makeRgTopScorersTbl(rg_rows, rgData),]
-    )
+    );
 }
 
 async function buildOnLoadDash(rgData: RGData) {

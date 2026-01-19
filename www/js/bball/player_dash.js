@@ -27,7 +27,7 @@ export async function fetchAndBuildPlayerDash(pst = 'submit', playerOverride = n
         return;
     }
     if (pst !== 'onload')
-        scrollIntoBySize(1350, 1250, "player_title");
+        scrollIntoBySize(1350, 1250, 'resp_ttl');
 }
 // accept player dash data, build tables/fetch images and display on screen
 async function buildPlayerDash(data, ts) {
