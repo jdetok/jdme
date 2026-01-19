@@ -1,4 +1,4 @@
-import { base, MSG, foldedLog, MSG_BOLD, fetchJSON } from "../global.js";
+import { base, MSG, foldedLog, MSG_BOLD, fetchJSON, errMsg } from "../global.js";
 import { getInputVals, inputVals } from "./inputs.js";
 import { RGData, PlayersResp } from "./resp_types.js";
 
@@ -38,6 +38,7 @@ export async function searchPlayer(pst: PlayerSearchType = 'submit',
         return data;
     } catch (e) {
         throw new Error(`error fetching data for player ${player} | season ${iv.season} | team ${iv.team}: ${e}`);
+        
     }
 }
 

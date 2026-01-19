@@ -5,7 +5,7 @@ import { RGData, LGData, TRData } from "./resp_types.js";
 import { fetchAndBuildPlayerDash } from "./player_dash.js";
 import { clearSearch, lgRadioBtns, loadSznOptions, loadTeamOptions,  } from "./inputs.js";
 import { rowsState, rowNum } from "./rowstate.js";
-import { listenForInput, setup_jump_btns, setupExclusiveCheckboxes } from "./listeners.js";
+import { listenForInput, setup_jump_btns, setupExclusiveCheckboxes, setupExclusiveSelectorGroups } from "./listeners.js";
 
 let exBtnsInitComplete = false;
 
@@ -16,8 +16,7 @@ export async function initUIElements(rs: rowsState): Promise<void> {
         await lgRadioBtns();
         await setup_jump_btns();
         await makeExpandTblBtns(rs);
-        await setupExclusiveCheckboxes('post', 'reg');
-        await setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
+        await setupExclusiveSelectorGroups();
         await loadSznOptions();
         await loadTeamOptions();
     } catch (e) {

@@ -66,4 +66,18 @@ export async function fetchJSON(url) {
     await logResp(url, r);
     return await r.json();
 }
+export async function errMsg(msg, el_id = 'errmsg') {
+    const el = document.getElementById(el_id);
+    if (!el)
+        throw new Error(`can't find element with id ${el_id}`);
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+export async function hideErr(el_id = 'errmsg') {
+    const el = document.getElementById(el_id);
+    if (!el)
+        throw new Error(`can't find element with id ${el_id}`);
+    el.textContent = '';
+    el.style.display = 'none';
+}
 //# sourceMappingURL=global.js.map

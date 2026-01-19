@@ -1,6 +1,6 @@
-import { RED_BOLD, foldedLog } from "../global.js";
+import { RED_BOLD, errMsg, foldedErr, foldedLog } from "../global.js";
 import { fetchAndBuildPlayerDash } from "./player_dash.js";
-import { clearSearch } from "./inputs.js";
+import { clearCheckBoxes, clearSearch } from "./inputs.js";
 
 export async function listenForInput(): Promise<void> {
     await clearSearchBtn();
@@ -24,6 +24,40 @@ export async function setup_jump_btns() {
     }
 }
 
+export type SznTmSelectors = {
+    szn_el: string,
+    szn: {
+        lbox: string, 
+        rbox: string,
+    },
+    tm_el: string,
+    tm: {
+        lbox: string,
+        rbox: string,
+    }
+}
+
+export async function setupExclusiveSelectorGroups(st: SznTmSelectors = {
+    szn_el: 'select_szns',
+    szn: {
+        lbox: 'post', 
+        rbox: 'reg',
+    },
+    tm_el: 'select_teams',
+    tm: {
+        lbox: 'nbaTm',
+        rbox: 'wnbaTm',
+    }
+}): Promise<void> {
+    // setup internal exclusive listeners
+    await setupExclusiveCheckboxes(st.szn.lbox, st.szn.rbox);
+    await setupExclusiveCheckboxes(st.tm.lbox, st.tm.rbox);
+    setupExclusiveGroups(
+        [st.szn.lbox, st.szn.rbox],
+        [st.tm.lbox, st.tm.rbox]
+    );
+}
+
 // make post + reg checkboxes exclusive (but allow neither checked)
 export async function setupExclusiveCheckboxes(leftbox: string, rightbox: string) {
     let lbox = document.getElementById(leftbox) as HTMLInputElement;
@@ -41,6 +75,39 @@ export async function setupExclusiveCheckboxes(leftbox: string, rightbox: string
     rbox.addEventListener("change", handleCheck);
 }
 
+function setupExclusiveGroups(
+    groupA: string[],
+    groupB: string[]
+) {
+    const aEls = groupA
+        .map(id => document.getElementById(id) as HTMLInputElement | null)
+        .filter(Boolean) as HTMLInputElement[];
+
+    const bEls = groupB
+        .map(id => document.getElementById(id) as HTMLInputElement | null)
+        .filter(Boolean) as HTMLInputElement[];
+
+    if (!aEls.length || !bEls.length) {
+        throw new Error("could not resolve checkbox groups");
+    }
+
+    function clearGroup(group: HTMLInputElement[]) {
+        group.forEach(cb => (cb.checked = false));
+    }
+
+    aEls.forEach(cb =>
+        cb.addEventListener("change", () => {
+            if (cb.checked) clearGroup(bEls);
+        })
+    );
+
+    bEls.forEach(cb =>
+        cb.addEventListener("change", () => {
+            if (cb.checked) clearGroup(aEls);
+        })
+    );
+}
+
 async function submitPlayerSearch(elId = 'ui') {
     const frm = document.getElementById(elId) as HTMLFormElement;
     if (!frm) throw new Error(`couldn't get element at Id ${elId}`);
@@ -56,7 +123,11 @@ async function randPlayerBtn(elId = 'randP') {
     if (!btn) throw new Error(`couldn't get button element at id ${elId}`);
     btn.addEventListener('click', async (e: Event) => {
         e.preventDefault();
-        await fetchAndBuildPlayerDash('random');
+        try {
+            await fetchAndBuildPlayerDash('random');
+        } catch (e) {
+            foldedErr(`error getting random player: ${e}`);
+        }
     });
 }
 
@@ -68,7 +139,6 @@ async function clearSearchBtn(): Promise<void> {
         clearSearch(true);
     });
 }
-
 
 // BUTTONS SECTION
 async function holdPlayerBtn(elId = 'holdP') {

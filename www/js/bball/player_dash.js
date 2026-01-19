@@ -1,4 +1,4 @@
-import { MSG, foldedLog, foldedErr, scrollIntoBySize, SBL } from "../global.js";
+import { MSG, foldedLog, foldedErr, scrollIntoBySize, SBL, errMsg, hideErr } from "../global.js";
 import { tblColHdrs, tblRowColHdrs } from "./tbls_resp.js";
 import { makeTmPlrImageDiv, fillImageDiv } from "./elements.js";
 import { searchPlayer } from "./player_search.js";
@@ -8,24 +8,20 @@ export async function fetchAndBuildPlayerDash(pst = 'submit', playerOverride = n
     let data = null;
     try {
         data = await searchPlayer(pst, playerOverride, rgData);
-    }
-    catch (e) {
-        foldedErr(`error searching player with player search type ${pst}`);
-        return;
-    }
-    if (!data)
-        throw new Error(`error getting data for search type ${pst}`);
-    const playerResp = data.player[0];
-    const player = playerResp.player_meta.player;
-    foldedLog(`%cbuilding pst=${pst} dash for player ${player}`, SBL);
-    try {
+        if (!data) {
+            throw new Error(`error getting data for search type ${pst}`);
+        }
+        const playerResp = data.player[0];
+        const player = playerResp.player_meta.player;
+        foldedLog(`%cbuilding pst=${pst} dash for player ${player}`, SBL);
         await setPHold(player);
         await buildPlayerDash(playerResp, rgData ?? null);
     }
     catch (e) {
-        foldedErr(`error building player with player search type ${pst}`);
-        return;
+        await errMsg('error fetching player');
+        throw new Error(`error building player with player search type ${pst}`);
     }
+    await hideErr();
     if (pst !== 'onload')
         scrollIntoBySize(1350, 1250, 'resp_ttl');
 }

@@ -10,6 +10,7 @@
     't . r'
     't jumpbtns r'
     't m r'
+    't err r'
     't . r'
     '. . r'
     'resp resp resp'
@@ -270,6 +271,11 @@ select {
     grid-template-columns: 1fr;
     grid-template-rows: repeat(4, fit-content);
     height: inherit;
+}
+
+#errmsg {
+    display: none;
+    grid-area: err;
 }
 
 .btm {

@@ -3,7 +3,7 @@ import { base, fetchJSON, foldedLog, SBL, MSG, BIGWINDOW, LARGEROWS, wsize } fro
 import { Tbl } from "./tbl.js";
 import { fetchAndBuildPlayerDash } from "./player_dash.js";
 import { clearSearch, lgRadioBtns, loadSznOptions, loadTeamOptions, } from "./inputs.js";
-import { listenForInput, setup_jump_btns, setupExclusiveCheckboxes } from "./listeners.js";
+import { listenForInput, setup_jump_btns, setupExclusiveSelectorGroups } from "./listeners.js";
 let exBtnsInitComplete = false;
 export async function initUIElements(rs) {
     foldedLog(`%csetting up UI elements...`, SBL);
@@ -12,8 +12,7 @@ export async function initUIElements(rs) {
         await lgRadioBtns();
         await setup_jump_btns();
         await makeExpandTblBtns(rs);
-        await setupExclusiveCheckboxes('post', 'reg');
-        await setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
+        await setupExclusiveSelectorGroups();
         await loadSznOptions();
         await loadTeamOptions();
     }

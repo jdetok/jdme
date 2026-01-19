@@ -1,4 +1,4 @@
-import { RED_BOLD, foldedLog } from "../global.js";
+import { RED_BOLD, foldedErr, foldedLog } from "../global.js";
 import { fetchAndBuildPlayerDash } from "./player_dash.js";
 import { clearSearch } from "./inputs.js";
 export async function listenForInput() {
@@ -21,6 +21,23 @@ export async function setup_jump_btns() {
         }
     }
 }
+export async function setupExclusiveSelectorGroups(st = {
+    szn_el: 'select_szns',
+    szn: {
+        lbox: 'post',
+        rbox: 'reg',
+    },
+    tm_el: 'select_teams',
+    tm: {
+        lbox: 'nbaTm',
+        rbox: 'wnbaTm',
+    }
+}) {
+    // setup internal exclusive listeners
+    await setupExclusiveCheckboxes(st.szn.lbox, st.szn.rbox);
+    await setupExclusiveCheckboxes(st.tm.lbox, st.tm.rbox);
+    setupExclusiveGroups([st.szn.lbox, st.szn.rbox], [st.tm.lbox, st.tm.rbox]);
+}
 // make post + reg checkboxes exclusive (but allow neither checked)
 export async function setupExclusiveCheckboxes(leftbox, rightbox) {
     let lbox = document.getElementById(leftbox);
@@ -41,6 +58,28 @@ export async function setupExclusiveCheckboxes(leftbox, rightbox) {
     lbox.addEventListener("change", handleCheck);
     rbox.addEventListener("change", handleCheck);
 }
+function setupExclusiveGroups(groupA, groupB) {
+    const aEls = groupA
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+    const bEls = groupB
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+    if (!aEls.length || !bEls.length) {
+        throw new Error("could not resolve checkbox groups");
+    }
+    function clearGroup(group) {
+        group.forEach(cb => (cb.checked = false));
+    }
+    aEls.forEach(cb => cb.addEventListener("change", () => {
+        if (cb.checked)
+            clearGroup(bEls);
+    }));
+    bEls.forEach(cb => cb.addEventListener("change", () => {
+        if (cb.checked)
+            clearGroup(aEls);
+    }));
+}
 async function submitPlayerSearch(elId = 'ui') {
     const frm = document.getElementById(elId);
     if (!frm)
@@ -57,7 +96,12 @@ async function randPlayerBtn(elId = 'randP') {
         throw new Error(`couldn't get button element at id ${elId}`);
     btn.addEventListener('click', async (e) => {
         e.preventDefault();
-        await fetchAndBuildPlayerDash('random');
+        try {
+            await fetchAndBuildPlayerDash('random');
+        }
+        catch (e) {
+            foldedErr(`error getting random player: ${e}`);
+        }
     });
 }
 async function clearSearchBtn() {
