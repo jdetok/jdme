@@ -2,6 +2,9 @@
 export const base = "https://dev.jdeko.me/bball";
 export const homeurl = "https://dev.jdeko.me/";
 export const checkBoxEls = ['post', 'reg', 'nbaTm', 'wnbaTm'];
+export const WINDOWSIZE = 700;
+export const BIGWINDOW = 1400;
+export const LARGEROWS = 25;
 export const mediaQueryBreak = 850;
 export const MSG = `color: mediumseagreen;`;
 export const SBL = `color: skyblue;`;

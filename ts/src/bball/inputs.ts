@@ -52,7 +52,13 @@ export async function lgRadioBtns() {
     }
 }
 
-export async function getInputVals() {
+export type inputVals = {
+    lg: string,
+    season: string,
+    team: string,
+}
+
+export async function getInputVals(): Promise<inputVals> {
     const lg = await lgRadioBtns();
     const season = await checkBoxGroupValue(
         {box: 'post', slct: 'ps_slct'}, 

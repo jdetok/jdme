@@ -1,24 +1,25 @@
-import { searchPlayer } from "./player.js";
-import { clearSearch } from "./inputs.js";
 import { RED_BOLD, foldedLog } from "../global.js";
-export async function submitPlayerSearch(elId = 'ui') {
-    const frm = document.getElementById(elId);
-    if (!frm)
-        throw new Error(`couldn't get element at Id ${elId}`);
-    frm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        await searchPlayer();
-    });
+import { fetchAndBuildPlayerDash } from "./player_dash.js";
+import { clearSearch } from "./inputs.js";
+export async function listenForInput() {
+    await clearSearchBtn();
+    await submitPlayerSearch();
+    await randPlayerBtn();
+    await holdPlayerBtn();
 }
-// get a random player from the API and getPlayerStats
-export async function randPlayerBtn(elId = 'randP') {
-    const btn = document.getElementById(elId);
-    if (!btn)
-        throw new Error(`couldn't get button element at id ${elId}`);
-    btn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        await searchPlayer('random');
-    });
+export async function setup_jump_btns() {
+    const btns = [{ el: "jumptoresp", jumpTo: "player_title" }, { el: "jumptosearch", jumpTo: "ui" }];
+    for (const btn of btns) {
+        const btnEl = document.getElementById(btn.el);
+        if (btnEl) {
+            btnEl.addEventListener('click', async () => {
+                const jmpEl = document.getElementById(btn.jumpTo);
+                if (jmpEl) {
+                    jmpEl.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            });
+        }
+    }
 }
 // make post + reg checkboxes exclusive (but allow neither checked)
 export async function setupExclusiveCheckboxes(leftbox, rightbox) {
@@ -40,7 +41,26 @@ export async function setupExclusiveCheckboxes(leftbox, rightbox) {
     lbox.addEventListener("change", handleCheck);
     rbox.addEventListener("change", handleCheck);
 }
-export async function clearSearchBtn() {
+async function submitPlayerSearch(elId = 'ui') {
+    const frm = document.getElementById(elId);
+    if (!frm)
+        throw new Error(`couldn't get element at Id ${elId}`);
+    frm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await fetchAndBuildPlayerDash();
+    });
+}
+// get a random player from the API and getPlayerStats
+async function randPlayerBtn(elId = 'randP') {
+    const btn = document.getElementById(elId);
+    if (!btn)
+        throw new Error(`couldn't get button element at id ${elId}`);
+    btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await fetchAndBuildPlayerDash('random');
+    });
+}
+async function clearSearchBtn() {
     const btn = document.getElementById('clearS');
     if (!btn)
         return;
@@ -50,7 +70,7 @@ export async function clearSearchBtn() {
     });
 }
 // BUTTONS SECTION
-export async function holdPlayerBtn(elId = 'holdP') {
+async function holdPlayerBtn(elId = 'holdP') {
     const btn = document.getElementById(elId);
     if (!btn)
         throw new Error(`couldn't get button element at ${elId}`);
@@ -70,19 +90,5 @@ export async function holdPlayerBtn(elId = 'holdP') {
         let search = document.getElementById(searchElId);
         search.value = player;
     });
-}
-export async function setup_jump_btns() {
-    const btns = [{ el: "jumptoresp", jumpTo: "player_title" }, { el: "jumptosearch", jumpTo: "ui" }];
-    for (const btn of btns) {
-        const btnEl = document.getElementById(btn.el);
-        if (btnEl) {
-            btnEl.addEventListener('click', async () => {
-                const jmpEl = document.getElementById(btn.jumpTo);
-                if (jmpEl) {
-                    jmpEl.scrollIntoView({ behavior: "smooth", block: "start" });
-                }
-            });
-        }
-    }
 }
 //# sourceMappingURL=listeners.js.map

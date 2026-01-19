@@ -61,8 +61,11 @@ export type TRData = {
     wnba_team_records: TeamRec[];
 };
 
+
 // /v2/players 
 // THIS IS THE ENDPOINT THAT BUILDS PLAYER DASH
+export type TopScorer = RGData | null;
+
 export type shotTypeStats = {
     made: number,
     attempted: number,

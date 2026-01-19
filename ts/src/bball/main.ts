@@ -1,11 +1,7 @@
-import { buildOnLoadDash } from "./player.js";
+import { getRGData, initEventListeners, buildOnLoadContent, initUIElements } from "./onload.js";
 import { foldedLog, foldedErr, MSG_BOLD, SBL } from "../global.js";
-import { clearSearch, lgRadioBtns, loadSznOptions, loadTeamOptions,  } from "./inputs.js";
-import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl, getRGData } from "./tbls_onload.js";
 import { RGData } from "./resp_types.js";
-import { rowsState, makeExpandTblBtns } from "./rowstate.js"
-import { submitPlayerSearch, randPlayerBtn, holdPlayerBtn, setup_jump_btns, setupExclusiveCheckboxes, clearSearchBtn } from "./listeners.js";
-import { fillImageDiv, makeLogoImgs } from "./img.js";
+import { rowsState } from "./rowstate.js"
 
 // CALL ENTRYPOINT
 await LoadContent();
@@ -18,7 +14,7 @@ async function LoadContent(): Promise<void> {
         foldedLog(`%cDOM loaded for ${wsize} page... `, SBL);
         
         let recentGameData: RGData;
-        let tblRowState: rowsState; 
+        let tblRowState: rowsState;
         let gameDate: string;
 
         try {
@@ -32,35 +28,21 @@ async function LoadContent(): Promise<void> {
         
         foldedLog(`%csetting up UI elements...`, SBL);
         try {
-            clearSearch();
-            await lgRadioBtns();
-            await setup_jump_btns();
-            await makeExpandTblBtns(tblRowState);
-            await setupExclusiveCheckboxes('post', 'reg');
-            await setupExclusiveCheckboxes('nbaTm', 'wnbaTm');
-            await loadSznOptions();
-            await loadTeamOptions();
-            await makeLogoImgs();
+            await initUIElements(tblRowState);
         } catch (e) {
             foldedErr(`error setting up page elements: ${e}`);
         }
 
         foldedLog(`%cbuilding tables with games data through ${gameDate}...`, SBL);
         try {
-            await makeLgTopScorersTbl(tblRowState.lgRowNum.value);
-            await makeRgTopScorersTbl(tblRowState.rgRowNum.value, recentGameData);
-            await makeTeamRecordsTbl(tblRowState.startRows);
-            await buildOnLoadDash(recentGameData);
+            await buildOnLoadContent(tblRowState, recentGameData);
         } catch (e) {
             foldedErr(`error building on load elements: ${e}`);
         }
 
         foldedLog(`%csetting up button listeners...`, SBL);
         try {
-            await clearSearchBtn();
-            await submitPlayerSearch();
-            await randPlayerBtn();
-            await holdPlayerBtn(); 
+            await initEventListeners();
         } catch (e) {
             foldedErr(`error starting submission listeners: ${e}`);
         }
