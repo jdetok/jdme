@@ -1,4 +1,5 @@
 import { base, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD, foldedErr, logResp } from "../global.js";
+import { makeTmPlrImageDiv } from "./elements.js";
 import { fillImageDiv } from "./img.js";
 import { setPHold, getInputVals } from "./inputs.js";
 import { RGData, PlayerResp, PlayersResp, playerMeta } from "./resp_types.js";
@@ -100,25 +101,13 @@ export type TopScorer = RGData | null;
 // accept player dash data, build tables/fetch images and display on screen
 export async function buildPlayerDash(data: PlayerResp, ts: TopScorer): Promise<void> {
     try {
-
-        // await fillImageDiv({
-        //     el: 'dash_imgs',
-        //     imgs: [
-        //         {
-        //             url: data.player_meta.team_logo_url,
-        //             el: 'tm_img',
-        //             alt: `failed to load image for team ${data.player_meta.team}`,
-        //         },
-        //         {
-        //             url: data.player_meta.headshot_url,
-        //             el: 'pl_img',
-        //             alt: `failed to load image for player ${data.player_meta.player}`,
-        //         },
-        //     ]
-        // })
-
-        await appendImg(data.player_meta.headshot_url, 'pl_img');
-        await appendImg(data.player_meta.team_logo_url, 'tm_img');
+        
+        await fillImageDiv(makeTmPlrImageDiv('dash_imgs', {
+            tm_url: data.player_meta.team_logo_url,
+            tm: data.player_meta.team,
+            plr_url: data.player_meta.headshot_url,
+            plr: data.player_meta.player,
+        }));
 
         await respPlayerTitle(data.player_meta, 'resp_ttl', ts);
         await respPlayerInfo(data, 'resp_subttl');
@@ -137,7 +126,7 @@ export async function buildPlayerDash(data: PlayerResp, ts: TopScorer): Promise<
     foldedLog(`%cbuilt ${ts ? 'top scorer' : ''} player dash for ${data.player_meta.player}`, MSG);
 }
 
-// ts is always nothing, except when buildPlayerDash is called on page load with recent games data
+// ts is nothing 
 // in that case, ts exists and should be the object returned from /games/recent
 async function respPlayerTitle(data: playerMeta, elId: string, ts: TopScorer) {
     const rTitle = document.getElementById(elId);

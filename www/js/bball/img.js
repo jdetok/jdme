@@ -1,17 +1,7 @@
 import { foldedLog, MSG } from "../global.js";
+import { NBA_WNBA_LOGO_IMGS } from "./elements.js";
 export async function makeLogoImgs() {
-    const imgs = await fillImageDiv({
-        el: 'lg_imgs', imgs: [
-            {
-                url: 'https://cdn.nba.com/logos/leagues/logo-wnba.svg',
-                alt: 'could not load WNBA logo',
-            },
-            {
-                url: 'https://cdn.nba.com/logos/leagues/logo-nba.svg',
-                alt: 'could not load NBA logo',
-            },
-        ]
-    });
+    const imgs = await fillImageDiv(NBA_WNBA_LOGO_IMGS);
     await normalizeImgHeights(imgs);
 }
 export async function normalizeImgHeights(imgs) {

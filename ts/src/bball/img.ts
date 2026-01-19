@@ -1,35 +1,8 @@
 import { foldedLog, MSG } from "../global.js";
-
-export type image = {
-    el: string,
-    url: string,
-    alt?: string,
-};
-
-export type imageInDiv = {
-    url: string,
-    el?: string,
-    alt?: string,
-};
-
-export type imageDiv = {
-    el: string,
-    imgs: imageInDiv[],
-};
+import { imageDiv, NBA_WNBA_LOGO_IMGS } from "./elements.js";
 
 export async function makeLogoImgs() {
-    const imgs = await fillImageDiv({
-        el: 'lg_imgs', imgs: [
-            {
-                url: 'https://cdn.nba.com/logos/leagues/logo-wnba.svg',
-                alt: 'could not load WNBA logo',
-            },
-            {
-                url: 'https://cdn.nba.com/logos/leagues/logo-nba.svg',
-                alt: 'could not load NBA logo',
-            },
-        ]
-    });
+    const imgs = await fillImageDiv(NBA_WNBA_LOGO_IMGS);
     await normalizeImgHeights(imgs);
 }
 
