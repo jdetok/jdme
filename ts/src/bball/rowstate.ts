@@ -1,9 +1,10 @@
 import { MSG, SBL, foldedLog } from "../global.js";
-import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl, RGData } from "./tbls_onload.js";
+import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
+import { RGData } from "./resp_types.js";
 import { makeLogoImgs } from "./img.js";
 
 const WINDOWSIZE = 700;
-const BIGWINDOW = 2000;
+const BIGWINDOW = 1400;
 const LARGEROWS = 25;
 let exBtnsInitComplete = false;
 

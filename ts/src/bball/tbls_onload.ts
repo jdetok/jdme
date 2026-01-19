@@ -1,7 +1,8 @@
 
 import { Tbl } from "./tbl.js";
 import { searchPlayer } from "./player.js";
-import { base, fetchJSON, foldedLog, RED_BOLD, SBL, MSG, foldedErr } from "../global.js";
+import { RGData, LGData, TRData } from "./resp_types.js";
+import { base, fetchJSON, foldedLog, SBL, MSG } from "../global.js";
 
 const getRGRow = (d: any, i: number) => {
     const player = d.top_scorers[i];
@@ -10,36 +11,6 @@ const getRGRow = (d: any, i: number) => {
     );
     return { player, game };
 };
-
-export type recentGameTopScorer = {
-    player_id: number,
-    team_id: number,
-    player: string,
-    league: "NBA" | "WNBA",
-    points: number, 
-    assists: number, 
-    rebounds: number,
-};
-
-export type recentGame = {
-    game_id: number,
-    team_id: number,
-    player_id: number,
-    player: string,
-    league: "NBA" | "WNBA",
-    team: string,
-    team_name: string,
-    game_date: string,
-    matchup: string,
-    wl: string,
-    points: number,
-    opp_points: number,
-};
-
-export type RGData = {
-    top_scorers: recentGameTopScorer[],
-    recent_games: recentGame[],
-}
 
 export async function getRGData(): Promise<RGData> {
     return await fetchJSON(`${base}/games/recent`);
@@ -110,18 +81,6 @@ export async function makeRgTopScorersTbl(numRows: number, data_in?: RGData): Pr
     foldedLog(`%cRgTopScorers table built successfully`, MSG);
 }
 
-export type scoringLeader = {
-    player_id: number,
-    player: string,
-    season: string,
-    team: string,
-    point: number,
-};
-
-export type LGData = {
-    nba: scoringLeader[];
-    wnba: scoringLeader[];
-}
 
 export async function getLGData(numRows: number): Promise<LGData> {
     return await fetchJSON(`${base}/league/scoring-leaders?num=${numRows}`);
@@ -178,23 +137,6 @@ export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
     }
     foldedLog(`%cLgTopScorers table built successfully`, MSG);
 }
-
-export type TeamRec = {
-    league: "NBA" | "WNBA",
-    season_id: number,
-    season: string,
-    season_desc: string,
-    team_id: number,
-    team: string,
-    team_long: string,
-    wins: number,
-    losses: number,
-};
-
-export type TRData = {
-    nba_team_records: TeamRec[];
-    wnba_team_records: TeamRec[];
-};
 
 export async function getTRData(): Promise<TRData> {
     return await fetchJSON(`${base}/teamrecs`);

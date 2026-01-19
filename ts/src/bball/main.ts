@@ -1,10 +1,11 @@
 import { buildOnLoadDash } from "./player.js";
 import { foldedLog, foldedErr, MSG_BOLD, SBL } from "../global.js";
 import { clearSearch, lgRadioBtns, loadSznOptions, loadTeamOptions,  } from "./inputs.js";
-import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl, getRGData, RGData } from "./tbls_onload.js";
+import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl, getRGData } from "./tbls_onload.js";
+import { RGData } from "./resp_types.js";
 import { rowsState, makeExpandTblBtns } from "./rowstate.js"
 import { submitPlayerSearch, randPlayerBtn, holdPlayerBtn, setup_jump_btns, setupExclusiveCheckboxes, clearSearchBtn } from "./listeners.js";
-import { makeLogoImgs } from "./img.js";
+import { fillImageDiv, makeLogoImgs } from "./img.js";
 
 // CALL ENTRYPOINT
 await LoadContent();

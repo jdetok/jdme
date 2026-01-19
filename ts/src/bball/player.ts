@@ -1,91 +1,8 @@
 import { base, scrollIntoBySize, MSG, foldedLog, MSG_BOLD, RED_BOLD, foldedErr, logResp } from "../global.js";
+import { fillImageDiv } from "./img.js";
 import { setPHold, getInputVals } from "./inputs.js";
-import { RGData } from "./tbls_onload.js";
+import { RGData, PlayerResp, PlayersResp, playerMeta } from "./resp_types.js";
 import { tblColHdrs, tblRowColHdrs } from "./tbls_resp.js";
-// html elements to fill
-const PLAYER_DASH_ELS = {
-    title: 'player_title', 
-    season: 'player_szn',
-    img: {
-        player: 'pl_img',
-        team: 'tm_img',
-    },
-    tables: {
-        total_boxstats: 'box',
-        avg_boxstats: 'avg-box',
-        shooting: 'shooting',
-        avg_shooting: 'avg-shooting',
-    },
-};
-
-export type shotTypeStats = {
-    made: number,
-    attempted: number,
-    percentage: string,
-}
-
-export type shootingStats = {
-    "field goals": shotTypeStats,
-    "three pointers": shotTypeStats,
-    "free throws": shotTypeStats,
-}
-
-export type boxStats = {
-    points: number,
-    assists: number,
-    rebounds: number,
-    steals: number,
-    blocks: number,
-}
-
-export type playerMeta = {
-    player_id: number,
-    team_id: number,
-    league: string,
-    season_id: number,
-    player: string,
-    team: string,
-    team_name: string,
-    season: string,
-    caption: string,
-    caption_short: string,
-    cap_box_tot: string,
-    cap_box_avg: string,
-    cap_shtg_tot: string,
-    cap_shtg_avg: string,
-    headshot_url: string,
-    team_logo_url: string,
-};
-
-export type statsGroup = {
-    box_stats: boxStats,
-    shooting: shootingStats,
-}
-
-export type playerPlaytime = {
-    games_played: number,
-    minutes: number,
-    minutes_pg: number,
-}
-
-export type PlayerResp = {
-    player_meta: playerMeta,
-    playtime: playerPlaytime,
-    totals: statsGroup,
-    per_game: statsGroup,
-}
-
-export type requestMeta = {
-    request: string,
-    requestedUrl: string,
-    errorsOccured: number,
-};
-
-export type PlayersResp = {
-    request_meta: requestMeta,
-    player: PlayerResp[],
-    error_string?: string,
-};
 
 export async function buildOnLoadDash(rgData: RGData) {
     try {
@@ -181,21 +98,38 @@ export async function fetchPlayer(base: string, player: string | number,
 export type TopScorer = RGData | null;
 
 // accept player dash data, build tables/fetch images and display on screen
-export async function buildPlayerDash(data: PlayerResp, ts: TopScorer, el = PLAYER_DASH_ELS): Promise<void> {
+export async function buildPlayerDash(data: PlayerResp, ts: TopScorer): Promise<void> {
     try {
-        await appendImg(data.player_meta.headshot_url, el.img.player);
-        await appendImg(data.player_meta.team_logo_url, el.img.team);
 
-        await respPlayerTitle(data.player_meta, el.title, ts);
-        await respPlayerInfo(data, el.season);
+        // await fillImageDiv({
+        //     el: 'dash_imgs',
+        //     imgs: [
+        //         {
+        //             url: data.player_meta.team_logo_url,
+        //             el: 'tm_img',
+        //             alt: `failed to load image for team ${data.player_meta.team}`,
+        //         },
+        //         {
+        //             url: data.player_meta.headshot_url,
+        //             el: 'pl_img',
+        //             alt: `failed to load image for player ${data.player_meta.player}`,
+        //         },
+        //     ]
+        // })
+
+        await appendImg(data.player_meta.headshot_url, 'pl_img');
+        await appendImg(data.player_meta.team_logo_url, 'tm_img');
+
+        await respPlayerTitle(data.player_meta, 'resp_ttl', ts);
+        await respPlayerInfo(data, 'resp_subttl');
 
         // box stat tables
-        await tblColHdrs(data.totals.box_stats, data.player_meta.cap_box_tot, el.tables.total_boxstats);
-        await tblColHdrs(data.per_game.box_stats, data.player_meta.cap_box_avg, el.tables.avg_boxstats);
+        await tblColHdrs(data.totals.box_stats, data.player_meta.cap_box_tot, 'box_tot');
+        await tblColHdrs(data.per_game.box_stats, data.player_meta.cap_box_avg, 'box_avg');
 
         // shooting stats tables
-        await tblRowColHdrs(data.totals.shooting, data.player_meta.cap_shtg_tot, 'shot type', el.tables.shooting);
-        await tblRowColHdrs(data.per_game.shooting, data.player_meta.cap_shtg_avg, 'shot type', el.tables.avg_shooting);
+        await tblRowColHdrs(data.totals.shooting, data.player_meta.cap_shtg_tot, 'shot type', 'stg_tot');
+        await tblRowColHdrs(data.per_game.shooting, data.player_meta.cap_shtg_avg, 'shot type', 'stg_avg');
     } catch (e) {
         foldedErr(`error building ${ts ? 'top scorer' : ''} player dash for ${data.player_meta.player}: ${e}`);
         return;

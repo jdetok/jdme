@@ -2,7 +2,7 @@ import { MSG, SBL, foldedLog } from "../global.js";
 import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
 import { makeLogoImgs } from "./img.js";
 const WINDOWSIZE = 700;
-const BIGWINDOW = 2000;
+const BIGWINDOW = 1400;
 const LARGEROWS = 25;
 let exBtnsInitComplete = false;
 // counter class for number of rows displayed per table

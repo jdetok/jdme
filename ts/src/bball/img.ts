@@ -1,8 +1,39 @@
 import { foldedLog, MSG } from "../global.js";
 
-export async function makeLogoImgs() {
-    const imgs = await createImages();
+export type image = {
+    el: string,
+    url: string,
+    alt?: string,
+};
 
+export type imageInDiv = {
+    url: string,
+    el?: string,
+    alt?: string,
+};
+
+export type imageDiv = {
+    el: string,
+    imgs: imageInDiv[],
+};
+
+export async function makeLogoImgs() {
+    const imgs = await fillImageDiv({
+        el: 'lg_imgs', imgs: [
+            {
+                url: 'https://cdn.nba.com/logos/leagues/logo-wnba.svg',
+                alt: 'could not load WNBA logo',
+            },
+            {
+                url: 'https://cdn.nba.com/logos/leagues/logo-nba.svg',
+                alt: 'could not load NBA logo',
+            },
+        ]
+    });
+    await normalizeImgHeights(imgs);
+}
+
+export async function normalizeImgHeights(imgs: HTMLImageElement[]): Promise<void> {
     const minHeight = Math.min(...imgs.map(img => img.getBoundingClientRect().height));
     foldedLog(`%cusing image height ${minHeight}px`, MSG);
     
@@ -16,29 +47,17 @@ export async function changeImgPxBoost(px: number, minHeight: number, imgs: HTML
     }
 }
 
-export async function newImg(url: string, elId: string): Promise<HTMLImageElement> {
-    const d = document.getElementById(elId);
-    if (!d) throw new Error(`couldnt' get response title element at ${elId}`);
-    const img = document.createElement('img');
-    d.textContent = '';
-    img.src = url;
-    img.alt = "image not found";
-    d.append(img);
-    return img;
-}
-
-export async function createImages(lgs = [
-    { el: 'wnba_img', url: 'https://cdn.nba.com/logos/leagues/logo-wnba.svg' },
-    { el: 'nba_img',  url: 'https://cdn.nba.com/logos/leagues/logo-nba.svg' },
-]): Promise<HTMLImageElement[]> {
-    const imgs: HTMLImageElement[] = []
-    for (const lg of lgs) {
-        const img = await newImg(lg.url, lg.el);
+export async function fillImageDiv(idiv: imageDiv): Promise<HTMLImageElement[]> {
+    const d = document.getElementById(idiv.el);
+    if (!d) throw new Error(`couldnt' get response title element at ${idiv.el}`);
+    d.innerHTML = '';
+    let imgs: HTMLImageElement[] = [];
+    for (const im of idiv.imgs) {
+        const img = document.createElement('img');
+        img.src = im.url;
+        img.alt = im.alt ?? 'image not found';
         imgs.push(img);
+        d.appendChild(img)
     }
-    // wait for all images to have real sizes
-    await Promise.all(imgs.map(img =>
-        img.complete ? Promise.resolve() : new Promise(r => img.onload = r)
-    ));
     return imgs;
 }
