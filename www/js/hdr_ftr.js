@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await mediaQueryMenuSizes(e);
     });
 });
-async function mediaQueryMenuSizes(e) {
+export async function mediaQueryMenuSizes(e) {
     foldedLog(`%csetting page headers for ${window.location.pathname}...`, MSG);
     const matches = e.matches ?? media_query.matches;
     foldedLog(`%cbuilding header`, MSG);

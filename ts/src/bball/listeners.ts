@@ -1,25 +1,61 @@
+import { RED_BOLD, errMsg, foldedErr, foldedLog } from "../global.js";
+import { fetchAndBuildPlayerDash } from "./player_dash.js";
+import { clearCheckBoxes, clearSearch } from "./inputs.js";
 
-import { searchPlayer } from "./player.js";
-import { clearSearch } from "./inputs.js";
-import { RED_BOLD, foldedLog } from "../global.js";
-
-export async function submitPlayerSearch(elId = 'ui') {
-    const frm = document.getElementById(elId) as HTMLFormElement;
-    if (!frm) throw new Error(`couldn't get element at Id ${elId}`);
-    frm.addEventListener('submit', async (e: SubmitEvent) => {
-        e.preventDefault();
-        await searchPlayer();
-    });
+export async function listenForInput(): Promise<void> {
+    await clearSearchBtn();
+    await submitPlayerSearch();
+    await randPlayerBtn();
+    await holdPlayerBtn(); 
 }
 
-// get a random player from the API and getPlayerStats
-export async function randPlayerBtn(elId = 'randP') {
-    const btn = document.getElementById(elId) as HTMLInputElement;
-    if (!btn) throw new Error(`couldn't get button element at id ${elId}`);
-    btn.addEventListener('click', async (e: Event) => {
-        e.preventDefault();
-        await searchPlayer('random');
-    });
+export async function setup_jump_btns() {
+    const btns = [{el: "jumptoresp", jumpTo: "player_title"}, {el: "jumptosearch", jumpTo: "ui"}]
+    for (const btn of btns) {
+        const btnEl = document.getElementById(btn.el);
+        if (btnEl) {
+            btnEl.addEventListener('click', async() => {
+                const jmpEl = document.getElementById(btn.jumpTo);
+                if (jmpEl) {
+                    jmpEl.scrollIntoView({behavior: "smooth", block: "start"});
+                }
+            })
+        }    
+    }
+}
+
+export type SznTmSelectors = {
+    szn_el: string,
+    szn: {
+        lbox: string, 
+        rbox: string,
+    },
+    tm_el: string,
+    tm: {
+        lbox: string,
+        rbox: string,
+    }
+}
+
+export async function setupExclusiveSelectorGroups(st: SznTmSelectors = {
+    szn_el: 'select_szns',
+    szn: {
+        lbox: 'post', 
+        rbox: 'reg',
+    },
+    tm_el: 'select_teams',
+    tm: {
+        lbox: 'nbaTm',
+        rbox: 'wnbaTm',
+    }
+}): Promise<void> {
+    // setup internal exclusive listeners
+    await setupExclusiveCheckboxes(st.szn.lbox, st.szn.rbox);
+    await setupExclusiveCheckboxes(st.tm.lbox, st.tm.rbox);
+    setupExclusiveGroups(
+        [st.szn.lbox, st.szn.rbox],
+        [st.tm.lbox, st.tm.rbox]
+    );
 }
 
 // make post + reg checkboxes exclusive (but allow neither checked)
@@ -39,7 +75,63 @@ export async function setupExclusiveCheckboxes(leftbox: string, rightbox: string
     rbox.addEventListener("change", handleCheck);
 }
 
-export async function clearSearchBtn(): Promise<void> {
+function setupExclusiveGroups(
+    groupA: string[],
+    groupB: string[]
+) {
+    const aEls = groupA
+        .map(id => document.getElementById(id) as HTMLInputElement | null)
+        .filter(Boolean) as HTMLInputElement[];
+
+    const bEls = groupB
+        .map(id => document.getElementById(id) as HTMLInputElement | null)
+        .filter(Boolean) as HTMLInputElement[];
+
+    if (!aEls.length || !bEls.length) {
+        throw new Error("could not resolve checkbox groups");
+    }
+
+    function clearGroup(group: HTMLInputElement[]) {
+        group.forEach(cb => (cb.checked = false));
+    }
+
+    aEls.forEach(cb =>
+        cb.addEventListener("change", () => {
+            if (cb.checked) clearGroup(bEls);
+        })
+    );
+
+    bEls.forEach(cb =>
+        cb.addEventListener("change", () => {
+            if (cb.checked) clearGroup(aEls);
+        })
+    );
+}
+
+async function submitPlayerSearch(elId = 'ui') {
+    const frm = document.getElementById(elId) as HTMLFormElement;
+    if (!frm) throw new Error(`couldn't get element at Id ${elId}`);
+    frm.addEventListener('submit', async (e: SubmitEvent) => {
+        e.preventDefault();
+        await fetchAndBuildPlayerDash();
+    });
+}
+
+// get a random player from the API and getPlayerStats
+async function randPlayerBtn(elId = 'randP') {
+    const btn = document.getElementById(elId) as HTMLInputElement;
+    if (!btn) throw new Error(`couldn't get button element at id ${elId}`);
+    btn.addEventListener('click', async (e: Event) => {
+        e.preventDefault();
+        try {
+            await fetchAndBuildPlayerDash('random');
+        } catch (e) {
+            foldedErr(`error getting random player: ${e}`);
+        }
+    });
+}
+
+async function clearSearchBtn(): Promise<void> {
     const btn = document.getElementById('clearS');
     if (!btn) return;
     btn.addEventListener('click', (event) => {
@@ -48,9 +140,8 @@ export async function clearSearchBtn(): Promise<void> {
     });
 }
 
-
 // BUTTONS SECTION
-export async function holdPlayerBtn(elId = 'holdP') {
+async function holdPlayerBtn(elId = 'holdP') {
     const btn = document.getElementById(elId);
     if (!btn) throw new Error(`couldn't get button element at ${elId}`);
     btn.addEventListener('click', async (event) => {
@@ -69,19 +160,4 @@ export async function holdPlayerBtn(elId = 'holdP') {
         let search = document.getElementById(searchElId) as HTMLInputElement;
         search.value = player;
     })
-}
-
-export async function setup_jump_btns() {
-    const btns = [{el: "jumptoresp", jumpTo: "player_title"}, {el: "jumptosearch", jumpTo: "ui"}]
-    for (const btn of btns) {
-        const btnEl = document.getElementById(btn.el);
-        if (btnEl) {
-            btnEl.addEventListener('click', async() => {
-                const jmpEl = document.getElementById(btn.jumpTo);
-                if (jmpEl) {
-                    jmpEl.scrollIntoView({behavior: "smooth", block: "start"});
-                }
-            })
-        }    
-    }
 }

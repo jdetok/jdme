@@ -1,12 +1,7 @@
-import { MSG, SBL, foldedLog } from "../global.js";
-import { makeLgTopScorersTbl, makeRgTopScorersTbl, makeTeamRecordsTbl } from "./tbls_onload.js";
-import { makeLogoImgs } from "./img.js";
-const WINDOWSIZE = 700;
-const BIGWINDOW = 2000;
-const LARGEROWS = 25;
-let exBtnsInitComplete = false;
+import { MSG, SBL, foldedLog, WINDOWSIZE, BIGWINDOW, LARGEROWS } from "../global.js";
+import { rebuildContent } from "./onload.js";
 // counter class for number of rows displayed per table
-class rowNum {
+export class rowNum {
     val;
     minR;
     maxR;
@@ -68,9 +63,7 @@ export class rowsState {
     startRows;
     rgData;
     constructor(rgData, winSize = WINDOWSIZE, bigWinSize = BIGWINDOW) {
-        // this.max = max;
         let rgRows = rgData?.top_scorers?.length ?? 30;
-        // let rgRows = 30;
         this.startRows = window.innerWidth <= winSize ? 5 : 10;
         if (window.innerWidth >= bigWinSize) {
             this.lgRowNum = new rowNum(this.lgRowLarge);
@@ -105,70 +98,7 @@ export class rowsState {
     }
     async handleMediaQueries() {
         this.resetRows();
-        await Promise.all([
-            makeLogoImgs(),
-            makeTeamRecordsTbl(this.trRowNum.value),
-            makeLgTopScorersTbl(this.lgRowNum.value),
-            makeRgTopScorersTbl(this.rgRowNum.value, this.rgData),
-        ]);
-    }
-}
-;
-export async function makeExpandTblBtns(rs, tblBtns = [
-    { elId: "seemorelessLGbtns", rows: rs.lgRowNum, build: makeLgTopScorersTbl },
-    { elId: "seemorelessRGbtns", rows: rs.rgRowNum, build: makeRgTopScorersTbl },
-    { elId: "seemorelessTRbtns", rows: rs.trRowNum, build: makeTeamRecordsTbl },
-]) {
-    if (exBtnsInitComplete)
-        return;
-    exBtnsInitComplete = true;
-    for (let etb of tblBtns) {
-        const d = document.getElementById(etb.elId);
-        if (!d)
-            continue;
-        let to_append = [];
-        for (const obj of [
-            { op: 'all', lbl: 'see all' },
-            { op: '+', lbl: 'see more' },
-            { op: '-', lbl: 'see less' },
-            { op: 'rst', lbl: 'reset' },
-            { op: 'min', lbl: 'minimize' }
-        ]) {
-            let newNum;
-            const btn = document.createElement('button');
-            btn.textContent = obj.lbl;
-            btn.addEventListener('click', async () => {
-                switch (obj.op) {
-                    case 'all':
-                        newNum = etb.rows.max();
-                        break;
-                    case 'min':
-                        newNum = etb.rows.min();
-                        break;
-                    case '+':
-                        newNum = etb.rows.increase();
-                        break;
-                    case '-':
-                        newNum = etb.rows.decrease();
-                        break;
-                    case 'rst':
-                        if (etb.elId === 'seemorelessLGbtns' && window.innerWidth >= BIGWINDOW) {
-                            newNum = etb.rows.reset(LARGEROWS);
-                        }
-                        else {
-                            newNum = etb.rows.reset();
-                        }
-                        break;
-                    default:
-                        throw new Error(`invalid case: ${obj.op} | ${obj.lbl}`);
-                }
-                await etb.build(newNum);
-            });
-            to_append.push(btn);
-        }
-        for (const b of to_append) {
-            d.appendChild(b);
-        }
+        await rebuildContent(this.trRowNum.value, this.lgRowNum.value, this.rgRowNum.value, this.rgData);
     }
 }
 ;

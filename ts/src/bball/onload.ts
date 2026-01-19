@@ -1,7 +1,139 @@
-
+import { NBA_WNBA_LOGO_IMGS, fillImageDiv, normalizeImgHeights } from "./elements.js";
+import { base, fetchJSON, foldedLog, SBL, MSG, BIGWINDOW, LARGEROWS, wsize } from "../global.js";
 import { Tbl } from "./tbl.js";
-import { searchPlayer } from "./player.js";
-import { base, fetchJSON, foldedLog, RED_BOLD, SBL, MSG, foldedErr } from "../global.js";
+import { RGData, LGData, TRData } from "./resp_types.js";
+import { fetchAndBuildPlayerDash } from "./player_dash.js";
+import { clearSearch, lgRadioBtns, loadSznOptions, loadTeamOptions,  } from "./inputs.js";
+import { rowsState, rowNum } from "./rowstate.js";
+import { listenForInput, setup_jump_btns, setupExclusiveCheckboxes, setupExclusiveSelectorGroups } from "./listeners.js";
+
+let exBtnsInitComplete = false;
+
+export async function initUIElements(rs: rowsState): Promise<void> {
+    foldedLog(`%csetting up UI elements...`, SBL);
+    try {
+        clearSearch();
+        await lgRadioBtns();
+        await setup_jump_btns();
+        await makeExpandTblBtns(rs);
+        await setupExclusiveSelectorGroups();
+        await loadSznOptions();
+        await loadTeamOptions();
+    } catch (e) {
+        throw new Error(`error occured building UI elements: ${e}`);
+    }
+}
+
+export async function initEventListeners(): Promise<void> {
+    foldedLog(`%csetting up event listeners...`, SBL);
+    try {
+        return await listenForInput();
+    } catch (e) {
+        throw new Error(`error occured setting up event listeners: ${e}`);
+    }
+}
+
+export async function buildOnLoadContent(rs: rowsState, rg: RGData): Promise<void> {
+    foldedLog(`%cbuilding tables with games data through ${rg.recent_games[0].game_date}...`, SBL);
+    try {
+        await makeLogoImgs();
+        await makeLgTopScorersTbl(rs.lgRowNum.value);
+        await makeRgTopScorersTbl(rs.rgRowNum.value, rg);
+        await makeTeamRecordsTbl(rs.startRows);
+        await buildOnLoadDash(rg);
+    } catch (e) {
+        throw new Error(`error occured setting up event listeners: ${e}`);
+    }
+}
+
+async function makeLogoImgs() {
+    const imgs = await fillImageDiv(NBA_WNBA_LOGO_IMGS);
+    await normalizeImgHeights(imgs);
+}
+
+// used for reloads on resize
+export async function rebuildContent(tr_rows: number, lg_rows: number, rg_rows: number, rgData?: RGData): Promise<any> {
+    // const wsize = `W:${window.innerWidth}px X H:${window.innerHeight}px`;
+    foldedLog(`%cmedia query listener called for page size ${wsize()}... `, SBL);
+    return await Promise.all([
+        makeLogoImgs(),
+        makeTeamRecordsTbl(tr_rows),
+        makeLgTopScorersTbl(lg_rows),
+        makeRgTopScorersTbl(rg_rows, rgData),]
+    );
+}
+
+async function buildOnLoadDash(rgData: RGData) {
+    try {
+        await fetchAndBuildPlayerDash('onload', null, rgData);
+    } catch (e) {
+        throw new Error(`error building onload dash: ${e}`);
+    }
+}
+
+type expandTblBtns = {
+    elId: string, 
+    rows: rowNum, 
+    build: (numRows: number) => Promise<void>
+}
+
+export async function makeExpandTblBtns(rs: rowsState, tblBtns: expandTblBtns[] = [
+    {elId: "seemorelessLGbtns", rows: rs.lgRowNum, build: makeLgTopScorersTbl},
+    {elId: "seemorelessRGbtns", rows: rs.rgRowNum, build: makeRgTopScorersTbl},
+    {elId: "seemorelessTRbtns", rows: rs.trRowNum, build: makeTeamRecordsTbl},
+]) {
+    if (exBtnsInitComplete) return;
+    exBtnsInitComplete = true;
+    for (let etb of tblBtns) {
+        const d = document.getElementById(etb.elId);
+        if (!d) continue;
+        
+        let to_append: HTMLButtonElement[] = [];
+        for (const obj of [
+            { op: 'all', lbl: 'see all' },
+            { op: '+', lbl: 'see more' },
+            { op: '-', lbl: 'see less' },
+            { op: 'rst', lbl: 'reset' },
+            { op: 'min', lbl: 'minimize' }
+        ]) {
+            let newNum: number;
+            
+            const btn = document.createElement('button');
+            btn.textContent = obj.lbl;
+            btn.addEventListener('click', async () => {
+                switch (obj.op) {
+                    case 'all':
+                        newNum = etb.rows.max();
+                        break;
+                    case 'min':
+                        newNum = etb.rows.min();
+                        break;
+                    case '+':
+                        newNum = etb.rows.increase();
+                        break;
+                    case '-':
+                        newNum = etb.rows.decrease();
+                        break;
+                    case 'rst':
+                        if (etb.elId === 'seemorelessLGbtns' && window.innerWidth >= BIGWINDOW) {
+                            newNum = etb.rows.reset(LARGEROWS);
+                        } else {
+                            newNum = etb.rows.reset();
+                        }
+                        break;
+                    default:
+                        throw new Error(`invalid case: ${obj.op} | ${obj.lbl}`)
+                }
+                await etb.build(newNum);
+            });
+            to_append.push(btn);
+        }
+        for (const b of to_append) {
+            d.appendChild(b);
+        }
+        
+    }
+};
 
 const getRGRow = (d: any, i: number) => {
     const player = d.top_scorers[i];
@@ -11,43 +143,13 @@ const getRGRow = (d: any, i: number) => {
     return { player, game };
 };
 
-export type recentGameTopScorer = {
-    player_id: number,
-    team_id: number,
-    player: string,
-    league: "NBA" | "WNBA",
-    points: number, 
-    assists: number, 
-    rebounds: number,
-};
-
-export type recentGame = {
-    game_id: number,
-    team_id: number,
-    player_id: number,
-    player: string,
-    league: "NBA" | "WNBA",
-    team: string,
-    team_name: string,
-    game_date: string,
-    matchup: string,
-    wl: string,
-    points: number,
-    opp_points: number,
-};
-
-export type RGData = {
-    top_scorers: recentGameTopScorer[],
-    recent_games: recentGame[],
-}
-
 export async function getRGData(): Promise<RGData> {
     return await fetchJSON(`${base}/games/recent`);
 }
 
 // top scorers from most recent day of games
 // data called on content load and passed through here to have max number of entries for row state
-export async function makeRgTopScorersTbl(numRows: number, data_in?: RGData): Promise<void> {
+async function makeRgTopScorersTbl(numRows: number, data_in?: RGData): Promise<void> {
     foldedLog(`%cattempting to build RgTopScorers table...`, SBL);
     let data: RGData;
     try {
@@ -84,7 +186,7 @@ export async function makeRgTopScorersTbl(numRows: number, data_in?: RGData): Pr
 
                 },
                 button: {
-                    onClick: async (v) => searchPlayer('button', v.split(" | ")[0]),
+                    onClick: async (v) => fetchAndBuildPlayerDash('button', v.split(" | ")[0]),
                 },
             }, {
                 header: 'matchup',
@@ -110,25 +212,13 @@ export async function makeRgTopScorersTbl(numRows: number, data_in?: RGData): Pr
     foldedLog(`%cRgTopScorers table built successfully`, MSG);
 }
 
-export type scoringLeader = {
-    player_id: number,
-    player: string,
-    season: string,
-    team: string,
-    point: number,
-};
 
-export type LGData = {
-    nba: scoringLeader[];
-    wnba: scoringLeader[];
-}
-
-export async function getLGData(numRows: number): Promise<LGData> {
+async function getLGData(numRows: number): Promise<LGData> {
     return await fetchJSON(`${base}/league/scoring-leaders?num=${numRows}`);
 }
 
 // top scorers in the current season
-export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
+async function makeLgTopScorersTbl(numRows: number): Promise<void> {
     foldedLog(`%cattempting to build LgTopScorers table...`, SBL);
 
     let data: LGData;
@@ -153,7 +243,7 @@ export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
                     header: `nba | ${data.nba[0].season}`, 
                     value: (d, i) => `${d.nba[i].player}`,
                     button: {
-                        onClick: async (v) => searchPlayer('button', v.split(" | ")[0]),
+                        onClick: async (v) => fetchAndBuildPlayerDash('button', v.split(" | ")[0]),
                     }
                 },
                 {
@@ -164,7 +254,7 @@ export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
                     header: `wnba | ${data.wnba[0].season}`,
                     value: (d: any, i) => `${d.wnba[i].player} | ${d.wnba[i].team}`,
                     button: {
-                        onClick: async (v) => searchPlayer('button',v.split(" | ")[0]),
+                        onClick: async (v) => fetchAndBuildPlayerDash('button',v.split(" | ")[0]),
                     },
                 },
                 {
@@ -179,29 +269,12 @@ export async function makeLgTopScorersTbl(numRows: number): Promise<void> {
     foldedLog(`%cLgTopScorers table built successfully`, MSG);
 }
 
-export type TeamRec = {
-    league: "NBA" | "WNBA",
-    season_id: number,
-    season: string,
-    season_desc: string,
-    team_id: number,
-    team: string,
-    team_long: string,
-    wins: number,
-    losses: number,
-};
-
-export type TRData = {
-    nba_team_records: TeamRec[];
-    wnba_team_records: TeamRec[];
-};
-
-export async function getTRData(): Promise<TRData> {
+async function getTRData(): Promise<TRData> {
     return await fetchJSON(`${base}/teamrecs`);
 }
 
 
-export async function makeTeamRecordsTbl(numRows: number): Promise<void> {
+async function makeTeamRecordsTbl(numRows: number): Promise<void> {
     foldedLog(`%cattempting to build TeamRecs table...`, SBL);
     
     let data: TRData;

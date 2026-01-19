@@ -58,6 +58,7 @@ var AllSeasons = `
 select szn_id, szn_desc, wszn_desc
 from lg.szn	
 where left(cast(szn_id as varchar(5)), 1) in ('2', '4', '9')
+and right(cast(szn_id as varchar(5)), 4) != '9999'
 order by right(cast(szn_id as varchar(5)), 4) desc, 
 left(cast(szn_id as varchar(5)), 1)	
 `

@@ -10,6 +10,7 @@
     't . r'
     't jumpbtns r'
     't m r'
+    't err r'
     't . r'
     '. . r'
     'resp resp resp'
@@ -31,10 +32,7 @@
     justify-content: center;
     padding: 10px;
 }
-#lg_imgs > div {
-    height: min-content;
-    width: fit-content;
-}
+
 /* ERROR MESSAGE */
 .err {
     display: none;
@@ -224,7 +222,7 @@ select {
     width: 100%;
 } 
 
-.resptitle {
+#resp_ttl {
     grid-column: 1 / -1;
     color: rgb(232, 225, 235);
     font-size: 40px;
@@ -254,18 +252,14 @@ select {
 } 
 
 /* div and img both necessary for player/team images! */
-.respimgs {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+#dash_imgs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     width: 100%;
+    align-items: center;
 }
 
-.respimgs div {
-    width: 50%;
-}
-
-.respimgs img {
+#dash_imgs img {
     width: 100%;
 }
 
@@ -279,8 +273,12 @@ select {
     height: inherit;
 }
 
+#errmsg {
+    display: none;
+    grid-area: err;
+}
+
 .btm {
     margin-top:35px;
-    /* font-size: 16px; */
     color: rgb(236, 237, 255);
 }

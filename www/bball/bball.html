@@ -22,35 +22,42 @@
     <div id="site_title">
       jdeko.me/bball<br>nba/wnba statistics
     </div>
-    <div class="respimgs" id="lg_imgs">
-      <div id="nba_img"></div>
-      <div id="wnba_img"></div>
-    </div>
+    
+    <div id="errmsg"></div>
+
+    <div id="lg_imgs"></div>
+    
     <div id="disclaimer"><i>no affiliation with the nba/wnba - this site is for educational purposes only</i></div>
+    
     <div class="btnshoriz" id="mobilebtns">
       <button id="jumptoresp">jump to current player</button>
       <button id="jumptosearch">jump to player search</button>
     </div>
+    
     <!-- TOP SCORERS FROM RECENTS GAMES TABLE -->
     <div class="tablewithbtns" id="top_players">
       <table class="ranktbl" id="tstbl"></table>
       <div class="btnshoriz" id="seemorelessRGbtns"></div>
     </div>
+
     <!-- TEAM RECORDS TABLE -->
     <div class="tablewithbtns" id="team_recs_tbl">
       <table class="ranktbl" id="trtbl"></table>
       <div class="btnshoriz" id="seemorelessTRbtns"></div>
     </div>
+
     <!-- LEAGUE/SEASON LEADING SCORERS TABLE -->
     <div class="tablewithbtns" id="top_lg_players">
       <table class="ranktbl" id="nba_tstbl"></table>
       <div class="btnshoriz" id="seemorelessLGbtns"></div>
     </div>
+
     <!-- UI FORM WITH SELECTORS/INPUTS -->
     <form id="ui">
+      
       <!-- SEASON SELECTORS -->
       <div class="uirowouter" id="select_szns"> 
-        <div class="uiopt" id="psdiv">
+        <div style="display: none" class="uiopt" id="psdiv">
           <label for="post">post-seasons:</label>
           <div class="uiel"> 
             <select id="ps_slct"></select>
@@ -65,6 +72,7 @@
           </div>
         </div>
       </div>
+
       <!-- TEAM SELECTORS -->
       <div class="uirowouter" id="select_teams"> 
         <div class="uiopt" id="teams"> 
@@ -82,6 +90,7 @@
           </div>
         </div>
       </div> 
+
       <!-- LEAGUE RADIO BUTTONS (NBA | WNBA | BOTH) -->
       <div id="lg_radio_btns"> 
         <input type="radio" id="nba" name="leagues" value="nba" />
@@ -91,6 +100,7 @@
         <input type="radio" id="all_lgs" name="leagues" value="all" />
         <label for="all_lgs">Both</label>
       </div>
+
       <!-- CLUSTER OF PLAYER INPUT BOX, SEARCH BUTTONS -->
       <div id="searchplayer">
         <div class="err" id="sErr"></div>
@@ -98,36 +108,39 @@
         <input type="text" id="pSearch" placeholder="Search for a player">
         <button type="submit" id="search">search player</button>
       </div>
+
       <!-- SEARCH PLAYER BUTTON | HOLD PLAYER BUTTON -->
       <div class="uiel">
         <button type="button" id="clearS">clear search</button>          
         <button type="button" id="holdP">hold current player</button>
       </div>
+
       <!-- RANDOM PLAYER BUTTON -->
       <div class="uiel">
         <button type="button" id="randP">search for a random player</button>
       </div>
+
     </form>
-  <!-- RESPONSE -->
+
+    <!-- RESPONSE -->
     <div class="response">
-      <div class="resptitle" id="player_title"></div>
+      <div id="resp_ttl"></div>
       <!-- PLAYER/TEAM IMAGES FROM RESPONSE -->
       <div class="respsect">
-        <div id="player_szn"></div>
-        <div class="respimgs" id="imgs">
-          <div id="tm_img"></div>
-          <div id="pl_img"></div>
-        </div>
+        <div id="resp_subttl"></div>
+        <div id="dash_imgs"></div>
       </div>
+
       <!-- STATS TABLES FROM RESPONSE  -->
       <div class="resptbls" id="stats">
-        <div class="resptbl" id="box"></div>
-        <div class="resptbl" id="avg-box"></div>
-        <div class="resptbl" id="shooting"></div>
-        <div class="resptbl" id="avg-shooting"></div>
+        <div class="resptbl" id="box_tot"></div>
+        <div class="resptbl" id="box_avg"></div>
+        <div class="resptbl" id="stg_tot"></div>
+        <div class="resptbl" id="stg_avg"></div>
       </div>
     </div>
   </div> 
+
   <!-- DISCLAIMER AT BOTTOM -->
   <div class="btm">
     <i>there may be small inconsitencies with statistics at nba.com -- 
@@ -136,7 +149,9 @@
       source of nba/wnba data
     </i>
   </div>
+  
   <a target="_blank" href="https://www.nba.com/stats">ALL DATA OWNED BY THE NBA/WNBA</a>
+
 </body>
 <footer id="ftr"></footer>
 </html>

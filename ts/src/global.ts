@@ -4,12 +4,19 @@ export const base = "https://jdeko.me/bball";
 export const homeurl = "https://jdeko.me/";
 export const checkBoxEls = ['post', 'reg', 'nbaTm', 'wnbaTm'] as string[];
 
+
+export const WINDOWSIZE = 700;
+export const BIGWINDOW = 1400;
+export const LARGEROWS = 25;
+
 export const mediaQueryBreak = 850;
 
 export const MSG = `color: mediumseagreen;`
 export const SBL = `color: skyblue;`
 export const MSG_BOLD = `color: mediumseagreen; font-weight: bold;`
 export const RED_BOLD = 'color: red; font-weight: bold;'
+
+export const wsize = (): string => { return `W:${window.innerWidth}px X H:${window.innerHeight}px` }
 
 export async function bytes_in_resp(r: Response): Promise<number> {
     const buf = await r.clone().arrayBuffer();
@@ -35,7 +42,7 @@ export function foldedLog(...args: any[]): void {
 }
 
 export async function logResp(url: string, r: Response) {
-    console.groupCollapsed(`%crequesting ${url}...`, SBL);
+    console.groupCollapsed(`%crequesting '${url}'...`, SBL);
     console.trace();
     console.log(`%c${await bytes_in_resp(r)} bytes received from ${url}}`, MSG);
     console.groupEnd();
@@ -70,4 +77,18 @@ export async function fetchJSON(url: string): Promise<any> {
     
     await logResp(url, r);
     return await r.json()
+}
+
+export async function errMsg(msg: string, el_id = 'errmsg'): Promise<void> { 
+    const el = document.getElementById(el_id);
+    if (!el) throw new Error(`can't find element with id ${el_id}`)
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+export async function hideErr(el_id = 'errmsg'): Promise<void> {
+    const el = document.getElementById(el_id);
+    if (!el) throw new Error(`can't find element with id ${el_id}`)
+    el.textContent = '';
+    el.style.display = 'none';
 }
