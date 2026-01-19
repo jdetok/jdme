@@ -14,6 +14,7 @@
             'l'
             'r'
             'm'
+            'err'
             'resp';
         justify-items: center;
     }
@@ -47,14 +48,4 @@
         flex-direction: column;
     }
 
-    /* body {
-        font-size: 14px;
-    } */
-    
 }
-
-/* @media (max-width: 800px) {
-    body {
-        font-size: 12px;
-    }
-} */
