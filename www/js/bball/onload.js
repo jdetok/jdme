@@ -48,7 +48,6 @@ async function makeLogoImgs() {
 }
 // used for reloads on resize
 export async function rebuildContent(tr_rows, lg_rows, rg_rows, rgData) {
-    // const wsize = `W:${window.innerWidth}px X H:${window.innerHeight}px`;
     foldedLog(`%cmedia query listener called for page size ${wsize()}... `, SBL);
     return await Promise.all([
         makeLogoImgs(),
