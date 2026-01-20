@@ -53,14 +53,13 @@ async function makeLogoImgs() {
 
 // used for reloads on resize
 export async function rebuildContent(tr_rows: number, lg_rows: number, rg_rows: number, rgData?: RGData): Promise<any> {
-    // const wsize = `W:${window.innerWidth}px X H:${window.innerHeight}px`;
     foldedLog(`%cmedia query listener called for page size ${wsize()}... `, SBL);
     return await Promise.all([
         makeLogoImgs(),
         makeTeamRecordsTbl(tr_rows),
         makeLgTopScorersTbl(lg_rows),
-        makeRgTopScorersTbl(rg_rows, rgData),]
-    );
+        makeRgTopScorersTbl(rg_rows, rgData),
+    ]);
 }
 
 async function buildOnLoadDash(rgData: RGData) {

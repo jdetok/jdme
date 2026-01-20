@@ -8,7 +8,7 @@ export async function listenForInput() {
     await holdPlayerBtn();
 }
 export async function setup_jump_btns() {
-    const btns = [{ el: "jumptoresp", jumpTo: "player_title" }, { el: "jumptosearch", jumpTo: "ui" }];
+    const btns = [{ el: "jumptoresp", jumpTo: "resp_subttl" }, { el: "jumptosearch", jumpTo: "ui" }];
     for (const btn of btns) {
         const btnEl = document.getElementById(btn.el);
         if (btnEl) {
