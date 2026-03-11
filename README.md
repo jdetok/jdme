@@ -21,8 +21,8 @@ a custom-designed postgres database stores the nba/wnba data returned by the API
 
 # Frontend (HTML/CSS/JavaScript)
 the site's frontend is written using only pure HTML/CSS/Javascript. all static files are served from /static by the handlers in /api/static.go. /static/bball are the current production files that serve jdeko.me/bball
-![Alt Text](https://jdeko.me/img/jdekome_ex_011326.png "main example")
-![Alt Text](https://jdeko.me/img/bball_ex_011326.png "/bball example")
+![main page example](https://jdeko.me/img/jdekome_ex_011326.png "main example")
+![bball page example](https://jdeko.me/img/bam.png "/bball example")
 
 # Architecture
 ![dgm](/z_docs/arch.png)
