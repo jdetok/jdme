@@ -98,7 +98,7 @@ services:
       - appdata:/app/persist
 
   pgis: 
-    container_name: postgis
+    container_name: pgis
     image: mrp-postgis
     build:
         context: .
@@ -112,7 +112,7 @@ services:
     volumes: 
         - postgis_data:/var/lib/postgresql
         - ./dkr/mrp/initdb:/docker-entrypoint-initdb.d:ro
-        - ./dkr/mrp/initdb/gis_260315_163732.dump:/dump/db.dump
+        - ./dkr/mrp/gis_260315_163733.dump:/dump/db.dump
         - ./dkr/mrp/postgresql.conf:/etc/postgresql/postgresql.conf:ro
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
