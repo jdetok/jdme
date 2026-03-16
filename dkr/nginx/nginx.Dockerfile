@@ -14,6 +14,23 @@ ARG REPO_REF=main
 
 RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /site
 
+FROM node:current-alpine AS mrpbuild
+RUN apk add --no-cache git 
+
+ARG REPO_URL=https://github.com/jdetok/stl-transit.git
+ARG REPO_REF=main
+
+RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /app
+
+WORKDIR /app
+
+# COPY package.json tsconfig.json vite.config.ts ./
+RUN npm i
+
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+RUN npm run build
+
 FROM node:20-alpine AS tsbuild
 
 RUN mkdir -p www/js/bball
@@ -34,13 +51,14 @@ COPY dkr/nginx/.htpasswd /etc/nginx/.htpasswd
 RUN chmod 644 /etc/nginx/.htpasswd
 
 RUN apk add --no-cache curl \
- && mkdir -p /etc/nginx /var/www /var/resume \
+ && mkdir -p /etc/nginx /var/www /var/resume /var/mrp \
  && touch /var/log/nginx/nginx.log /var/log/nginx/err.log \
  && chmod 644 /etc/nginx/.htpasswd
 
 # COPY www /var/www
 COPY --from=fetch /site/public /var/resume
 COPY --from=tsbuild /src/www/js /var/www/js
+COPY --from=mrpbuild /app/www /var/mrp
 COPY --from=imgopt /img /var/www/img
 
 RUN touch /var/log/nginx/nginx.log /var/log/nginx/err.log \

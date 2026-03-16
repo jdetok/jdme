@@ -22,3 +22,4 @@ dkr/cloudflare/**/*.json
 dkr/cloudflare/**/*.pem
 archive/
 node_modules/
+*.dump
