@@ -15,19 +15,18 @@ ARG REPO_REF=main
 RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /site
 
 FROM node:current-alpine AS mrpbuild
-RUN apk add --no-cache git 
-
-ARG REPO_URL=https://github.com/jdetok/stl-transit.git
-ARG REPO_REF=main
-
-RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /app
 
 WORKDIR /app
 
-# COPY package.json tsconfig.json vite.config.ts ./
+COPY ./stl-transit/package.json ./stl-transit/tsconfig.json ./stl-transit/vite.config.ts ./
+
 RUN npm i
 
 ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+COPY ./stl-transit/www/*.html www/
+COPY ./stl-transit/www/css/*.css www/css/
+COPY ./stl-transit/www/src/ www/src/
 
 RUN npm run build
 
@@ -58,7 +57,7 @@ RUN apk add --no-cache curl \
 # COPY www /var/www
 COPY --from=fetch /site/public /var/resume
 COPY --from=tsbuild /src/www/js /var/www/js
-COPY --from=mrpbuild /app/www /var/mrp
+COPY --from=mrpbuild /app/www/js /var/mrp/js
 COPY --from=imgopt /img /var/www/img
 
 RUN touch /var/log/nginx/nginx.log /var/log/nginx/err.log \
