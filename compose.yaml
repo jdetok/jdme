@@ -124,8 +124,8 @@ services:
         condition: service_healthy
     image: jdme-mrp
     build:
-      context: .
-      dockerfile: ./dkr/mrp/api.Dockerfile
+      context: ./stl-transit
+      dockerfile: Dockerfile
     networks:
       apinet:
       pgnet:

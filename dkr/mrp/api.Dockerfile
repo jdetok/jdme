@@ -1,6 +1,6 @@
 FROM golang:1.26-alpine
 
-RUN apk add --no-cache git 
+RUN apk add --no-cache git curl
 
 ARG REPO_URL=https://github.com/jdetok/stl-transit.git
 ARG REPO_REF=main

@@ -1,0 +1,3 @@
+[submodule "stl-transit"]
+	path = stl-transit
+	url = git@github.com:jdetok/stl-transit
