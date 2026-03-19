@@ -159,9 +159,9 @@ services:
       - proxylog:/var/log/nginx
       - www:/var/www
       - cvpublic:/var/hugocv
-      - ./stl-transit/www/index.html:/var/mrp/index.html
-      - ./stl-transit/www/about.html:/var/mrp/about.html
-      - ./stl-transit/www/css:/var/mrp/css
+      - ./stl-transit/www/index.html:/var/mrp/index.html:ro
+      - ./stl-transit/www/about.html:/var/mrp/about.html:ro
+      - ./stl-transit/www/css:/var/mrp/css:ro
       
   cloudflared:
     container_name: cf

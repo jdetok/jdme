@@ -14,6 +14,19 @@ ARG REPO_REF=main
 
 RUN git clone --depth 1 --branch ${REPO_REF} ${REPO_URL} /site
 
+FROM node:20-alpine AS tsbuild
+
+RUN mkdir -p www/js/bball
+
+WORKDIR /src
+
+COPY package.json package-lock.json tsconfig.json ./
+RUN npm ci
+
+COPY ts ./ts
+
+RUN npm run build
+
 FROM node:current-alpine AS mrpbuild
 
 WORKDIR /app
@@ -27,19 +40,6 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 COPY ./stl-transit/www/*.html www/
 COPY ./stl-transit/www/css/*.css www/css/
 COPY ./stl-transit/www/src/ www/src/
-
-RUN npm run build
-
-FROM node:20-alpine AS tsbuild
-
-RUN mkdir -p www/js/bball
-
-WORKDIR /src
-
-COPY package.json package-lock.json tsconfig.json ./
-RUN npm ci
-
-COPY ts ./ts
 
 RUN npm run build
 
