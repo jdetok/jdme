@@ -1,3 +1,6 @@
 [submodule "stl-transit"]
 	path = stl-transit
 	url = git@github.com:jdetok/stl-transit
+[submodule "resume"]
+	path = resume
+	url = git@github.com:jdetok/resume.git
