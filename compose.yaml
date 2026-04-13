@@ -164,7 +164,7 @@ services:
       - ./stl-transit/www/about.html:/var/mrp/about.html:ro
       - ./stl-transit/www/ccsc.html:/var/mrp/ccsc.html:ro
       - ./stl-transit/www/css:/var/mrp/css:ro
-      - ./stl-transit/www/js:/var/mrp/js:ro
+      # - ./stl-transit/www/js:/var/mrp/js:ro
       - ./stl-transit/www/img:/var/mrp/img:ro
       
   cloudflared:
