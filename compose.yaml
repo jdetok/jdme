@@ -135,6 +135,16 @@ services:
       - "9999:9999"
     restart: unless-stopped
 
+  uptime-kuma:
+      image: louislam/uptime-kuma:2
+      container_name: uptime-kuma
+      restart: unless-stopped
+      ports: 
+        - "3001:3001"
+      networks:
+        apinet:
+      volumes:
+        - uptime-kuma-data:/app/data
 # REVERSE PROXY
   nginx:
     container_name: nginx
@@ -157,6 +167,7 @@ services:
     volumes:
       - ./dkr/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./resume/public:/var/resume
+      - /home/jdeto/music:/var/music
       - proxylog:/var/log/nginx
       - www:/var/www
       - cvpublic:/var/hugocv
@@ -164,7 +175,6 @@ services:
       - ./stl-transit/www/about.html:/var/mrp/about.html:ro
       - ./stl-transit/www/ccsc.html:/var/mrp/ccsc.html:ro
       - ./stl-transit/www/css:/var/mrp/css:ro
-      # - ./stl-transit/www/js:/var/mrp/js:ro
       - ./stl-transit/www/img:/var/mrp/img:ro
       
   cloudflared:
@@ -234,3 +244,4 @@ volumes:
   cvsrc:
     name: cvsrc
   postgis_data:
+  uptime-kuma-data:

@@ -6,4 +6,6 @@ ingress:
     service: http://nginx:80
   - hostname: www.jdeko.me
     service: http://nginx:80
+  - hostname: uptime.jdeko.me
+    service: http://nginx:80
   - service: http_status:404
