@@ -34,3 +34,31 @@ h1 {
     color:rgb(226, 201, 165);
     font-size: 44px;
 }
+
+h2 {
+    color: rgb(219, 169, 123);
+    font-size: 30px;
+}
+
+.h2-1 {
+    color: rgb(217, 217, 217);
+}
+
+.h2-2 {
+    font-size: 36px;
+    margin: 0 auto;
+    text-decoration: underline;
+    margin-bottom: 1rem;
+    width: fit-content;
+}
+
+.projects {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.projects > * {
+    flex: 1 1 calc(33.333% - 14px);
+    box-sizing: border-box;
+}

@@ -23,3 +23,7 @@ dkr/cloudflare/**/*.pem
 archive/
 node_modules/
 *.dump
+*.aif
+*.mp3
+*.wav
+jdme-react/**/*.jpg
